@@ -1,0 +1,87 @@
+.shell {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--semantic-color-surface-bg);
+  padding-block: var(--primitives-spacing-5);
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+.shell::before {
+  content: none;
+}
+
+:global([data-theme='light']) .shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--primitives-color-purple-300),
+    var(--primitives-color-amber-300)
+  );
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.headerBand {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding-inline: var(--primitives-spacing-5);
+  margin-bottom: calc(
+    var(--primitives-spacing-12) + var(--primitives-spacing-6) + var(--primitives-spacing-1) * 0.5
+  );
+  animation: dashboardHeaderEnter 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes dashboardHeaderEnter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--primitives-spacing-10));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tooltipEnter {
+  animation: dashboardTooltipFade 360ms ease-out var(--dashboard-tooltip-enter-delay, 1330ms) both;
+}
+
+@keyframes dashboardTooltipFade {
+  from {
+    opacity: 0;
+    transform: translateY(var(--primitives-spacing-3));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headerBand,
+  .tooltipEnter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.cardStack {
+  position: relative;
+  z-index: 1;
+  width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-10) * 0.5);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitives-spacing-8);
+}

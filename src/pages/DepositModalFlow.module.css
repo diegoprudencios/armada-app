@@ -1,0 +1,54 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: auto;
+}
+
+.overlay::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--semantic-color-surface-bg);
+  opacity: 1;
+  animation: depositOverlayEnter 240ms ease-out both;
+}
+
+.overlayExiting::before {
+  animation: depositOverlayFadeOut var(--modal-overlay-exit-ms, 180ms) ease-out
+    var(--modal-overlay-exit-delay, 440ms) forwards;
+}
+
+@keyframes depositOverlayEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes depositOverlayFadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay::before {
+    animation: none;
+    opacity: 1;
+  }
+
+  .overlayExiting::before {
+    animation: none;
+    opacity: 0;
+  }
+}

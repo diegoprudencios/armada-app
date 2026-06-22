@@ -1,0 +1,242 @@
+/* Figma frame 383:12296 — DepositCard */
+.column {
+  width: 100%;
+  max-width: 434px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--primitives-spacing-8);
+}
+
+.title {
+  margin: 0;
+  padding-left: 36px;
+  font-family: var(--primitives-fontFamily-display), serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-3xl) * 1px);
+  line-height: 1.25;
+  letter-spacing: var(--primitives-letterSpacing-tight);
+  color: var(--semantic-color-text-primary);
+  text-align: center;
+}
+
+.card {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--primitives-spacing-10);
+  padding:
+    calc(var(--primitives-spacing-12) + var(--primitives-spacing-3))
+    var(--primitives-spacing-5)
+    var(--primitives-spacing-5)
+    var(--primitives-spacing-5);
+  background: var(--semantic-color-surface-default);
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+}
+
+.amountGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+}
+
+.tokenBadge {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tokenBadgeIcon {
+  flex-shrink: 0;
+  display: block;
+}
+
+.tokenBadgeIcon :global(svg) {
+  display: block;
+}
+
+.amountField {
+  display: flex;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  height: var(--primitives-spacing-10);
+}
+
+.amountInput {
+  width: auto;
+  min-width: 1ch;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: var(--primitives-spacing-10);
+  line-height: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  color: var(--semantic-color-text-primary);
+  outline: none;
+  field-sizing: content;
+}
+
+.amountInput::placeholder {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: var(--primitives-spacing-10);
+  color: color-mix(in srgb, var(--semantic-color-text-primary) 30%, transparent);
+}
+
+.cardFooter {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.feeReveal {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-top: 0;
+  transition:
+    max-height 200ms ease,
+    opacity 150ms ease,
+    margin-top 200ms ease;
+}
+
+.feeRevealOpen {
+  max-height: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
+  opacity: 1;
+  margin-top: var(--primitives-spacing-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feeReveal {
+    transition: none;
+  }
+}
+
+.bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: var(--primitives-spacing-5);
+  gap: var(--primitives-spacing-3);
+}
+
+.walletBalance {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  min-width: 0;
+  max-width: 88px;
+  height: var(--primitives-spacing-5);
+}
+
+.walletIcon {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+  flex-shrink: 0;
+  color: color-mix(in srgb, var(--semantic-color-text-primary) 38%, transparent);
+}
+
+.balanceText {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  color: var(--semantic-color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pctPills {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--primitives-spacing-1);
+  width: 182px;
+  flex-shrink: 0;
+  height: var(--primitives-spacing-5);
+}
+
+.pctPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--primitives-spacing-5);
+  padding: 0 var(--primitives-spacing-2);
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-default);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: transparent;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  color: var(--semantic-color-text-primary);
+  cursor: pointer;
+}
+
+.pctPill:hover {
+  background: var(--semantic-color-surface-hover);
+}
+
+.pctPill:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 0.5);
+}
+
+.feeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
+  padding-inline: var(--primitives-spacing-3);
+  border-radius: calc(var(--primitives-borderRadius-sm) * 1px + 1px);
+  background: var(--semantic-color-surface-bg);
+}
+
+.feeLabel,
+.feeValue {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: var(--semantic-component-button-primary-md-font-size);
+  color: var(--semantic-color-text-secondary);
+}
+
+.feeValue {
+  font-weight: var(--primitives-fontWeight-medium);
+  color: var(--semantic-color-text-primary);
+}
+
+.buttonRow {
+  display: flex;
+  gap: var(--primitives-spacing-3);
+  width: 100%;
+}
+
+.buttonRow > * {
+  flex: 1;
+  max-width: 211px;
+}
+
+/* Figma: disabled Review keeps enabled lavender fill at 20% node opacity — not Button's disabled palette. */
+.reviewBtn.btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  transform: none;
+  background: var(--semantic-component-button-primary-bg);
+  color: var(--semantic-component-button-primary-text);
+}

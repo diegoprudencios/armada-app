@@ -1,0 +1,40 @@
+---
+description: Armada App — design tokens, build, and styling conventions
+globs:
+  - "**/*.{tsx,ts,css,html}"
+alwaysApply: true
+---
+
+# Armada App
+
+## Required workflow
+
+1. **Read** `../armada-crowdfund/ARMADA_DESIGN_SYSTEM.md` before writing or editing UI.
+2. **Never hardcode** hex colors, raw `px` spacing/sizing, or font sizes — use CSS custom properties from `src/styles/tokens.css`.
+3. **Verify token names** in `src/styles/tokens.css` before using any `var(--…)`.
+4. **Run `npm run build`** before marking any task complete.
+
+## Tokens
+
+| File | Role |
+|------|------|
+| `src/tokens/armada-tokens.json` | Token Studio source (synced from armada-crowdfund) |
+| `src/styles/tokens.css` | Primitives + semantic colors (synced from armada-crowdfund) |
+| `src/styles/typography.css` | Composite typography classes (synced from armada-poc `@armada/ui`) |
+
+After token changes in sibling repos, run:
+
+```bash
+npm run tokens:sync
+```
+
+## Styling
+
+- CSS Modules per component (`Component.module.css`).
+- Prefer semantic tokens (`--semantic-*`); use primitives when no semantic alias exists.
+- Border radius and font-size primitives are unitless — wrap with `calc(var(--token) * 1px)`.
+
+## Dev
+
+- `npm run dev` → http://localhost:5177/
+- `npm run build` → `tsc && vite build`

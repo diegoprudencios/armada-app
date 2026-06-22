@@ -1,0 +1,102 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitives-spacing-8);
+  padding: var(--primitives-spacing-8);
+  background: var(--semantic-color-surface-bg);
+  color: var(--semantic-color-text-primary);
+}
+
+.header {
+  max-width: 36rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-4);
+}
+
+.eyebrow {
+  color: var(--semantic-color-text-lavender);
+}
+
+.title {
+  color: var(--semantic-color-text-primary);
+}
+
+.lead {
+  color: var(--semantic-color-text-secondary);
+}
+
+.card {
+  width: min(100%, 28rem);
+  padding: var(--primitives-spacing-6);
+  border-radius: calc(var(--semantic-borderRadius-card) * 1px);
+  border: 1px solid var(--semantic-color-border-default);
+  background: var(--semantic-color-surface-raised);
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-4);
+}
+
+.cardTitle {
+  color: var(--semantic-color-text-primary);
+}
+
+.cardBody {
+  color: var(--semantic-color-text-muted);
+}
+
+.code {
+  font-family: var(--primitives-fontFamily-mono), monospace;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  color: var(--semantic-color-text-secondary);
+}
+
+.swatchRow {
+  display: flex;
+  gap: var(--primitives-spacing-3);
+}
+
+.swatchLavender,
+.swatchAmber,
+.swatchSurface {
+  flex: 1;
+  height: var(--primitives-spacing-8);
+  border-radius: calc(var(--semantic-borderRadius-input) * 1px);
+  border: 1px solid var(--semantic-color-border-default);
+}
+
+.swatchLavender {
+  background: var(--semantic-color-brand-lavender);
+}
+
+.swatchAmber {
+  background: var(--semantic-color-brand-amber);
+}
+
+.swatchSurface {
+  background: var(--semantic-color-surface-default);
+}
+
+.themeToggle {
+  height: var(--semantic-component-button-primary-md-height);
+  padding: 0 var(--semantic-component-button-primary-md-padding-x);
+  border-radius: calc(var(--semantic-component-button-primary-md-radius) * 1px);
+  background: var(--semantic-component-button-primary-bg);
+  color: var(--semantic-component-button-primary-text);
+  font-size: calc(var(--primitives-fontSize-md) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  transition: background 0.15s ease;
+}
+
+.themeToggle:hover {
+  background: var(--semantic-component-button-primary-bg-hover);
+}
+
+.themeToggle:focus-visible {
+  outline: 2px solid var(--semantic-color-border-focus);
+  outline-offset: 2px;
+}

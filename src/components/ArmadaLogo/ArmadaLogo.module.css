@@ -1,0 +1,28 @@
+.fullWrap {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.fullWrap svg,
+.fullWrap img {
+  height: 100%;
+  width: auto;
+}
+
+/* Theme swap — scoped under .fullWrap so rules beat global `img, svg { display: block }`. */
+.fullWrap .fullDark {
+  display: block;
+}
+
+.fullWrap .fullLight {
+  display: none;
+}
+
+:global([data-theme='light']) .fullWrap .fullLight {
+  display: block;
+}
+
+:global([data-theme='light']) .fullWrap .fullDark {
+  display: none;
+}

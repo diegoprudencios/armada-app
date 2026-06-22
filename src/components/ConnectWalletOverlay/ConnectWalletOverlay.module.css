@@ -1,0 +1,48 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: auto;
+  background: var(--semantic-color-surface-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--primitives-spacing-5);
+  box-sizing: border-box;
+}
+
+.panel {
+  width: 100%;
+  max-width: 434px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-8);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-display), serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-3xl) * 1px);
+  line-height: 1.25;
+  letter-spacing: var(--primitives-letterSpacing-tight);
+  color: var(--semantic-color-text-primary);
+  text-align: center;
+}
+
+.subtitle {
+  margin: calc(var(--primitives-spacing-2) * -1) 0 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  line-height: var(--primitives-lineHeight-normal);
+  color: var(--semantic-color-text-secondary);
+  text-align: center;
+}
+
+.walletList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-3);
+  width: 100%;
+}

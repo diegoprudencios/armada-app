@@ -1,0 +1,41 @@
+/* Full viewport width with 20px horizontal inset — logo left, wallet right. */
+.header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--primitives-spacing-4);
+  min-height: var(--primitives-spacing-10);
+}
+
+.logo {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-width: 0;
+}
+
+.logoFull {
+  height: var(--primitives-spacing-8);
+  width: auto;
+  max-width: 100%;
+}
+
+.logoLight {
+  display: none;
+}
+
+:global([data-theme='light']) .logo .logoLight {
+  display: block;
+}
+
+:global([data-theme='light']) .logo .logoDark {
+  display: none;
+}
+
+.wallet {
+  flex: 0 0 auto;
+  margin-left: auto;
+}

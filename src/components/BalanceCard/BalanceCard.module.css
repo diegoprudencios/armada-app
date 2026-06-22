@@ -1,0 +1,307 @@
+.card {
+  width: 100%;
+  height: calc(var(--primitives-spacing-16) * 5);
+  background: color-mix(in srgb, var(--semantic-color-surface-default) 40%, transparent);
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+  position: relative;
+  padding: var(--primitives-spacing-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  animation: balanceCardEnter 480ms cubic-bezier(0.22, 1, 0.36, 1) 220ms both;
+}
+
+.cardBodyTop {
+  width: 100%;
+  display: flex;
+  justify-content: stretch;
+  opacity: 0;
+  animation: balanceTopRowEnter 360ms ease-out 480ms forwards;
+}
+
+.cardBodyBalance {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+@keyframes balanceTopRowEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes balanceTokenSequence {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--primitives-spacing-10));
+  }
+
+  42% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  42.01% {
+    opacity: 1;
+    transform: translateY(0) translateX(calc(var(--primitives-spacing-10) + var(--primitives-spacing-2)));
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+}
+
+@keyframes balanceAmountSequence {
+  0%,
+  42% {
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(calc(-1 * (var(--primitives-spacing-10) + var(--primitives-spacing-2))));
+  }
+
+  42.01% {
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(calc(-1 * (var(--primitives-spacing-10) + var(--primitives-spacing-2))));
+  }
+
+  100% {
+    max-width: 16ch;
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes actionButtonEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  48% {
+    opacity: 1;
+    transform: translateY(calc(var(--primitives-spacing-3) * -1));
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.topRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.iconBadge {
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--semantic-component-button-primary-text);
+}
+
+.brandBadge {
+  width: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
+  height: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
+  background: linear-gradient(
+    to bottom,
+    var(--semantic-component-button-gradient-default-from),
+    var(--semantic-component-button-gradient-default-to)
+  );
+  color: white;
+}
+
+.brandMark {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+}
+
+.eyeBadge {
+  width: var(--primitives-spacing-8);
+  height: var(--primitives-spacing-8);
+  background: color-mix(in srgb, var(--semantic-component-button-gradient-default-from) 20%, transparent);
+}
+
+.badgeIcon {
+  width: var(--primitives-spacing-4);
+  height: var(--primitives-spacing-4);
+}
+
+.label {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: var(--semantic-component-button-primary-sm-font-size);
+  font-weight: var(--primitives-fontWeight-medium);
+  letter-spacing: var(--primitives-letterSpacing-normal);
+  color: var(--semantic-color-text-muted);
+}
+
+@keyframes balanceCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--primitives-spacing-10));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.balanceRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.balanceCluster {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  height: var(--primitives-spacing-10);
+}
+
+.balanceCluster .tokenBadge {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  opacity: 0;
+  animation: balanceTokenSequence 920ms cubic-bezier(0.22, 1, 0.36, 1) 1280ms forwards;
+}
+
+.balanceCluster .balanceValue {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  animation: balanceAmountSequence 920ms cubic-bezier(0.22, 1, 0.36, 1) 1280ms forwards;
+}
+
+.tokenBadge {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.tokenBadgeIcon {
+  flex-shrink: 0;
+  display: block;
+}
+
+.tokenBadgeIcon :global(svg) {
+  display: block;
+}
+
+.balanceValue {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: var(--primitives-spacing-10);
+  font-weight: var(--primitives-fontWeight-medium);
+  color: var(--semantic-color-text-primary);
+  line-height: var(--primitives-spacing-10);
+}
+
+.actionRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.actionEnter {
+  opacity: 0;
+  animation: actionButtonEnter 520ms cubic-bezier(0.34, 1.15, 0.64, 1) both;
+}
+
+.actionEnter:nth-child(1) {
+  animation-delay: 560ms;
+}
+
+.actionEnter:nth-child(2) {
+  animation-delay: 630ms;
+}
+
+.actionEnter:nth-child(3) {
+  animation-delay: 700ms;
+}
+
+.actionEnter:nth-child(4) {
+  animation-delay: 770ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .cardBodyTop,
+  .balanceCluster .tokenBadge,
+  .balanceCluster .balanceValue,
+  .actionEnter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    max-width: none;
+  }
+}
+
+.sendButton {
+  width: calc(
+    var(--primitives-spacing-12) + var(--primitives-spacing-24) - var(--primitives-spacing-2) -
+      var(--primitives-spacing-1) * 0.25
+  );
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.actionAmber {
+  background: var(--primitives-color-purple-200);
+  color: var(--semantic-component-button-gradient-text);
+  border-color: transparent;
+}
+
+.actionEnter .actionAmber:hover:not(:disabled) {
+  background: var(--primitives-color-purple-300);
+}
+
+.actionEnter .actionAmber:active:not(:disabled) {
+  background: var(--primitives-color-purple-400);
+}
+
+.actionEnter .actionAmber:disabled {
+  background: var(--semantic-component-button-primary-bg-disabled);
+  color: var(--semantic-component-button-primary-text-disabled);
+}
+
+.actionMore {
+  background: color-mix(in srgb, var(--semantic-color-brand-lavender) 12%, transparent);
+  border-color: transparent;
+  color: var(--semantic-component-button-gradient-text);
+}
+
+.actionEnter .actionMore:hover:not(:disabled) {
+  background: var(--primitives-color-purple-200);
+}
+
+.actionEnter .actionMore:active:not(:disabled) {
+  background: var(--primitives-color-purple-300);
+}
+
+.actionIcon {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+}

@@ -1,0 +1,51 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  height: var(--primitives-spacing-6);
+  padding: 0 var(--primitives-spacing-3);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  border: 1px solid transparent;
+  background: var(--primitives-color-neutral-100);
+  color: var(--semantic-color-text-secondary);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: currentColor;
+  opacity: 0.85;
+}
+
+.label {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+}
+
+.neutral {
+  background: var(--primitives-color-neutral-100);
+  border-color: var(--semantic-color-border-default);
+  color: var(--semantic-color-text-secondary);
+}
+
+.warning {
+  background: color-mix(in srgb, var(--semantic-color-status-warning) 12%, transparent);
+  border-color: color-mix(in srgb, var(--semantic-color-status-warning) 32%, transparent);
+  color: var(--semantic-color-status-warning);
+}
+
+.success {
+  background: color-mix(in srgb, var(--semantic-color-status-success) 12%, transparent);
+  border-color: color-mix(in srgb, var(--semantic-color-status-success) 32%, transparent);
+  color: var(--semantic-color-status-success);
+}
+
+.error {
+  background: color-mix(in srgb, var(--semantic-color-status-error) 12%, transparent);
+  border-color: color-mix(in srgb, var(--semantic-color-status-error) 32%, transparent);
+  color: var(--semantic-color-status-error);
+}
