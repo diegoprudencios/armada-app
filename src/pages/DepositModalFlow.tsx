@@ -3,7 +3,6 @@ import type { DepositChainId } from '@/components/DepositAmountCard'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { DepositAmountScreen } from './DepositAmountScreen'
-import { DepositConfirmedScreen } from './DepositConfirmedScreen'
 import { DepositProcessingScreen } from './DepositProcessingScreen'
 import { DepositReviewScreen } from './DepositReviewScreen'
 import { DepositWalletApproveScreen } from './DepositWalletApproveScreen'
@@ -21,7 +20,7 @@ const DEPOSIT_STEP_NUMBER: Record<DepositModalStep, number> = {
   review: 2,
   wallet: 3,
   processing: 4,
-  confirmed: 5,
+  confirmed: 4,
 }
 
 export interface DepositModalFlowProps {
@@ -64,6 +63,7 @@ export function DepositModalFlow({
   const [exiting, setExiting] = useState(false)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
+  const isConfirmStep = step === 'processing' || step === 'confirmed'
   const isConfirmed = step === 'confirmed'
 
   const requestClose = useCallback(() => {
@@ -102,17 +102,14 @@ export function DepositModalFlow({
           />
         )
       case 'processing':
-        return (
-          <DepositProcessingScreen
-            onCancel={onProcessingCancel}
-            onComplete={onProcessingComplete}
-          />
-        )
       case 'confirmed':
         return (
-          <DepositConfirmedScreen
+          <DepositProcessingScreen
             amount={amount}
-            onViewExplorer={onConfirmedViewExplorer ?? (() => undefined)}
+            confirmed={isConfirmed}
+            onCancel={onProcessingCancel}
+            onComplete={onProcessingComplete}
+            onViewExplorer={onConfirmedViewExplorer}
             onGoToDashboard={handleConfirmedGoToDashboard}
           />
         )
@@ -147,7 +144,7 @@ export function DepositModalFlow({
         exiting={exiting}
         onClose={requestClose}
       >
-        <div key={step} className={modalStepShell}>
+        <div key={isConfirmStep ? 'confirm' : step} className={modalStepShell}>
           {renderStep()}
         </div>
       </ModalShell>

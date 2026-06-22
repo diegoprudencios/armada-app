@@ -4,18 +4,10 @@
     <meta charset="UTF-8" />
     <script>
       (function () {
-        var key = 'armada-theme';
-        var saved = null;
+        document.documentElement.setAttribute('data-theme', 'light');
         try {
-          saved = localStorage.getItem(key);
+          localStorage.setItem('armada-theme', 'light');
         } catch (e) {}
-        var theme =
-          saved === 'light' || saved === 'dark'
-            ? saved
-            : window.matchMedia('(prefers-color-scheme: dark)').matches
-              ? 'dark'
-              : 'light';
-        document.documentElement.setAttribute('data-theme', theme);
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

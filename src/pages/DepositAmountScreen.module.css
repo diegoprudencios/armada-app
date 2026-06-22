@@ -148,8 +148,8 @@
   display: flex;
   align-items: center;
   gap: var(--primitives-spacing-2);
+  flex: 1;
   min-width: 0;
-  max-width: 88px;
   height: var(--primitives-spacing-5);
 }
 
@@ -166,8 +166,7 @@
   font-size: calc(var(--primitives-fontSize-base) * 1px);
   color: var(--semantic-color-text-secondary);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
 }
 
 .balanceTextError {

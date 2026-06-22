@@ -10,11 +10,10 @@ import {
   DepositStep2ReviewFooter,
 } from '@/components/DepositFlow/steps/DepositStep2Review'
 import { DepositStep3Processing } from '@/components/DepositFlow/steps/DepositStep3Processing'
+import { DEPOSIT_PROGRESS_STEPS, DEPOSIT_WALLET_BALANCE } from '@/pages/depositFlowConstants'
 import styles from './DepositFlow.module.css'
 
-/** Five segments in the progress bar (Amount → Review → Wallet → Confirm → Complete). */
-const DEPOSIT_PROGRESS_STEPS = ['Amount', 'Review', 'Wallet', 'Confirm', 'Complete'] as const
-const BALANCE = '1235.1542'
+const BALANCE = DEPOSIT_WALLET_BALANCE
 const FEE = '0.00'
 const CHAIN_LABEL = 'Sepolia'
 
@@ -39,7 +38,7 @@ export function DepositFlow({ onClose, initialAmount = '1000' }: DepositFlowProp
         <Steps
           flowLabel="Deposit"
           steps={[...DEPOSIT_PROGRESS_STEPS]}
-          currentStep={step}
+          currentStep={step === 3 ? 4 : step}
           status="default"
         />
 

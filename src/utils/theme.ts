@@ -2,6 +2,9 @@ export const THEME_STORAGE_KEY = 'armada-theme'
 
 export type Theme = 'light' | 'dark'
 
+/** Light mode only for now — dark theme is disabled until refined. */
+export const DEFAULT_THEME: Theme = 'light'
+
 export function isTheme(value: string | null): value is Theme {
   return value === 'light' || value === 'dark'
 }
@@ -16,19 +19,23 @@ export function getSavedTheme(): Theme | null {
 }
 
 export function getSystemTheme(): Theme {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return DEFAULT_THEME
 }
 
 export function getAppliedTheme(): Theme {
-  const attr = document.documentElement.getAttribute('data-theme')
-  return attr === 'light' ? 'light' : 'dark'
+  return DEFAULT_THEME
 }
 
-export function setTheme(theme: Theme): void {
-  document.documentElement.setAttribute('data-theme', theme)
+export function initTheme(): void {
+  document.documentElement.setAttribute('data-theme', DEFAULT_THEME)
   try {
-    localStorage.setItem(THEME_STORAGE_KEY, theme)
+    localStorage.setItem(THEME_STORAGE_KEY, DEFAULT_THEME)
   } catch {
     // ignore quota / private mode
   }
+}
+
+/** Always applies light mode while dark theme is hidden. */
+export function setTheme(_theme: Theme): void {
+  initTheme()
 }

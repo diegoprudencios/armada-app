@@ -19,6 +19,7 @@ export default defineConfig({
         showcase: resolve(__dirname, 'showcase.html'),
         deposit: resolve(__dirname, 'deposit.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),
+        dashboardV2: resolve(__dirname, 'dashboard-v2.html'),
       },
     },
   },

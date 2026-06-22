@@ -3,10 +3,13 @@ import './styles/tokens.css'
 import './styles/typography.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { App } from './App'
+import { initTheme } from '@/utils/theme'
+import { LandingPage } from './pages/LandingPage'
+
+initTheme()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <LandingPage />
   </StrictMode>,
 )

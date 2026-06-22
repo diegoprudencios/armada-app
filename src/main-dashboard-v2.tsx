@@ -5,13 +5,13 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { initDashboardBackground } from '@/utils/dashboardBackground'
 import { initTheme } from '@/utils/theme'
-import { ArmadaAppDashboard } from './pages/ArmadaAppDashboard'
+import { ArmadaAppDashboardV2 } from './pages/ArmadaAppDashboardV2'
 
 initTheme()
 initDashboardBackground()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ArmadaAppDashboard />
+    <ArmadaAppDashboardV2 />
   </StrictMode>,
 )

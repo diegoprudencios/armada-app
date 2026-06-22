@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "routes": [
+    { "src": "^/dashboard-v2/?$", "dest": "/dashboard-v2.html" },
     { "src": "^/dashboard/?$", "dest": "/dashboard.html" },
     { "src": "^/deposit/?$", "dest": "/deposit.html" },
     { "src": "^/showcase/?$", "dest": "/showcase.html" },

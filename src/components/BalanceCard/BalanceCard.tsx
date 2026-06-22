@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
   EyeIcon,
   EyeSlashIcon,
@@ -15,8 +15,13 @@ import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { IconButton } from '@/components/IconButton'
 import { RollingBalanceValue, type BalanceRollMode } from '@/components/RollingBalanceValue'
 import { BalancePixelMask } from './BalancePixelMask'
+import {
+  BALANCE_REVEAL_DELAY_MS,
+  BALANCE_REVEAL_DURATION_MS,
+} from './balanceRevealMotion'
 import { SendButton } from '@/components/SendButton'
 import { Tooltip } from '@/components/Tooltip'
+import { useDashboardBackground } from '@/hooks/useDashboardBackground'
 import { formatUsdcAmount } from '@/utils/format'
 import styles from './BalanceCard.module.css'
 
@@ -24,12 +29,16 @@ const TOKEN_BADGE_PX = 40
 /** @web3icons branded assets use an 18px circle in a 24px viewBox — scale up to fill the badge. */
 const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
 
+export type BalanceCardActionLayout = 'default' | 'v2'
+
 export interface BalanceCardProps {
   balance: number
   balanceRollTrigger?: number
   balanceRollMode?: BalanceRollMode
   balanceRollFromValue?: string
   hasCompletedDeposit?: boolean
+  /** v2: deposit in ellipses menu; request as lavender pill beside send. */
+  actionLayout?: BalanceCardActionLayout
   onSend?: () => void
   onDeposit?: () => void
   onRequest?: () => void
@@ -38,12 +47,20 @@ export interface BalanceCardProps {
   onWithdraw?: () => void
 }
 
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+const BALANCE_CLUSTER_GAP_PX = 8
+
 export function BalanceCard({
   balance,
   balanceRollTrigger = 0,
   balanceRollMode = 'fromZero',
   balanceRollFromValue,
   hasCompletedDeposit = false,
+  actionLayout = 'default',
   onSend,
   onDeposit,
   onRequest,
@@ -51,14 +68,101 @@ export function BalanceCard({
   onEarn,
   onWithdraw,
 }: BalanceCardProps) {
+  const isV2Actions = actionLayout === 'v2'
+  const [background] = useDashboardBackground()
+  const isSolidBackground = background === 'solid'
   const [balanceHidden, setBalanceHidden] = useState(false)
   const [peekBalance, setPeekBalance] = useState(false)
   const [maskGeneration, setMaskGeneration] = useState(0)
+  const [balanceIntroPlaying, setBalanceIntroPlaying] = useState(() => !prefersReducedMotion())
+  const balanceValueRef = useRef<HTMLSpanElement>(null)
+  const balanceValueSizerRef = useRef<HTMLSpanElement>(null)
+  const [balanceOffset, setBalanceOffset] = useState('0px')
+  const [lockedWidth, setLockedWidth] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!balanceIntroPlaying) return
+    const timer = window.setTimeout(
+      () => setBalanceIntroPlaying(false),
+      BALANCE_REVEAL_DELAY_MS + BALANCE_REVEAL_DURATION_MS + 50,
+    )
+    return () => window.clearTimeout(timer)
+  }, [balanceIntroPlaying])
+
   const formattedBalance = formatUsdcAmount(balance)
+
+  useLayoutEffect(() => {
+    if (!balanceIntroPlaying) return
+    const width = balanceValueRef.current?.getBoundingClientRect().width
+    if (!width) return
+    setBalanceOffset(`${(width + BALANCE_CLUSTER_GAP_PX) / 2}px`)
+  }, [balanceIntroPlaying, formattedBalance])
+
+  useLayoutEffect(() => {
+    if (balanceIntroPlaying) return
+    const width = balanceValueSizerRef.current?.getBoundingClientRect().width
+    if (!width) return
+    setLockedWidth(width)
+  }, [balanceIntroPlaying, formattedBalance])
+
   const showBalance = !balanceHidden || peekBalance
+  const stableEnableRoll =
+    balance > 0 && (balanceRollTrigger > 0 || balanceRollMode === 'fromValue')
   const sendClassName = [styles.sendButton, !hasCompletedDeposit && styles.actionAmber]
     .filter(Boolean)
     .join(' ')
+
+  const balanceClusterLayers = (
+    <>
+      <div
+        className={styles.tokenBadge}
+        onAnimationEnd={
+          balanceIntroPlaying
+            ? (event) => {
+                if (event.target !== event.currentTarget) return
+                setBalanceIntroPlaying(false)
+              }
+            : undefined
+        }
+      >
+        <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
+      </div>
+      <span
+        ref={balanceValueRef}
+        className={styles.balanceValue}
+        style={balanceIntroPlaying ? undefined : { width: lockedWidth ?? 'max-content' }}
+        aria-label={showBalance ? formattedBalance : 'Balance hidden'}
+      >
+        <span ref={balanceValueSizerRef} className={styles.balanceValueSizer} aria-hidden>
+          {formattedBalance}
+        </span>
+        <span
+          className={[
+            styles.balanceValueLayer,
+            showBalance ? styles.balanceValueLayerVisible : styles.balanceValueLayerHidden,
+          ].join(' ')}
+          aria-hidden={!showBalance}
+        >
+          <RollingBalanceValue
+            value={formattedBalance}
+            enableRoll={balanceIntroPlaying ? balance > 0 : stableEnableRoll}
+            mode={balanceRollMode}
+            fromValue={balanceRollFromValue}
+            rollTrigger={balanceRollTrigger}
+          />
+        </span>
+        <span
+          className={[
+            styles.balanceValueLayer,
+            showBalance ? styles.balanceValueLayerHidden : styles.balanceValueLayerVisible,
+          ].join(' ')}
+          aria-hidden={showBalance}
+        >
+          <BalancePixelMask key={`mask-${maskGeneration}`} seed={formattedBalance} />
+        </span>
+      </span>
+    </>
+  )
 
   return (
     <div className={styles.cardShell}>
@@ -86,7 +190,9 @@ export function BalanceCard({
           strokeWidth="2"
         />
       </svg>
-      <div className={styles.card}>
+      <div
+        className={[styles.card, isSolidBackground && styles.cardSolid].filter(Boolean).join(' ')}
+      >
         <div className={styles.cardBodyTop}>
           <div className={styles.topRow}>
             <div className={`${styles.iconBadge} ${styles.brandBadge}`} aria-hidden>
@@ -116,67 +222,39 @@ export function BalanceCard({
         </div>
 
         <div className={styles.cardBodyBalance}>
-          <div className={styles.balanceRow}>
-            <div
-              className={[
-                styles.balanceCluster,
-                balanceHidden && styles.balanceClusterPrivate,
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              onMouseEnter={() => {
-                if (balanceHidden) setPeekBalance(true)
-              }}
-              onMouseLeave={() => setPeekBalance(false)}
-            >
-              <div className={styles.tokenBadge}>
-                <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
+          <div
+            className={styles.balanceRow}
+            onMouseEnter={() => {
+              if (balanceHidden) setPeekBalance(true)
+            }}
+            onMouseLeave={() => setPeekBalance(false)}
+          >
+            {balanceIntroPlaying ? (
+              <div
+                className={[styles.balanceCluster, styles.balanceClusterIntro].join(' ')}
+                style={{ '--balance-offset': balanceOffset } as React.CSSProperties}
+              >
+                {balanceClusterLayers}
               </div>
-              <span
+            ) : (
+              <div
                 className={[
-                  styles.balanceValue,
-                  balanceHidden && styles.balanceValueHidden,
+                  styles.balanceCluster,
+                  styles.balanceClusterStable,
+                  balanceHidden && styles.balanceClusterPrivate,
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                aria-label={showBalance ? formattedBalance : 'Balance hidden'}
               >
-                <span className={styles.balanceValueSizer} aria-hidden>
-                  {formattedBalance}
-                </span>
-                <span
-                  className={[
-                    styles.balanceValueLayer,
-                    showBalance ? styles.balanceValueLayerVisible : styles.balanceValueLayerHidden,
-                  ].join(' ')}
-                  aria-hidden={!showBalance}
-                >
-                  <RollingBalanceValue
-                    value={formattedBalance}
-                    enableRoll={balance > 0}
-                    mode={balanceRollMode}
-                    fromValue={balanceRollFromValue}
-                    rollTrigger={balanceRollTrigger}
-                  />
-                </span>
-                <span
-                  className={[
-                    styles.balanceValueLayer,
-                    showBalance ? styles.balanceValueLayerHidden : styles.balanceValueLayerVisible,
-                  ].join(' ')}
-                  aria-hidden={showBalance}
-                >
-                  <BalancePixelMask
-                    key={`mask-${maskGeneration}`}
-                    seed={formattedBalance}
-                  />
-                </span>
-              </span>
-            </div>
+                {balanceClusterLayers}
+              </div>
+            )}
           </div>
         </div>
 
-        <div className={styles.actionRow}>
+        <div
+          className={[styles.actionRow, isV2Actions && styles.actionRowV2].filter(Boolean).join(' ')}
+        >
           <div className={styles.actionEnter}>
             <SendButton
               variant={hasCompletedDeposit ? 'gradient' : 'solid'}
@@ -184,30 +262,54 @@ export function BalanceCard({
               onClick={onSend}
             />
           </div>
-          <div className={styles.actionEnter}>
-            <Tooltip variant="action" content="Deposit">
-              <IconButton
-                variant={hasCompletedDeposit ? 'solid' : 'gradient'}
-                className={hasCompletedDeposit ? styles.actionAmber : undefined}
-                icon={<PlusIcon className={styles.actionIcon} strokeWidth={1.5} />}
-                aria-label="Deposit"
-                onClick={onDeposit}
-              />
-            </Tooltip>
-          </div>
-          <div className={styles.actionEnter}>
-            <Tooltip variant="action" content="Request">
-              <IconButton
-                variant="solid"
-                className={styles.actionAmber}
-                icon={<ArrowDownIcon className={styles.actionIcon} strokeWidth={1.5} />}
-                aria-label="Request"
+          {isV2Actions ? (
+            <div className={styles.actionEnter}>
+              <SendButton
+                variant="lavender"
+                label="REQUEST"
+                icon={<ArrowDownIcon className={styles.pillIcon} strokeWidth={1.5} />}
+                className={sendClassName}
                 onClick={onRequest}
               />
-            </Tooltip>
-          </div>
+            </div>
+          ) : (
+            <>
+              <div className={styles.actionEnter}>
+                <Tooltip variant="action" content="Deposit">
+                  <IconButton
+                    variant={hasCompletedDeposit ? 'solid' : 'gradient'}
+                    className={hasCompletedDeposit ? styles.actionAmber : undefined}
+                    icon={<PlusIcon className={styles.actionIcon} strokeWidth={1.5} />}
+                    aria-label="Deposit"
+                    onClick={onDeposit}
+                  />
+                </Tooltip>
+              </div>
+              <div className={styles.actionEnter}>
+                <Tooltip variant="action" content="Request">
+                  <IconButton
+                    variant="solid"
+                    className={styles.actionAmber}
+                    icon={<ArrowDownIcon className={styles.actionIcon} strokeWidth={1.5} />}
+                    aria-label="Request"
+                    onClick={onRequest}
+                  />
+                </Tooltip>
+              </div>
+            </>
+          )}
           <div className={`${styles.actionEnter} ${styles.moreMenuRoot}`}>
             <div className={styles.moreMenu} role="menu" aria-label="More options">
+              {isV2Actions ? (
+                <button type="button" className={styles.moreMenuItem} role="menuitem" onClick={onDeposit}>
+                  <span className={styles.moreMenuItemLead}>
+                    <span className={styles.moreMenuIconBadge}>
+                      <PlusIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
+                    </span>
+                    <span className={styles.moreMenuLabel}>Deposit</span>
+                  </span>
+                </button>
+              ) : null}
               <button type="button" className={styles.moreMenuItem} role="menuitem" onClick={onEarn}>
                 <span className={styles.moreMenuItemLead}>
                   <span className={styles.moreMenuIconBadge}>

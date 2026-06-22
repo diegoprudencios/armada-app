@@ -1,12 +1,8 @@
-import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import {
   ArrowRightOnRectangleIcon,
-  BeakerIcon,
   ChevronDownIcon,
   ClipboardDocumentIcon,
-  GlobeAltIcon,
-  MoonIcon,
-  SunIcon,
   WalletIcon,
 } from '@heroicons/react/24/outline'
 import { CheckIcon } from '@heroicons/react/24/solid'
@@ -16,9 +12,13 @@ import {
   WalletWalletConnect,
 } from '@web3icons/react'
 import buttonStyles from '@/components/Button/Button.module.css'
-import { useEnvironment } from '@/hooks/useEnvironment'
-import { formatUsdcAmount } from '@/utils/format'
-import { getAppliedTheme, setTheme, type Theme } from '@/utils/theme'
+import { useDashboardBackground } from '@/hooks/useDashboardBackground'
+import { formatWalletBalance } from '@/utils/format'
+import {
+  DASHBOARD_VERSION_PATHS,
+  getDashboardVersionFromPath,
+  type DashboardVersion,
+} from '@/utils/dashboardVersion'
 import styles from './WalletPillMenu.module.css'
 
 export interface WalletPillMenuProps {
@@ -34,21 +34,6 @@ export interface WalletPillMenuProps {
 
 const PROVIDER_ICON_PX = 20
 const CARD_ICON_PX = 48
-
-function subscribeToTheme(onStoreChange: () => void) {
-  const observer = new MutationObserver(onStoreChange)
-  observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-  })
-  return () => observer.disconnect()
-}
-
-function useTheme() {
-  const theme = useSyncExternalStore(subscribeToTheme, getAppliedTheme, () => 'dark' as Theme)
-  const applyTheme = useCallback((next: Theme) => setTheme(next), [])
-  return [theme, applyTheme] as const
-}
 
 export function WalletProviderIcon({ provider, size = PROVIDER_ICON_PX }: { provider?: string; size?: number }) {
   switch (provider) {
@@ -72,11 +57,17 @@ export function WalletPillMenu({
 }: WalletPillMenuProps) {
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [theme, applyTheme] = useTheme()
-  const [environment, applyEnvironment] = useEnvironment()
+  const [dashboardVersion, setDashboardVersion] = useState<DashboardVersion>(() =>
+    getDashboardVersionFromPath(),
+  )
+  const [background, applyBackground] = useDashboardBackground()
   const rootRef = useRef<HTMLDivElement>(null)
   const menuId = useId()
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    setDashboardVersion(getDashboardVersionFromPath())
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -114,20 +105,12 @@ export function WalletPillMenu({
     }
   }
 
-  const handleToggleTheme = () => {
-    applyTheme(theme === 'light' ? 'dark' : 'light')
-  }
-
-  const handleToggleEnvironment = () => {
-    applyEnvironment(environment === 'mock' ? 'sepolia' : 'mock')
-  }
-
   const handleDisconnect = () => {
     setOpen(false)
     onDisconnect?.()
   }
 
-  const balanceLabel = `${formatUsdcAmount(usdcBalance)} USDC`
+  const balanceLabel = `${formatWalletBalance(usdcBalance)} USDC`
 
   return (
     <div className={styles.root} ref={rootRef}>
@@ -167,71 +150,7 @@ export function WalletPillMenu({
             </div>
 
             <div className={styles.cardActions}>
-              <button
-                type="button"
-                role="menuitem"
-                className={[
-                  buttonStyles.btn,
-                  buttonStyles.secondary,
-                  buttonStyles.lg,
-                  styles.actionBtn,
-                ].join(' ')}
-                onClick={handleToggleEnvironment}
-              >
-                {environment === 'mock' ? (
-                  <GlobeAltIcon className={styles.actionIcon} aria-hidden />
-                ) : (
-                  <BeakerIcon className={styles.actionIcon} aria-hidden />
-                )}
-                <span className={styles.actionLabel}>
-                  {environment === 'mock' ? 'Switch to Sepolia' : 'Switch to Mock'}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                role="menuitem"
-                className={[
-                  buttonStyles.btn,
-                  buttonStyles.secondary,
-                  buttonStyles.lg,
-                  styles.actionBtn,
-                ].join(' ')}
-                onClick={handleToggleTheme}
-              >
-                {theme === 'light' ? (
-                  <MoonIcon className={styles.actionIcon} aria-hidden />
-                ) : (
-                  <SunIcon className={styles.actionIcon} aria-hidden />
-                )}
-                <span className={styles.actionLabel}>
-                  {theme === 'light' ? 'Dark mode' : 'Light mode'}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                role="menuitem"
-                className={[
-                  buttonStyles.btn,
-                  buttonStyles.secondary,
-                  buttonStyles.lg,
-                  styles.actionBtn,
-                  copied && styles.actionBtnCopied,
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                onClick={() => void handleCopy()}
-              >
-                {copied ? (
-                  <CheckIcon className={styles.actionIcon} aria-hidden />
-                ) : (
-                  <ClipboardDocumentIcon className={styles.actionIcon} aria-hidden />
-                )}
-                <span className={styles.actionLabel}>{copied ? 'Copied' : 'Copy address'}</span>
-              </button>
-
-              {onDisconnect && (
+              <div className={styles.actionButtons}>
                 <button
                   type="button"
                   role="menuitem"
@@ -240,14 +159,101 @@ export function WalletPillMenu({
                     buttonStyles.secondary,
                     buttonStyles.lg,
                     styles.actionBtn,
-                    styles.disconnect,
-                  ].join(' ')}
-                  onClick={handleDisconnect}
+                    copied && styles.actionBtnCopied,
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={() => void handleCopy()}
                 >
-                  <ArrowRightOnRectangleIcon className={styles.actionIcon} aria-hidden />
-                  <span className={styles.actionLabel}>Disconnect</span>
+                  {copied ? (
+                    <CheckIcon className={styles.actionIcon} aria-hidden />
+                  ) : (
+                    <ClipboardDocumentIcon className={styles.actionIcon} aria-hidden />
+                  )}
+                  <span className={styles.actionLabel}>{copied ? 'Copied' : 'Copy address'}</span>
                 </button>
-              )}
+
+                {onDisconnect && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className={[
+                      buttonStyles.btn,
+                      buttonStyles.secondary,
+                      buttonStyles.lg,
+                      styles.actionBtn,
+                      styles.disconnect,
+                    ].join(' ')}
+                    onClick={handleDisconnect}
+                  >
+                    <ArrowRightOnRectangleIcon className={styles.actionIcon} aria-hidden />
+                    <span className={styles.actionLabel}>Disconnect</span>
+                  </button>
+                )}
+              </div>
+
+              <div className={styles.menuControls}>
+                <div className={styles.menuSection}>
+                  <span className={styles.menuSectionLabel}>Dashboard version</span>
+                  <div className={styles.segmented} role="group" aria-label="Dashboard version">
+                    <a
+                      className={[
+                        styles.segment,
+                        dashboardVersion === 'v1' && styles.segmentActive,
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      href={DASHBOARD_VERSION_PATHS.v1}
+                      aria-current={dashboardVersion === 'v1' ? 'page' : undefined}
+                    >
+                      v01
+                    </a>
+                    <a
+                      className={[
+                        styles.segment,
+                        dashboardVersion === 'v2' && styles.segmentActive,
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      href={DASHBOARD_VERSION_PATHS.v2}
+                      aria-current={dashboardVersion === 'v2' ? 'page' : undefined}
+                    >
+                      v02
+                    </a>
+                  </div>
+                </div>
+
+                <div className={styles.menuSection}>
+                  <span className={styles.menuSectionLabel}>Background</span>
+                  <div className={styles.segmented} role="group" aria-label="Dashboard background">
+                    <button
+                      type="button"
+                      className={[
+                        styles.segment,
+                        background === 'gradient' && styles.segmentActive,
+                      ]
+                        .filter(Boolean)
+                        .join(' ')}
+                      aria-pressed={background === 'gradient'}
+                      onClick={() => applyBackground('gradient')}
+                    >
+                      <span className={styles.swatchGradient} aria-hidden />
+                      Gradient
+                    </button>
+                    <button
+                      type="button"
+                      className={[styles.segment, background === 'solid' && styles.segmentActive]
+                        .filter(Boolean)
+                        .join(' ')}
+                      aria-pressed={background === 'solid'}
+                      onClick={() => applyBackground('solid')}
+                    >
+                      <span className={styles.swatchSolid} aria-hidden />
+                      Solid
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

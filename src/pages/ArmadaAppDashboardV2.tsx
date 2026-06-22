@@ -9,20 +9,20 @@ import { DashboardOverlays } from './DashboardOverlays'
 import { DEPOSIT_WALLET_BALANCE } from './depositFlowConstants'
 import styles from './ArmadaAppDashboard.module.css'
 
-export interface ArmadaAppDashboardProps {
+export interface ArmadaAppDashboardV2Props {
   balance?: number
   onSend?: () => void
   onRequest?: () => void
   onMore?: () => void
 }
 
-/** Dashboard layout v1 — shared shell with v2; default balance card actions. */
-export function ArmadaAppDashboard({
+/** Dashboard v2 — same shell as v1; deposit in ellipses menu, request as lavender pill. */
+export function ArmadaAppDashboardV2({
   balance: initialBalance = 0,
   onSend,
   onRequest,
   onMore,
-}: ArmadaAppDashboardProps) {
+}: ArmadaAppDashboardV2Props) {
   const state = useDashboardDemoState(initialBalance)
   const {
     wallet,
@@ -49,13 +49,14 @@ export function ArmadaAppDashboard({
           onDisconnect={disconnectWallet}
         />
       </div>
-      <div className={styles.cardStack}>
+      <div className={[styles.cardStack, styles.cardStackV2].join(' ')}>
         <BalanceCard
           balance={dashboardBalance}
           balanceRollTrigger={balanceRoll.trigger}
           balanceRollMode={balanceRoll.mode}
           balanceRollFromValue={balanceRoll.fromValue}
           hasCompletedDeposit={hasCompletedDeposit}
+          actionLayout="v2"
           onSend={onSend}
           onDeposit={openDeposit}
           onRequest={onRequest}
@@ -70,7 +71,7 @@ export function ArmadaAppDashboard({
               } as CSSProperties
             }
           >
-            <DepositTooltip />
+            <DepositTooltip variant="v2" onDeposit={openDeposit} />
           </div>
         ) : null}
       </div>

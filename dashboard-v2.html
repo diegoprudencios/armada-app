@@ -8,6 +8,16 @@
         try {
           localStorage.setItem('armada-theme', 'light');
         } catch (e) {}
+
+        var bgKey = 'armada-dashboard-background';
+        var savedBg = null;
+        try {
+          savedBg = localStorage.getItem(bgKey);
+        } catch (e) {}
+        document.documentElement.setAttribute(
+          'data-dashboard-bg',
+          savedBg === 'solid' ? 'solid' : 'gradient',
+        );
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,10 +28,10 @@
       href="https://fonts.googleapis.com/css2?family=Charis+SIL:wght@400;700&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap"
       rel="stylesheet"
     />
-    <title>Armada App — Showcase</title>
+    <title>Armada App — Dashboard v2</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main-showcase.tsx"></script>
+    <script type="module" src="/src/main-dashboard-v2.tsx"></script>
   </body>
 </html>

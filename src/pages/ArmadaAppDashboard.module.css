@@ -27,6 +27,14 @@
   pointer-events: none;
 }
 
+:global([data-theme='light'][data-dashboard-bg='solid']) .shell {
+  background: var(--primitives-color-neutral-0);
+}
+
+:global([data-theme='light'][data-dashboard-bg='solid']) .shell::before {
+  content: none;
+}
+
 .headerBand {
   position: relative;
   z-index: 1;
@@ -84,4 +92,8 @@
   flex-direction: column;
   align-items: center;
   gap: var(--primitives-spacing-8);
+}
+
+.cardStackV2 {
+  gap: var(--primitives-spacing-5);
 }

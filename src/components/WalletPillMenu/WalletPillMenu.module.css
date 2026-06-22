@@ -111,7 +111,19 @@
 .cardActions {
   display: flex;
   flex-direction: column;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
   gap: var(--primitives-spacing-3);
+}
+
+.menuControls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-3);
+  margin-top: var(--primitives-spacing-6);
 }
 
 .actionBtn {
@@ -146,4 +158,77 @@
 .disconnect:hover {
   color: var(--semantic-color-status-error);
   background: color-mix(in srgb, var(--semantic-color-status-error) 12%, transparent);
+}
+
+.menuSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-2);
+}
+
+.menuSectionLabel {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  color: var(--semantic-color-text-muted);
+}
+
+.segmented {
+  display: flex;
+  width: 100%;
+  padding: var(--primitives-spacing-1);
+  gap: var(--primitives-spacing-1);
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
+  background: color-mix(in srgb, var(--semantic-color-text-primary) 6%, transparent);
+}
+
+.segment {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitives-spacing-2);
+  min-height: var(--primitives-spacing-8);
+  padding-inline: var(--primitives-spacing-3);
+  border: none;
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px - 2px);
+  background: transparent;
+  color: var(--semantic-color-text-secondary);
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.segment:hover {
+  color: var(--semantic-color-text-primary);
+}
+
+.segmentActive {
+  background: var(--semantic-color-surface-default);
+  color: var(--semantic-color-text-primary);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--semantic-color-text-primary) 8%, transparent);
+}
+
+.swatchGradient,
+.swatchSolid {
+  width: var(--primitives-spacing-3);
+  height: var(--primitives-spacing-3);
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.swatchGradient {
+  background: linear-gradient(
+    135deg,
+    var(--primitives-color-purple-300) 0%,
+    var(--primitives-color-amber-300) 100%
+  );
+}
+
+.swatchSolid {
+  background: var(--primitives-color-neutral-0);
+  border: 1px solid color-mix(in srgb, var(--semantic-color-text-primary) 12%, transparent);
 }

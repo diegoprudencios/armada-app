@@ -94,3 +94,21 @@
 .gradient:disabled {
   color: var(--semantic-component-button-gradient-text-disabled);
 }
+
+.lavender {
+  background: var(--primitives-color-purple-200);
+  color: var(--semantic-component-button-gradient-text);
+}
+
+.lavender:hover:not(:disabled) {
+  background: var(--primitives-color-purple-300);
+}
+
+.lavender:active:not(:disabled) {
+  background: var(--primitives-color-purple-400);
+}
+
+.lavender:disabled {
+  background: var(--semantic-component-button-primary-bg-disabled);
+  color: var(--semantic-component-button-primary-text-disabled);
+}

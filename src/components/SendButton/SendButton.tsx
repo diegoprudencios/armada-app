@@ -1,10 +1,13 @@
 import { ArrowRightIcon } from '@heroicons/react/24/outline'
+import type { ReactNode } from 'react'
 import styles from './SendButton.module.css'
 
-export type SendButtonVariant = 'gradient' | 'solid'
+export type SendButtonVariant = 'gradient' | 'solid' | 'lavender'
 
 export interface SendButtonProps {
   variant: SendButtonVariant
+  label?: string
+  icon?: ReactNode
   onClick?: () => void
   disabled?: boolean
   className?: string
@@ -12,6 +15,8 @@ export interface SendButtonProps {
 
 export function SendButton({
   variant,
+  label = 'SEND',
+  icon,
   onClick,
   disabled = false,
   className,
@@ -25,9 +30,9 @@ export function SendButton({
       onClick={onClick}
       disabled={disabled}
     >
-      <span className={styles.label}>SEND</span>
+      <span className={styles.label}>{label}</span>
       <span className={styles.icon} aria-hidden>
-        <ArrowRightIcon className={styles.arrowIcon} strokeWidth={1.5} />
+        {icon ?? <ArrowRightIcon className={styles.arrowIcon} strokeWidth={1.5} />}
       </span>
     </button>
   )

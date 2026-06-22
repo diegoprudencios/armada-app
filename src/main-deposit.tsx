@@ -3,7 +3,10 @@ import './styles/tokens.css'
 import './styles/typography.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { initTheme } from '@/utils/theme'
 import { DepositFlowDemo } from './pages/DepositFlowDemo'
+
+initTheme()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

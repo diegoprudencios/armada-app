@@ -91,6 +91,81 @@
   gap: 0;
 }
 
+.textStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.textBlockV2 {
+  gap: var(--primitives-spacing-3);
+}
+
+.rootV2 {
+  --deposit-tooltip-v2-width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-10) * 0.5);
+  --deposit-tooltip-v2-height: calc(
+    var(--primitives-spacing-12) * 2 + var(--primitives-spacing-6) + var(--primitives-spacing-1) * 1.5
+  );
+  --deposit-tooltip-v2-illustration: calc(
+    var(--primitives-spacing-20) + var(--primitives-spacing-5) + var(--primitives-spacing-1) * 0.5
+  );
+
+  width: var(--deposit-tooltip-v2-width);
+  height: var(--deposit-tooltip-v2-height);
+  align-items: center;
+  gap: var(--primitives-spacing-3);
+  padding: var(--primitives-spacing-3);
+}
+
+.iconTileV2 {
+  width: var(--deposit-tooltip-v2-illustration);
+  height: var(--deposit-tooltip-v2-illustration);
+  padding: 0;
+}
+
+.iconClusterV2 {
+  width: calc(var(--primitives-spacing-16) + var(--primitives-spacing-4) + var(--primitives-spacing-1) * 0.5);
+  height: calc(var(--primitives-spacing-16) + var(--primitives-spacing-3) + var(--primitives-spacing-1) * 0.25);
+}
+
+.depositIconV2 {
+  width: calc(var(--primitives-spacing-12) + var(--primitives-spacing-1) * 0.75);
+  height: calc(var(--primitives-spacing-12) + var(--primitives-spacing-1) * 0.75);
+}
+
+.depositIconGlyphV2 {
+  width: calc(var(--primitives-spacing-5) + var(--primitives-spacing-1) * 0.25);
+  height: calc(var(--primitives-spacing-5) + var(--primitives-spacing-1) * 0.25);
+}
+
+.depositCta {
+  align-self: flex-start;
+  height: var(--primitives-spacing-8);
+  padding-inline: var(--primitives-spacing-4);
+  border: none;
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  background: var(--semantic-color-surface-default);
+  color: var(--semantic-color-text-primary);
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.depositCta:hover {
+  background: var(--semantic-color-surface-hover);
+}
+
+.depositCta:active {
+  background: color-mix(in srgb, var(--semantic-color-surface-default) 88%, var(--semantic-color-text-primary));
+}
+
+.depositCta:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
 .headline {
   margin: 0;
   font-family: var(--primitives-fontFamily-ui), sans-serif;

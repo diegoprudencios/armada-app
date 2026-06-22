@@ -32,7 +32,8 @@ export function DepositAmountScreen({
 }: DepositAmountScreenProps) {
   const amountInputId = useId()
   const amountInputRef = useRef<HTMLInputElement>(null)
-  const balanceStr = formatWalletBalance(balance).replace(/,/g, '')
+  const balanceDisplay = formatWalletBalance(balance)
+  const balanceInputValue = balanceDisplay.replace(/,/g, '')
   const showFee = hasActiveAmount(amount)
   const exceedsBalance = amountExceedsBalance(amount, balance)
   const canReview = showFee && !exceedsBalance
@@ -50,7 +51,7 @@ export function DepositAmountScreen({
   }
 
   function handleMax() {
-    onAmountChange(balanceStr)
+    onAmountChange(balanceInputValue)
   }
 
   useEffect(() => {
@@ -101,7 +102,7 @@ export function DepositAmountScreen({
                     .filter(Boolean)
                     .join(' ')}
                 >
-                  {balanceStr}
+                  {balanceDisplay}
                 </span>
               </div>
               <div className={styles.pctPills}>
