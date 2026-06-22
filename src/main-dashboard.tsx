@@ -1,17 +1,12 @@
 import './styles/global.css'
 import './styles/tokens.css'
 import './styles/typography.css'
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
 import { initDashboardBackground } from '@/utils/dashboardBackground'
 import { initTheme } from '@/utils/theme'
+import { mountRoot } from '@/mountRoot'
 import { ArmadaAppDashboard } from './pages/ArmadaAppDashboard'
 
 initTheme()
 initDashboardBackground()
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ArmadaAppDashboard />
-  </StrictMode>,
-)
+mountRoot(<ArmadaAppDashboard />)
