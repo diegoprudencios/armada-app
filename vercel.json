@@ -1,0 +1,10 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "routes": [
+    { "src": "^/dashboard/?$", "dest": "/dashboard.html" },
+    { "src": "^/deposit/?$", "dest": "/deposit.html" },
+    { "src": "^/showcase/?$", "dest": "/showcase.html" },
+    { "src": "^/$", "dest": "/index.html" }
+  ]
+}

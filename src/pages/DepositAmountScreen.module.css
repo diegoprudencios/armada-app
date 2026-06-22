@@ -98,6 +98,14 @@
   color: color-mix(in srgb, var(--semantic-color-text-primary) 30%, transparent);
 }
 
+.amountInputError {
+  color: var(--semantic-color-status-error);
+}
+
+.amountInputError::placeholder {
+  color: color-mix(in srgb, var(--semantic-color-status-error) 30%, transparent);
+}
+
 .cardFooter {
   width: 100%;
   display: flex;
@@ -160,6 +168,14 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.balanceTextError {
+  color: var(--semantic-color-status-error);
+}
+
+.walletIconError {
+  color: var(--semantic-color-status-error);
 }
 
 .pctPills {

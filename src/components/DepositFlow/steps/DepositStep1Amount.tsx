@@ -3,7 +3,7 @@ import {
   DepositAmountCard,
   type DepositChainId,
 } from '@/components/DepositAmountCard'
-import { hasActiveAmount } from '@/utils/amountInput'
+import { amountExceedsBalance, hasActiveAmount, parseActiveAmount } from '@/utils/amountInput'
 import flowStyles from '../DepositFlow.module.css'
 import styles from './DepositStep1Amount.module.css'
 
@@ -49,10 +49,12 @@ export function DepositStep1AmountContent({
 
 export function DepositStep1AmountFooter({
   amount,
+  balance,
   onCancel,
   onContinue,
-}: Pick<DepositStep1AmountProps, 'amount' | 'onCancel' | 'onContinue'>) {
-  const canContinue = hasActiveAmount(amount)
+}: Pick<DepositStep1AmountProps, 'amount' | 'balance' | 'onCancel' | 'onContinue'>) {
+  const availableBalance = parseActiveAmount(balance.replace(/,/g, ''))
+  const canContinue = hasActiveAmount(amount) && !amountExceedsBalance(amount, availableBalance)
 
   return (
     <div className={flowStyles.buttonRow}>

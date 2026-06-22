@@ -47,11 +47,6 @@
   left: auto;
   z-index: 150;
   min-width: calc(var(--primitives-spacing-16) * 5);
-  padding: var(--primitives-spacing-2);
-  background: transparent;
-  border: none;
-  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
-  box-shadow: 0 12px 40px color-mix(in srgb, var(--semantic-color-surface-bg) 55%, transparent);
   animation: menuIn 160ms ease;
 }
 
@@ -68,16 +63,15 @@
 
 .card {
   background: var(--semantic-color-surface-default);
-  border: 1px solid var(--semantic-component-button-secondary-border);
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
   padding: var(--primitives-spacing-6);
   display: flex;
   flex-direction: column;
   gap: var(--primitives-spacing-6);
-}
-
-:global([data-theme='dark']) .card {
-  border: none;
+  box-shadow: 0
+    calc(var(--primitives-spacing-6) + var(--primitives-spacing-1) * 0.25)
+    calc(var(--primitives-spacing-12) + var(--primitives-spacing-1) * 0.5)
+    0 color-mix(in srgb, var(--primitives-color-purple-300) 25%, transparent);
 }
 
 .cardIdentity {

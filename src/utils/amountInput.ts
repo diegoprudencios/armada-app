@@ -37,3 +37,9 @@ export function parseActiveAmount(value: string, cap = Infinity): number {
   if (Number.isNaN(num)) return 0
   return Math.min(Math.max(0, num), cap)
 }
+
+/** True when the entered amount is greater than the available balance. */
+export function amountExceedsBalance(amount: string, balance: number): boolean {
+  if (!hasActiveAmount(amount)) return false
+  return parseActiveAmount(amount) > balance
+}

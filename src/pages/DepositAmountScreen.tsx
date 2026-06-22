@@ -4,7 +4,7 @@ import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import type { DepositChainId } from '@/components/DepositAmountCard'
 import { Button } from '@/components/Button'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
-import { hasActiveAmount, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
+import { hasActiveAmount, amountExceedsBalance, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
 import { calculateDepositFee } from '@/utils/depositFee'
 import { formatUsdcAmount, formatWalletBalance } from '@/utils/format'
 import styles from './DepositAmountScreen.module.css'
@@ -34,7 +34,8 @@ export function DepositAmountScreen({
   const amountInputRef = useRef<HTMLInputElement>(null)
   const balanceStr = formatWalletBalance(balance).replace(/,/g, '')
   const showFee = hasActiveAmount(amount)
-  const canReview = hasActiveAmount(amount)
+  const exceedsBalance = amountExceedsBalance(amount, balance)
+  const canReview = showFee && !exceedsBalance
   const feeUsdc = calculateDepositFee(parseActiveAmount(amount))
   const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
 
@@ -70,7 +71,9 @@ export function DepositAmountScreen({
               <input
                 ref={amountInputRef}
                 id={amountInputId}
-                className={styles.amountInput}
+                className={[styles.amountInput, exceedsBalance && styles.amountInputError]
+                  .filter(Boolean)
+                  .join(' ')}
                 type="text"
                 inputMode="decimal"
                 autoComplete="off"
@@ -78,6 +81,7 @@ export function DepositAmountScreen({
                 value={amount}
                 onChange={(event) => handleAmountChange(event.target.value)}
                 aria-label="Deposit amount"
+                aria-invalid={exceedsBalance}
                 size={Math.max(1, amount.length || 1)}
               />
             </div>
@@ -86,8 +90,19 @@ export function DepositAmountScreen({
           <div className={styles.cardFooter}>
             <div className={styles.bottomRow}>
               <div className={styles.walletBalance}>
-                <WalletIcon className={styles.walletIcon} aria-hidden />
-                <span className={styles.balanceText}>{balanceStr}</span>
+                <WalletIcon
+                  className={[styles.walletIcon, exceedsBalance && styles.walletIconError]
+                    .filter(Boolean)
+                    .join(' ')}
+                  aria-hidden
+                />
+                <span
+                  className={[styles.balanceText, exceedsBalance && styles.balanceTextError]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  {balanceStr}
+                </span>
               </div>
               <div className={styles.pctPills}>
                 <button type="button" className={styles.pctPill} onClick={() => applyPercent(0.25)}>

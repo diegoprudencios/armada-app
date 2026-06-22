@@ -97,25 +97,28 @@
 .action {
   bottom: calc(100% + var(--primitives-spacing-2));
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: var(--primitives-spacing-2);
   width: max-content;
   height: calc(var(--primitives-spacing-5) + var(--primitives-spacing-3) - var(--primitives-spacing-1) * 0.5);
   padding: 0 var(--primitives-spacing-4);
-  background: color-mix(in srgb, white 50%, transparent);
+  background: var(--primitives-color-neutral-50);
   border: none;
   border-radius: calc(var(--semantic-borderRadius-item) * 1px);
   box-shadow: 0 10px 25px 0 color-mix(in srgb, var(--primitives-color-purple-300) 25%, transparent);
+  opacity: 1;
 }
 
 .actionText {
   margin: 0;
-  font-family: var(--semantic-typography-ui-button-font-family);
-  font-weight: var(--semantic-typography-ui-button-font-weight);
-  font-size: var(--semantic-typography-ui-button-font-size);
-  line-height: var(--primitives-spacing-5);
-  letter-spacing: var(--semantic-typography-ui-button-letter-spacing);
-  color: var(--semantic-component-button-gradient-text);
+  font-family: var(--semantic-typography-ui-label-md-font-family);
+  font-weight: var(--semantic-typography-ui-label-md-font-weight);
+  font-size: var(--semantic-typography-ui-label-md-font-size);
+  line-height: var(--primitives-spacing-4);
+  letter-spacing: var(--semantic-typography-ui-label-md-letter-spacing);
+  color: var(--semantic-color-text-secondary);
   white-space: nowrap;
 }
 

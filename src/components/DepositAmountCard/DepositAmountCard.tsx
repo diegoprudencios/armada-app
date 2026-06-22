@@ -5,7 +5,7 @@ import NetworkArbitrumSepolia from '@web3icons/react/icons/networks/NetworkArbit
 import NetworkBaseSepolia from '@web3icons/react/icons/networks/NetworkBaseSepolia'
 import NetworkSepolia from '@web3icons/react/icons/networks/NetworkSepolia'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
-import { hasActiveAmount, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
+import { hasActiveAmount, amountExceedsBalance, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
 import styles from './DepositAmountCard.module.css'
 
 const ICON_SIZE = 32
@@ -81,7 +81,9 @@ export function DepositAmountCard({
   }
 
   const showActiveAmount = hasActiveAmount(amount)
-  const showAllocation = showActiveAmount && maxArm != null && maxArm > 0
+  const availableBalance = parseActiveAmount(balance.replace(/,/g, ''))
+  const exceedsBalance = amountExceedsBalance(amount, availableBalance)
+  const showAllocation = showActiveAmount && maxArm != null && maxArm > 0 && !exceedsBalance
   const allocationCap = maxArm ?? 0
   const depositAmount = showAllocation
     ? parseActiveAmount(amount, Math.max(0, allocationCap - existingCommittedUsdc))
@@ -151,12 +153,20 @@ export function DepositAmountCard({
       <label className={styles.amountWrapper} htmlFor={amountInputId}>
         <span className={styles.visuallyHidden}>Deposit amount</span>
         <span
-          className={[styles.amountField, showActiveAmount && styles.amountFieldHasValue]
+          className={[
+            styles.amountField,
+            showActiveAmount && styles.amountFieldHasValue,
+            exceedsBalance && styles.amountFieldError,
+          ]
             .filter(Boolean)
             .join(' ')}
         >
           <span
-            className={[styles.amountDisplay, showActiveAmount && styles.amountDisplayActive]
+            className={[
+              styles.amountDisplay,
+              showActiveAmount && styles.amountDisplayActive,
+              exceedsBalance && styles.amountDisplayError,
+            ]
               .filter(Boolean)
               .join(' ')}
             aria-hidden="true"
@@ -172,6 +182,7 @@ export function DepositAmountCard({
             value={amount}
             onChange={(e) => handleAmountInput(e.target.value)}
             aria-label="Deposit amount"
+            aria-invalid={exceedsBalance}
           />
         </span>
       </label>
@@ -179,8 +190,19 @@ export function DepositAmountCard({
       <div className={styles.footerStack}>
         <div className={styles.bottomRow}>
           <div className={styles.balanceGroup}>
-            <WalletIcon className={styles.walletIcon} aria-hidden />
-            <span className={styles.balanceText}>{balance}</span>
+            <WalletIcon
+              className={[styles.walletIcon, exceedsBalance && styles.walletIconError]
+                .filter(Boolean)
+                .join(' ')}
+              aria-hidden
+            />
+            <span
+              className={[styles.balanceText, exceedsBalance && styles.balanceTextError]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              {balance}
+            </span>
             {onMax ? (
               <button type="button" className={styles.maxBtn} onClick={onMax}>
                 Max

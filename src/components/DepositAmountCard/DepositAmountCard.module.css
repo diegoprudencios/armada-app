@@ -185,6 +185,14 @@
   color: var(--semantic-color-brand-lavender);
 }
 
+.amountDisplayError {
+  color: var(--semantic-color-status-error);
+}
+
+.amountFieldError.amountFieldHasValue .amountInput {
+  caret-color: var(--semantic-color-status-error);
+}
+
 .amountInput {
   position: absolute;
   inset: 0;
@@ -226,6 +234,14 @@
   height: var(--primitives-spacing-5);
   flex-shrink: 0;
   color: color-mix(in srgb, var(--semantic-color-text-primary) 38%, transparent);
+}
+
+.walletIconError {
+  color: var(--semantic-color-status-error);
+}
+
+.balanceTextError {
+  color: var(--semantic-color-status-error);
 }
 
 .maxBtn {

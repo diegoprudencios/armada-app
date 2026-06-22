@@ -64,6 +64,7 @@ export function DepositFlow({ onClose, initialAmount = '1000' }: DepositFlowProp
         {step === 1 ? (
           <DepositStep1AmountFooter
             amount={amount}
+            balance={BALANCE}
             onCancel={onClose}
             onContinue={() => setStep(2)}
           />
