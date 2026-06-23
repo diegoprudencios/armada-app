@@ -37,3 +37,12 @@ svg {
 code {
   font-family: var(--primitives-fontFamily-mono), monospace;
 }
+
+/* Light-mode raised panels (deposit modals, balance card, etc.) */
+[data-theme='light'] {
+  --semantic-color-surface-main: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
+}
+
+[data-theme='dark'] {
+  --semantic-color-surface-main: var(--semantic-color-surface-default);
+}

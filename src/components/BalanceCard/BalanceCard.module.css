@@ -36,7 +36,7 @@
 .card {
   width: 100%;
   height: calc(var(--primitives-spacing-16) * 5);
-  background: color-mix(in srgb, var(--semantic-color-surface-default) 40%, transparent);
+  background: var(--semantic-color-surface-main);
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
   position: relative;
   padding: var(--primitives-spacing-6);

@@ -7,7 +7,7 @@
 
 .statusCard,
 .detailsCard {
-  background: var(--semantic-color-surface-default);
+  background: var(--semantic-color-surface-main);
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
   padding: var(--primitives-spacing-5);
   display: flex;
@@ -70,7 +70,7 @@
   justify-content: center;
   width: 20px;
   height: 20px;
-  background: var(--semantic-color-surface-default);
+  background: var(--primitives-color-neutral-50);
   border-radius: 50%;
 }
 

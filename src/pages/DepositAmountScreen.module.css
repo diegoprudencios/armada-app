@@ -33,7 +33,7 @@
     var(--primitives-spacing-5)
     var(--primitives-spacing-5)
     var(--primitives-spacing-5);
-  background: var(--semantic-color-surface-default);
+  background: var(--semantic-color-surface-main);
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
 }
 
@@ -220,7 +220,7 @@
   height: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
   padding-inline: var(--primitives-spacing-3);
   border-radius: calc(var(--primitives-borderRadius-sm) * 1px + 1px);
-  background: var(--semantic-color-surface-bg);
+  background: var(--primitives-color-neutral-50);
 }
 
 .feeLabel,

@@ -1,6 +1,6 @@
 .card {
   width: 100%;
-  background: var(--semantic-color-surface-raised);
+  background: var(--semantic-color-surface-main);
   border: 1px solid var(--semantic-color-border-default);
   border-radius: calc(var(--semantic-borderRadius-item) * 1px);
   overflow: hidden;
