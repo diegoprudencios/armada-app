@@ -1,0 +1,190 @@
+.popup {
+  position: fixed;
+  top: var(--primitives-spacing-4);
+  right: var(--primitives-spacing-4);
+  z-index: 200;
+  width: 360px;
+  max-width: calc(100vw - var(--primitives-spacing-8));
+  border-radius: calc(var(--primitives-borderRadius-lg) * 1px);
+  background: #24272a;
+  border: 1px solid #3b4046;
+  box-shadow:
+    0 8px 32px rgb(0 0 0 / 28%),
+    0 0 0 1px rgb(0 0 0 / 12%);
+  color: #fff;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  box-sizing: border-box;
+  animation: mockMetaMaskEnter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes mockMetaMaskEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  padding: var(--primitives-spacing-3) var(--primitives-spacing-4);
+  border-bottom: 1px solid #3b4046;
+  background: #121314;
+}
+
+.brand {
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  color: #e9ebee;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-4);
+  padding: var(--primitives-spacing-5) var(--primitives-spacing-4);
+}
+
+.accountRow {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-3);
+}
+
+.accountAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #f6851b 0%, #e2761b 100%);
+  flex-shrink: 0;
+}
+
+.accountMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.accountName {
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  color: #fff;
+}
+
+.accountAddress {
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  color: #9fa6ae;
+  font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
+}
+
+.promptTitle {
+  margin: 0;
+  font-size: calc(var(--primitives-fontSize-lg) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-snug);
+  color: #fff;
+}
+
+.siteOrigin {
+  margin: calc(var(--primitives-spacing-1) * -1) 0 0;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  color: #9fa6ae;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-3);
+  padding: var(--primitives-spacing-4);
+  border-radius: calc(var(--primitives-borderRadius-md) * 1px);
+  background: #121314;
+  border: 1px solid #3b4046;
+}
+
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--primitives-spacing-3);
+}
+
+.detailLabel {
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  color: #9fa6ae;
+  flex-shrink: 0;
+}
+
+.detailValue {
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  color: #e9ebee;
+  text-align: right;
+  word-break: break-word;
+}
+
+.amountValue {
+  composes: detailValue;
+  font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
+}
+
+.footer {
+  display: flex;
+  gap: var(--primitives-spacing-3);
+  padding: 0 var(--primitives-spacing-4) var(--primitives-spacing-4);
+}
+
+.actionButton {
+  flex: 1;
+  min-height: 48px;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  border: 1px solid transparent;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    opacity 120ms ease;
+}
+
+.actionButton:active {
+  transform: translateY(1px);
+}
+
+.rejectButton {
+  composes: actionButton;
+  background: transparent;
+  border-color: #3b4046;
+  color: #e9ebee;
+}
+
+.rejectButton:hover {
+  background: #2a2d31;
+}
+
+.confirmButton {
+  composes: actionButton;
+  background: #037dd6;
+  color: #fff;
+}
+
+.confirmButton:hover {
+  background: #0260a4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popup {
+    animation: none;
+  }
+
+  .actionButton:active {
+    transform: none;
+  }
+}

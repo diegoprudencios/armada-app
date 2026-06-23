@@ -30,6 +30,7 @@ export function DepositFlowDemo() {
       onReviewBack={() => setStep('amount')}
       onReviewConfirm={() => setStep('wallet')}
       onWalletComplete={() => setStep('processing')}
+      onWalletCancel={() => setStep('review')}
       onProcessingCancel={() => setStep('review')}
       onProcessingComplete={() => setStep('confirmed')}
       onConfirmedGoToDashboard={reset}

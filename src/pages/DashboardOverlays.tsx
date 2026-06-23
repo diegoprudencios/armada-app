@@ -47,6 +47,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onReviewBack={() => setDepositStep('amount')}
           onReviewConfirm={() => setDepositStep('wallet')}
           onWalletComplete={() => setDepositStep('processing')}
+          onWalletCancel={() => setDepositStep('review')}
           onProcessingCancel={() => setDepositStep('review')}
           onProcessingComplete={() => setDepositStep('confirmed')}
           onConfirmedGoToDashboard={completeDeposit}

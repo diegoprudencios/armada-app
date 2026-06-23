@@ -36,6 +36,7 @@ export interface DepositModalFlowProps {
   onReviewBack: () => void
   onReviewConfirm: () => void
   onWalletComplete: () => void
+  onWalletCancel: () => void
   onProcessingCancel: () => void
   onProcessingComplete: () => void
   onConfirmedViewExplorer?: () => void
@@ -55,6 +56,7 @@ export function DepositModalFlow({
   onReviewBack,
   onReviewConfirm,
   onWalletComplete,
+  onWalletCancel,
   onProcessingCancel,
   onProcessingComplete,
   onConfirmedViewExplorer,
@@ -98,7 +100,10 @@ export function DepositModalFlow({
         return (
           <DepositWalletApproveScreen
             amount={amount}
+            networkName={networkDisplayName(chain)}
+            walletAddress={walletAddress}
             onComplete={onWalletComplete}
+            onCancel={onWalletCancel}
           />
         )
       case 'processing':

@@ -15,12 +15,15 @@ const STATUS_LABEL: Record<WalletStepStatus, string> = {
 
 export interface WalletConfirmListProps {
   steps: WalletStep[]
+  className?: string
 }
 
-export function WalletConfirmList({ steps }: WalletConfirmListProps) {
+export function WalletConfirmList({ steps, className }: WalletConfirmListProps) {
+  const cardClassName = [styles.card, className].filter(Boolean).join(' ')
+
   return (
     <div
-      className={styles.card}
+      className={cardClassName}
       role="list"
       aria-live="polite"
       aria-label="Wallet confirmations"
