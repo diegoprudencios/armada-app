@@ -14,6 +14,8 @@ export interface ButtonProps {
   /** Default `arrow-right`, or `arrow-right-micro` for Participate CTAs (Heroicons 16/solid). */
   icon?: ButtonIcon
   disabled?: boolean
+  /** When false, disabled keeps the enabled palette and only shows not-allowed cursor. @default true */
+  dimWhenDisabled?: boolean
   onClick?: () => void
   style?: React.CSSProperties
   className?: string
@@ -37,6 +39,7 @@ export function Button({
   showIcon = true,
   icon,
   disabled = false,
+  dimWhenDisabled = true,
   onClick,
   className,
   type = 'button',
@@ -45,7 +48,14 @@ export function Button({
   const resolvedIcon = resolveIcon(label, icon, showIcon)
   const iconPx = resolvedIcon === 'arrow-right-micro' ? MICRO_ICON_PX : ICON_PX[size]
 
-  const cls = [styles.btn, styles[variant], styles[size], !showIcon && styles.noIcon, className ?? '']
+  const cls = [
+    styles.btn,
+    styles[variant],
+    styles[size],
+    !showIcon && styles.noIcon,
+    disabled && !dimWhenDisabled && styles.keepEnabledLook,
+    className ?? '',
+  ]
     .filter(Boolean)
     .join(' ')
 

@@ -10,7 +10,11 @@
   border-radius: calc(var(--semantic-borderRadius-button) * 1px);
   cursor: pointer;
   outline: none;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .button:focus-visible {
@@ -21,6 +25,7 @@
 .button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
 }
 
 .icon {
@@ -102,6 +107,10 @@
   background: color-mix(in srgb, var(--semantic-color-brand-lavender) 12%, transparent);
 }
 
+.ghost:active:not(:disabled) {
+  background: var(--semantic-component-button-ghost-bg-active);
+}
+
 .ghostSurface {
   background: var(--semantic-color-surface-default);
   border-color: var(--semantic-component-button-secondary-border);
@@ -110,4 +119,8 @@
 
 .ghostSurface:hover:not(:disabled) {
   background: color-mix(in srgb, var(--semantic-color-brand-lavender) 12%, transparent);
+}
+
+.ghostSurface:active:not(:disabled) {
+  background: var(--semantic-component-button-ghost-bg-active);
 }

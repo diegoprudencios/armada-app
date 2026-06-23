@@ -9,7 +9,11 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: background 150ms ease;
+  transition: background 150ms ease, transform 0.1s ease;
+}
+
+.item:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .item:hover:not(:disabled) {

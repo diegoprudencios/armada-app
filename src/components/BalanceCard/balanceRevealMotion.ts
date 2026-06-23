@@ -3,7 +3,7 @@ export const BALANCE_REVEAL_DELAY_MS = 1280
 export const BALANCE_REVEAL_DURATION_MS = 920
 export const BALANCE_REVEAL_SPLIT_AT = 0.42
 
-/** Digit odometer roll — intentionally longer than the mask-reveal split window. */
+/** Digit odometer roll — intentionally longer than the balance reveal split window. */
 export const BALANCE_ROLL_DURATION_MS = 1000
 export const BALANCE_ROLL_DIGIT_STAGGER_MS = 70
 

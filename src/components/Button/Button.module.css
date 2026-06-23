@@ -20,6 +20,7 @@
 .btn:focus-visible { box-shadow: 0 0 0 2px var(--semantic-color-border-focus); }
 .btn:active:not(:disabled) { transform: translateY(1px); }
 .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.btn.keepEnabledLook:disabled { opacity: 1; cursor: not-allowed; }
 
 /* Sizes — Figma: fixed height, asymmetric horizontal padding, 4px gap */
 .sm {
@@ -57,11 +58,19 @@
 .primary:hover:not(:disabled) { background: var(--semantic-component-button-primary-bg-hover); }
 .primary:active:not(:disabled) { background: var(--semantic-component-button-primary-bg-active); }
 .primary:disabled { background: var(--semantic-component-button-primary-bg-disabled); color: var(--semantic-component-button-primary-text-disabled); }
+.primary.keepEnabledLook:disabled {
+  background: var(--semantic-component-button-primary-bg);
+  color: var(--semantic-component-button-primary-text);
+}
 
 /* Secondary */
-.secondary { background: transparent; color: var(--semantic-component-button-secondary-text); border-color: var(--semantic-component-button-secondary-border); }
-.secondary:hover:not(:disabled) { background: var(--semantic-component-button-secondary-bg-hover); border-color: var(--semantic-component-button-secondary-border-hover); }
+.secondary { background: var(--semantic-component-button-secondary-bg); color: var(--semantic-component-button-secondary-text); border-color: transparent; }
+.secondary:hover:not(:disabled) { background: var(--semantic-component-button-secondary-bg-hover); border-color: transparent; }
 .secondary:active:not(:disabled) { background: var(--semantic-component-button-secondary-bg-active); }
+
+:global([data-theme='light']) .secondary:active:not(:disabled) {
+  background: var(--semantic-color-surface-hover);
+}
 .secondary:disabled { color: var(--semantic-component-button-secondary-text-disabled); }
 
 /* Ghost — text matches secondary (no border) */

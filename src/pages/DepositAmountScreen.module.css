@@ -201,6 +201,11 @@
   font-size: calc(var(--primitives-fontSize-sm) * 1px);
   color: var(--semantic-color-text-primary);
   cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.pctPill:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .pctPill:hover {
@@ -245,13 +250,4 @@
 .buttonRow > * {
   flex: 1;
   max-width: 211px;
-}
-
-/* Figma: disabled Review keeps enabled lavender fill at 20% node opacity — not Button's disabled palette. */
-.reviewBtn.btn:disabled {
-  opacity: 0.2;
-  cursor: not-allowed;
-  transform: none;
-  background: var(--semantic-component-button-primary-bg);
-  color: var(--semantic-component-button-primary-text);
 }

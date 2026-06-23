@@ -16,7 +16,11 @@
   color: var(--semantic-component-button-gradient-text);
   cursor: pointer;
   outline: none;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .button:focus-visible {
@@ -27,6 +31,7 @@
 .button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+  transform: none;
 }
 
 .label,

@@ -14,7 +14,7 @@ import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { IconButton } from '@/components/IconButton'
 import { RollingBalanceValue, type BalanceRollMode } from '@/components/RollingBalanceValue'
-import { BalancePixelMask } from './BalancePixelMask'
+import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
 import {
   BALANCE_REVEAL_DELAY_MS,
   BALANCE_REVEAL_DURATION_MS,
@@ -73,7 +73,6 @@ export function BalanceCard({
   const isSolidBackground = background === 'solid'
   const [balanceHidden, setBalanceHidden] = useState(false)
   const [peekBalance, setPeekBalance] = useState(false)
-  const [maskGeneration, setMaskGeneration] = useState(0)
   const [balanceIntroPlaying, setBalanceIntroPlaying] = useState(() => !prefersReducedMotion())
   const balanceValueRef = useRef<HTMLSpanElement>(null)
   const balanceValueSizerRef = useRef<HTMLSpanElement>(null)
@@ -106,8 +105,6 @@ export function BalanceCard({
   }, [balanceIntroPlaying, formattedBalance])
 
   const showBalance = !balanceHidden || peekBalance
-  const stableEnableRoll =
-    balance > 0 && (balanceRollTrigger > 0 || balanceRollMode === 'fromValue')
   const sendClassName = [styles.sendButton, !hasCompletedDeposit && styles.actionAmber]
     .filter(Boolean)
     .join(' ')
@@ -139,26 +136,23 @@ export function BalanceCard({
         <span
           className={[
             styles.balanceValueLayer,
-            showBalance ? styles.balanceValueLayerVisible : styles.balanceValueLayerHidden,
+            styles.balanceValueLayerVisible,
           ].join(' ')}
-          aria-hidden={!showBalance}
         >
-          <RollingBalanceValue
-            value={formattedBalance}
-            enableRoll={balanceIntroPlaying ? balance > 0 : stableEnableRoll}
-            mode={balanceRollMode}
-            fromValue={balanceRollFromValue}
-            rollTrigger={balanceRollTrigger}
-          />
-        </span>
-        <span
-          className={[
-            styles.balanceValueLayer,
-            showBalance ? styles.balanceValueLayerHidden : styles.balanceValueLayerVisible,
-          ].join(' ')}
-          aria-hidden={showBalance}
-        >
-          <BalancePixelMask key={`mask-${maskGeneration}`} seed={formattedBalance} />
+          {balanceIntroPlaying ? (
+            <RollingBalanceValue
+              value={formattedBalance}
+              enableRoll={balance > 0}
+              mode={balanceRollMode}
+              fromValue={balanceRollFromValue}
+              rollTrigger={balanceRollTrigger}
+            />
+          ) : (
+            <BalanceScrambleValue
+              value={formattedBalance}
+              revealed={showBalance}
+            />
+          )}
         </span>
       </span>
     </>
@@ -205,10 +199,7 @@ export function BalanceCard({
               aria-label={balanceHidden ? 'Show balance' : 'Hide balance'}
               aria-pressed={balanceHidden}
               onClick={() => {
-                setBalanceHidden((hidden) => {
-                  if (!hidden) setMaskGeneration((generation) => generation + 1)
-                  return !hidden
-                })
+                setBalanceHidden((hidden) => !hidden)
                 setPeekBalance(false)
               }}
             >

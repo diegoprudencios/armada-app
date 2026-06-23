@@ -16,8 +16,12 @@
   );
   color: #291433;
   gap: 0px;
-  transition: width 220ms ease, padding 220ms ease, gap 220ms ease;
+  transition: width 220ms ease, padding 220ms ease, gap 220ms ease, transform 0.1s ease;
   white-space: nowrap;
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
 }
 
 .button:hover,

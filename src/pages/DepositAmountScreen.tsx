@@ -37,6 +37,7 @@ export function DepositAmountScreen({
   const showFee = hasActiveAmount(amount)
   const exceedsBalance = amountExceedsBalance(amount, balance)
   const canReview = showFee && !exceedsBalance
+  const reviewLabel = showFee ? 'Review' : 'Input amount'
   const feeUsdc = calculateDepositFee(parseActiveAmount(amount))
   const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
 
@@ -145,10 +146,10 @@ export function DepositAmountScreen({
           <Button
             variant="primary"
             size="lg"
-            label="Review"
+            label={reviewLabel}
             showIcon={false}
             disabled={!canReview}
-            className={styles.reviewBtn}
+            dimWhenDisabled={false}
             onClick={() => onReview(amount, chain)}
           />
         </div>

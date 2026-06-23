@@ -1,0 +1,10 @@
+/* App-specific theme tweaks — must load after tokens.css (synced tokens reset some values). */
+
+[data-theme='light'] {
+  --semantic-color-surface-main: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
+  --semantic-component-button-secondary-bg: var(--semantic-color-surface-main);
+}
+
+[data-theme='dark'] {
+  --semantic-color-surface-main: var(--semantic-color-surface-default);
+}
