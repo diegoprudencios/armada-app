@@ -28,35 +28,37 @@ export function DepositReviewSummary({
 
   return (
     <div className={styles.summary}>
-      <div className={styles.summaryRow}>
-        <span className={styles.summaryLabel}>Network</span>
-        <span className={styles.summaryValue}>{networkName}</span>
-      </div>
-      <div className={styles.summaryRow}>
-        <span className={styles.summaryLabel}>From your wallet</span>
-        <span className={styles.summaryValue}>
-          <span className={styles.valueWithIcon}>
-            <WalletProviderIcon provider={walletProvider} size={ROW_ICON_PX} />
-            <span>{truncateAddress(walletAddress)}</span>
+      <div className={styles.summaryBody}>
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>Network</span>
+          <span className={styles.summaryValue}>{networkName}</span>
+        </div>
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>From your wallet</span>
+          <span className={styles.summaryValue}>
+            <span className={styles.valueWithIcon}>
+              <WalletProviderIcon provider={walletProvider} size={ROW_ICON_PX} />
+              <span>{truncateAddress(walletAddress)}</span>
+            </span>
           </span>
-        </span>
-      </div>
-      <div className={styles.summaryRow}>
-        <span className={styles.summaryLabel}>To Armada</span>
-        <span className={styles.summaryValue}>
-          <span className={styles.valueWithIcon}>
-            <ArmadaLogo variant="mark" className={styles.armadaIcon} />
-            <span>{truncateAddress(armadaAddress)}</span>
+        </div>
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>To Armada</span>
+          <span className={styles.summaryValue}>
+            <span className={styles.valueWithIcon}>
+              <ArmadaLogo variant="mark" className={styles.armadaIcon} />
+              <span>{truncateAddress(armadaAddress)}</span>
+            </span>
           </span>
-        </span>
+        </div>
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>Fees</span>
+          <span className={styles.summaryValue}>{feeLabel}</span>
+        </div>
       </div>
-      <div className={styles.summaryRow}>
-        <span className={styles.summaryLabel}>Fees</span>
-        <span className={styles.summaryValue}>{feeLabel}</span>
-      </div>
-      <div className={styles.summaryRow}>
-        <span className={styles.summaryLabel}>Total</span>
-        <span className={styles.summaryValue}>{totalLabel}</span>
+      <div className={styles.summaryTotalRow}>
+        <span className={styles.summaryTotalLabel}>Total</span>
+        <span className={styles.summaryTotalValue}>{totalLabel}</span>
       </div>
     </div>
   )

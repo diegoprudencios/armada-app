@@ -3,7 +3,9 @@
   inset: 0;
   z-index: 100;
   overflow: auto;
-  background: var(--semantic-color-surface-bg);
+  background: color-mix(in srgb, var(--primitives-color-amber-300) 30%, transparent);
+  backdrop-filter: blur(100px);
+  -webkit-backdrop-filter: blur(100px);
   display: flex;
   align-items: center;
   justify-content: center;

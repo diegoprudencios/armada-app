@@ -7,9 +7,9 @@
   justify-content: center;
   padding: var(--primitives-spacing-8);
   box-sizing: border-box;
-  background: color-mix(in srgb, var(--semantic-color-surface-bg) 72%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--primitives-color-amber-300) 30%, transparent);
+  backdrop-filter: blur(100px);
+  -webkit-backdrop-filter: blur(100px);
   animation: modalBackdropIn 280ms ease;
 }
 

@@ -46,7 +46,7 @@ export function ModalShell({
     <div className={styles.shell} style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}>
       <header className={headerClassName}>
         <div className={styles.logoSlot}>
-          <ArmadaLogo variant="mark" className={styles.logo} />
+          <ArmadaLogo variant="mark" markTone="white" className={styles.logo} />
         </div>
         <div className={styles.stepsWrap}>
           <Steps

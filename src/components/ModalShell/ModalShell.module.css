@@ -116,6 +116,7 @@
   width: var(--primitives-spacing-10);
   height: var(--primitives-spacing-10);
   display: block;
+  color: var(--semantic-color-brand-deep);
 }
 
 .stepsWrap {
