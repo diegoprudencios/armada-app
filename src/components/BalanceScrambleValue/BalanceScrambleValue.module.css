@@ -1,20 +1,41 @@
 .root {
-  display: inline-flex;
+  display: inline-grid;
   align-items: center;
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  vertical-align: top;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+}
+
+.widthAnchor,
+.displayLayer {
+  grid-area: 1 / 1;
+}
+
+.widthAnchor {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.displayLayer {
+  display: inline;
+  min-width: 0;
 }
 
 .glyph {
   display: inline-block;
-  min-width: 0.58em;
+  width: 1ch;
   text-align: center;
+  vertical-align: top;
 }
 
 .spinColumn {
   display: inline-block;
+  width: 1ch;
   height: 1em;
-  min-width: 0.58em;
   overflow: hidden;
   vertical-align: top;
   perspective: 240px;
@@ -40,8 +61,8 @@
 
 .digitColumn {
   display: inline-block;
+  width: 1ch;
   height: 1em;
-  min-width: 0.58em;
   overflow: hidden;
   vertical-align: top;
 }
@@ -67,8 +88,9 @@
 
 .settleGlyph {
   display: inline-block;
-  min-width: 0.58em;
+  width: 1ch;
   text-align: center;
+  vertical-align: top;
   opacity: 0;
   transform: scale(0.7) translateY(0.16em);
   filter: blur(4px);

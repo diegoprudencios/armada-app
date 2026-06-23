@@ -117,9 +117,8 @@
   min-height: 0;
   width: 100%;
   overflow: hidden;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--semantic-color-text-primary) 8%, transparent);
-  background: var(--primitives-color-neutral-50);
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+  background: var(--semantic-color-surface-main);
 }
 
 .listInner {
@@ -144,8 +143,7 @@
   gap: var(--primitives-spacing-3);
   flex-shrink: 0;
   padding: var(--primitives-spacing-4) var(--primitives-spacing-5);
-  border-bottom: 1px solid var(--semantic-color-border-default);
-  background: var(--semantic-color-surface-default);
+  background: var(--semantic-color-surface-main);
   box-sizing: border-box;
 }
 
@@ -181,6 +179,10 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-1);
+  padding: var(--primitives-spacing-2) 0;
 }
 
 .row {
@@ -196,10 +198,6 @@
   text-align: left;
   width: 100%;
   box-sizing: border-box;
-}
-
-.row + .row {
-  border-top: 1px solid var(--semantic-color-border-default);
 }
 
 .empty {
@@ -290,7 +288,6 @@
 
 .clipHint {
   padding: var(--primitives-spacing-3) var(--primitives-spacing-4);
-  border-top: 1px solid var(--semantic-color-border-default);
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(var(--primitives-fontSize-sm) * 1px);
   color: var(--semantic-color-text-muted);
@@ -348,9 +345,8 @@
     width: 100%;
     max-height: min(360px, 50vh);
     overflow: hidden;
-    border-radius: calc(var(--semantic-borderRadius-item) * 1px);
-    border: 1px solid var(--semantic-color-border-default);
-    background: var(--semantic-color-surface-default);
+    border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+    background: var(--semantic-color-surface-main);
     box-sizing: border-box;
   }
 
@@ -361,6 +357,10 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--primitives-spacing-1);
+    padding: var(--primitives-spacing-2) 0;
   }
 
   .mobileRow {

@@ -1,6 +1,7 @@
 import { Button } from '@/components/Button'
 import flowStyles from '../DepositFlow.module.css'
 import styles from './DepositStep2Review.module.css'
+import usdcAmount from '@/styles/usdcAmount.module.css'
 
 export interface DepositStep2ReviewProps {
   amount: string
@@ -29,10 +30,9 @@ export function DepositStep2ReviewContent({
           <span className={styles.summaryLabel}>Estimated fee</span>
           <span className={styles.summaryValue}>No fee</span>
         </div>
-        <hr className={styles.summaryDivider} />
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>You&apos;ll deposit</span>
-          <span className={styles.summaryValue}>{amount} USDC</span>
+          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{amount} USDC</span>
         </div>
       </div>
     </div>

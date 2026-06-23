@@ -146,13 +146,12 @@
 }
 
 .details {
-  background: var(--semantic-color-surface-raised);
-  border: 1px solid var(--semantic-color-border-default);
-  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
-  padding: var(--primitives-spacing-4);
+  background: var(--semantic-color-surface-main);
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+  padding: var(--primitives-spacing-5);
   display: flex;
   flex-direction: column;
-  gap: var(--primitives-spacing-3);
+  gap: var(--primitives-spacing-4);
 }
 
 .detailRow {

@@ -1,6 +1,7 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { WalletProviderIcon } from '@/components/WalletPillMenu/WalletPillMenu'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
+import usdcAmount from '@/styles/usdcAmount.module.css'
 import styles from './DepositReviewSummary.module.css'
 
 const ROW_ICON_PX = 16
@@ -53,12 +54,12 @@ export function DepositReviewSummary({
         </div>
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Fees</span>
-          <span className={styles.summaryValue}>{feeLabel}</span>
+          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{feeLabel}</span>
         </div>
       </div>
       <div className={styles.summaryTotalRow}>
         <span className={styles.summaryTotalLabel}>Total</span>
-        <span className={styles.summaryTotalValue}>{totalLabel}</span>
+        <span className={[styles.summaryTotalValue, usdcAmount.font].join(' ')}>{totalLabel}</span>
       </div>
     </div>
   )

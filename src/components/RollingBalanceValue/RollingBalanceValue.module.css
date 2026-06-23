@@ -1,11 +1,16 @@
 .root {
   display: inline-flex;
   align-items: center;
-  font-variant-numeric: tabular-nums;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
 }
 
 .digitColumn {
   display: inline-block;
+  width: 1ch;
   height: 1em;
   overflow: hidden;
   vertical-align: top;
@@ -44,6 +49,10 @@
 }
 
 .separator {
+  display: inline-block;
+  width: 1ch;
+  text-align: center;
+  vertical-align: top;
   opacity: 0;
 }
 

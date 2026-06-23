@@ -25,12 +25,10 @@ export function WalletConfirmList({ steps }: WalletConfirmListProps) {
       aria-live="polite"
       aria-label="Wallet confirmations"
     >
-      {steps.map((step, index) => (
-        <div key={step.label} role="listitem">
-          {index > 0 ? <div className={styles.divider} aria-hidden="true" /> : null}
-          <div className={styles.row}>
-            <span className={styles.label}>{step.label}</span>
-            <div className={styles.status} aria-label={STATUS_LABEL[step.status]}>
+      {steps.map((step) => (
+        <div key={step.label} className={styles.row} role="listitem">
+          <span className={styles.label}>{step.label}</span>
+          <div className={styles.status} aria-label={STATUS_LABEL[step.status]}>
               {step.status === 'loading' ? (
                 <div className={styles.spinner} role="status" aria-label="Loading" />
               ) : null}
@@ -52,7 +50,6 @@ export function WalletConfirmList({ steps }: WalletConfirmListProps) {
               ) : null}
               <span className={styles.visuallyHidden}>{STATUS_LABEL[step.status]}</span>
             </div>
-          </div>
         </div>
       ))}
     </div>

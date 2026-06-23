@@ -1,4 +1,5 @@
 import styles from './Step3Review.module.css'
+import usdcAmount from '@/styles/usdcAmount.module.css'
 import { Steps } from '@/components/Steps'
 import { Button } from '@/components/Button'
 import { Tooltip } from '@/components/Tooltip'
@@ -42,12 +43,10 @@ export default function Step3Review({
             <span className={styles.summaryLabel}>Hop level</span>
             <span className={styles.summaryValue}>{hopLevel}</span>
           </div>
-          <div className={styles.divider} />
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Committing</span>
-            <span className={styles.summaryValue}>{formattedAmount} USDC</span>
+            <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{formattedAmount} USDC</span>
           </div>
-          <div className={styles.divider} />
           <div className={styles.summaryRow}>
             <div className={styles.summaryLabelGroup}>
               <span className={styles.summaryLabel}>EST. ARM allocation</span>

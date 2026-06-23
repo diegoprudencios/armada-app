@@ -290,22 +290,30 @@ export function BalanceScrambleValue({
   const fromTokens = useMemo(() => tokenizeBalance(fromValue), [fromValue])
   const toTokens = useMemo(() => tokenizeBalance(toValue), [toValue])
 
+  const renderGlyphs = (text: string, keyPrefix: string) =>
+    tokenizeBalance(text).map((token) => (
+      <span key={`${keyPrefix}-${token.key}`} className={styles.glyph}>
+        {token.char}
+      </span>
+    ))
+
   return (
     <span className={rootClassName} aria-label={revealed ? value : 'Balance hidden'}>
-      {transition
-        ? fromTokens.map((token, index) => (
-            <ScrambleSlot
-              key={`${transition.key}-${token.key}`}
-              fromChar={token.char}
-              toChar={toTokens[index]?.char ?? BALANCE_MASK_CHAR}
-              charIndex={token.charIndex}
-            />
-          ))
-        : toTokens.map((token) => (
-            <span key={token.key} className={styles.glyph}>
-              {token.char}
-            </span>
-          ))}
+      <span className={styles.widthAnchor} aria-hidden>
+        {value}
+      </span>
+      <span className={styles.displayLayer}>
+        {transition
+          ? fromTokens.map((token, index) => (
+              <ScrambleSlot
+                key={`${transition.key}-${token.key}`}
+                fromChar={token.char}
+                toChar={toTokens[index]?.char ?? BALANCE_MASK_CHAR}
+                charIndex={token.charIndex}
+              />
+            ))
+          : renderGlyphs(toValue, 'static')}
+      </span>
     </span>
   )
 }

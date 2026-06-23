@@ -42,11 +42,13 @@ export function DepositReviewScreen({
       <div className={modalStepBodyEnter}>
         <h1 className={styles.title}>Review your deposit</h1>
 
-        <div className={styles.amountGroup}>
-          <div className={styles.tokenBadge} aria-hidden>
-            <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
+        <div className={styles.amountRow}>
+          <div className={styles.amountGroup}>
+            <div className={styles.tokenBadge} aria-hidden>
+              <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
+            </div>
+            <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
           </div>
-          <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
         </div>
 
         <DepositReviewSummary

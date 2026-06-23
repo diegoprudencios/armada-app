@@ -1,0 +1,5 @@
+/* Monospace typography for USDC amounts (hero digits, "N USDC" rows, wallet balances). */
+.font {
+  font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
+  letter-spacing: 0;
+}

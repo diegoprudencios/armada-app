@@ -18,6 +18,8 @@ import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
 import {
   BALANCE_REVEAL_DELAY_MS,
   BALANCE_REVEAL_DURATION_MS,
+  BALANCE_ROLL_DIGIT_STAGGER_MS,
+  balanceRevealRollDurationMs,
 } from './balanceRevealMotion'
 import { SendButton } from '@/components/SendButton'
 import { Tooltip } from '@/components/Tooltip'
@@ -54,6 +56,12 @@ function prefersReducedMotion(): boolean {
 
 const BALANCE_CLUSTER_GAP_PX = 8
 
+function estimateDepositRollDurationMs(formattedBalance: string): number {
+  const digitCount = formattedBalance.replace(/\D/g, '').length
+  const stagger = Math.max(0, digitCount - 1) * BALANCE_ROLL_DIGIT_STAGGER_MS
+  return balanceRevealRollDurationMs() + stagger + 80
+}
+
 export function BalanceCard({
   balance,
   balanceRollTrigger = 0,
@@ -78,6 +86,7 @@ export function BalanceCard({
   const balanceValueSizerRef = useRef<HTMLSpanElement>(null)
   const [balanceOffset, setBalanceOffset] = useState('0px')
   const [lockedWidth, setLockedWidth] = useState<number | null>(null)
+  const [completedRollTrigger, setCompletedRollTrigger] = useState(0)
 
   useEffect(() => {
     if (!balanceIntroPlaying) return
@@ -89,6 +98,16 @@ export function BalanceCard({
   }, [balanceIntroPlaying])
 
   const formattedBalance = formatUsdcAmount(balance)
+
+  useEffect(() => {
+    if (balanceRollTrigger <= completedRollTrigger) return
+
+    const timer = window.setTimeout(
+      () => setCompletedRollTrigger(balanceRollTrigger),
+      estimateDepositRollDurationMs(formattedBalance),
+    )
+    return () => window.clearTimeout(timer)
+  }, [balanceRollTrigger, completedRollTrigger, formattedBalance])
 
   useLayoutEffect(() => {
     if (!balanceIntroPlaying) return
@@ -105,6 +124,13 @@ export function BalanceCard({
   }, [balanceIntroPlaying, formattedBalance])
 
   const showBalance = !balanceHidden || peekBalance
+  const depositRollActive =
+    !balanceIntroPlaying &&
+    showBalance &&
+    !balanceHidden &&
+    balance > 0 &&
+    balanceRollTrigger > completedRollTrigger
+  const showRollingBalance = balanceIntroPlaying || depositRollActive
   const sendClassName = [styles.sendButton, !hasCompletedDeposit && styles.actionAmber]
     .filter(Boolean)
     .join(' ')
@@ -139,10 +165,10 @@ export function BalanceCard({
             styles.balanceValueLayerVisible,
           ].join(' ')}
         >
-          {balanceIntroPlaying ? (
+          {showRollingBalance ? (
             <RollingBalanceValue
               value={formattedBalance}
-              enableRoll={balance > 0}
+              enableRoll={balanceIntroPlaying ? balance > 0 : depositRollActive}
               mode={balanceRollMode}
               fromValue={balanceRollFromValue}
               rollTrigger={balanceRollTrigger}

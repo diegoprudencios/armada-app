@@ -95,13 +95,27 @@
 
 .chainName,
 .tokenName,
-.balanceText,
-.feeText,
 .chainOptionLabel {
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-weight: var(--primitives-fontWeight-regular);
   font-size: calc(var(--primitives-fontSize-base) * 1px);
   color: var(--semantic-color-text-secondary);
+}
+
+.feeText {
+  font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  color: var(--semantic-color-text-secondary);
+  letter-spacing: 0;
+}
+
+.balanceText {
+  font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  color: var(--semantic-color-text-secondary);
+  letter-spacing: 0;
 }
 
 .chevron {
