@@ -15,8 +15,10 @@ import {
   resolveDemoWalletAddress,
   type DemoWalletProvider,
 } from '@/pages/depositFlowConstants'
+import type { SendChainId } from '@/pages/sendFlowConstants'
 
 export type DepositStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
+export type SendStep = 'recipient' | 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 
 type BalanceRollState = {
   trigger: number
@@ -53,11 +55,16 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [depositStep, setDepositStep] = useState<DepositStep | null>(null)
   const [depositAmount, setDepositAmount] = useState('')
   const [depositChain, setDepositChain] = useState<DepositChainId>('sepolia')
+  const [sendStep, setSendStep] = useState<SendStep | null>(null)
+  const [sendAmount, setSendAmount] = useState('')
+  const [sendRecipient, setSendRecipient] = useState('')
+  const [sendChain, setSendChain] = useState<SendChainId>('ethereum')
   const [balanceRoll, setBalanceRoll] = useState<BalanceRollState>({
     trigger: 0,
     mode: 'fromZero',
   })
   const pendingDepositRef = useRef(0)
+  const pendingSendRef = useRef(0)
 
   useEffect(() => {
     if (!isMock) return
@@ -86,7 +93,46 @@ export function useDashboardDemoState(initialBalance = 0) {
     setHasCompletedDeposit(false)
     setConnectOpen(false)
     closeDeposit()
+    closeSend()
     returnToLanding()
+  }
+
+  function openSend() {
+    if (!wallet) {
+      openConnect()
+      return
+    }
+    setSendRecipient('')
+    setSendAmount('')
+    setSendChain('ethereum')
+    setSendStep('recipient')
+  }
+
+  function closeSend() {
+    setSendStep(null)
+    setSendAmount('')
+    setSendRecipient('')
+    setSendChain('ethereum')
+
+    const sent = pendingSendRef.current
+    pendingSendRef.current = 0
+
+    if (sent > 0) {
+      const fromValue = formatUsdcAmount(dashboardBalance)
+      setDashboardBalance((prev) => prev - sent)
+      setBalanceRoll((roll) => ({
+        trigger: roll.trigger + 1,
+        mode: 'fromValue',
+        fromValue,
+      }))
+    }
+  }
+
+  function completeSend() {
+    const sent = parseActiveAmount(sendAmount)
+    if (sent > 0) {
+      pendingSendRef.current = sent
+    }
   }
 
   function openDeposit() {
@@ -136,6 +182,10 @@ export function useDashboardDemoState(initialBalance = 0) {
     depositStep,
     depositAmount,
     depositChain,
+    sendStep,
+    sendAmount,
+    sendRecipient,
+    sendChain,
     balanceRoll,
     showDepositTooltip,
     openConnect,
@@ -144,8 +194,15 @@ export function useDashboardDemoState(initialBalance = 0) {
     openDeposit,
     closeDeposit,
     completeDeposit,
+    openSend,
+    closeSend,
+    completeSend,
     setDepositAmount,
     setDepositChain,
     setDepositStep,
+    setSendAmount,
+    setSendRecipient,
+    setSendChain,
+    setSendStep,
   }
 }

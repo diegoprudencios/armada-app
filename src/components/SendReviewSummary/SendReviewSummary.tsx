@@ -1,28 +1,25 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
-import { WalletProviderIcon } from '@/components/WalletPillMenu/WalletPillMenu'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
+import { isArmadaAddress } from '@/pages/sendFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
-import styles from './DepositReviewSummary.module.css'
+import styles from './SendReviewSummary.module.css'
 
-const ROW_ICON_PX = 16
-
-export interface DepositReviewSummaryProps {
-  networkName: string
+export interface SendReviewSummaryProps {
+  recipientAddress: string
+  armadaAddress: string
+  networkName?: string
   amount: number
   feeUsdc: number
-  walletAddress: string
-  walletProvider?: string
-  armadaAddress: string
 }
 
-export function DepositReviewSummary({
+export function SendReviewSummary({
+  recipientAddress,
+  armadaAddress,
   networkName,
   amount,
   feeUsdc,
-  walletAddress,
-  walletProvider = 'metamask',
-  armadaAddress,
-}: DepositReviewSummaryProps) {
+}: SendReviewSummaryProps) {
+  const isPrivate = isArmadaAddress(recipientAddress)
   const total = amount + feeUsdc
   const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
   const totalLabel = `${formatUsdcAmount(total, 2)} USDC`
@@ -30,27 +27,35 @@ export function DepositReviewSummary({
   return (
     <div className={styles.summary}>
       <div className={styles.summaryBody}>
+        {!isPrivate && networkName ? (
+          <div className={styles.summaryRow}>
+            <span className={styles.summaryLabel}>Network</span>
+            <span className={styles.summaryValue}>{networkName}</span>
+          </div>
+        ) : null}
         <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Network</span>
-          <span className={styles.summaryValue}>{networkName}</span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>From your wallet</span>
-          <span className={styles.summaryValue}>
-            <span className={styles.valueWithIcon}>
-              <WalletProviderIcon provider={walletProvider} size={ROW_ICON_PX} />
-              <span>{truncateAddress(walletAddress)}</span>
-            </span>
-          </span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>To your private account</span>
+          <span className={styles.summaryLabel}>From your private account</span>
           <span className={styles.summaryValue}>
             <span className={styles.valueWithIcon}>
               <ArmadaLogo variant="mark" className={styles.armadaIcon} />
               <span>{truncateAddress(armadaAddress)}</span>
             </span>
           </span>
+        </div>
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>To recipient</span>
+          <span className={styles.summaryValue}>
+            <span className={styles.valueWithIcon}>
+              {isPrivate ? (
+                <ArmadaLogo variant="mark" className={styles.armadaIcon} />
+              ) : null}
+              <span>{truncateAddress(recipientAddress)}</span>
+            </span>
+          </span>
+        </div>
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>Privacy</span>
+          <span className={styles.summaryValue}>{isPrivate ? 'Private' : 'Public'}</span>
         </div>
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Fees</span>

@@ -15,6 +15,7 @@ export interface DepositWalletApproveScreenProps {
   amount: string
   networkName?: string
   walletAddress?: string
+  signStepLabel?: string
   onComplete: () => void
   onCancel: () => void
 }
@@ -23,6 +24,7 @@ export function DepositWalletApproveScreen({
   amount,
   networkName,
   walletAddress,
+  signStepLabel = 'Sign deposit transaction',
   onComplete,
   onCancel,
 }: DepositWalletApproveScreenProps) {
@@ -32,7 +34,7 @@ export function DepositWalletApproveScreen({
   const [promptPhase, setPromptPhase] = useState<WalletPromptPhase>('waiting')
   const [steps, setSteps] = useState<WalletStep[]>([
     { label: `Approve ${amountLabel} USDC`, status: 'loading' },
-    { label: 'Sign deposit transaction', status: 'pending' },
+    { label: signStepLabel, status: 'pending' },
   ])
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export function DepositWalletApproveScreen({
   function handleApprove() {
     setSteps([
       { label: `Approve ${amountLabel} USDC`, status: 'done' },
-      { label: 'Sign deposit transaction', status: 'loading' },
+      { label: signStepLabel, status: 'loading' },
     ])
     setPromptPhase('sign')
   }
@@ -57,7 +59,7 @@ export function DepositWalletApproveScreen({
   function handleSign() {
     setSteps([
       { label: `Approve ${amountLabel} USDC`, status: 'done' },
-      { label: 'Sign deposit transaction', status: 'done' },
+      { label: signStepLabel, status: 'done' },
     ])
     setPromptPhase('closed')
     completeTimerRef.current = window.setTimeout(onComplete, COMPLETE_DELAY_MS)

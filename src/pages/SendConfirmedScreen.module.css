@@ -1,0 +1,77 @@
+.column {
+  width: 100%;
+  max-width: 434px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--primitives-spacing-8);
+}
+
+.title {
+  margin: 0;
+  width: 100%;
+  font-family: var(--primitives-fontFamily-display), serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-3xl) * 1px);
+  line-height: 1.25;
+  letter-spacing: var(--primitives-letterSpacing-tight);
+  color: var(--semantic-color-text-primary);
+  text-align: center;
+}
+
+.amountRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.amountGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+}
+
+.tokenBadge {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tokenBadgeIcon {
+  flex-shrink: 0;
+  display: block;
+}
+
+.tokenBadgeIcon :global(svg) {
+  display: block;
+}
+
+.amountValue {
+  display: block;
+  font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: var(--primitives-spacing-10);
+  line-height: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  color: var(--semantic-color-text-primary);
+  letter-spacing: 0;
+}
+
+.buttonRow {
+  display: flex;
+  gap: var(--primitives-spacing-3);
+  width: 100%;
+}
+
+.buttonRow > * {
+  flex: 1;
+  max-width: 211px;
+}

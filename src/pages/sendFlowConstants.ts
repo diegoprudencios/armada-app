@@ -1,0 +1,51 @@
+import NetworkArbitrumOne from '@web3icons/react/icons/networks/NetworkArbitrumOne'
+import NetworkBase from '@web3icons/react/icons/networks/NetworkBase'
+import NetworkEthereum from '@web3icons/react/icons/networks/NetworkEthereum'
+import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
+
+export const SEND_PROGRESS_STEPS = ['Recipient', 'Amount', 'Review', 'Confirm'] as const
+
+export type SendChainId = 'ethereum' | 'arbitrum' | 'base'
+
+export const DEMO_ZK_RECIPIENT =
+  'zk928927wshw738whs73673wbs8373hw8733e98s78d2f9a1b4c6e8f0a2b4c6d8'
+
+export const DEMO_0X_RECIPIENT = '0x928927a8b4c6d8e0f2a4b6c8d0e2f4a6b8c0d2e4f6a8b0c2d4e6f8a0b2c4d6'
+
+export const RECENT_SEND_ADDRESSES: ReadonlyArray<{
+  address: string
+  sentAgo: string
+}> = [
+  { address: '0x82a7f3c91d4e5b6a7081928374655647382910a2b3c4d5e6f728', sentAgo: '2 days ago' },
+  { address: '0x41c2e8f90a1b3d5e7f9a0b2c4d6e8f0a2b4c6d8e0f2a4b6c8d0e2f4a6', sentAgo: '5 days ago' },
+  { address: DEMO_ARMADA_ADDRESS, sentAgo: '1 week ago' },
+]
+
+export const SEND_CHAIN_OPTIONS: ReadonlyArray<{
+  id: SendChainId
+  label: string
+  displayName: string
+  Icon: typeof NetworkEthereum
+}> = [
+  { id: 'ethereum', label: 'Ethereum', displayName: 'Ethereum', Icon: NetworkEthereum },
+  { id: 'arbitrum', label: 'Arbitrum', displayName: 'Arbitrum', Icon: NetworkArbitrumOne },
+  { id: 'base', label: 'Base', displayName: 'Base', Icon: NetworkBase },
+]
+
+export function sendNetworkDisplayName(chain: SendChainId): string {
+  return SEND_CHAIN_OPTIONS.find((option) => option.id === chain)?.displayName ?? chain
+}
+
+export function isArmadaAddress(address: string): boolean {
+  return address.trim().toLowerCase().startsWith('zk')
+}
+
+export function isPublicAddress(address: string): boolean {
+  return address.trim().toLowerCase().startsWith('0x')
+}
+
+export function isValidRecipientAddress(address: string): boolean {
+  const trimmed = address.trim()
+  if (!trimmed) return false
+  return isArmadaAddress(trimmed) || isPublicAddress(trimmed)
+}

@@ -33,6 +33,7 @@ export function ArmadaAppDashboard({
     openConnect,
     disconnectWallet,
     openDeposit,
+    openSend,
   } = state
 
   useRequireConnectedWallet(wallet)
@@ -56,7 +57,7 @@ export function ArmadaAppDashboard({
           balanceRollMode={balanceRoll.mode}
           balanceRollFromValue={balanceRoll.fromValue}
           hasCompletedDeposit={hasCompletedDeposit}
-          onSend={onSend}
+          onSend={onSend ?? openSend}
           onDeposit={openDeposit}
           onRequest={onRequest}
           onMore={onMore}
