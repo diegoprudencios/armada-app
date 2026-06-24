@@ -14,6 +14,7 @@ export function openAppWithWallet(): void {
     balance: 0,
     earningBalance: 0,
     hasCompletedDeposit: false,
+    activityVisible: false,
   })
   window.location.assign(APP_DASHBOARD_V1_PATH)
 }

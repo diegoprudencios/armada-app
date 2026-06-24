@@ -7,6 +7,7 @@ import {
 import { PlusIcon } from '@heroicons/react/24/outline'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { BalanceCard } from '@/components/BalanceCard'
+import { RecentActivityList } from '@/components/RecentActivityList'
 import { Button } from '@/components/Button'
 import { DepositProcessingStepper } from '@/components/DepositProcessingStepper'
 import { DepositReviewSummary } from '@/components/DepositReviewSummary'
@@ -101,6 +102,7 @@ export function Showcase() {
   const [balanceLayout, setBalanceLayout] = useState<'default' | 'v2'>('default')
   const [hasDeposit, setHasDeposit] = useState(false)
   const [showVaultPosition, setShowVaultPosition] = useState(false)
+  const [activityVisible, setActivityVisible] = useState(false)
 
   return (
     <div className={styles.page}>
@@ -419,12 +421,15 @@ export function Showcase() {
             actionLayout={balanceLayout}
             hasCompletedDeposit={hasDeposit}
             vaultBalance={showVaultPosition ? 250 : 0}
+            activityVisible={activityVisible}
+            onToggleActivity={() => setActivityVisible((value) => !value)}
             onSend={() => undefined}
             onDeposit={() => undefined}
             onRequest={() => undefined}
             onMore={() => undefined}
             onEarn={() => undefined}
           />
+          {activityVisible ? <RecentActivityList /> : null}
         </div>
       </ShowcaseSection>
     </div>

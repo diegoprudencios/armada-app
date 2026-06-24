@@ -9,6 +9,7 @@ import {
   ChartBarIcon,
   EllipsisHorizontalIcon,
   PlusIcon,
+  QueueListIcon,
 } from '@heroicons/react/24/outline'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
@@ -51,6 +52,8 @@ export interface BalanceCardProps {
   vaultApy?: number
   vaultRollFromValue?: string
   onVaultOpen?: () => void
+  activityVisible?: boolean
+  onToggleActivity?: () => void
 }
 
 function prefersReducedMotion(): boolean {
@@ -82,6 +85,8 @@ export function BalanceCard({
   vaultApy,
   vaultRollFromValue,
   onVaultOpen,
+  activityVisible = false,
+  onToggleActivity,
 }: BalanceCardProps) {
   const isV2Actions = actionLayout === 'v2'
   const [background] = useDashboardBackground()
@@ -365,6 +370,21 @@ export function BalanceCard({
                     <ArrowUpIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
                   </span>
                   <span className={styles.moreMenuLabel}>Withdraw</span>
+                </span>
+              </button>
+              <button
+                type="button"
+                className={styles.moreMenuItem}
+                role="menuitem"
+                onClick={onToggleActivity}
+              >
+                <span className={styles.moreMenuItemLead}>
+                  <span className={styles.moreMenuIconBadge}>
+                    <QueueListIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
+                  </span>
+                  <span className={styles.moreMenuLabel}>
+                    {activityVisible ? 'Hide activity' : 'Show activity'}
+                  </span>
                 </span>
               </button>
             </div>

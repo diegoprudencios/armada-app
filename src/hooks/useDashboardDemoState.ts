@@ -54,6 +54,13 @@ function readInitialEarningBalance(): number {
   return 0
 }
 
+function readInitialActivityVisible(): boolean {
+  if (getCurrentEnvironment() === 'mock') {
+    return readDemoDashboardSession()?.activityVisible ?? false
+  }
+  return false
+}
+
 export function useDashboardDemoState(initialBalance = 0) {
   const [environment] = useEnvironment()
   const isMock = environment === 'mock'
@@ -73,6 +80,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [earnTab, setEarnTab] = useState<EarnTab>('add')
   const [earnAmount, setEarnAmount] = useState('')
   const [earningBalance, setEarningBalance] = useState(readInitialEarningBalance)
+  const [activityVisible, setActivityVisible] = useState(readInitialActivityVisible)
   const [balanceRoll, setBalanceRoll] = useState<BalanceRollState>({
     trigger: 0,
     mode: 'fromZero',
@@ -88,8 +96,9 @@ export function useDashboardDemoState(initialBalance = 0) {
       balance: dashboardBalance,
       earningBalance,
       hasCompletedDeposit,
+      activityVisible,
     })
-  }, [isMock, wallet, dashboardBalance, earningBalance, hasCompletedDeposit])
+  }, [isMock, wallet, dashboardBalance, earningBalance, hasCompletedDeposit, activityVisible])
 
   function openConnect() {
     setConnectOpen(true)
@@ -108,6 +117,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     setDashboardBalance(initialBalance)
     setEarningBalance(0)
     setHasCompletedDeposit(false)
+    setActivityVisible(false)
     setConnectOpen(false)
     closeDeposit()
     closeSend()
@@ -246,6 +256,10 @@ export function useDashboardDemoState(initialBalance = 0) {
   const earnSourceBalance = earnTab === 'add' ? dashboardBalance : earningBalance
   const showDepositTooltip = Boolean(wallet) && !hasCompletedDeposit
 
+  function toggleActivity() {
+    setActivityVisible((visible) => !visible)
+  }
+
   return {
     wallet,
     dashboardBalance,
@@ -262,6 +276,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     earnTab,
     earnAmount,
     earningBalance,
+    activityVisible,
     earnSourceBalance,
     balanceRoll,
     showDepositTooltip,
@@ -287,5 +302,6 @@ export function useDashboardDemoState(initialBalance = 0) {
     setEarnTab,
     setEarnAmount,
     setEarnStep,
+    toggleActivity,
   }
 }

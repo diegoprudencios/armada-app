@@ -9,6 +9,7 @@ export type DemoDashboardSession = {
   balance: number
   earningBalance: number
   hasCompletedDeposit: boolean
+  activityVisible: boolean
 }
 
 const STORAGE_KEY = 'armada-app-demo-dashboard'
@@ -30,6 +31,7 @@ export function readDemoDashboardSession(): DemoDashboardSession | null {
       balance: parsed.balance ?? 0,
       earningBalance: parsed.earningBalance ?? 0,
       hasCompletedDeposit: parsed.hasCompletedDeposit ?? false,
+      activityVisible: parsed.activityVisible ?? false,
     }
   } catch {
     return null

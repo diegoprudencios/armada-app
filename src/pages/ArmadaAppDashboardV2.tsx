@@ -3,6 +3,7 @@ import { BalanceCard } from '@/components/BalanceCard'
 import { DASHBOARD_TOOLTIP_ENTER_DELAY_MS } from '@/components/BalanceCard/balanceRevealMotion'
 import { DashboardHeader } from '@/components/DashboardHeader'
 import { DepositTooltip } from '@/components/DepositTooltip'
+import { RecentActivityList } from '@/components/RecentActivityList'
 import { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
 import { useRequireConnectedWallet } from '@/hooks/useRequireConnectedWallet'
 import { DashboardOverlays } from './DashboardOverlays'
@@ -36,6 +37,8 @@ export function ArmadaAppDashboardV2({
     openSend,
     openEarn,
     earningBalance,
+    activityVisible,
+    toggleActivity,
   } = state
 
   useRequireConnectedWallet(wallet)
@@ -68,7 +71,10 @@ export function ArmadaAppDashboardV2({
           vaultBalance={earningBalance}
           vaultRollFromValue={balanceRoll.vaultFromValue}
           onVaultOpen={() => openEarn('add')}
+          activityVisible={activityVisible}
+          onToggleActivity={toggleActivity}
         />
+        {activityVisible ? <RecentActivityList /> : null}
         {showDepositTooltip ? (
           <div
             className={styles.tooltipEnter}
