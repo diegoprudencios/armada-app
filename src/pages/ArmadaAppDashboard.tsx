@@ -39,6 +39,7 @@ export function ArmadaAppDashboard({
     earningBalance,
     activityVisible,
     toggleActivity,
+    recentActivity,
   } = state
 
   useRequireConnectedWallet(wallet)
@@ -73,7 +74,7 @@ export function ArmadaAppDashboard({
           activityVisible={activityVisible}
           onToggleActivity={toggleActivity}
         />
-        {activityVisible ? <RecentActivityList /> : null}
+        {activityVisible ? <RecentActivityList items={recentActivity} /> : null}
         {showDepositTooltip ? (
           <div
             className={styles.tooltipEnter}

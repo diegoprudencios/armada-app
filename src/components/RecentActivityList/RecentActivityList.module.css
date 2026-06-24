@@ -106,6 +106,54 @@
   color: var(--semantic-color-text-primary);
 }
 
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  width: 100%;
+  padding: var(--primitives-spacing-6) var(--primitives-spacing-5);
+  border-radius: calc(var(--primitives-spacing-5) / 2);
+  background: var(--semantic-color-surface-main);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.emptyIconBadge {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
+  background: color-mix(in srgb, var(--primitives-color-purple-500) 15%, transparent);
+  color: var(--semantic-color-text-muted);
+}
+
+.emptyIcon {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+}
+
+.emptyTitle {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-primary);
+}
+
+.emptyBody {
+  margin: 0;
+  max-width: calc(var(--primitives-spacing-20) * 3);
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-regular);
+  line-height: var(--primitives-lineHeight-normal);
+  color: var(--semantic-color-text-muted);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .root {
     animation: none;

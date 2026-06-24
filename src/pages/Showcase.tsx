@@ -429,7 +429,7 @@ export function Showcase() {
             onMore={() => undefined}
             onEarn={() => undefined}
           />
-          {activityVisible ? <RecentActivityList /> : null}
+          {activityVisible ? <RecentActivityList items={[]} /> : null}
         </div>
       </ShowcaseSection>
     </div>

@@ -5,7 +5,9 @@ import { useEnvironment } from '@/hooks/useEnvironment'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import {
+  readActivityPanelVisible,
   readDemoDashboardSession,
+  writeActivityPanelVisible,
   writeDemoDashboardSession,
   type DemoWallet,
 } from '@/utils/demoDashboardSession'
@@ -17,6 +19,13 @@ import {
 } from '@/pages/depositFlowConstants'
 import type { SendChainId } from '@/pages/sendFlowConstants'
 import type { EarnModalStep, EarnTab } from '@/pages/earnFlowConstants'
+import type { DashboardActivityItem } from '@/constants/dashboardActivity'
+import {
+  createDepositActivity,
+  createEarnActivity,
+  createSendActivity,
+  prependActivity,
+} from '@/utils/dashboardActivity'
 
 export type DepositStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 export type SendStep = 'recipient' | 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
@@ -54,11 +63,11 @@ function readInitialEarningBalance(): number {
   return 0
 }
 
-function readInitialActivityVisible(): boolean {
+function readInitialRecentActivity(): DashboardActivityItem[] {
   if (getCurrentEnvironment() === 'mock') {
-    return readDemoDashboardSession()?.activityVisible ?? false
+    return readDemoDashboardSession()?.recentActivity ?? []
   }
-  return false
+  return []
 }
 
 export function useDashboardDemoState(initialBalance = 0) {
@@ -80,7 +89,8 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [earnTab, setEarnTab] = useState<EarnTab>('add')
   const [earnAmount, setEarnAmount] = useState('')
   const [earningBalance, setEarningBalance] = useState(readInitialEarningBalance)
-  const [activityVisible, setActivityVisible] = useState(readInitialActivityVisible)
+  const [activityVisible, setActivityVisible] = useState(readActivityPanelVisible)
+  const [recentActivity, setRecentActivity] = useState<DashboardActivityItem[]>(readInitialRecentActivity)
   const [balanceRoll, setBalanceRoll] = useState<BalanceRollState>({
     trigger: 0,
     mode: 'fromZero',
@@ -96,9 +106,9 @@ export function useDashboardDemoState(initialBalance = 0) {
       balance: dashboardBalance,
       earningBalance,
       hasCompletedDeposit,
-      activityVisible,
+      recentActivity,
     })
-  }, [isMock, wallet, dashboardBalance, earningBalance, hasCompletedDeposit, activityVisible])
+  }, [isMock, wallet, dashboardBalance, earningBalance, hasCompletedDeposit, recentActivity])
 
   function openConnect() {
     setConnectOpen(true)
@@ -118,6 +128,8 @@ export function useDashboardDemoState(initialBalance = 0) {
     setEarningBalance(0)
     setHasCompletedDeposit(false)
     setActivityVisible(false)
+    writeActivityPanelVisible(false)
+    setRecentActivity([])
     setConnectOpen(false)
     closeDeposit()
     closeSend()
@@ -137,15 +149,16 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function closeSend() {
+    const sent = pendingSendRef.current
+    const recipient = sendRecipient
+    pendingSendRef.current = 0
     setSendStep(null)
     setSendAmount('')
     setSendRecipient('')
     setSendChain('ethereum')
 
-    const sent = pendingSendRef.current
-    pendingSendRef.current = 0
-
     if (sent > 0) {
+      setRecentActivity((items) => prependActivity(items, createSendActivity(sent, recipient)))
       const fromValue = formatUsdcAmount(dashboardBalance)
       setDashboardBalance((prev) => prev - sent)
       setBalanceRoll((roll) => ({
@@ -174,14 +187,15 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function closeDeposit() {
+    const deposited = pendingDepositRef.current
+    const chain = depositChain
+    pendingDepositRef.current = 0
     setDepositStep(null)
     setDepositAmount('')
     setDepositChain('sepolia')
 
-    const deposited = pendingDepositRef.current
-    pendingDepositRef.current = 0
-
     if (deposited > 0) {
+      setRecentActivity((items) => prependActivity(items, createDepositActivity(deposited, chain)))
       const fromValue = formatUsdcAmount(dashboardBalance)
       setDashboardBalance((prev) => prev + deposited)
       setBalanceRoll((roll) => ({
@@ -220,6 +234,10 @@ export function useDashboardDemoState(initialBalance = 0) {
 
     if (!pending || pending.amount <= 0) return
 
+    setRecentActivity((items) =>
+      prependActivity(items, createEarnActivity(pending.amount, pending.tab)),
+    )
+
     if (pending.tab === 'add') {
       const balanceFrom = formatUsdcAmount(dashboardBalance)
       const vaultFrom = formatUsdcAmount(earningBalance)
@@ -257,7 +275,11 @@ export function useDashboardDemoState(initialBalance = 0) {
   const showDepositTooltip = Boolean(wallet) && !hasCompletedDeposit
 
   function toggleActivity() {
-    setActivityVisible((visible) => !visible)
+    setActivityVisible((visible) => {
+      const next = !visible
+      writeActivityPanelVisible(next)
+      return next
+    })
   }
 
   return {
@@ -277,6 +299,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     earnAmount,
     earningBalance,
     activityVisible,
+    recentActivity,
     earnSourceBalance,
     balanceRoll,
     showDepositTooltip,
