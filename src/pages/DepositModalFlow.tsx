@@ -30,6 +30,7 @@ export interface DepositModalFlowProps {
   depositWalletBalance?: number
   walletAddress?: string
   walletProvider?: string
+  confirmedAt?: number | null
   onClose: () => void
   onAmountChange: (amount: string) => void
   onAmountReview: (amount: string, chain: DepositChainId) => void
@@ -50,6 +51,7 @@ export function DepositModalFlow({
   depositWalletBalance = Number(DEPOSIT_WALLET_BALANCE),
   walletAddress,
   walletProvider,
+  confirmedAt,
   onClose,
   onAmountChange,
   onAmountReview,
@@ -114,6 +116,7 @@ export function DepositModalFlow({
             networkName={networkDisplayName(chain)}
             walletAddress={walletAddress}
             walletProvider={walletProvider}
+            confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
             onCancel={onProcessingCancel}
             onComplete={onProcessingComplete}

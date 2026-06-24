@@ -19,13 +19,16 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     depositStep,
     depositAmount,
     depositChain,
+    depositConfirmedAt,
     sendStep,
     sendAmount,
     sendRecipient,
     sendChain,
+    sendConfirmedAt,
     earnStep,
     earnTab,
     earnAmount,
+    earnConfirmedAt,
     earnSourceBalance,
     dashboardBalance,
     connectWallet,
@@ -38,13 +41,16 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     setDepositAmount,
     setDepositChain,
     setDepositStep,
+    setDepositConfirmedAt,
     setSendAmount,
     setSendRecipient,
     setSendChain,
     setSendStep,
+    setSendConfirmedAt,
     setEarnTab,
     setEarnAmount,
     setEarnStep,
+    setEarnConfirmedAt,
   } = state
 
   return (
@@ -59,6 +65,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           depositWalletBalance={Number(DEPOSIT_WALLET_BALANCE)}
           walletAddress={wallet?.address}
           walletProvider={wallet?.provider}
+          confirmedAt={depositConfirmedAt}
           onClose={closeDeposit}
           onAmountChange={setDepositAmount}
           onAmountReview={(nextAmount, nextChain) => {
@@ -71,7 +78,10 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onWalletComplete={() => setDepositStep('processing')}
           onWalletCancel={() => setDepositStep('review')}
           onProcessingCancel={() => setDepositStep('review')}
-          onProcessingComplete={() => setDepositStep('confirmed')}
+          onProcessingComplete={() => {
+            setDepositConfirmedAt(Date.now())
+            setDepositStep('confirmed')
+          }}
           onConfirmedGoToDashboard={completeDeposit}
         />
       ) : null}
@@ -85,6 +95,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           armadaBalance={dashboardBalance}
           armadaAddress={DEMO_ARMADA_ADDRESS}
           walletAddress={wallet?.address}
+          confirmedAt={sendConfirmedAt}
           onClose={closeSend}
           onRecipientChange={setSendRecipient}
           onChainChange={setSendChain}
@@ -100,7 +111,10 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onWalletComplete={() => setSendStep('processing')}
           onWalletCancel={() => setSendStep('review')}
           onProcessingCancel={() => setSendStep('review')}
-          onProcessingComplete={() => setSendStep('confirmed')}
+          onProcessingComplete={() => {
+            setSendConfirmedAt(Date.now())
+            setSendStep('confirmed')
+          }}
           onConfirmedGoToDashboard={completeSend}
         />
       ) : null}
@@ -111,6 +125,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           tab={earnTab}
           amount={earnAmount}
           sourceBalance={earnSourceBalance}
+          confirmedAt={earnConfirmedAt}
           onClose={closeEarn}
           onTabChange={setEarnTab}
           onAmountChange={setEarnAmount}
@@ -121,7 +136,10 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onReviewBack={() => setEarnStep('amount')}
           onReviewConfirm={() => setEarnStep('processing')}
           onProcessingCancel={() => setEarnStep('review')}
-          onProcessingComplete={() => setEarnStep('confirmed')}
+          onProcessingComplete={() => {
+            setEarnConfirmedAt(Date.now())
+            setEarnStep('confirmed')
+          }}
           onConfirmedGoToDashboard={completeEarn}
         />
       ) : null}

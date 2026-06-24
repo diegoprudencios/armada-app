@@ -12,6 +12,7 @@ export interface SendProcessingScreenProps {
   recipient: string
   chain: SendChainId
   armadaAddress?: string
+  confirmedAt: number
   confirmed?: boolean
   onCancel: () => void
   onComplete: () => void
@@ -24,6 +25,7 @@ export function SendProcessingScreen({
   recipient,
   chain,
   armadaAddress,
+  confirmedAt,
   confirmed = false,
   onCancel,
   onComplete,
@@ -53,6 +55,7 @@ export function SendProcessingScreen({
         recipient={recipient}
         chain={chain}
         armadaAddress={armadaAddress}
+        confirmedAt={confirmedAt}
         onViewExplorer={onViewExplorer ?? (() => undefined)}
         onGoToDashboard={onGoToDashboard}
       />

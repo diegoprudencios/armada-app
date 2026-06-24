@@ -12,6 +12,7 @@ export interface DepositProcessingScreenProps {
   walletAddress?: string
   walletProvider?: string
   armadaAddress?: string
+  confirmedAt: number
   confirmed?: boolean
   onCancel: () => void
   onComplete: () => void
@@ -25,6 +26,7 @@ export function DepositProcessingScreen({
   walletAddress,
   walletProvider,
   armadaAddress,
+  confirmedAt,
   confirmed = false,
   onCancel,
   onComplete,
@@ -55,6 +57,7 @@ export function DepositProcessingScreen({
         walletAddress={walletAddress}
         walletProvider={walletProvider}
         armadaAddress={armadaAddress}
+        confirmedAt={confirmedAt}
         onViewExplorer={onViewExplorer ?? (() => undefined)}
         onGoToDashboard={onGoToDashboard}
       />

@@ -35,6 +35,7 @@ export interface SendModalFlowProps {
   armadaAddress?: string
   walletAddress?: string
   walletProvider?: string
+  confirmedAt?: number | null
   onClose: () => void
   onRecipientChange: (recipient: string) => void
   onChainChange: (chain: SendChainId) => void
@@ -60,6 +61,7 @@ export function SendModalFlow({
   armadaBalance,
   armadaAddress,
   walletAddress,
+  confirmedAt,
   onClose,
   onRecipientChange,
   onChainChange,
@@ -141,6 +143,7 @@ export function SendModalFlow({
             recipient={recipient}
             chain={chain}
             armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
+            confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
             onCancel={onProcessingCancel}
             onComplete={onProcessingComplete}

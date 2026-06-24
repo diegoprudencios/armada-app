@@ -19,6 +19,7 @@ export interface EarnModalFlowProps {
   tab: EarnTab
   amount: string
   sourceBalance: number
+  confirmedAt?: number | null
   onClose: () => void
   onTabChange: (tab: EarnTab) => void
   onAmountChange: (amount: string) => void
@@ -36,6 +37,7 @@ export function EarnModalFlow({
   tab,
   amount,
   sourceBalance,
+  confirmedAt,
   onClose,
   onTabChange,
   onAmountChange,
@@ -85,6 +87,7 @@ export function EarnModalFlow({
           <EarnProcessingScreen
             tab={tab}
             amount={amount}
+            confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
             onCancel={onProcessingCancel}
             onComplete={onProcessingComplete}

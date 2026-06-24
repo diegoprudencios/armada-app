@@ -21,6 +21,7 @@ export interface DepositConfirmedScreenProps {
   walletAddress?: string
   walletProvider?: string
   armadaAddress?: string
+  confirmedAt: number
   onViewExplorer: () => void
   onGoToDashboard: () => void
 }
@@ -31,6 +32,7 @@ export function DepositConfirmedScreen({
   walletAddress,
   walletProvider,
   armadaAddress,
+  confirmedAt,
   onViewExplorer,
   onGoToDashboard,
 }: DepositConfirmedScreenProps) {
@@ -59,6 +61,7 @@ export function DepositConfirmedScreen({
           walletAddress={walletAddress ?? DEMO_WALLET_ADDRESS}
           walletProvider={walletProvider}
           armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
+          confirmedAt={confirmedAt}
         />
       </div>
 

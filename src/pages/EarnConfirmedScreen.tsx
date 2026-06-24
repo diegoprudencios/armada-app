@@ -20,6 +20,7 @@ export interface EarnConfirmedScreenProps {
   tab: EarnTab
   amount: string
   apy?: number
+  confirmedAt: number
   onViewExplorer: () => void
   onGoToDashboard: () => void
 }
@@ -28,6 +29,7 @@ export function EarnConfirmedScreen({
   tab,
   amount,
   apy = DEMO_EARN_APY,
+  confirmedAt,
   onViewExplorer,
   onGoToDashboard,
 }: EarnConfirmedScreenProps) {
@@ -48,7 +50,7 @@ export function EarnConfirmedScreen({
           </div>
         </div>
 
-        <EarnReviewSummary tab={tab} amount={amountNum} apy={apy} feeUsdc={feeUsdc} />
+        <EarnReviewSummary tab={tab} amount={amountNum} apy={apy} feeUsdc={feeUsdc} confirmedAt={confirmedAt} />
       </div>
 
       <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>

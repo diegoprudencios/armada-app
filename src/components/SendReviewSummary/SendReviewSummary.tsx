@@ -1,4 +1,5 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
 import { isArmadaAddress } from '@/pages/sendFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
@@ -10,6 +11,7 @@ export interface SendReviewSummaryProps {
   networkName?: string
   amount: number
   feeUsdc: number
+  confirmedAt?: number
 }
 
 export function SendReviewSummary({
@@ -18,6 +20,7 @@ export function SendReviewSummary({
   networkName,
   amount,
   feeUsdc,
+  confirmedAt,
 }: SendReviewSummaryProps) {
   const isPrivate = isArmadaAddress(recipientAddress)
   const total = amount + feeUsdc
@@ -27,6 +30,7 @@ export function SendReviewSummary({
   return (
     <div className={styles.summary}>
       <div className={styles.summaryBody}>
+        {confirmedAt ? <TransactionDateTimeRow confirmedAt={confirmedAt} /> : null}
         {!isPrivate && networkName ? (
           <div className={styles.summaryRow}>
             <span className={styles.summaryLabel}>Network</span>

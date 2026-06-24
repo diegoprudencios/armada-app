@@ -10,6 +10,7 @@ const STAGE_ADVANCE_MS = 2500
 export interface EarnProcessingScreenProps {
   tab: EarnTab
   amount: string
+  confirmedAt: number
   confirmed?: boolean
   onCancel: () => void
   onComplete: () => void
@@ -20,6 +21,7 @@ export interface EarnProcessingScreenProps {
 export function EarnProcessingScreen({
   tab,
   amount,
+  confirmedAt,
   confirmed = false,
   onCancel,
   onComplete,
@@ -47,6 +49,7 @@ export function EarnProcessingScreen({
       <EarnConfirmedScreen
         tab={tab}
         amount={amount}
+        confirmedAt={confirmedAt}
         onViewExplorer={onViewExplorer ?? (() => undefined)}
         onGoToDashboard={onGoToDashboard}
       />

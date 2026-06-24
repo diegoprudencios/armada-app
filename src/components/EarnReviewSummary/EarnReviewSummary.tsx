@@ -1,3 +1,4 @@
+import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { formatUsdcAmount } from '@/utils/format'
 import { formatDemoApy, type EarnTab } from '@/pages/earnFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
@@ -8,9 +9,10 @@ export interface EarnReviewSummaryProps {
   amount: number
   apy: number
   feeUsdc: number
+  confirmedAt?: number
 }
 
-export function EarnReviewSummary({ tab, amount, apy, feeUsdc }: EarnReviewSummaryProps) {
+export function EarnReviewSummary({ tab, amount, apy, feeUsdc, confirmedAt }: EarnReviewSummaryProps) {
   const modeLabel = tab === 'add' ? 'Add to vault' : 'Withdraw from vault'
   const amountRowLabel = tab === 'add' ? 'Your deposit' : 'Your withdrawal'
   const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
@@ -20,6 +22,7 @@ export function EarnReviewSummary({ tab, amount, apy, feeUsdc }: EarnReviewSumma
   return (
     <div className={styles.summary}>
       <div className={styles.summaryBody}>
+        {confirmedAt ? <TransactionDateTimeRow confirmedAt={confirmedAt} /> : null}
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Mode</span>
           <span className={styles.summaryValue}>{modeLabel}</span>

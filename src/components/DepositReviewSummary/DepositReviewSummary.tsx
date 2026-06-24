@@ -1,4 +1,5 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { WalletProviderIcon } from '@/components/WalletPillMenu/WalletPillMenu'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
 import usdcAmount from '@/styles/usdcAmount.module.css'
@@ -13,6 +14,7 @@ export interface DepositReviewSummaryProps {
   walletAddress: string
   walletProvider?: string
   armadaAddress: string
+  confirmedAt?: number
 }
 
 export function DepositReviewSummary({
@@ -22,6 +24,7 @@ export function DepositReviewSummary({
   walletAddress,
   walletProvider = 'metamask',
   armadaAddress,
+  confirmedAt,
 }: DepositReviewSummaryProps) {
   const total = amount + feeUsdc
   const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
@@ -30,6 +33,7 @@ export function DepositReviewSummary({
   return (
     <div className={styles.summary}>
       <div className={styles.summaryBody}>
+        {confirmedAt ? <TransactionDateTimeRow confirmedAt={confirmedAt} /> : null}
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Network</span>
           <span className={styles.summaryValue}>{networkName}</span>

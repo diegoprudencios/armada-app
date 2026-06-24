@@ -18,6 +18,7 @@ export interface SendConfirmedScreenProps {
   recipient: string
   chain: SendChainId
   armadaAddress?: string
+  confirmedAt: number
   onViewExplorer: () => void
   onGoToDashboard: () => void
 }
@@ -27,6 +28,7 @@ export function SendConfirmedScreen({
   recipient,
   chain,
   armadaAddress,
+  confirmedAt,
   onViewExplorer,
   onGoToDashboard,
 }: SendConfirmedScreenProps) {
@@ -56,6 +58,7 @@ export function SendConfirmedScreen({
           networkName={networkName}
           amount={amountNum}
           feeUsdc={feeUsdc}
+          confirmedAt={confirmedAt}
         />
       </div>
 
