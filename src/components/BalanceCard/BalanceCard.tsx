@@ -54,6 +54,8 @@ export interface BalanceCardProps {
   onVaultOpen?: () => void
   activityVisible?: boolean
   onToggleActivity?: () => void
+  balanceHidden?: boolean
+  onBalanceHiddenChange?: (hidden: boolean) => void
 }
 
 function prefersReducedMotion(): boolean {
@@ -87,11 +89,22 @@ export function BalanceCard({
   onVaultOpen,
   activityVisible = false,
   onToggleActivity,
+  balanceHidden: balanceHiddenProp,
+  onBalanceHiddenChange,
 }: BalanceCardProps) {
   const isV2Actions = actionLayout === 'v2'
   const [background] = useDashboardBackground()
   const isSolidBackground = background === 'solid'
-  const [balanceHidden, setBalanceHidden] = useState(false)
+  const [internalBalanceHidden, setInternalBalanceHidden] = useState(false)
+  const balanceHiddenControlled = balanceHiddenProp !== undefined
+  const balanceHidden = balanceHiddenControlled ? balanceHiddenProp : internalBalanceHidden
+  const setBalanceHidden = (next: boolean | ((hidden: boolean) => boolean)) => {
+    const resolved = typeof next === 'function' ? next(balanceHidden) : next
+    onBalanceHiddenChange?.(resolved)
+    if (!balanceHiddenControlled) {
+      setInternalBalanceHidden(resolved)
+    }
+  }
   const [peekBalance, setPeekBalance] = useState(false)
   const [balanceIntroPlaying, setBalanceIntroPlaying] = useState(() => !prefersReducedMotion())
   const balanceValueRef = useRef<HTMLSpanElement>(null)

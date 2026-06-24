@@ -1,8 +1,14 @@
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
+import { DepositReviewSummary } from '@/components/DepositReviewSummary'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import { parseActiveAmount } from '@/utils/amountInput'
+import { calculateDepositFee } from '@/utils/depositFee'
 import { formatUsdcAmount } from '@/utils/format'
+import {
+  DEMO_ARMADA_ADDRESS,
+  DEMO_WALLET_ADDRESS,
+} from './depositFlowConstants'
 import styles from './DepositConfirmedScreen.module.css'
 
 const TOKEN_BADGE_PX = 40
@@ -11,16 +17,26 @@ const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
 
 export interface DepositConfirmedScreenProps {
   amount: string
+  networkName: string
+  walletAddress?: string
+  walletProvider?: string
+  armadaAddress?: string
   onViewExplorer: () => void
   onGoToDashboard: () => void
 }
 
 export function DepositConfirmedScreen({
   amount,
+  networkName,
+  walletAddress,
+  walletProvider,
+  armadaAddress,
   onViewExplorer,
   onGoToDashboard,
 }: DepositConfirmedScreenProps) {
-  const amountLabel = formatUsdcAmount(parseActiveAmount(amount))
+  const amountNum = parseActiveAmount(amount)
+  const feeUsdc = calculateDepositFee(amountNum)
+  const amountLabel = formatUsdcAmount(amountNum)
 
   return (
     <div className={styles.column}>
@@ -35,6 +51,15 @@ export function DepositConfirmedScreen({
             <span className={styles.amountValue}>{amountLabel}</span>
           </div>
         </div>
+
+        <DepositReviewSummary
+          networkName={networkName}
+          amount={amountNum}
+          feeUsdc={feeUsdc}
+          walletAddress={walletAddress ?? DEMO_WALLET_ADDRESS}
+          walletProvider={walletProvider}
+          armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
+        />
       </div>
 
       <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>

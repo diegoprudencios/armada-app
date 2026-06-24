@@ -36,6 +36,16 @@ button.root:hover::before {
   opacity: 1;
 }
 
+:global([data-theme='light'][data-dashboard-bg='solid']) .root::before {
+  background: var(--primitives-color-neutral-100);
+  opacity: 1;
+}
+
+:global([data-theme='light'][data-dashboard-bg='solid']) button.root:hover::before {
+  background: var(--primitives-color-neutral-200);
+  opacity: 1;
+}
+
 .root:focus-visible {
   outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
   outline-offset: calc(var(--primitives-spacing-1) * 1px);

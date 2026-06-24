@@ -1,8 +1,12 @@
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
+import { SendReviewSummary } from '@/components/SendReviewSummary'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import { parseActiveAmount } from '@/utils/amountInput'
+import { calculateSendFee } from '@/utils/sendFee'
 import { formatUsdcAmount } from '@/utils/format'
+import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
+import { isArmadaAddress, type SendChainId, sendNetworkDisplayName } from './sendFlowConstants'
 import styles from './SendConfirmedScreen.module.css'
 
 const TOKEN_BADGE_PX = 40
@@ -11,16 +15,26 @@ const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
 
 export interface SendConfirmedScreenProps {
   amount: string
+  recipient: string
+  chain: SendChainId
+  armadaAddress?: string
   onViewExplorer: () => void
   onGoToDashboard: () => void
 }
 
 export function SendConfirmedScreen({
   amount,
+  recipient,
+  chain,
+  armadaAddress,
   onViewExplorer,
   onGoToDashboard,
 }: SendConfirmedScreenProps) {
-  const amountLabel = formatUsdcAmount(parseActiveAmount(amount))
+  const amountNum = parseActiveAmount(amount)
+  const feeUsdc = calculateSendFee(amountNum)
+  const isPrivate = isArmadaAddress(recipient)
+  const networkName = isPrivate ? undefined : sendNetworkDisplayName(chain)
+  const amountLabel = formatUsdcAmount(amountNum)
 
   return (
     <div className={styles.column}>
@@ -35,6 +49,14 @@ export function SendConfirmedScreen({
             <span className={styles.amountValue}>{amountLabel}</span>
           </div>
         </div>
+
+        <SendReviewSummary
+          recipientAddress={recipient}
+          armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
+          networkName={networkName}
+          amount={amountNum}
+          feeUsdc={feeUsdc}
+        />
       </div>
 
       <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>

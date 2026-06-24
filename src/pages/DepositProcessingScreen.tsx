@@ -8,6 +8,10 @@ const STAGE_ADVANCE_MS = 2500
 
 export interface DepositProcessingScreenProps {
   amount: string
+  networkName: string
+  walletAddress?: string
+  walletProvider?: string
+  armadaAddress?: string
   confirmed?: boolean
   onCancel: () => void
   onComplete: () => void
@@ -17,6 +21,10 @@ export interface DepositProcessingScreenProps {
 
 export function DepositProcessingScreen({
   amount,
+  networkName,
+  walletAddress,
+  walletProvider,
+  armadaAddress,
   confirmed = false,
   onCancel,
   onComplete,
@@ -43,6 +51,10 @@ export function DepositProcessingScreen({
     return (
       <DepositConfirmedScreen
         amount={amount}
+        networkName={networkName}
+        walletAddress={walletAddress}
+        walletProvider={walletProvider}
+        armadaAddress={armadaAddress}
         onViewExplorer={onViewExplorer ?? (() => undefined)}
         onGoToDashboard={onGoToDashboard}
       />

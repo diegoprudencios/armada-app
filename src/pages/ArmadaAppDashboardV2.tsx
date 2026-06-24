@@ -40,6 +40,9 @@ export function ArmadaAppDashboardV2({
     activityVisible,
     toggleActivity,
     recentActivity,
+    balanceHidden,
+    setBalanceHidden,
+    openActivityReceipt,
   } = state
 
   useRequireConnectedWallet(wallet)
@@ -74,8 +77,16 @@ export function ArmadaAppDashboardV2({
           onVaultOpen={() => openEarn('add')}
           activityVisible={activityVisible}
           onToggleActivity={toggleActivity}
+          balanceHidden={balanceHidden}
+          onBalanceHiddenChange={setBalanceHidden}
         />
-        {activityVisible ? <RecentActivityList items={recentActivity} /> : null}
+        {activityVisible ? (
+          <RecentActivityList
+            items={recentActivity}
+            balanceRevealed={!balanceHidden}
+            onItemClick={openActivityReceipt}
+          />
+        ) : null}
         {showDepositTooltip ? (
           <div
             className={styles.tooltipEnter}

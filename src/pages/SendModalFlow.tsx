@@ -138,6 +138,9 @@ export function SendModalFlow({
         return (
           <SendProcessingScreen
             amount={amount}
+            recipient={recipient}
+            chain={chain}
+            armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
             confirmed={isConfirmed}
             onCancel={onProcessingCancel}
             onComplete={onProcessingComplete}

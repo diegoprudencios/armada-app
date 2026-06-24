@@ -18,6 +18,15 @@
   background: var(--semantic-color-surface-hover);
 }
 
+:global([data-theme='light'][data-dashboard-bg='solid']) .root .trigger {
+  background: var(--primitives-color-neutral-100);
+}
+
+:global([data-theme='light'][data-dashboard-bg='solid']) .root .trigger:hover:not(:disabled),
+:global([data-theme='light'][data-dashboard-bg='solid']) .root .trigger:active:not(:disabled) {
+  background: var(--primitives-color-neutral-200);
+}
+
 .triggerIcon {
   display: flex;
   align-items: center;
@@ -72,6 +81,14 @@
     calc(var(--primitives-spacing-6) + var(--primitives-spacing-1) * 0.25)
     calc(var(--primitives-spacing-12) + var(--primitives-spacing-1) * 0.5)
     0 color-mix(in srgb, var(--primitives-color-purple-300) 25%, transparent);
+}
+
+:global([data-theme='light'][data-dashboard-bg='solid']) .card {
+  background: var(--primitives-color-neutral-100);
+  box-shadow: 0
+    calc(var(--primitives-spacing-2) + var(--primitives-spacing-1) * 0.5)
+    calc(var(--primitives-spacing-6) + var(--primitives-spacing-1) * 0.25)
+    0 color-mix(in srgb, var(--semantic-color-text-primary) 8%, transparent);
 }
 
 .cardIdentity {

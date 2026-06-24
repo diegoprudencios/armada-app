@@ -111,6 +111,9 @@ export function DepositModalFlow({
         return (
           <DepositProcessingScreen
             amount={amount}
+            networkName={networkDisplayName(chain)}
+            walletAddress={walletAddress}
+            walletProvider={walletProvider}
             confirmed={isConfirmed}
             onCancel={onProcessingCancel}
             onComplete={onProcessingComplete}

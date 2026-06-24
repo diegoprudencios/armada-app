@@ -91,6 +91,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [earningBalance, setEarningBalance] = useState(readInitialEarningBalance)
   const [activityVisible, setActivityVisible] = useState(readActivityPanelVisible)
   const [recentActivity, setRecentActivity] = useState<DashboardActivityItem[]>(readInitialRecentActivity)
+  const [balanceHidden, setBalanceHidden] = useState(false)
   const [balanceRoll, setBalanceRoll] = useState<BalanceRollState>({
     trigger: 0,
     mode: 'fromZero',
@@ -98,6 +99,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   const pendingDepositRef = useRef(0)
   const pendingSendRef = useRef(0)
   const pendingEarnRef = useRef<{ amount: number; tab: EarnTab } | null>(null)
+  const activityReceiptRef = useRef(false)
 
   useEffect(() => {
     if (!isMock) return
@@ -129,6 +131,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     setHasCompletedDeposit(false)
     setActivityVisible(false)
     writeActivityPanelVisible(false)
+    setBalanceHidden(false)
     setRecentActivity([])
     setConnectOpen(false)
     closeDeposit()
@@ -149,8 +152,18 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function closeSend() {
+    if (activityReceiptRef.current) {
+      activityReceiptRef.current = false
+      setSendStep(null)
+      setSendAmount('')
+      setSendRecipient('')
+      setSendChain('ethereum')
+      return
+    }
+
     const sent = pendingSendRef.current
     const recipient = sendRecipient
+    const chain = sendChain
     pendingSendRef.current = 0
     setSendStep(null)
     setSendAmount('')
@@ -158,7 +171,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     setSendChain('ethereum')
 
     if (sent > 0) {
-      setRecentActivity((items) => prependActivity(items, createSendActivity(sent, recipient)))
+      setRecentActivity((items) => prependActivity(items, createSendActivity(sent, recipient, chain)))
       const fromValue = formatUsdcAmount(dashboardBalance)
       setDashboardBalance((prev) => prev - sent)
       setBalanceRoll((roll) => ({
@@ -170,6 +183,8 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function completeSend() {
+    if (activityReceiptRef.current) return
+
     const sent = parseActiveAmount(sendAmount)
     if (sent > 0) {
       pendingSendRef.current = sent
@@ -187,6 +202,14 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function closeDeposit() {
+    if (activityReceiptRef.current) {
+      activityReceiptRef.current = false
+      setDepositStep(null)
+      setDepositAmount('')
+      setDepositChain('sepolia')
+      return
+    }
+
     const deposited = pendingDepositRef.current
     const chain = depositChain
     pendingDepositRef.current = 0
@@ -207,6 +230,8 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function completeDeposit() {
+    if (activityReceiptRef.current) return
+
     const deposited = parseActiveAmount(depositAmount)
     if (deposited > 0) {
       pendingDepositRef.current = deposited
@@ -225,6 +250,14 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function closeEarn() {
+    if (activityReceiptRef.current) {
+      activityReceiptRef.current = false
+      setEarnStep(null)
+      setEarnAmount('')
+      setEarnTab('add')
+      return
+    }
+
     setEarnStep(null)
     setEarnAmount('')
     setEarnTab('add')
@@ -265,6 +298,8 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function completeEarn() {
+    if (activityReceiptRef.current) return
+
     const moved = parseActiveAmount(earnAmount)
     if (moved > 0) {
       pendingEarnRef.current = { amount: moved, tab: earnTab }
@@ -280,6 +315,34 @@ export function useDashboardDemoState(initialBalance = 0) {
       writeActivityPanelVisible(next)
       return next
     })
+  }
+
+  function openActivityReceipt(item: DashboardActivityItem) {
+    if (!wallet) return
+
+    activityReceiptRef.current = true
+    const amountLabel = String(Math.abs(item.amount))
+
+    switch (item.kind) {
+      case 'send':
+        setSendRecipient(item.recipient)
+        setSendChain(item.chain)
+        setSendAmount(amountLabel)
+        setSendStep('confirmed')
+        return
+      case 'deposit':
+        setDepositChain(item.chain)
+        setDepositAmount(amountLabel)
+        setDepositStep('confirmed')
+        return
+      case 'earn':
+        setEarnTab(item.tab)
+        setEarnAmount(amountLabel)
+        setEarnStep('confirmed')
+        return
+      default:
+        activityReceiptRef.current = false
+    }
   }
 
   return {
@@ -300,6 +363,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     earningBalance,
     activityVisible,
     recentActivity,
+    balanceHidden,
     earnSourceBalance,
     balanceRoll,
     showDepositTooltip,
@@ -325,6 +389,8 @@ export function useDashboardDemoState(initialBalance = 0) {
     setEarnTab,
     setEarnAmount,
     setEarnStep,
+    setBalanceHidden,
     toggleActivity,
+    openActivityReceipt,
   }
 }

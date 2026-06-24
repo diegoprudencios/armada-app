@@ -1,4 +1,5 @@
 import type { DashboardActivityItem } from '@/constants/dashboardActivity'
+import { normalizeActivityItems } from '@/utils/dashboardActivity'
 
 export type DemoWallet = {
   address: string
@@ -55,7 +56,7 @@ export function readDemoDashboardSession(): DemoDashboardSession | null {
       balance: parsed.balance ?? 0,
       earningBalance: parsed.earningBalance ?? 0,
       hasCompletedDeposit: parsed.hasCompletedDeposit ?? false,
-      recentActivity: parsed.recentActivity ?? [],
+      recentActivity: normalizeActivityItems(parsed.recentActivity ?? []),
     }
   } catch {
     return null

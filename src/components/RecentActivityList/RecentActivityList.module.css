@@ -42,10 +42,25 @@
   gap: var(--primitives-spacing-3);
   width: 100%;
   min-height: var(--primitives-spacing-11);
-  padding: var(--primitives-spacing-4) var(--primitives-spacing-5);
+  padding: var(--primitives-spacing-3);
   border-radius: calc(var(--primitives-spacing-5) / 2);
   background: var(--semantic-color-surface-main);
   box-sizing: border-box;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: background-color 160ms ease;
+}
+
+.item:hover {
+  background: var(--semantic-color-surface-hover);
+}
+
+.item:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
 }
 
 .iconBadge {
@@ -104,6 +119,10 @@
 
 .amountNegative {
   color: var(--semantic-color-text-primary);
+}
+
+.amountSuffix {
+  white-space: pre;
 }
 
 .emptyState {

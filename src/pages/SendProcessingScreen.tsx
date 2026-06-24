@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { SendProcessingStepper } from '@/components/SendProcessingStepper'
 import { SendConfirmedScreen } from '@/pages/SendConfirmedScreen'
+import type { SendChainId } from './sendFlowConstants'
 import styles from './SendProcessingScreen.module.css'
 
 const DEMO_PROCESSING_MS = 8000
@@ -8,6 +9,9 @@ const STAGE_ADVANCE_MS = 2500
 
 export interface SendProcessingScreenProps {
   amount: string
+  recipient: string
+  chain: SendChainId
+  armadaAddress?: string
   confirmed?: boolean
   onCancel: () => void
   onComplete: () => void
@@ -17,6 +21,9 @@ export interface SendProcessingScreenProps {
 
 export function SendProcessingScreen({
   amount,
+  recipient,
+  chain,
+  armadaAddress,
   confirmed = false,
   onCancel,
   onComplete,
@@ -43,6 +50,9 @@ export function SendProcessingScreen({
     return (
       <SendConfirmedScreen
         amount={amount}
+        recipient={recipient}
+        chain={chain}
+        armadaAddress={armadaAddress}
         onViewExplorer={onViewExplorer ?? (() => undefined)}
         onGoToDashboard={onGoToDashboard}
       />

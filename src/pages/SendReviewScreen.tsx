@@ -37,7 +37,7 @@ export function SendReviewScreen({
   return (
     <div className={styles.column}>
       <div className={modalStepBodyEnter}>
-        <h1 className={styles.title}>Review your send</h1>
+        <h1 className={styles.title}>Review transfer</h1>
 
         <div className={styles.amountRow}>
           <div className={styles.amountGroup}>
