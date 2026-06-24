@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/solid'
-import { GlobeAltIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
+import { GlobeAltIcon } from '@heroicons/react/24/outline'
+import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { Button } from '@/components/Button'
 import { modalStepBodyEnter } from '@/components/ModalShell'
 import { useEnvironment } from '@/hooks/useEnvironment'
@@ -189,19 +190,19 @@ export function SendRecipientScreen({
         </div>
 
         {hasAddress ? (
-          <div className={styles.actionRow}>
+          <div className={`${styles.actionRow} ${styles.actionRowReveal}`}>
             <div className={styles.privacyBadge}>
               <span
                 className={[
                   styles.privacyIcon,
-                  isPrivate ? styles.privacyIconPrivate : styles.privacyIconPublic,
+                  isPrivate ? styles.brandBadge : styles.privacyIconPublic,
                 ]
                   .filter(Boolean)
                   .join(' ')}
                 aria-hidden
               >
                 {isPrivate ? (
-                  <ShieldCheckIcon className={styles.privacyIconSvg} strokeWidth={1.75} />
+                  <ArmadaLogo variant="mark" markTone="white" className={styles.brandMark} />
                 ) : (
                   <GlobeAltIcon className={styles.privacyIconSvg} strokeWidth={1.75} />
                 )}

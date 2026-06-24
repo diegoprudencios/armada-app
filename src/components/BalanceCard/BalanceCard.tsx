@@ -23,6 +23,7 @@ import {
 } from './balanceRevealMotion'
 import { SendButton } from '@/components/SendButton'
 import { Tooltip } from '@/components/Tooltip'
+import { VaultPositionBar } from '@/components/VaultPositionBar'
 import { useDashboardBackground } from '@/hooks/useDashboardBackground'
 import { formatUsdcAmount } from '@/utils/format'
 import styles from './BalanceCard.module.css'
@@ -46,7 +47,10 @@ export interface BalanceCardProps {
   onRequest?: () => void
   onMore?: () => void
   onEarn?: () => void
-  onWithdraw?: () => void
+  vaultBalance?: number
+  vaultApy?: number
+  vaultRollFromValue?: string
+  onVaultOpen?: () => void
 }
 
 function prefersReducedMotion(): boolean {
@@ -74,7 +78,10 @@ export function BalanceCard({
   onRequest,
   onMore,
   onEarn,
-  onWithdraw,
+  vaultBalance = 0,
+  vaultApy,
+  vaultRollFromValue,
+  onVaultOpen,
 }: BalanceCardProps) {
   const isV2Actions = actionLayout === 'v2'
   const [background] = useDashboardBackground()
@@ -130,6 +137,10 @@ export function BalanceCard({
     !balanceHidden &&
     balance > 0 &&
     balanceRollTrigger > completedRollTrigger
+  const vaultTransferRollActive =
+    !balanceIntroPlaying &&
+    vaultRollFromValue !== undefined &&
+    balanceRollTrigger > completedRollTrigger
   const showRollingBalance = balanceIntroPlaying || depositRollActive
   const sendClassName = [styles.sendButton, !hasCompletedDeposit && styles.actionAmber]
     .filter(Boolean)
@@ -183,6 +194,17 @@ export function BalanceCard({
       </span>
     </>
   )
+
+  const showVaultPosition = vaultBalance > 0 || vaultTransferRollActive
+  const vaultBarWasRevealed = useRef(vaultBalance > 0)
+  const shouldAnimateVaultEnter =
+    showVaultPosition && !vaultBarWasRevealed.current && !vaultTransferRollActive
+
+  if (showVaultPosition) {
+    vaultBarWasRevealed.current = true
+  } else {
+    vaultBarWasRevealed.current = false
+  }
 
   return (
     <div className={styles.cardShell}>
@@ -269,9 +291,10 @@ export function BalanceCard({
           </div>
         </div>
 
-        <div
-          className={[styles.actionRow, isV2Actions && styles.actionRowV2].filter(Boolean).join(' ')}
-        >
+        <div className={styles.cardFooter}>
+          <div
+            className={[styles.actionRow, isV2Actions && styles.actionRowV2].filter(Boolean).join(' ')}
+          >
           <div className={styles.actionEnter}>
             <SendButton
               variant={hasCompletedDeposit ? 'gradient' : 'solid'}
@@ -336,7 +359,7 @@ export function BalanceCard({
                 </span>
                 <span className={styles.moreMenuMeta}>4.2% APR</span>
               </button>
-              <button type="button" className={styles.moreMenuItem} role="menuitem" onClick={onWithdraw ?? onMore}>
+              <button type="button" className={styles.moreMenuItem} role="menuitem" disabled>
                 <span className={styles.moreMenuItemLead}>
                   <span className={styles.moreMenuIconBadge}>
                     <ArrowUpIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
@@ -352,6 +375,30 @@ export function BalanceCard({
               aria-label="More options"
             />
           </div>
+          </div>
+
+          {showVaultPosition ? (
+            <div
+              className={[
+                styles.vaultPositionWrap,
+                shouldAnimateVaultEnter ? styles.vaultPositionEnter : styles.vaultPositionVisible,
+              ].join(' ')}
+              onMouseEnter={() => {
+                if (balanceHidden) setPeekBalance(true)
+              }}
+              onMouseLeave={() => setPeekBalance(false)}
+            >
+              <VaultPositionBar
+                balance={vaultBalance}
+                apy={vaultApy}
+                vaultRollActive={vaultTransferRollActive}
+                vaultRollFromValue={vaultRollFromValue}
+                vaultRollTrigger={balanceRollTrigger}
+                balanceRevealed={showBalance}
+                onOpen={onVaultOpen ?? onEarn}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

@@ -16,14 +16,17 @@ import {
   type DemoWalletProvider,
 } from '@/pages/depositFlowConstants'
 import type { SendChainId } from '@/pages/sendFlowConstants'
+import type { EarnModalStep, EarnTab } from '@/pages/earnFlowConstants'
 
 export type DepositStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 export type SendStep = 'recipient' | 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
+export type EarnStep = EarnModalStep
 
 type BalanceRollState = {
   trigger: number
   mode: BalanceRollMode
   fromValue?: string
+  vaultFromValue?: string
 }
 
 function readInitialWallet(): DemoWallet | null {
@@ -44,6 +47,13 @@ function readInitialHasCompletedDeposit(): boolean {
   return false
 }
 
+function readInitialEarningBalance(): number {
+  if (getCurrentEnvironment() === 'mock') {
+    return readDemoDashboardSession()?.earningBalance ?? 0
+  }
+  return 0
+}
+
 export function useDashboardDemoState(initialBalance = 0) {
   const [environment] = useEnvironment()
   const isMock = environment === 'mock'
@@ -59,21 +69,27 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [sendAmount, setSendAmount] = useState('')
   const [sendRecipient, setSendRecipient] = useState('')
   const [sendChain, setSendChain] = useState<SendChainId>('ethereum')
+  const [earnStep, setEarnStep] = useState<EarnStep | null>(null)
+  const [earnTab, setEarnTab] = useState<EarnTab>('add')
+  const [earnAmount, setEarnAmount] = useState('')
+  const [earningBalance, setEarningBalance] = useState(readInitialEarningBalance)
   const [balanceRoll, setBalanceRoll] = useState<BalanceRollState>({
     trigger: 0,
     mode: 'fromZero',
   })
   const pendingDepositRef = useRef(0)
   const pendingSendRef = useRef(0)
+  const pendingEarnRef = useRef<{ amount: number; tab: EarnTab } | null>(null)
 
   useEffect(() => {
     if (!isMock) return
     writeDemoDashboardSession({
       wallet,
       balance: dashboardBalance,
+      earningBalance,
       hasCompletedDeposit,
     })
-  }, [isMock, wallet, dashboardBalance, hasCompletedDeposit])
+  }, [isMock, wallet, dashboardBalance, earningBalance, hasCompletedDeposit])
 
   function openConnect() {
     setConnectOpen(true)
@@ -90,10 +106,12 @@ export function useDashboardDemoState(initialBalance = 0) {
   function disconnectWallet() {
     setWallet(null)
     setDashboardBalance(initialBalance)
+    setEarningBalance(0)
     setHasCompletedDeposit(false)
     setConnectOpen(false)
     closeDeposit()
     closeSend()
+    closeEarn()
     returnToLanding()
   }
 
@@ -172,6 +190,60 @@ export function useDashboardDemoState(initialBalance = 0) {
     setHasCompletedDeposit(true)
   }
 
+  function openEarn(tab: EarnTab = 'add') {
+    if (!wallet) {
+      openConnect()
+      return
+    }
+    setEarnTab(tab)
+    setEarnAmount('')
+    setEarnStep('amount')
+  }
+
+  function closeEarn() {
+    setEarnStep(null)
+    setEarnAmount('')
+    setEarnTab('add')
+
+    const pending = pendingEarnRef.current
+    pendingEarnRef.current = null
+
+    if (!pending || pending.amount <= 0) return
+
+    if (pending.tab === 'add') {
+      const balanceFrom = formatUsdcAmount(dashboardBalance)
+      const vaultFrom = formatUsdcAmount(earningBalance)
+      setDashboardBalance((prev) => prev - pending.amount)
+      setEarningBalance((prev) => prev + pending.amount)
+      setBalanceRoll((roll) => ({
+        trigger: roll.trigger + 1,
+        mode: 'fromValue',
+        fromValue: balanceFrom,
+        vaultFromValue: vaultFrom,
+      }))
+      return
+    }
+
+    const balanceFrom = formatUsdcAmount(dashboardBalance)
+    const vaultFrom = formatUsdcAmount(earningBalance)
+    setEarningBalance((prev) => prev - pending.amount)
+    setDashboardBalance((prev) => prev + pending.amount)
+    setBalanceRoll((roll) => ({
+      trigger: roll.trigger + 1,
+      mode: 'fromValue',
+      fromValue: balanceFrom,
+      vaultFromValue: vaultFrom,
+    }))
+  }
+
+  function completeEarn() {
+    const moved = parseActiveAmount(earnAmount)
+    if (moved > 0) {
+      pendingEarnRef.current = { amount: moved, tab: earnTab }
+    }
+  }
+
+  const earnSourceBalance = earnTab === 'add' ? dashboardBalance : earningBalance
   const showDepositTooltip = Boolean(wallet) && !hasCompletedDeposit
 
   return {
@@ -186,6 +258,11 @@ export function useDashboardDemoState(initialBalance = 0) {
     sendAmount,
     sendRecipient,
     sendChain,
+    earnStep,
+    earnTab,
+    earnAmount,
+    earningBalance,
+    earnSourceBalance,
     balanceRoll,
     showDepositTooltip,
     openConnect,
@@ -197,6 +274,9 @@ export function useDashboardDemoState(initialBalance = 0) {
     openSend,
     closeSend,
     completeSend,
+    openEarn,
+    closeEarn,
+    completeEarn,
     setDepositAmount,
     setDepositChain,
     setDepositStep,
@@ -204,5 +284,8 @@ export function useDashboardDemoState(initialBalance = 0) {
     setSendRecipient,
     setSendChain,
     setSendStep,
+    setEarnTab,
+    setEarnAmount,
+    setEarnStep,
   }
 }

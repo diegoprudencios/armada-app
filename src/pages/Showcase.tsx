@@ -100,6 +100,7 @@ export function Showcase() {
   const [processingStage, setProcessingStage] = useState(1)
   const [balanceLayout, setBalanceLayout] = useState<'default' | 'v2'>('default')
   const [hasDeposit, setHasDeposit] = useState(false)
+  const [showVaultPosition, setShowVaultPosition] = useState(false)
 
   return (
     <div className={styles.page}>
@@ -404,18 +405,25 @@ export function Showcase() {
           >
             {hasDeposit ? 'First deposit' : 'Has deposit'}
           </button>
+          <button
+            type="button"
+            className={styles.stepControl}
+            onClick={() => setShowVaultPosition((value) => !value)}
+          >
+            {showVaultPosition ? 'Hide vault' : 'Show vault'}
+          </button>
         </div>
         <div className={styles.balanceFrame}>
           <BalanceCard
             balance={123283.23}
             actionLayout={balanceLayout}
             hasCompletedDeposit={hasDeposit}
+            vaultBalance={showVaultPosition ? 250 : 0}
             onSend={() => undefined}
             onDeposit={() => undefined}
             onRequest={() => undefined}
             onMore={() => undefined}
             onEarn={() => undefined}
-            onWithdraw={() => undefined}
           />
         </div>
       </ShowcaseSection>

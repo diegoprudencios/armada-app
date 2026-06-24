@@ -34,6 +34,8 @@ export function ArmadaAppDashboard({
     disconnectWallet,
     openDeposit,
     openSend,
+    openEarn,
+    earningBalance,
   } = state
 
   useRequireConnectedWallet(wallet)
@@ -61,6 +63,10 @@ export function ArmadaAppDashboard({
           onDeposit={openDeposit}
           onRequest={onRequest}
           onMore={onMore}
+          onEarn={() => openEarn('add')}
+          vaultBalance={earningBalance}
+          vaultRollFromValue={balanceRoll.vaultFromValue}
+          onVaultOpen={() => openEarn('add')}
         />
         {showDepositTooltip ? (
           <div

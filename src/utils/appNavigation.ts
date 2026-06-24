@@ -12,6 +12,7 @@ export function openAppWithWallet(): void {
   writeDemoDashboardSession({
     wallet: { address: DEMO_WALLET_ADDRESS, provider: 'metamask' },
     balance: 0,
+    earningBalance: 0,
     hasCompletedDeposit: false,
   })
   window.location.assign(APP_DASHBOARD_V1_PATH)

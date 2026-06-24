@@ -7,6 +7,7 @@ export type DemoDashboardSession = {
   version: 1
   wallet: DemoWallet | null
   balance: number
+  earningBalance: number
   hasCompletedDeposit: boolean
 }
 
@@ -27,6 +28,7 @@ export function readDemoDashboardSession(): DemoDashboardSession | null {
       version: STORAGE_VERSION,
       wallet: parsed.wallet,
       balance: parsed.balance ?? 0,
+      earningBalance: parsed.earningBalance ?? 0,
       hasCompletedDeposit: parsed.hasCompletedDeposit ?? false,
     }
   } catch {

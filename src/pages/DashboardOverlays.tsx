@@ -2,6 +2,7 @@ import { ConnectWalletOverlay } from '@/components/ConnectWalletOverlay'
 import type { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
 import { DEPOSIT_WALLET_BALANCE, DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
 import { DepositModalFlow } from './DepositModalFlow'
+import { EarnModalFlow } from './EarnModalFlow'
 import { SendModalFlow } from './SendModalFlow'
 
 type DashboardDemoState = ReturnType<typeof useDashboardDemoState>
@@ -22,12 +23,18 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     sendAmount,
     sendRecipient,
     sendChain,
+    earnStep,
+    earnTab,
+    earnAmount,
+    earnSourceBalance,
     dashboardBalance,
     connectWallet,
     closeDeposit,
     completeDeposit,
     closeSend,
     completeSend,
+    closeEarn,
+    completeEarn,
     setDepositAmount,
     setDepositChain,
     setDepositStep,
@@ -35,6 +42,9 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     setSendRecipient,
     setSendChain,
     setSendStep,
+    setEarnTab,
+    setEarnAmount,
+    setEarnStep,
   } = state
 
   return (
@@ -92,6 +102,27 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onProcessingCancel={() => setSendStep('review')}
           onProcessingComplete={() => setSendStep('confirmed')}
           onConfirmedGoToDashboard={completeSend}
+        />
+      ) : null}
+
+      {earnStep ? (
+        <EarnModalFlow
+          step={earnStep}
+          tab={earnTab}
+          amount={earnAmount}
+          sourceBalance={earnSourceBalance}
+          onClose={closeEarn}
+          onTabChange={setEarnTab}
+          onAmountChange={setEarnAmount}
+          onAmountReview={(nextAmount) => {
+            setEarnAmount(nextAmount)
+            setEarnStep('review')
+          }}
+          onReviewBack={() => setEarnStep('amount')}
+          onReviewConfirm={() => setEarnStep('processing')}
+          onProcessingCancel={() => setEarnStep('review')}
+          onProcessingComplete={() => setEarnStep('confirmed')}
+          onConfirmedGoToDashboard={completeEarn}
         />
       ) : null}
     </>
