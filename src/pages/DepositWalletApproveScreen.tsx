@@ -3,6 +3,7 @@ import { MockMetaMaskPopup } from '@/components/MockMetaMaskPopup'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import { WalletConfirmList, type WalletStep } from '@/components/WalletConfirmList'
 import { parseActiveAmount } from '@/utils/amountInput'
+import { calculateDepositFee } from '@/utils/depositFee'
 import { formatUsdcAmount } from '@/utils/format'
 import styles from './DepositWalletApproveScreen.module.css'
 
@@ -28,7 +29,9 @@ export function DepositWalletApproveScreen({
   onComplete,
   onCancel,
 }: DepositWalletApproveScreenProps) {
-  const amountLabel = formatUsdcAmount(parseActiveAmount(amount))
+  const amountNum = parseActiveAmount(amount)
+  const totalUsdc = amountNum + calculateDepositFee(amountNum)
+  const amountLabel = formatUsdcAmount(totalUsdc)
   const completeTimerRef = useRef(0)
 
   const [promptPhase, setPromptPhase] = useState<WalletPromptPhase>('waiting')
