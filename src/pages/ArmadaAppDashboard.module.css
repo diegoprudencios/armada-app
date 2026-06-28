@@ -176,7 +176,6 @@
 
   .cardStackActivity {
     flex-shrink: 0;
-    scroll-margin-top: var(--primitives-spacing-3);
   }
 
   .tooltipEnter {

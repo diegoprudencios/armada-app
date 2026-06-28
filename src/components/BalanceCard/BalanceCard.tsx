@@ -437,7 +437,7 @@ export function BalanceCard({
           ) : (
             <>
               <div className={styles.actionEnter}>
-                <Tooltip variant="action" content="Deposit">
+                {isMobileLayout ? (
                   <IconButton
                     variant={hasCompletedDeposit ? 'solid' : 'gradient'}
                     className={hasCompletedDeposit ? styles.actionAmber : undefined}
@@ -445,10 +445,20 @@ export function BalanceCard({
                     aria-label="Deposit"
                     onClick={onDeposit}
                   />
-                </Tooltip>
+                ) : (
+                  <Tooltip variant="action" content="Deposit">
+                    <IconButton
+                      variant={hasCompletedDeposit ? 'solid' : 'gradient'}
+                      className={hasCompletedDeposit ? styles.actionAmber : undefined}
+                      icon={<PlusIcon className={styles.actionIcon} strokeWidth={1.5} />}
+                      aria-label="Deposit"
+                      onClick={onDeposit}
+                    />
+                  </Tooltip>
+                )}
               </div>
               <div className={styles.actionEnter}>
-                <Tooltip variant="action" content="Request">
+                {isMobileLayout ? (
                   <IconButton
                     variant="solid"
                     className={styles.actionAmber}
@@ -456,7 +466,17 @@ export function BalanceCard({
                     aria-label="Request"
                     onClick={onRequest}
                   />
-                </Tooltip>
+                ) : (
+                  <Tooltip variant="action" content="Request">
+                    <IconButton
+                      variant="solid"
+                      className={styles.actionAmber}
+                      icon={<ArrowDownIcon className={styles.actionIcon} strokeWidth={1.5} />}
+                      aria-label="Request"
+                      onClick={onRequest}
+                    />
+                  </Tooltip>
+                )}
               </div>
             </>
           )}

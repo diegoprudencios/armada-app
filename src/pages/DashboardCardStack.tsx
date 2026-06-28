@@ -1,5 +1,4 @@
 import { type CSSProperties, type ReactNode } from 'react'
-import { useMobileDashboardCardStack } from '@/hooks/useMobileDashboardCardStack'
 import styles from './ArmadaAppDashboard.module.css'
 
 export interface DashboardCardStackProps {
@@ -21,11 +20,8 @@ export function DashboardCardStack({
   depositTooltip,
   tooltipEnterStyle,
 }: DashboardCardStackProps) {
-  const { cardStackRef, activitySlotRef } = useMobileDashboardCardStack(activityVisible)
-
   return (
     <div
-      ref={cardStackRef}
       className={[styles.cardStack, stackClassName].filter(Boolean).join(' ')}
       data-activity-visible={activityVisible ? 'true' : 'false'}
       data-deposit-tooltip={showDepositTooltip ? 'visible' : 'hidden'}
@@ -42,9 +38,7 @@ export function DashboardCardStack({
         ) : null}
       </div>
       {activityVisible && activityList ? (
-        <div ref={activitySlotRef} className={styles.cardStackActivity}>
-          {activityList}
-        </div>
+        <div className={styles.cardStackActivity}>{activityList}</div>
       ) : null}
     </div>
   )
