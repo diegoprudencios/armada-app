@@ -1,0 +1,85 @@
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { XMarkIcon } from '@heroicons/react/24/outline'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import styles from './SidePanel.module.css'
+
+const EXIT_MS = 240
+
+export interface SidePanelProps {
+  open: boolean
+  onClose: () => void
+  title?: string
+  ariaLabel?: string
+  children: ReactNode
+}
+
+export function SidePanel({ open, onClose, title, ariaLabel, children }: SidePanelProps) {
+  const titleId = useId()
+  const [mounted, setMounted] = useState(open)
+  const [exiting, setExiting] = useState(false)
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+
+  useBodyScrollLock(open || exiting)
+
+  useEffect(() => {
+    if (open) {
+      setMounted(true)
+      setExiting(false)
+      return
+    }
+
+    if (!mounted) return
+
+    setExiting(true)
+    const timer = window.setTimeout(() => {
+      setMounted(false)
+      setExiting(false)
+    }, EXIT_MS)
+    return () => window.clearTimeout(timer)
+  }, [open, mounted])
+
+  useEffect(() => {
+    if (!mounted || exiting) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onCloseRef.current()
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [mounted, exiting])
+
+  if (!mounted) return null
+
+  const scrimClassName = [styles.scrim, exiting && styles.scrimExit].filter(Boolean).join(' ')
+  const panelClassName = [styles.panel, exiting && styles.panelExit].filter(Boolean).join(' ')
+
+  return createPortal(
+    <div className={scrimClassName} role="presentation" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        aria-label={title ? undefined : ariaLabel}
+        className={panelClassName}
+        onClick={(event) => event.stopPropagation()}
+      >
+        {title ? (
+          <div className={styles.header}>
+            <h2 id={titleId} className={styles.title}>
+              {title}
+            </h2>
+            <button type="button" className={styles.closeButton} aria-label="Close" onClick={onClose}>
+              <XMarkIcon width={20} height={20} strokeWidth={2} />
+            </button>
+          </div>
+        ) : null}
+
+        <div className={styles.body}>{children}</div>
+      </div>
+    </div>,
+    document.body,
+  )
+}

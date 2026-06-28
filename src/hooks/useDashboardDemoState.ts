@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import type { DepositChainId } from '@/components/DepositAmountCard'
 import type { BalanceRollMode } from '@/components/RollingBalanceValue'
+import {
+  activityRevealDelayAfterIntroMs,
+  activityRevealDelayAfterRollMs,
+} from '@/components/BalanceCard/balanceRevealMotion'
 import { useEnvironment } from '@/hooks/useEnvironment'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import {
-  readActivityPanelVisible,
+  readActivityUserHidden,
   readDemoDashboardSession,
   writeActivityPanelVisible,
+  writeActivityUserHidden,
   writeDemoDashboardSession,
   type DemoWallet,
 } from '@/utils/demoDashboardSession'
@@ -89,7 +94,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [earnTab, setEarnTab] = useState<EarnTab>('add')
   const [earnAmount, setEarnAmount] = useState('')
   const [earningBalance, setEarningBalance] = useState(readInitialEarningBalance)
-  const [activityVisible, setActivityVisible] = useState(readActivityPanelVisible)
+  const [activityVisible, setActivityVisible] = useState(false)
   const [recentActivity, setRecentActivity] = useState<DashboardActivityItem[]>(readInitialRecentActivity)
   const [balanceHidden, setBalanceHidden] = useState(false)
   const [depositConfirmedAt, setDepositConfirmedAt] = useState<number | null>(null)
@@ -103,6 +108,45 @@ export function useDashboardDemoState(initialBalance = 0) {
   const pendingSendRef = useRef(0)
   const pendingEarnRef = useRef<{ amount: number; tab: EarnTab } | null>(null)
   const activityReceiptRef = useRef(false)
+  const activityRevealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function clearActivityRevealTimer() {
+    if (activityRevealTimerRef.current) {
+      clearTimeout(activityRevealTimerRef.current)
+      activityRevealTimerRef.current = null
+    }
+  }
+
+  function scheduleActivityReveal(delayMs: number) {
+    if (readActivityUserHidden()) return
+
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const resolvedDelay = prefersReducedMotion ? 80 : delayMs
+
+    clearActivityRevealTimer()
+    activityRevealTimerRef.current = setTimeout(() => {
+      setActivityVisible(true)
+      writeActivityPanelVisible(true)
+      writeActivityUserHidden(false)
+      activityRevealTimerRef.current = null
+    }, resolvedDelay)
+  }
+
+  function activityRevealDelayMs(): number {
+    return activityRevealDelayAfterIntroMs()
+  }
+
+  useEffect(() => {
+    if (!hasCompletedDeposit || readActivityUserHidden()) return
+    scheduleActivityReveal(activityRevealDelayMs())
+    return clearActivityRevealTimer
+    // Reveal once on mount when the session already completed a deposit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => () => clearActivityRevealTimer(), [])
 
   useEffect(() => {
     if (!isMock) return
@@ -134,6 +178,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     setHasCompletedDeposit(false)
     setActivityVisible(false)
     writeActivityPanelVisible(false)
+    writeActivityUserHidden(false)
     setBalanceHidden(false)
     setRecentActivity([])
     setConnectOpen(false)
@@ -227,12 +272,14 @@ export function useDashboardDemoState(initialBalance = 0) {
     if (deposited > 0) {
       setRecentActivity((items) => prependActivity(items, createDepositActivity(deposited, chain)))
       const fromValue = formatUsdcAmount(dashboardBalance)
-      setDashboardBalance((prev) => prev + deposited)
+      const nextBalance = dashboardBalance + deposited
+      setDashboardBalance(nextBalance)
       setBalanceRoll((roll) => ({
         trigger: roll.trigger + 1,
         mode: 'fromValue',
         fromValue,
       }))
+      scheduleActivityReveal(activityRevealDelayAfterRollMs(formatUsdcAmount(nextBalance)))
     }
   }
 
@@ -322,6 +369,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     setActivityVisible((visible) => {
       const next = !visible
       writeActivityPanelVisible(next)
+      writeActivityUserHidden(!next)
       return next
     })
   }

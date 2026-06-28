@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { BottomSheet } from '@/components/BottomSheet'
 import { IconButton } from '@/components/IconButton'
 import { RollingBalanceValue, type BalanceRollMode } from '@/components/RollingBalanceValue'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
@@ -26,6 +27,7 @@ import { SendButton } from '@/components/SendButton'
 import { Tooltip } from '@/components/Tooltip'
 import { VaultPositionBar } from '@/components/VaultPositionBar'
 import { useDashboardBackground } from '@/hooks/useDashboardBackground'
+import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { formatUsdcAmount } from '@/utils/format'
 import styles from './BalanceCard.module.css'
 
@@ -71,6 +73,81 @@ function estimateDepositRollDurationMs(formattedBalance: string): number {
   return balanceRevealRollDurationMs() + stagger + 80
 }
 
+interface BalanceCardMoreMenuItemsProps {
+  isV2Actions: boolean
+  hasCompletedDeposit: boolean
+  activityVisible: boolean
+  onDeposit?: () => void
+  onEarn?: () => void
+  onToggleActivity?: () => void
+  onSelect?: () => void
+}
+
+function BalanceCardMoreMenuItems({
+  isV2Actions,
+  hasCompletedDeposit,
+  activityVisible,
+  onDeposit,
+  onEarn,
+  onToggleActivity,
+  onSelect,
+}: BalanceCardMoreMenuItemsProps) {
+  function run(action?: () => void) {
+    if (!action) return
+    onSelect?.()
+    action()
+  }
+
+  return (
+    <>
+      {isV2Actions ? (
+        <button type="button" className={styles.moreMenuItem} role="menuitem" onClick={() => run(onDeposit)}>
+          <span className={styles.moreMenuItemLead}>
+            <span className={styles.moreMenuIconBadge}>
+              <PlusIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
+            </span>
+            <span className={styles.moreMenuLabel}>Deposit</span>
+          </span>
+        </button>
+      ) : null}
+      <button type="button" className={styles.moreMenuItem} role="menuitem" onClick={() => run(onEarn)}>
+        <span className={styles.moreMenuItemLead}>
+          <span className={styles.moreMenuIconBadge}>
+            <ChartBarIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
+          </span>
+          <span className={styles.moreMenuLabel}>Earn</span>
+        </span>
+        <span className={styles.moreMenuMeta}>4.2% APR</span>
+      </button>
+      <button type="button" className={styles.moreMenuItem} role="menuitem" disabled>
+        <span className={styles.moreMenuItemLead}>
+          <span className={styles.moreMenuIconBadge}>
+            <ArrowUpIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
+          </span>
+          <span className={styles.moreMenuLabel}>Withdraw</span>
+        </span>
+      </button>
+      {hasCompletedDeposit ? (
+        <button
+          type="button"
+          className={styles.moreMenuItem}
+          role="menuitem"
+          onClick={() => run(onToggleActivity)}
+        >
+          <span className={styles.moreMenuItemLead}>
+            <span className={styles.moreMenuIconBadge}>
+              <QueueListIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
+            </span>
+            <span className={styles.moreMenuLabel}>
+              {activityVisible ? 'Hide activity' : 'Show activity'}
+            </span>
+          </span>
+        </button>
+      ) : null}
+    </>
+  )
+}
+
 export function BalanceCard({
   balance,
   balanceRollTrigger = 0,
@@ -93,8 +170,10 @@ export function BalanceCard({
   onBalanceHiddenChange,
 }: BalanceCardProps) {
   const isV2Actions = actionLayout === 'v2'
+  const isMobileLayout = useMobileLayout()
   const [background] = useDashboardBackground()
   const isSolidBackground = background === 'solid'
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false)
   const [internalBalanceHidden, setInternalBalanceHidden] = useState(false)
   const balanceHiddenControlled = balanceHiddenProp !== undefined
   const balanceHidden = balanceHiddenControlled ? balanceHiddenProp : internalBalanceHidden
@@ -163,6 +242,37 @@ export function BalanceCard({
   const sendClassName = [styles.sendButton, !hasCompletedDeposit && styles.actionAmber]
     .filter(Boolean)
     .join(' ')
+
+  function revealBalancePeek() {
+    if (balanceHidden) setPeekBalance(true)
+  }
+
+  function hideBalancePeek() {
+    setPeekBalance(false)
+  }
+
+  const balancePeekHandlers = isMobileLayout
+    ? {
+        onPointerDown: revealBalancePeek,
+        onPointerUp: hideBalancePeek,
+        onPointerCancel: hideBalancePeek,
+      }
+    : {
+        onMouseEnter: revealBalancePeek,
+        onMouseLeave: hideBalancePeek,
+      }
+
+  const moreMenuItems = (
+    <BalanceCardMoreMenuItems
+      isV2Actions={isV2Actions}
+      hasCompletedDeposit={hasCompletedDeposit}
+      activityVisible={activityVisible}
+      onDeposit={onDeposit}
+      onEarn={onEarn}
+      onToggleActivity={onToggleActivity}
+      onSelect={() => setMoreMenuOpen(false)}
+    />
+  )
 
   const balanceClusterLayers = (
     <>
@@ -279,13 +389,7 @@ export function BalanceCard({
         </div>
 
         <div className={styles.cardBodyBalance}>
-          <div
-            className={styles.balanceRow}
-            onMouseEnter={() => {
-              if (balanceHidden) setPeekBalance(true)
-            }}
-            onMouseLeave={() => setPeekBalance(false)}
-          >
+          <div className={styles.balanceRow} {...balancePeekHandlers}>
             {balanceIntroPlaying ? (
               <div
                 className={[styles.balanceCluster, styles.balanceClusterIntro].join(' ')}
@@ -357,55 +461,19 @@ export function BalanceCard({
             </>
           )}
           <div className={`${styles.actionEnter} ${styles.moreMenuRoot}`}>
-            <div className={styles.moreMenu} role="menu" aria-label="More options">
-              {isV2Actions ? (
-                <button type="button" className={styles.moreMenuItem} role="menuitem" onClick={onDeposit}>
-                  <span className={styles.moreMenuItemLead}>
-                    <span className={styles.moreMenuIconBadge}>
-                      <PlusIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
-                    </span>
-                    <span className={styles.moreMenuLabel}>Deposit</span>
-                  </span>
-                </button>
-              ) : null}
-              <button type="button" className={styles.moreMenuItem} role="menuitem" onClick={onEarn}>
-                <span className={styles.moreMenuItemLead}>
-                  <span className={styles.moreMenuIconBadge}>
-                    <ChartBarIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
-                  </span>
-                  <span className={styles.moreMenuLabel}>Earn</span>
-                </span>
-                <span className={styles.moreMenuMeta}>4.2% APR</span>
-              </button>
-              <button type="button" className={styles.moreMenuItem} role="menuitem" disabled>
-                <span className={styles.moreMenuItemLead}>
-                  <span className={styles.moreMenuIconBadge}>
-                    <ArrowUpIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
-                  </span>
-                  <span className={styles.moreMenuLabel}>Withdraw</span>
-                </span>
-              </button>
-              <button
-                type="button"
-                className={styles.moreMenuItem}
-                role="menuitem"
-                onClick={onToggleActivity}
-              >
-                <span className={styles.moreMenuItemLead}>
-                  <span className={styles.moreMenuIconBadge}>
-                    <QueueListIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
-                  </span>
-                  <span className={styles.moreMenuLabel}>
-                    {activityVisible ? 'Hide activity' : 'Show activity'}
-                  </span>
-                </span>
-              </button>
-            </div>
+            {!isMobileLayout ? (
+              <div className={`${styles.moreMenu} ${styles.moreMenuDesktop}`} role="menu" aria-label="More options">
+                {moreMenuItems}
+              </div>
+            ) : null}
             <IconButton
               variant="ghost"
               className={styles.actionMore}
               icon={<EllipsisHorizontalIcon className={styles.actionIcon} strokeWidth={2} />}
               aria-label="More options"
+              aria-expanded={isMobileLayout ? moreMenuOpen : undefined}
+              aria-haspopup={isMobileLayout ? 'dialog' : 'menu'}
+              onClick={isMobileLayout ? () => setMoreMenuOpen(true) : undefined}
             />
           </div>
           </div>
@@ -416,10 +484,7 @@ export function BalanceCard({
                 styles.vaultPositionWrap,
                 shouldAnimateVaultEnter ? styles.vaultPositionEnter : styles.vaultPositionVisible,
               ].join(' ')}
-              onMouseEnter={() => {
-                if (balanceHidden) setPeekBalance(true)
-              }}
-              onMouseLeave={() => setPeekBalance(false)}
+              {...balancePeekHandlers}
             >
               <VaultPositionBar
                 balance={vaultBalance}
@@ -434,6 +499,19 @@ export function BalanceCard({
           ) : null}
         </div>
       </div>
+
+      {isMobileLayout ? (
+        <BottomSheet
+          open={moreMenuOpen}
+          onClose={() => setMoreMenuOpen(false)}
+          title="More options"
+          ariaLabel="More options"
+        >
+          <div className={styles.moreMenuSheet} role="menu">
+            {moreMenuItems}
+          </div>
+        </BottomSheet>
+      ) : null}
     </div>
   )
 }

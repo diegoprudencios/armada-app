@@ -1,6 +1,7 @@
 import {
   clearDemoDashboardSession,
   writeActivityPanelVisible,
+  writeActivityUserHidden,
   writeDemoDashboardSession,
 } from '@/utils/demoDashboardSession'
 import { DEMO_WALLET_ADDRESS } from '@/pages/depositFlowConstants'
@@ -18,6 +19,7 @@ export function openAppWithWallet(): void {
     recentActivity: [],
   })
   writeActivityPanelVisible(false)
+  writeActivityUserHidden(false)
   window.location.assign(APP_DASHBOARD_V1_PATH)
 }
 

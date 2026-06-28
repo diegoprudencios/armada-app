@@ -23,6 +23,13 @@
   max-width: 100%;
 }
 
+.logoMark {
+  width: var(--primitives-spacing-11);
+  height: var(--primitives-spacing-11);
+  flex-shrink: 0;
+  color: var(--semantic-color-text-primary);
+}
+
 .logoLight {
   display: none;
 }
@@ -38,4 +45,21 @@
 .wallet {
   flex: 0 0 auto;
   margin-left: auto;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 767px) {
+  .header {
+    min-height: var(--primitives-spacing-11);
+    gap: var(--primitives-spacing-3);
+  }
+
+  .wallet {
+    flex: 1 1 auto;
+    max-width: none;
+    display: flex;
+    justify-content: flex-end;
+  }
 }

@@ -83,6 +83,19 @@
   height: calc(var(--primitives-spacing-4) + var(--primitives-spacing-1) * 0.5);
 }
 
+.depositIconDecor {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  background: linear-gradient(
+    to right,
+    var(--semantic-component-button-gradient-default-from) 0%,
+    var(--semantic-component-button-gradient-default-to) 100%
+  );
+  pointer-events: none;
+}
+
 .textBlock {
   flex: 1;
   min-width: 0;
@@ -179,4 +192,48 @@
 .body {
   margin: 0;
   color: #ffffff;
+}
+
+.rootInteractive {
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.rootInteractive:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.rootInteractive:active {
+  filter: brightness(0.98);
+}
+
+.iconTileStatic {
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .root {
+    width: 100%;
+    height: var(--deposit-tooltip-height);
+    min-height: var(--deposit-tooltip-height);
+    padding: var(--primitives-spacing-2);
+    gap: var(--primitives-spacing-3);
+  }
+
+  .rootV2 {
+    width: 100%;
+    height: auto;
+    min-height: var(--deposit-tooltip-v2-height);
+    padding: var(--primitives-spacing-3);
+  }
+
+  .pointer {
+    display: none;
+  }
 }

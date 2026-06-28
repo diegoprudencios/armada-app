@@ -7,6 +7,7 @@ import { RecentActivityList } from '@/components/RecentActivityList'
 import { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
 import { useRequireConnectedWallet } from '@/hooks/useRequireConnectedWallet'
 import { DashboardOverlays } from './DashboardOverlays'
+import { DashboardCardStack } from './DashboardCardStack'
 import { DEPOSIT_WALLET_BALANCE } from './depositFlowConstants'
 import styles from './ArmadaAppDashboard.module.css'
 
@@ -59,47 +60,46 @@ export function ArmadaAppDashboardV2({
           onDisconnect={disconnectWallet}
         />
       </div>
-      <div className={[styles.cardStack, styles.cardStackV2].join(' ')}>
-        <BalanceCard
-          balance={dashboardBalance}
-          balanceRollTrigger={balanceRoll.trigger}
-          balanceRollMode={balanceRoll.mode}
-          balanceRollFromValue={balanceRoll.fromValue}
-          hasCompletedDeposit={hasCompletedDeposit}
-          actionLayout="v2"
-          onSend={onSend ?? openSend}
-          onDeposit={openDeposit}
-          onRequest={onRequest}
-          onMore={onMore}
-          onEarn={() => openEarn('add')}
-          vaultBalance={earningBalance}
-          vaultRollFromValue={balanceRoll.vaultFromValue}
-          onVaultOpen={() => openEarn('add')}
-          activityVisible={activityVisible}
-          onToggleActivity={toggleActivity}
-          balanceHidden={balanceHidden}
-          onBalanceHiddenChange={setBalanceHidden}
-        />
-        {activityVisible ? (
+      <DashboardCardStack
+        stackClassName={styles.cardStackV2}
+        showDepositTooltip={showDepositTooltip}
+        activityVisible={activityVisible && hasCompletedDeposit}
+        tooltipEnterStyle={
+          {
+            '--dashboard-tooltip-enter-delay': `${DASHBOARD_TOOLTIP_ENTER_DELAY_MS}ms`,
+          } as CSSProperties
+        }
+        balanceCard={
+          <BalanceCard
+            balance={dashboardBalance}
+            balanceRollTrigger={balanceRoll.trigger}
+            balanceRollMode={balanceRoll.mode}
+            balanceRollFromValue={balanceRoll.fromValue}
+            hasCompletedDeposit={hasCompletedDeposit}
+            actionLayout="v2"
+            onSend={onSend ?? openSend}
+            onDeposit={openDeposit}
+            onRequest={onRequest}
+            onMore={onMore}
+            onEarn={() => openEarn('add')}
+            vaultBalance={earningBalance}
+            vaultRollFromValue={balanceRoll.vaultFromValue}
+            onVaultOpen={() => openEarn('add')}
+            activityVisible={activityVisible}
+            onToggleActivity={toggleActivity}
+            balanceHidden={balanceHidden}
+            onBalanceHiddenChange={setBalanceHidden}
+          />
+        }
+        activityList={
           <RecentActivityList
             items={recentActivity}
             balanceRevealed={!balanceHidden}
             onItemClick={openActivityReceipt}
           />
-        ) : null}
-        {showDepositTooltip ? (
-          <div
-            className={styles.tooltipEnter}
-            style={
-              {
-                '--dashboard-tooltip-enter-delay': `${DASHBOARD_TOOLTIP_ENTER_DELAY_MS}ms`,
-              } as CSSProperties
-            }
-          >
-            <DepositTooltip variant="v2" onDeposit={openDeposit} />
-          </div>
-        ) : null}
-      </div>
+        }
+        depositTooltip={<DepositTooltip variant="v2" onDeposit={openDeposit} />}
+      />
 
       <DashboardOverlays state={state} />
     </div>

@@ -15,10 +15,23 @@ export const BALANCE_DEPOSIT_BUTTON_ENTER_DELAY_MS = 630
 export const DASHBOARD_TOOLTIP_ENTER_DELAY_MS =
   BALANCE_DEPOSIT_BUTTON_ENTER_DELAY_MS + BALANCE_ACTION_BUTTON_ENTER_MS + 180
 
+/** Pause after balance motion before the activity panel enters. */
+export const ACTIVITY_REVEAL_BUFFER_MS = 240
+
 export function balanceRevealRollStartMs(): number {
   return BALANCE_REVEAL_DELAY_MS + BALANCE_REVEAL_DURATION_MS * BALANCE_REVEAL_SPLIT_AT
 }
 
 export function balanceRevealRollDurationMs(): number {
   return BALANCE_ROLL_DURATION_MS
+}
+
+export function activityRevealDelayAfterIntroMs(): number {
+  return BALANCE_REVEAL_DELAY_MS + BALANCE_REVEAL_DURATION_MS + ACTIVITY_REVEAL_BUFFER_MS
+}
+
+export function activityRevealDelayAfterRollMs(formattedBalance: string): number {
+  const digitCount = formattedBalance.replace(/\D/g, '').length
+  const stagger = Math.max(0, digitCount - 1) * BALANCE_ROLL_DIGIT_STAGGER_MS
+  return BALANCE_ROLL_DURATION_MS + stagger + 80 + ACTIVITY_REVEAL_BUFFER_MS
 }

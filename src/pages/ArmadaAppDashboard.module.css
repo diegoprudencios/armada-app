@@ -37,7 +37,7 @@
 
 .headerBand {
   position: relative;
-  z-index: 1;
+  z-index: 100;
   width: 100%;
   padding-inline: var(--primitives-spacing-5);
   margin-bottom: calc(
@@ -96,4 +96,90 @@
 
 .cardStackV2 {
   gap: var(--primitives-spacing-5);
+}
+
+.primaryStack {
+  display: contents;
+}
+
+.cardStackBalance,
+.cardStackActivity,
+.cardStackTooltip {
+  width: 100%;
+}
+
+.cardStackBalance {
+  order: 1;
+}
+
+.cardStackActivity {
+  order: 2;
+}
+
+.cardStackTooltip {
+  order: 3;
+}
+
+/* Mobile layout — keep in sync with MOBILE_LAYOUT_MAX_WIDTH_PX (767). */
+@media (max-width: 767px) {
+  .shell {
+    min-height: 100dvh;
+    padding-block-start: calc(var(--primitives-spacing-4) + var(--mobile-safe-area-top));
+    padding-block-end: calc(var(--primitives-spacing-6) + var(--mobile-safe-area-bottom));
+  }
+
+  .headerBand {
+    flex-shrink: 0;
+    margin-bottom: var(--primitives-spacing-6);
+    padding-inline: var(--primitives-spacing-4);
+  }
+
+  .cardStack {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    max-width: none;
+    align-self: stretch;
+    padding-inline: var(--primitives-spacing-4);
+    box-sizing: border-box;
+    gap: var(--primitives-spacing-3);
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .cardStack[data-activity-visible='true'] {
+    overflow-y: auto;
+  }
+
+  .primaryStack {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    width: 100%;
+    gap: var(--primitives-spacing-3);
+  }
+
+  .cardStackBalance,
+  .cardStackActivity,
+  .cardStackTooltip {
+    order: unset;
+  }
+
+  .cardStackBalance {
+    flex-shrink: 0;
+    width: 100%;
+  }
+
+  .cardStackTooltip {
+    flex-shrink: 0;
+  }
+
+  .cardStackActivity {
+    flex-shrink: 0;
+    scroll-margin-top: var(--primitives-spacing-3);
+  }
+
+  .tooltipEnter {
+    flex-shrink: 0;
+  }
 }

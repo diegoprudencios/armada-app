@@ -1,6 +1,7 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { WalletButton } from '@/components/WalletButton'
 import { WalletPillMenu } from '@/components/WalletPillMenu'
+import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { truncateAddress } from '@/utils/format'
 import type { DemoWallet } from '@/utils/demoDashboardSession'
 import styles from './DashboardHeader.module.css'
@@ -21,17 +22,25 @@ export function DashboardHeader({
   onConnect,
   onDisconnect,
 }: DashboardHeaderProps) {
+  const isMobile = useMobileLayout()
+
   return (
     <header className={styles.header}>
       <div className={styles.logo}>
-        <ArmadaLogo className={`${styles.logoFull} ${styles.logoDark}`} />
-        <img
-          className={`${styles.logoFull} ${styles.logoLight}`}
-          src={DASHBOARD_LIGHT_LOGO_SRC}
-          alt="Armada"
-          width={132}
-          height={32}
-        />
+        {isMobile ? (
+          <ArmadaLogo variant="mark" markTone="white" className={styles.logoMark} />
+        ) : (
+          <>
+            <ArmadaLogo className={`${styles.logoFull} ${styles.logoDark}`} />
+            <img
+              className={`${styles.logoFull} ${styles.logoLight}`}
+              src={DASHBOARD_LIGHT_LOGO_SRC}
+              alt="Armada"
+              width={132}
+              height={32}
+            />
+          </>
+        )}
       </div>
       <div className={styles.wallet}>
         {wallet ? (

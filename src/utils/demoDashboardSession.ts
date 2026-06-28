@@ -17,9 +17,10 @@ export type DemoDashboardSession = {
 
 const STORAGE_KEY = 'armada-app-demo-dashboard'
 const ACTIVITY_VISIBLE_KEY = 'armada-app-dashboard-activity-visible'
+const ACTIVITY_USER_HIDDEN_KEY = 'armada-app-dashboard-activity-user-hidden'
 const STORAGE_VERSION = 1 as const
 
-/** Activity panel is hidden by default; only shown after the user opts in. */
+/** Activity panel is hidden by default; auto-shown after the first deposit. */
 export function readActivityPanelVisible(): boolean {
   if (typeof window === 'undefined') return false
 
@@ -35,6 +36,26 @@ export function writeActivityPanelVisible(visible: boolean): void {
 
   try {
     sessionStorage.setItem(ACTIVITY_VISIBLE_KEY, visible ? 'true' : 'false')
+  } catch {
+    // ignore quota / private mode
+  }
+}
+
+export function readActivityUserHidden(): boolean {
+  if (typeof window === 'undefined') return false
+
+  try {
+    return sessionStorage.getItem(ACTIVITY_USER_HIDDEN_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
+export function writeActivityUserHidden(hidden: boolean): void {
+  if (typeof window === 'undefined') return
+
+  try {
+    sessionStorage.setItem(ACTIVITY_USER_HIDDEN_KEY, hidden ? 'true' : 'false')
   } catch {
     // ignore quota / private mode
   }
@@ -82,4 +103,5 @@ export function clearDemoDashboardSession(): void {
   if (typeof window === 'undefined') return
   window.sessionStorage.removeItem(STORAGE_KEY)
   window.sessionStorage.removeItem(ACTIVITY_VISIBLE_KEY)
+  window.sessionStorage.removeItem(ACTIVITY_USER_HIDDEN_KEY)
 }
