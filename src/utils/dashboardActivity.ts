@@ -16,6 +16,49 @@ export function createActivityId(): string {
   return `activity-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 }
 
+export function createDemoTxHash(): string {
+  const bytes = new Uint8Array(32)
+  crypto.getRandomValues(bytes)
+  return `0x${Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`
+}
+
+function deriveDemoTxHash(seed: string): string {
+  const hex = Array.from({ length: 64 }, (_, index) => {
+    const code = seed.charCodeAt(index % seed.length)
+    const mixed = Math.imul(code, index + 1) ^ seed.length
+    return (Math.abs(mixed) % 16).toString(16)
+  }).join('')
+
+  return `0x${hex}`
+}
+
+export function resolveActivityTxHash(item: DashboardActivityItem): string {
+  const record = item as DashboardActivityItem & { txHash?: string }
+  if (record.txHash) return record.txHash
+  return deriveDemoTxHash(item.id)
+}
+
+export function matchesActivityTxHashSearch(item: DashboardActivityItem, query: string): boolean {
+  const normalizedQuery = query.trim().toLowerCase().replace(/^0x/, '')
+  if (!normalizedQuery) return true
+
+  const normalizedHash = resolveActivityTxHash(item).toLowerCase().replace(/^0x/, '')
+  return normalizedHash.includes(normalizedQuery)
+}
+
+export function matchesActivityKindFilter(
+  item: DashboardActivityItem,
+  filter: 'all' | DashboardActivityItem['kind'],
+): boolean {
+  return filter === 'all' || item.kind === filter
+}
+
+function withResolvedTxHash(item: DashboardActivityItem): DashboardActivityItem {
+  const record = item as DashboardActivityItem & { txHash?: string }
+  if (record.txHash) return item
+  return { ...item, txHash: deriveDemoTxHash(item.id) }
+}
+
 export function createSendActivity(
   amount: number,
   recipient: string,
@@ -34,6 +77,7 @@ export function createSendActivity(
     occurredAt: Date.now(),
     recipient: trimmed,
     chain,
+    txHash: createDemoTxHash(),
   }
 }
 
@@ -48,6 +92,7 @@ export function createDepositActivity(
     amount,
     occurredAt: Date.now(),
     chain,
+    txHash: createDemoTxHash(),
   }
 }
 
@@ -60,6 +105,7 @@ export function createEarnActivity(amount: number, tab: EarnTab): DashboardEarnA
       amount: -amount,
       occurredAt: Date.now(),
       tab,
+      txHash: createDemoTxHash(),
     }
   }
 
@@ -70,6 +116,7 @@ export function createEarnActivity(amount: number, tab: EarnTab): DashboardEarnA
     amount,
     occurredAt: Date.now(),
     tab,
+    txHash: createDemoTxHash(),
   }
 }
 
@@ -86,6 +133,7 @@ export function createWithdrawActivity(
     occurredAt: Date.now(),
     chain,
     recipient: recipient.trim(),
+    txHash: createDemoTxHash(),
   }
 }
 
@@ -136,5 +184,5 @@ export function isOpenableActivityItem(item: unknown): item is DashboardActivity
 
 export function normalizeActivityItems(items: unknown): DashboardActivityItem[] {
   if (!Array.isArray(items)) return []
-  return items.filter(isOpenableActivityItem)
+  return items.filter(isOpenableActivityItem).map(withResolvedTxHash)
 }

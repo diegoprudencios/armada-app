@@ -1,0 +1,40 @@
+.root {
+  display: flex;
+  align-items: stretch;
+  gap: var(--primitives-spacing-2);
+  width: 100%;
+  margin-bottom: var(--primitives-spacing-4);
+}
+
+.filterBtn {
+  flex: 1;
+  min-width: 0;
+  height: var(--primitives-spacing-10);
+  padding: 0 var(--primitives-spacing-2);
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-default);
+  cursor: pointer;
+  background: color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent);
+  color: var(--semantic-color-text-primary);
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  text-align: center;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.filterBtn:hover {
+  background: var(--semantic-color-surface-hover);
+}
+
+.filterBtnActive {
+  background: color-mix(in srgb, var(--primitives-color-purple-500) 15%, transparent);
+  border-color: color-mix(in srgb, var(--primitives-color-purple-500) 35%, var(--semantic-color-border-default));
+  color: var(--semantic-color-text-primary);
+}
+
+.filterBtn:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}

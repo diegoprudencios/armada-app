@@ -1,6 +1,8 @@
 import { type CSSProperties } from 'react'
+import { DASHBOARD_ACTIVITY_BOTTOM_SPACING_PX } from '@/constants/activityList'
 import { BalanceCard } from '@/components/BalanceCard'
 import { DASHBOARD_TOOLTIP_ENTER_DELAY_MS } from '@/components/BalanceCard/balanceRevealMotion'
+import { DashboardScrollTopFade } from '@/components/DashboardScrollTopFade'
 import { DashboardHeader } from '@/components/DashboardHeader'
 import { DepositTooltip } from '@/components/DepositTooltip'
 import { RecentActivityList } from '@/components/RecentActivityList'
@@ -51,8 +53,21 @@ export function ArmadaAppDashboard({
 
   if (!wallet) return null
 
+  const showActivity = activityVisible && hasCompletedDeposit
+
   return (
-    <div className={styles.shell}>
+    <div
+      className={styles.shell}
+      data-activity-visible={showActivity ? 'true' : 'false'}
+      style={
+        showActivity
+          ? ({
+              '--dashboard-activity-bottom-spacing': `${DASHBOARD_ACTIVITY_BOTTOM_SPACING_PX}px`,
+            } as CSSProperties)
+          : undefined
+      }
+    >
+      <DashboardScrollTopFade enabled={showActivity} />
       <div className={styles.headerBand}>
         <DashboardHeader
           wallet={wallet}
@@ -63,7 +78,7 @@ export function ArmadaAppDashboard({
       </div>
       <DashboardCardStack
         showDepositTooltip={showDepositTooltip}
-        activityVisible={activityVisible && hasCompletedDeposit}
+        activityVisible={showActivity}
         tooltipEnterStyle={
           {
             '--dashboard-tooltip-enter-delay': `${DASHBOARD_TOOLTIP_ENTER_DELAY_MS}ms`,

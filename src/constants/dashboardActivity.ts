@@ -12,6 +12,7 @@ export type DashboardSendActivityItem = {
   occurredAt: number
   recipient: string
   chain: SendChainId
+  txHash: string
 }
 
 export type DashboardDepositActivityItem = {
@@ -21,6 +22,7 @@ export type DashboardDepositActivityItem = {
   amount: number
   occurredAt: number
   chain: DepositChainId
+  txHash: string
 }
 
 export type DashboardEarnActivityItem = {
@@ -30,6 +32,7 @@ export type DashboardEarnActivityItem = {
   amount: number
   occurredAt: number
   tab: EarnTab
+  txHash: string
 }
 
 export type DashboardWithdrawActivityItem = {
@@ -40,6 +43,7 @@ export type DashboardWithdrawActivityItem = {
   occurredAt: number
   chain: SendChainId
   recipient: string
+  txHash: string
 }
 
 export type DashboardActivityItem =

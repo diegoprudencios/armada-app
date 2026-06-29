@@ -3,10 +3,15 @@
   width: 100%;
   min-height: 100dvh;
   background: var(--semantic-color-surface-bg);
-  padding-block: var(--primitives-spacing-5);
+  padding-block-start: var(--primitives-spacing-5);
+  padding-block-end: var(--primitives-spacing-5);
   display: flex;
   flex-direction: column;
   isolation: isolate;
+}
+
+.shell[data-activity-visible='true'] {
+  padding-block-end: var(--dashboard-activity-bottom-spacing, 120px);
 }
 
 .shell::before {
@@ -121,6 +126,64 @@
 }
 
 @media (min-width: 768px) {
+  .shell {
+    padding-block-start: 0;
+    background-color: var(--semantic-color-surface-bg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100dvh;
+  }
+
+  :global([data-theme='light']) .shell {
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--primitives-color-purple-300) 40%, var(--semantic-color-surface-bg)),
+      color-mix(in srgb, var(--primitives-color-amber-300) 40%, var(--semantic-color-surface-bg))
+    );
+  }
+
+  :global([data-theme='light']) .shell::before {
+    content: none;
+  }
+
+  :global([data-theme='dark']) .shell {
+    background-image: none;
+  }
+
+  :global([data-theme='dark']) .shell::before {
+    content: none;
+  }
+
+  :global([data-theme='light'][data-dashboard-bg='solid']) .shell {
+    background-color: var(--primitives-color-neutral-0);
+    background-image: none;
+  }
+
+  :global([data-theme='light'][data-dashboard-bg='solid']) .shell::before {
+    content: none;
+  }
+
+  .headerBand {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    margin-bottom: 0;
+    padding-block-start: var(--primitives-spacing-5);
+    padding-block-end: 0;
+    background: transparent;
+  }
+
+  .cardStack {
+    position: relative;
+    z-index: 1;
+    padding-top: calc(
+      var(--primitives-spacing-5) + var(--primitives-spacing-10) + var(--primitives-spacing-12) +
+        var(--primitives-spacing-6) + var(--primitives-spacing-1) * 0.5
+    );
+  }
+
   .cardStackTooltip {
     display: flex;
     justify-content: center;
@@ -133,6 +196,10 @@
     min-height: 100dvh;
     padding-block-start: calc(var(--primitives-spacing-4) + var(--mobile-safe-area-top));
     padding-block-end: calc(var(--primitives-spacing-6) + var(--mobile-safe-area-bottom));
+  }
+
+  .shell[data-activity-visible='true'] {
+    padding-block-end: calc(var(--dashboard-activity-bottom-spacing, 120px) + var(--mobile-safe-area-bottom));
   }
 
   .headerBand {
@@ -150,12 +217,6 @@
     padding-inline: var(--primitives-spacing-4);
     box-sizing: border-box;
     gap: var(--primitives-spacing-3);
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .cardStack[data-activity-visible='true'] {
-    overflow-y: auto;
   }
 
   .primaryStack {

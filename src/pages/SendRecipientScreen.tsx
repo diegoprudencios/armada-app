@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/solid'
-import { GlobeAltIcon } from '@heroicons/react/24/outline'
+import { ArrowRightIcon, GlobeAltIcon } from '@heroicons/react/24/outline'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { Button } from '@/components/Button'
 import { modalStepBodyEnter } from '@/components/ModalShell'
@@ -15,7 +15,8 @@ import {
   isValidRecipientAddress,
   RECENT_SEND_ADDRESSES,
   SEND_CHAIN_OPTIONS,
-  sendRecipientTitle,
+  sendRecipientTitleLead,
+  SEND_RECIPIENT_TITLE_TAIL,
   type SendChainId,
   type SendFlowVariant,
 } from './sendFlowConstants'
@@ -128,7 +129,11 @@ export function SendRecipientScreen({
   return (
     <div className={styles.column}>
       <div className={modalStepBodyEnter}>
-        <h1 className={styles.title}>{sendRecipientTitle(variant)}</h1>
+        <h1 className={styles.title}>
+          {sendRecipientTitleLead(variant)}
+          <br />
+          {SEND_RECIPIENT_TITLE_TAIL}
+        </h1>
 
         <div className={styles.addressBlock}>
           <div className={styles.addressField}>
@@ -246,6 +251,9 @@ export function SendRecipientScreen({
                     className={styles.recentItem}
                     onClick={() => onRecipientChange(item.address)}
                   >
+                    <span className={styles.recentIconBadge} aria-hidden>
+                      <ArrowRightIcon className={styles.recentIcon} strokeWidth={1.5} />
+                    </span>
                     <span className={styles.recentAddress}>{truncateAddress(item.address)}</span>
                     <span className={styles.recentTime}>{item.sentAgo}</span>
                   </button>

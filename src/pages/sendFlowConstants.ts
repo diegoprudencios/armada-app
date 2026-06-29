@@ -52,9 +52,11 @@ export function isValidRecipientAddress(address: string): boolean {
 
 export type SendFlowVariant = 'send' | 'withdraw'
 
-export function sendRecipientTitle(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Where do you want to send your USDC?' : 'Who do you want to pay?'
+export function sendRecipientTitleLead(variant: SendFlowVariant): string {
+  return variant === 'withdraw' ? 'Where do you want to send' : 'Who do you want to send'
 }
+
+export const SEND_RECIPIENT_TITLE_TAIL = 'your USDC?'
 
 export function sendReviewTitle(variant: SendFlowVariant): string {
   return variant === 'withdraw' ? 'Review your withdrawal' : 'Review transfer'

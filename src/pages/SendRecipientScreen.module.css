@@ -328,13 +328,13 @@
 .recentItem {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--primitives-spacing-3);
   width: 100%;
-  min-height: var(--primitives-spacing-11);
-  padding: var(--primitives-spacing-4) var(--primitives-spacing-5);
+  min-height: var(--primitives-spacing-16);
+  padding: var(--primitives-spacing-3);
   border: none;
   border-radius: calc(var(--primitives-spacing-5) / 2);
-  background: var(--semantic-color-surface-main);
+  background: color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent);
   cursor: pointer;
   text-align: left;
   box-sizing: border-box;
@@ -349,7 +349,26 @@
   transform: translateY(1px);
 }
 
+.recentIconBadge {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
+  background: color-mix(in srgb, var(--primitives-color-purple-500) 15%, transparent);
+  color: var(--semantic-color-text-primary);
+}
+
+.recentIcon {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+}
+
 .recentAddress {
+  flex: 1;
+  min-width: 0;
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(var(--primitives-fontSize-base) * 1px);
   font-weight: var(--primitives-fontWeight-medium);

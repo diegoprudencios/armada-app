@@ -1,1 +1,1 @@
-export { RecentActivityList, type RecentActivityListProps } from './RecentActivityList'
+export { RecentActivityList, type RecentActivityListProps, type RecentActivityListVariant } from './RecentActivityList'
