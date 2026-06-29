@@ -5,6 +5,7 @@ import { DepositModalFlow } from './DepositModalFlow'
 import { EarnModalFlow } from './EarnModalFlow'
 import { SendModalFlow } from './SendModalFlow'
 import { WithdrawModalFlow } from './WithdrawModalFlow'
+import { RequestModalFlow } from './RequestModalFlow'
 
 type DashboardDemoState = ReturnType<typeof useDashboardDemoState>
 
@@ -37,6 +38,16 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     withdrawAmount,
     withdrawChain,
     withdrawConfirmedAt,
+    requestStep,
+    requestAmount,
+    requestAnyAmount,
+    requestNote,
+    requestExpiryId,
+    requestPaymentLink,
+    requestRoutingAddress,
+    requestId,
+    requestExpiresAt,
+    requestLinkRevoked,
     connectWallet,
     closeDeposit,
     completeDeposit,
@@ -47,6 +58,9 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     openWithdraw,
     closeWithdraw,
     completeWithdraw,
+    closeRequest,
+    completeRequestLink,
+    markRequestLinkRevoked,
     setDepositAmount,
     setDepositChain,
     setDepositStep,
@@ -65,6 +79,10 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     setWithdrawChain,
     setWithdrawStep,
     setWithdrawConfirmedAt,
+    setRequestAmount,
+    setRequestAnyAmount,
+    setRequestNote,
+    setRequestExpiryId,
   } = state
 
   return (
@@ -188,6 +206,30 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
             setWithdrawStep('confirmed')
           }}
           onConfirmedGoToDashboard={completeWithdraw}
+        />
+      ) : null}
+
+      {requestStep ? (
+        <RequestModalFlow
+          step={requestStep}
+          privateAddress={DEMO_ARMADA_ADDRESS}
+          amount={requestAmount}
+          anyAmount={requestAnyAmount}
+          note={requestNote}
+          expiryId={requestExpiryId}
+          paymentLink={requestPaymentLink}
+          routingAddress={requestRoutingAddress}
+          requestId={requestId}
+          expiresAt={requestExpiresAt}
+          linkRevoked={requestLinkRevoked}
+          onClose={closeRequest}
+          onAmountChange={setRequestAmount}
+          onAnyAmountChange={setRequestAnyAmount}
+          onNoteChange={setRequestNote}
+          onExpiryChange={setRequestExpiryId}
+          onCreateLink={completeRequestLink}
+          onLinkRevoked={markRequestLinkRevoked}
+          onDone={closeRequest}
         />
       ) : null}
     </>

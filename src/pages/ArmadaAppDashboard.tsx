@@ -38,6 +38,7 @@ export function ArmadaAppDashboard({
     disconnectWallet,
     openDeposit,
     openSend,
+    openRequest,
     openEarn,
     openWithdraw,
     earningBalance,
@@ -93,7 +94,7 @@ export function ArmadaAppDashboard({
             hasCompletedDeposit={hasCompletedDeposit}
             onSend={onSend ?? openSend}
             onDeposit={openDeposit}
-            onRequest={onRequest}
+            onRequest={onRequest ?? openRequest}
             onMore={onMore}
             onEarn={() => openEarn('add')}
             onWithdraw={openWithdraw}

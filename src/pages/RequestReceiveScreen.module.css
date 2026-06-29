@@ -1,0 +1,270 @@
+.column {
+  width: 100%;
+  max-width: 434px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--primitives-spacing-8);
+}
+
+.title {
+  margin: 0;
+  width: 100%;
+  font-family: var(--primitives-fontFamily-display), serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-3xl) * 1px);
+  line-height: 1.25;
+  letter-spacing: var(--primitives-letterSpacing-tight);
+  color: var(--semantic-color-text-primary);
+  text-align: center;
+}
+
+.addressCard,
+.linkCard {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-4);
+  padding: var(--primitives-spacing-5);
+  background: var(--semantic-color-surface-main);
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+}
+
+.sectionLabel {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  letter-spacing: var(--primitives-letterSpacing-wide);
+  text-transform: uppercase;
+  color: var(--semantic-color-text-muted);
+}
+
+.addressRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--primitives-spacing-3);
+  width: 100%;
+}
+
+.addressValue {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--semantic-typography-mono-sm-font-family);
+  font-size: var(--semantic-typography-mono-sm-font-size);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--semantic-typography-mono-sm-line-height);
+  letter-spacing: var(--semantic-typography-mono-sm-letter-spacing);
+  color: var(--semantic-color-text-primary);
+}
+
+.copyButton {
+  flex-shrink: 0;
+  margin: 0;
+  padding: var(--primitives-spacing-2) var(--primitives-spacing-4);
+  border: none;
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  background: color-mix(in srgb, var(--primitives-color-purple-500) 15%, transparent);
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-primary);
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.copyButton:hover {
+  background: color-mix(in srgb, var(--primitives-color-purple-500) 22%, transparent);
+}
+
+.copyButton:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.divider {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  letter-spacing: var(--primitives-letterSpacing-wide);
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--semantic-color-text-muted);
+}
+
+.linkCard {
+  gap: var(--primitives-spacing-5);
+}
+
+.amountOptions,
+.expiryPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--primitives-spacing-2);
+  width: 100%;
+}
+
+.optionPill {
+  margin: 0;
+  padding: var(--primitives-spacing-2) var(--primitives-spacing-4);
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-default);
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  background: var(--semantic-color-surface-main);
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-primary);
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.optionPill:hover {
+  border-color: color-mix(in srgb, var(--primitives-color-purple-500) 35%, var(--semantic-color-border-default));
+}
+
+.optionPillActive {
+  border-color: color-mix(in srgb, var(--primitives-color-purple-500) 45%, transparent);
+  background: color-mix(in srgb, var(--primitives-color-purple-500) 12%, transparent);
+}
+
+.optionPill:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.anyAmountLabel {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-4xl) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: 1;
+  letter-spacing: var(--primitives-letterSpacing-tight);
+  color: var(--semantic-color-text-muted);
+}
+
+.fieldBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-2);
+  width: 100%;
+}
+
+.fieldLabel {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-muted);
+}
+
+.fieldOptional {
+  font-weight: var(--primitives-fontWeight-regular);
+}
+
+.noteInput {
+  width: 100%;
+  min-height: calc(var(--primitives-spacing-12) + var(--primitives-spacing-2));
+  padding: var(--primitives-spacing-3) var(--primitives-spacing-4);
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-default);
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
+  background: var(--semantic-color-surface-main);
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  font-weight: var(--primitives-fontWeight-regular);
+  line-height: var(--primitives-lineHeight-normal);
+  color: var(--semantic-color-text-primary);
+}
+
+.noteInput:focus {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.noteInput::placeholder {
+  color: var(--semantic-color-text-muted);
+}
+
+.noteMeta {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-muted);
+  text-align: right;
+}
+
+.amountGroup {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitives-spacing-2);
+  width: 100%;
+  height: var(--primitives-spacing-10);
+}
+
+.tokenBadge {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tokenBadgeIcon {
+  flex-shrink: 0;
+  display: block;
+}
+
+.tokenBadgeIcon :global(svg) {
+  display: block;
+}
+
+.amountField {
+  display: flex;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  height: var(--primitives-spacing-10);
+}
+
+.amountInput {
+  width: auto;
+  min-width: 1ch;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-4xl) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: 1;
+  letter-spacing: var(--primitives-letterSpacing-tight);
+  color: var(--semantic-color-text-primary);
+  text-align: left;
+}
+
+.amountInput:focus {
+  outline: none;
+}
+
+.amountInput::placeholder {
+  color: var(--semantic-color-text-muted);
+}
+
+.createLinkButton {
+  width: 100%;
+}

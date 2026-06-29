@@ -9,6 +9,7 @@ import { DEMO_WALLET_ADDRESS } from '@/pages/depositFlowConstants'
 export const LANDING_PATH = '/'
 export const APP_DASHBOARD_V1_PATH = '/dashboard'
 export const APP_DASHBOARD_V2_PATH = '/dashboard-v2'
+export const PAY_VIA_LINK_PATH = '/pay-via-link'
 
 export function openAppWithWallet(): void {
   writeDemoDashboardSession({

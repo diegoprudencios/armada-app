@@ -38,6 +38,7 @@ export function ArmadaAppDashboardV2({
     disconnectWallet,
     openDeposit,
     openSend,
+    openRequest,
     openEarn,
     openWithdraw,
     earningBalance,
@@ -95,7 +96,7 @@ export function ArmadaAppDashboardV2({
             actionLayout="v2"
             onSend={onSend ?? openSend}
             onDeposit={openDeposit}
-            onRequest={onRequest}
+            onRequest={onRequest ?? openRequest}
             onMore={onMore}
             onEarn={() => openEarn('add')}
             onWithdraw={openWithdraw}

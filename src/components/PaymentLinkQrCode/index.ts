@@ -1,0 +1,1 @@
+export { PaymentLinkQrCode } from './PaymentLinkQrCode'

@@ -25,6 +25,11 @@ import {
 import type { SendChainId } from '@/pages/sendFlowConstants'
 import type { EarnModalStep, EarnTab } from '@/pages/earnFlowConstants'
 import type { WithdrawModalStep } from '@/pages/withdrawFlowConstants'
+import type { RequestModalStep } from '@/pages/requestFlowConstants'
+import {
+  DEFAULT_REQUEST_LINK_EXPIRY_ID,
+  type RequestLinkExpiryId,
+} from '@/pages/requestFlowConstants'
 import type { DashboardActivityItem } from '@/constants/dashboardActivity'
 import {
   createDepositActivity,
@@ -33,11 +38,13 @@ import {
   createWithdrawActivity,
   prependActivity,
 } from '@/utils/dashboardActivity'
+import { clearPendingPayViaLink, readPendingPayViaLink } from '@/utils/payViaLink'
 
 export type DepositStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 export type SendStep = 'recipient' | 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 export type EarnStep = EarnModalStep
 export type WithdrawStep = WithdrawModalStep
+export type RequestStep = RequestModalStep
 
 type BalanceRollState = {
   trigger: number
@@ -108,6 +115,16 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [sendConfirmedAt, setSendConfirmedAt] = useState<number | null>(null)
   const [earnConfirmedAt, setEarnConfirmedAt] = useState<number | null>(null)
   const [withdrawConfirmedAt, setWithdrawConfirmedAt] = useState<number | null>(null)
+  const [requestStep, setRequestStep] = useState<RequestStep | null>(null)
+  const [requestAmount, setRequestAmount] = useState('')
+  const [requestAnyAmount, setRequestAnyAmount] = useState(false)
+  const [requestNote, setRequestNote] = useState('')
+  const [requestExpiryId, setRequestExpiryId] = useState<RequestLinkExpiryId>(DEFAULT_REQUEST_LINK_EXPIRY_ID)
+  const [requestPaymentLink, setRequestPaymentLink] = useState('')
+  const [requestRoutingAddress, setRequestRoutingAddress] = useState('')
+  const [requestId, setRequestId] = useState('')
+  const [requestExpiresAt, setRequestExpiresAt] = useState(0)
+  const [requestLinkRevoked, setRequestLinkRevoked] = useState(false)
   const [balanceRoll, setBalanceRoll] = useState<BalanceRollState>({
     trigger: 0,
     mode: 'fromZero',
@@ -158,6 +175,17 @@ export function useDashboardDemoState(initialBalance = 0) {
   useEffect(() => () => clearActivityRevealTimer(), [])
 
   useEffect(() => {
+    const pendingPay = readPendingPayViaLink()
+    if (!pendingPay || !wallet) return
+
+    setSendRecipient(pendingPay.recipient)
+    setSendAmount(pendingPay.amount ?? '')
+    setSendChain('ethereum')
+    setSendStep(pendingPay.amount ? 'review' : 'amount')
+    clearPendingPayViaLink()
+  }, [wallet])
+
+  useEffect(() => {
     if (!isMock) return
     writeDemoDashboardSession({
       wallet,
@@ -195,6 +223,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     closeSend()
     closeEarn()
     closeWithdraw()
+    closeRequest()
     returnToLanding()
   }
 
@@ -428,6 +457,54 @@ export function useDashboardDemoState(initialBalance = 0) {
     }
   }
 
+  function openRequest() {
+    if (!wallet) {
+      openConnect()
+      return
+    }
+    setRequestAmount('')
+    setRequestAnyAmount(false)
+    setRequestNote('')
+    setRequestExpiryId(DEFAULT_REQUEST_LINK_EXPIRY_ID)
+    setRequestPaymentLink('')
+    setRequestRoutingAddress('')
+    setRequestId('')
+    setRequestExpiresAt(0)
+    setRequestLinkRevoked(false)
+    setRequestStep('receive')
+  }
+
+  function closeRequest() {
+    setRequestStep(null)
+    setRequestAmount('')
+    setRequestAnyAmount(false)
+    setRequestNote('')
+    setRequestExpiryId(DEFAULT_REQUEST_LINK_EXPIRY_ID)
+    setRequestPaymentLink('')
+    setRequestRoutingAddress('')
+    setRequestId('')
+    setRequestExpiresAt(0)
+    setRequestLinkRevoked(false)
+  }
+
+  function completeRequestLink(payload: {
+    paymentLink: string
+    routingAddress: string
+    requestId: string
+    expiresAt: number
+  }) {
+    setRequestPaymentLink(payload.paymentLink)
+    setRequestRoutingAddress(payload.routingAddress)
+    setRequestId(payload.requestId)
+    setRequestExpiresAt(payload.expiresAt)
+    setRequestLinkRevoked(false)
+    setRequestStep('link')
+  }
+
+  function markRequestLinkRevoked() {
+    setRequestLinkRevoked(true)
+  }
+
   const earnSourceBalance = earnTab === 'add' ? dashboardBalance : earningBalance
   const showDepositTooltip = Boolean(wallet) && !hasCompletedDeposit
 
@@ -501,6 +578,16 @@ export function useDashboardDemoState(initialBalance = 0) {
     withdrawAmount,
     withdrawChain,
     withdrawConfirmedAt,
+    requestStep,
+    requestAmount,
+    requestAnyAmount,
+    requestNote,
+    requestExpiryId,
+    requestPaymentLink,
+    requestRoutingAddress,
+    requestId,
+    requestExpiresAt,
+    requestLinkRevoked,
     earningBalance,
     activityVisible,
     recentActivity,
@@ -523,6 +610,10 @@ export function useDashboardDemoState(initialBalance = 0) {
     openWithdraw,
     closeWithdraw,
     completeWithdraw,
+    openRequest,
+    closeRequest,
+    completeRequestLink,
+    markRequestLinkRevoked,
     setDepositAmount,
     setDepositChain,
     setDepositStep,
@@ -541,6 +632,10 @@ export function useDashboardDemoState(initialBalance = 0) {
     setWithdrawChain,
     setWithdrawStep,
     setWithdrawConfirmedAt,
+    setRequestAmount,
+    setRequestAnyAmount,
+    setRequestNote,
+    setRequestExpiryId,
     setBalanceHidden,
     toggleActivity,
     openActivityReceipt,
