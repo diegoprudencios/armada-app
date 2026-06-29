@@ -13,3 +13,9 @@ export function truncateAddress(address: string): string {
   if (address.length <= 13) return address
   return `${address.slice(0, 6)}...${address.slice(-5)}`
 }
+
+/** Shielded / Armada zk address — slightly longer tail for readability. */
+export function truncateArmadaAddress(address: string): string {
+  if (address.length <= 15) return address
+  return `${address.slice(0, 6)}...${address.slice(-6)}`
+}

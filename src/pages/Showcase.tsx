@@ -428,6 +428,7 @@ export function Showcase() {
             onRequest={() => undefined}
             onMore={() => undefined}
             onEarn={() => undefined}
+            armadaAddress={DEMO_ARMADA_ADDRESS}
           />
           {activityVisible ? <RecentActivityList items={[]} /> : null}
         </div>

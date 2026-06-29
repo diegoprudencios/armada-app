@@ -8,7 +8,7 @@ import { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
 import { useRequireConnectedWallet } from '@/hooks/useRequireConnectedWallet'
 import { DashboardOverlays } from './DashboardOverlays'
 import { DashboardCardStack } from './DashboardCardStack'
-import { DEPOSIT_WALLET_BALANCE } from './depositFlowConstants'
+import { DEPOSIT_WALLET_BALANCE, DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
 import styles from './ArmadaAppDashboard.module.css'
 
 export interface ArmadaAppDashboardV2Props {
@@ -89,6 +89,7 @@ export function ArmadaAppDashboardV2({
             onToggleActivity={toggleActivity}
             balanceHidden={balanceHidden}
             onBalanceHiddenChange={setBalanceHidden}
+            armadaAddress={DEMO_ARMADA_ADDRESS}
           />
         }
         activityList={

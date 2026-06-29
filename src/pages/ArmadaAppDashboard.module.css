@@ -120,6 +120,13 @@
   order: 3;
 }
 
+@media (min-width: 768px) {
+  .cardStackTooltip {
+    display: flex;
+    justify-content: center;
+  }
+}
+
 /* Mobile layout — keep in sync with MOBILE_LAYOUT_MAX_WIDTH_PX (767). */
 @media (max-width: 767px) {
   .shell {

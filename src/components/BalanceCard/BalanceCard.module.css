@@ -222,12 +222,56 @@
   height: var(--primitives-spacing-4);
 }
 
+.labelStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 0;
+  text-align: center;
+}
+
 .label {
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: var(--semantic-component-button-primary-sm-font-size);
   font-weight: var(--primitives-fontWeight-medium);
   letter-spacing: var(--primitives-letterSpacing-normal);
   color: var(--semantic-color-text-muted);
+}
+
+.armadaAddress {
+  font-family: var(--semantic-typography-mono-sm-font-family);
+  font-size: var(--semantic-typography-mono-sm-font-size);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--semantic-typography-mono-sm-line-height);
+  letter-spacing: var(--semantic-typography-mono-sm-letter-spacing);
+  color: var(--semantic-color-text-secondary);
+  border: none;
+  margin: 0;
+  padding: 0 var(--primitives-spacing-2);
+  background: none;
+  cursor: pointer;
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.armadaAddress:hover {
+  color: var(--semantic-color-text-primary);
+  background: color-mix(in srgb, var(--semantic-color-text-primary) 8%, transparent);
+}
+
+.armadaAddress:active {
+  background: color-mix(in srgb, var(--semantic-color-text-primary) 12%, transparent);
+}
+
+.armadaAddress:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.armadaAddressCopied {
+  color: var(--semantic-color-text-primary);
 }
 
 @keyframes balanceCardEnter {

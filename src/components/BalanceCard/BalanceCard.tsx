@@ -28,7 +28,7 @@ import { Tooltip } from '@/components/Tooltip'
 import { VaultPositionBar } from '@/components/VaultPositionBar'
 import { useDashboardBackground } from '@/hooks/useDashboardBackground'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
-import { formatUsdcAmount } from '@/utils/format'
+import { formatUsdcAmount, truncateArmadaAddress } from '@/utils/format'
 import styles from './BalanceCard.module.css'
 
 const TOKEN_BADGE_PX = 40
@@ -58,6 +58,8 @@ export interface BalanceCardProps {
   onToggleActivity?: () => void
   balanceHidden?: boolean
   onBalanceHiddenChange?: (hidden: boolean) => void
+  /** User's shielded Armada address — shown under the balance label when set. */
+  armadaAddress?: string
 }
 
 function prefersReducedMotion(): boolean {
@@ -168,6 +170,7 @@ export function BalanceCard({
   onToggleActivity,
   balanceHidden: balanceHiddenProp,
   onBalanceHiddenChange,
+  armadaAddress,
 }: BalanceCardProps) {
   const isV2Actions = actionLayout === 'v2'
   const isMobileLayout = useMobileLayout()
@@ -191,6 +194,26 @@ export function BalanceCard({
   const [balanceOffset, setBalanceOffset] = useState('0px')
   const [lockedWidth, setLockedWidth] = useState<number | null>(null)
   const [completedRollTrigger, setCompletedRollTrigger] = useState(0)
+  const [armadaAddressCopied, setArmadaAddressCopied] = useState(false)
+  const armadaAddressCopyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (armadaAddressCopyTimerRef.current) clearTimeout(armadaAddressCopyTimerRef.current)
+    }
+  }, [])
+
+  async function copyArmadaAddress() {
+    if (!armadaAddress) return
+    try {
+      await navigator.clipboard.writeText(armadaAddress)
+      setArmadaAddressCopied(true)
+      if (armadaAddressCopyTimerRef.current) clearTimeout(armadaAddressCopyTimerRef.current)
+      armadaAddressCopyTimerRef.current = setTimeout(() => setArmadaAddressCopied(false), 2000)
+    } catch {
+      setArmadaAddressCopied(false)
+    }
+  }
 
   useEffect(() => {
     if (!balanceIntroPlaying) return
@@ -368,7 +391,31 @@ export function BalanceCard({
             <div className={`${styles.iconBadge} ${styles.brandBadge}`} aria-hidden>
               <ArmadaLogo variant="mark" markTone="white" className={styles.brandMark} />
             </div>
-            <span className={styles.label}>Private USDC</span>
+            <div className={styles.labelStack}>
+              <span className={styles.label}>Private USDC Balance</span>
+              {armadaAddress ? (
+                <button
+                  type="button"
+                  className={[
+                    styles.armadaAddress,
+                    armadaAddressCopied && styles.armadaAddressCopied,
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={() => void copyArmadaAddress()}
+                  title={armadaAddressCopied ? undefined : armadaAddress}
+                  aria-label={
+                    armadaAddressCopied
+                      ? 'Address copied'
+                      : `Copy Armada address ${truncateArmadaAddress(armadaAddress)}`
+                  }
+                >
+                  {armadaAddressCopied
+                    ? 'Copied'
+                    : truncateArmadaAddress(armadaAddress)}
+                </button>
+              ) : null}
+            </div>
             <button
               type="button"
               className={`${styles.iconBadge} ${styles.eyeBadge}`}
