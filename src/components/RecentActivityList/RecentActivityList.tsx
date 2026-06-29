@@ -1,5 +1,6 @@
 import type { ComponentType, SVGProps } from 'react'
 import {
+  ArrowLeftIcon,
   ArrowUpIcon,
   ChartBarIcon,
   ClockIcon,
@@ -19,6 +20,7 @@ const ACTIVITY_ICONS: Record<
   send: ArrowUpIcon,
   deposit: PlusIcon,
   earn: ChartBarIcon,
+  withdraw: ArrowLeftIcon,
 }
 
 function formatSignedAmount(amount: number): string {

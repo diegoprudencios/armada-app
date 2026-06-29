@@ -4,6 +4,7 @@ import { DEPOSIT_WALLET_BALANCE, DEMO_ARMADA_ADDRESS } from './depositFlowConsta
 import { DepositModalFlow } from './DepositModalFlow'
 import { EarnModalFlow } from './EarnModalFlow'
 import { SendModalFlow } from './SendModalFlow'
+import { WithdrawModalFlow } from './WithdrawModalFlow'
 
 type DashboardDemoState = ReturnType<typeof useDashboardDemoState>
 
@@ -31,6 +32,11 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     earnConfirmedAt,
     earnSourceBalance,
     dashboardBalance,
+    withdrawStep,
+    withdrawRecipient,
+    withdrawAmount,
+    withdrawChain,
+    withdrawConfirmedAt,
     connectWallet,
     closeDeposit,
     completeDeposit,
@@ -38,6 +44,9 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     completeSend,
     closeEarn,
     completeEarn,
+    openWithdraw,
+    closeWithdraw,
+    completeWithdraw,
     setDepositAmount,
     setDepositChain,
     setDepositStep,
@@ -51,6 +60,11 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     setEarnAmount,
     setEarnStep,
     setEarnConfirmedAt,
+    setWithdrawRecipient,
+    setWithdrawAmount,
+    setWithdrawChain,
+    setWithdrawStep,
+    setWithdrawConfirmedAt,
   } = state
 
   return (
@@ -141,6 +155,39 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
             setEarnStep('confirmed')
           }}
           onConfirmedGoToDashboard={completeEarn}
+        />
+      ) : null}
+
+      {withdrawStep ? (
+        <WithdrawModalFlow
+          step={withdrawStep}
+          amount={withdrawAmount}
+          recipient={withdrawRecipient}
+          chain={withdrawChain}
+          armadaBalance={dashboardBalance}
+          armadaAddress={DEMO_ARMADA_ADDRESS}
+          walletAddress={wallet?.address}
+          confirmedAt={withdrawConfirmedAt}
+          onClose={closeWithdraw}
+          onRecipientChange={setWithdrawRecipient}
+          onChainChange={setWithdrawChain}
+          onRecipientContinue={() => setWithdrawStep('amount')}
+          onAmountChange={setWithdrawAmount}
+          onAmountBack={() => setWithdrawStep('recipient')}
+          onAmountReview={(nextAmount) => {
+            setWithdrawAmount(nextAmount)
+            setWithdrawStep('review')
+          }}
+          onReviewBack={() => setWithdrawStep('amount')}
+          onReviewConfirm={() => setWithdrawStep('wallet')}
+          onWalletComplete={() => setWithdrawStep('processing')}
+          onWalletCancel={() => setWithdrawStep('review')}
+          onProcessingCancel={() => setWithdrawStep('review')}
+          onProcessingComplete={() => {
+            setWithdrawConfirmedAt(Date.now())
+            setWithdrawStep('confirmed')
+          }}
+          onConfirmedGoToDashboard={completeWithdraw}
         />
       ) : null}
     </>

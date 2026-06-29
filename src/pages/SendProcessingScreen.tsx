@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { SendProcessingStepper } from '@/components/SendProcessingStepper'
 import { SendConfirmedScreen } from '@/pages/SendConfirmedScreen'
-import type { SendChainId } from './sendFlowConstants'
+import type { SendChainId, SendFlowVariant } from './sendFlowConstants'
 import styles from './SendProcessingScreen.module.css'
 
 const DEMO_PROCESSING_MS = 8000
@@ -14,6 +14,7 @@ export interface SendProcessingScreenProps {
   armadaAddress?: string
   confirmedAt: number
   confirmed?: boolean
+  variant?: SendFlowVariant
   onCancel: () => void
   onComplete: () => void
   onViewExplorer?: () => void
@@ -27,6 +28,7 @@ export function SendProcessingScreen({
   armadaAddress,
   confirmedAt,
   confirmed = false,
+  variant = 'send',
   onCancel,
   onComplete,
   onViewExplorer,
@@ -56,6 +58,7 @@ export function SendProcessingScreen({
         chain={chain}
         armadaAddress={armadaAddress}
         confirmedAt={confirmedAt}
+        variant={variant}
         onViewExplorer={onViewExplorer ?? (() => undefined)}
         onGoToDashboard={onGoToDashboard}
       />
@@ -64,7 +67,7 @@ export function SendProcessingScreen({
 
   return (
     <div className={styles.column}>
-      <SendProcessingStepper activeStageIndex={activeStageIndex} onCancel={onCancel} />
+      <SendProcessingStepper activeStageIndex={activeStageIndex} variant={variant} onCancel={onCancel} />
     </div>
   )
 }

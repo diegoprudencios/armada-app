@@ -24,17 +24,20 @@ import {
 } from '@/pages/depositFlowConstants'
 import type { SendChainId } from '@/pages/sendFlowConstants'
 import type { EarnModalStep, EarnTab } from '@/pages/earnFlowConstants'
+import type { WithdrawModalStep } from '@/pages/withdrawFlowConstants'
 import type { DashboardActivityItem } from '@/constants/dashboardActivity'
 import {
   createDepositActivity,
   createEarnActivity,
   createSendActivity,
+  createWithdrawActivity,
   prependActivity,
 } from '@/utils/dashboardActivity'
 
 export type DepositStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 export type SendStep = 'recipient' | 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 export type EarnStep = EarnModalStep
+export type WithdrawStep = WithdrawModalStep
 
 type BalanceRollState = {
   trigger: number
@@ -93,6 +96,10 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [earnStep, setEarnStep] = useState<EarnStep | null>(null)
   const [earnTab, setEarnTab] = useState<EarnTab>('add')
   const [earnAmount, setEarnAmount] = useState('')
+  const [withdrawStep, setWithdrawStep] = useState<WithdrawStep | null>(null)
+  const [withdrawRecipient, setWithdrawRecipient] = useState('')
+  const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [withdrawChain, setWithdrawChain] = useState<SendChainId>('ethereum')
   const [earningBalance, setEarningBalance] = useState(readInitialEarningBalance)
   const [activityVisible, setActivityVisible] = useState(false)
   const [recentActivity, setRecentActivity] = useState<DashboardActivityItem[]>(readInitialRecentActivity)
@@ -100,6 +107,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [depositConfirmedAt, setDepositConfirmedAt] = useState<number | null>(null)
   const [sendConfirmedAt, setSendConfirmedAt] = useState<number | null>(null)
   const [earnConfirmedAt, setEarnConfirmedAt] = useState<number | null>(null)
+  const [withdrawConfirmedAt, setWithdrawConfirmedAt] = useState<number | null>(null)
   const [balanceRoll, setBalanceRoll] = useState<BalanceRollState>({
     trigger: 0,
     mode: 'fromZero',
@@ -107,6 +115,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   const pendingDepositRef = useRef(0)
   const pendingSendRef = useRef(0)
   const pendingEarnRef = useRef<{ amount: number; tab: EarnTab } | null>(null)
+  const pendingWithdrawRef = useRef(0)
   const activityReceiptRef = useRef(false)
   const activityRevealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -185,6 +194,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     closeDeposit()
     closeSend()
     closeEarn()
+    closeWithdraw()
     returnToLanding()
   }
 
@@ -362,6 +372,62 @@ export function useDashboardDemoState(initialBalance = 0) {
     }
   }
 
+  function openWithdraw() {
+    if (!wallet) {
+      openConnect()
+      return
+    }
+    if (!hasCompletedDeposit || dashboardBalance <= 0) return
+    setWithdrawRecipient(wallet.address)
+    setWithdrawAmount('')
+    setWithdrawChain('ethereum')
+    setWithdrawStep('recipient')
+  }
+
+  function closeWithdraw() {
+    if (activityReceiptRef.current) {
+      activityReceiptRef.current = false
+      setWithdrawStep(null)
+      setWithdrawRecipient('')
+      setWithdrawAmount('')
+      setWithdrawChain('ethereum')
+      setWithdrawConfirmedAt(null)
+      return
+    }
+
+    const withdrawn = pendingWithdrawRef.current
+    const chain = withdrawChain
+    const recipient = withdrawRecipient
+    pendingWithdrawRef.current = 0
+    setWithdrawStep(null)
+    setWithdrawRecipient('')
+    setWithdrawAmount('')
+    setWithdrawChain('ethereum')
+    setWithdrawConfirmedAt(null)
+
+    if (withdrawn > 0) {
+      setRecentActivity((items) =>
+        prependActivity(items, createWithdrawActivity(withdrawn, chain, recipient)),
+      )
+      const fromValue = formatUsdcAmount(dashboardBalance)
+      setDashboardBalance((prev) => prev - withdrawn)
+      setBalanceRoll((roll) => ({
+        trigger: roll.trigger + 1,
+        mode: 'fromValue',
+        fromValue,
+      }))
+    }
+  }
+
+  function completeWithdraw() {
+    if (activityReceiptRef.current) return
+
+    const withdrawn = parseActiveAmount(withdrawAmount)
+    if (withdrawn > 0) {
+      pendingWithdrawRef.current = withdrawn
+    }
+  }
+
   const earnSourceBalance = earnTab === 'add' ? dashboardBalance : earningBalance
   const showDepositTooltip = Boolean(wallet) && !hasCompletedDeposit
 
@@ -400,6 +466,13 @@ export function useDashboardDemoState(initialBalance = 0) {
         setEarnConfirmedAt(item.occurredAt)
         setEarnStep('confirmed')
         return
+      case 'withdraw':
+        setWithdrawRecipient(item.recipient)
+        setWithdrawChain(item.chain)
+        setWithdrawAmount(amountLabel)
+        setWithdrawConfirmedAt(item.occurredAt)
+        setWithdrawStep('confirmed')
+        return
       default:
         activityReceiptRef.current = false
     }
@@ -423,6 +496,11 @@ export function useDashboardDemoState(initialBalance = 0) {
     earnTab,
     earnAmount,
     earnConfirmedAt,
+    withdrawStep,
+    withdrawRecipient,
+    withdrawAmount,
+    withdrawChain,
+    withdrawConfirmedAt,
     earningBalance,
     activityVisible,
     recentActivity,
@@ -442,6 +520,9 @@ export function useDashboardDemoState(initialBalance = 0) {
     openEarn,
     closeEarn,
     completeEarn,
+    openWithdraw,
+    closeWithdraw,
+    completeWithdraw,
     setDepositAmount,
     setDepositChain,
     setDepositStep,
@@ -455,6 +536,11 @@ export function useDashboardDemoState(initialBalance = 0) {
     setEarnAmount,
     setEarnStep,
     setEarnConfirmedAt,
+    setWithdrawRecipient,
+    setWithdrawAmount,
+    setWithdrawChain,
+    setWithdrawStep,
+    setWithdrawConfirmedAt,
     setBalanceHidden,
     toggleActivity,
     openActivityReceipt,

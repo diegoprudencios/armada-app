@@ -15,7 +15,9 @@ import {
   isValidRecipientAddress,
   RECENT_SEND_ADDRESSES,
   SEND_CHAIN_OPTIONS,
+  sendRecipientTitle,
   type SendChainId,
+  type SendFlowVariant,
 } from './sendFlowConstants'
 import styles from './SendRecipientScreen.module.css'
 
@@ -24,6 +26,8 @@ const NETWORK_ICON_SIZE = 32
 export interface SendRecipientScreenProps {
   recipient: string
   chain: SendChainId
+  variant?: SendFlowVariant
+  showRecentAddresses?: boolean
   onRecipientChange: (recipient: string) => void
   onChainChange: (chain: SendChainId) => void
   onContinue: () => void
@@ -32,6 +36,8 @@ export interface SendRecipientScreenProps {
 export function SendRecipientScreen({
   recipient,
   chain,
+  variant = 'send',
+  showRecentAddresses = true,
   onRecipientChange,
   onChainChange,
   onContinue,
@@ -122,7 +128,7 @@ export function SendRecipientScreen({
   return (
     <div className={styles.column}>
       <div className={modalStepBodyEnter}>
-        <h1 className={styles.title}>Who do you want to pay?</h1>
+        <h1 className={styles.title}>{sendRecipientTitle(variant)}</h1>
 
         <div className={styles.addressBlock}>
           <div className={styles.addressField}>
@@ -214,7 +220,7 @@ export function SendRecipientScreen({
                 <span className={styles.privacySubtitle}>
                   {isPrivate
                     ? 'Transaction will be fully private'
-                    : 'Privacy might be affected'}
+                    : "Transfer won't be fully private"}
                 </span>
               </div>
             </div>
@@ -229,23 +235,25 @@ export function SendRecipientScreen({
           </div>
         ) : null}
 
-        <div className={styles.recentSection}>
-          <span className={styles.recentLabel}>Recent address</span>
-          <ul className={styles.recentList}>
-            {RECENT_SEND_ADDRESSES.map((item) => (
-              <li key={item.address}>
-                <button
-                  type="button"
-                  className={styles.recentItem}
-                  onClick={() => onRecipientChange(item.address)}
-                >
-                  <span className={styles.recentAddress}>{truncateAddress(item.address)}</span>
-                  <span className={styles.recentTime}>{item.sentAgo}</span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {showRecentAddresses ? (
+          <div className={styles.recentSection}>
+            <span className={styles.recentLabel}>Recent address</span>
+            <ul className={styles.recentList}>
+              {RECENT_SEND_ADDRESSES.map((item) => (
+                <li key={item.address}>
+                  <button
+                    type="button"
+                    className={styles.recentItem}
+                    onClick={() => onRecipientChange(item.address)}
+                  >
+                    <span className={styles.recentAddress}>{truncateAddress(item.address)}</span>
+                    <span className={styles.recentTime}>{item.sentAgo}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </div>
     </div>
   )

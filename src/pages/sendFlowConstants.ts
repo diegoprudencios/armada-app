@@ -49,3 +49,33 @@ export function isValidRecipientAddress(address: string): boolean {
   if (!trimmed) return false
   return isArmadaAddress(trimmed) || isPublicAddress(trimmed)
 }
+
+export type SendFlowVariant = 'send' | 'withdraw'
+
+export function sendRecipientTitle(variant: SendFlowVariant): string {
+  return variant === 'withdraw' ? 'Where do you want to send your USDC?' : 'Who do you want to pay?'
+}
+
+export function sendReviewTitle(variant: SendFlowVariant): string {
+  return variant === 'withdraw' ? 'Review your withdrawal' : 'Review transfer'
+}
+
+export function sendReviewConfirmLabel(variant: SendFlowVariant): string {
+  return variant === 'withdraw' ? 'Confirm withdrawal' : 'Confirm send'
+}
+
+export function sendConfirmedTitle(variant: SendFlowVariant): string {
+  return variant === 'withdraw' ? 'Withdrawal complete' : 'Send confirmed'
+}
+
+export function sendWalletSignLabel(variant: SendFlowVariant): string {
+  return variant === 'withdraw' ? 'Sign withdrawal transaction' : 'Sign send transaction'
+}
+
+export function sendProcessingFinalStageLabel(variant: SendFlowVariant): string {
+  return variant === 'withdraw' ? 'Withdrawn' : 'Sent'
+}
+
+export function sendProcessingKind(variant: SendFlowVariant): string {
+  return variant === 'withdraw' ? 'unshield-local' : 'send'
+}

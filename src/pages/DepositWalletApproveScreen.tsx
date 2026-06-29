@@ -17,6 +17,7 @@ export interface DepositWalletApproveScreenProps {
   networkName?: string
   walletAddress?: string
   signStepLabel?: string
+  computeFeeUsdc?: (amount: number) => number
   onComplete: () => void
   onCancel: () => void
 }
@@ -26,11 +27,12 @@ export function DepositWalletApproveScreen({
   networkName,
   walletAddress,
   signStepLabel = 'Sign deposit transaction',
+  computeFeeUsdc = calculateDepositFee,
   onComplete,
   onCancel,
 }: DepositWalletApproveScreenProps) {
   const amountNum = parseActiveAmount(amount)
-  const totalUsdc = amountNum + calculateDepositFee(amountNum)
+  const totalUsdc = amountNum + computeFeeUsdc(amountNum)
   const amountLabel = formatUsdcAmount(totalUsdc)
   const completeTimerRef = useRef(0)
 

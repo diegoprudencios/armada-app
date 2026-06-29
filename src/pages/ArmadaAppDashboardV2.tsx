@@ -37,6 +37,7 @@ export function ArmadaAppDashboardV2({
     openDeposit,
     openSend,
     openEarn,
+    openWithdraw,
     earningBalance,
     activityVisible,
     toggleActivity,
@@ -82,6 +83,7 @@ export function ArmadaAppDashboardV2({
             onRequest={onRequest}
             onMore={onMore}
             onEarn={() => openEarn('add')}
+            onWithdraw={openWithdraw}
             vaultBalance={earningBalance}
             vaultRollFromValue={balanceRoll.vaultFromValue}
             onVaultOpen={() => openEarn('add')}

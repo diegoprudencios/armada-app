@@ -5,7 +5,7 @@ import {
 } from '@heroicons/react/24/solid'
 import {
   ArrowDownIcon,
-  ArrowUpIcon,
+  ArrowLeftIcon,
   ChartBarIcon,
   EllipsisHorizontalIcon,
   PlusIcon,
@@ -50,6 +50,7 @@ export interface BalanceCardProps {
   onRequest?: () => void
   onMore?: () => void
   onEarn?: () => void
+  onWithdraw?: () => void
   vaultBalance?: number
   vaultApy?: number
   vaultRollFromValue?: string
@@ -79,8 +80,10 @@ interface BalanceCardMoreMenuItemsProps {
   isV2Actions: boolean
   hasCompletedDeposit: boolean
   activityVisible: boolean
+  canWithdraw: boolean
   onDeposit?: () => void
   onEarn?: () => void
+  onWithdraw?: () => void
   onToggleActivity?: () => void
   onSelect?: () => void
 }
@@ -89,8 +92,10 @@ function BalanceCardMoreMenuItems({
   isV2Actions,
   hasCompletedDeposit,
   activityVisible,
+  canWithdraw,
   onDeposit,
   onEarn,
+  onWithdraw,
   onToggleActivity,
   onSelect,
 }: BalanceCardMoreMenuItemsProps) {
@@ -121,10 +126,16 @@ function BalanceCardMoreMenuItems({
         </span>
         <span className={styles.moreMenuMeta}>4.2% APR</span>
       </button>
-      <button type="button" className={styles.moreMenuItem} role="menuitem" disabled>
+      <button
+        type="button"
+        className={styles.moreMenuItem}
+        role="menuitem"
+        disabled={!canWithdraw}
+        onClick={() => run(onWithdraw)}
+      >
         <span className={styles.moreMenuItemLead}>
           <span className={styles.moreMenuIconBadge}>
-            <ArrowUpIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
+            <ArrowLeftIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
           </span>
           <span className={styles.moreMenuLabel}>Withdraw</span>
         </span>
@@ -162,6 +173,7 @@ export function BalanceCard({
   onRequest,
   onMore,
   onEarn,
+  onWithdraw,
   vaultBalance = 0,
   vaultApy,
   vaultRollFromValue,
@@ -290,8 +302,10 @@ export function BalanceCard({
       isV2Actions={isV2Actions}
       hasCompletedDeposit={hasCompletedDeposit}
       activityVisible={activityVisible}
+      canWithdraw={hasCompletedDeposit && balance > 0}
       onDeposit={onDeposit}
       onEarn={onEarn}
+      onWithdraw={onWithdraw}
       onToggleActivity={onToggleActivity}
       onSelect={() => setMoreMenuOpen(false)}
     />

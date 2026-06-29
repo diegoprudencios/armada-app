@@ -5,10 +5,11 @@ import {
   type DashboardDepositActivityItem,
   type DashboardEarnActivityItem,
   type DashboardSendActivityItem,
+  type DashboardWithdrawActivityItem,
 } from '@/constants/dashboardActivity'
 import { networkDisplayName } from '@/pages/depositFlowConstants'
 import type { EarnTab } from '@/pages/earnFlowConstants'
-import { isArmadaAddress, type SendChainId } from '@/pages/sendFlowConstants'
+import { isArmadaAddress, sendNetworkDisplayName, type SendChainId } from '@/pages/sendFlowConstants'
 import { truncateAddress } from '@/utils/format'
 
 export function createActivityId(): string {
@@ -72,6 +73,22 @@ export function createEarnActivity(amount: number, tab: EarnTab): DashboardEarnA
   }
 }
 
+export function createWithdrawActivity(
+  amount: number,
+  chain: SendChainId,
+  recipient: string,
+): DashboardWithdrawActivityItem {
+  return {
+    id: createActivityId(),
+    kind: 'withdraw',
+    label: `Withdraw to ${sendNetworkDisplayName(chain)}`,
+    amount: -amount,
+    occurredAt: Date.now(),
+    chain,
+    recipient: recipient.trim(),
+  }
+}
+
 export function prependActivity(
   items: readonly DashboardActivityItem[],
   item: DashboardActivityItem,
@@ -106,6 +123,12 @@ export function isOpenableActivityItem(item: unknown): item is DashboardActivity
       return typeof record.chain === 'string' && DEPOSIT_CHAINS.has(record.chain as DepositChainId)
     case 'earn':
       return record.tab === 'add' || record.tab === 'withdraw'
+    case 'withdraw':
+      return (
+        typeof record.recipient === 'string' &&
+        typeof record.chain === 'string' &&
+        SEND_CHAINS.has(record.chain as SendChainId)
+      )
     default:
       return false
   }

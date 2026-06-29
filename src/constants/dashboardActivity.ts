@@ -2,7 +2,7 @@ import type { DepositChainId } from '@/components/DepositAmountCard'
 import type { EarnTab } from '@/pages/earnFlowConstants'
 import type { SendChainId } from '@/pages/sendFlowConstants'
 
-export type DashboardActivityKind = 'send' | 'deposit' | 'earn'
+export type DashboardActivityKind = 'send' | 'deposit' | 'earn' | 'withdraw'
 
 export type DashboardSendActivityItem = {
   id: string
@@ -32,9 +32,20 @@ export type DashboardEarnActivityItem = {
   tab: EarnTab
 }
 
+export type DashboardWithdrawActivityItem = {
+  id: string
+  kind: 'withdraw'
+  label: string
+  amount: number
+  occurredAt: number
+  chain: SendChainId
+  recipient: string
+}
+
 export type DashboardActivityItem =
   | DashboardSendActivityItem
   | DashboardDepositActivityItem
   | DashboardEarnActivityItem
+  | DashboardWithdrawActivityItem
 
 export const MAX_RECENT_ACTIVITY_ITEMS = 20

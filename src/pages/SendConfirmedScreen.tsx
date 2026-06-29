@@ -6,7 +6,7 @@ import { parseActiveAmount } from '@/utils/amountInput'
 import { calculateSendFee } from '@/utils/sendFee'
 import { formatUsdcAmount } from '@/utils/format'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
-import { isArmadaAddress, type SendChainId, sendNetworkDisplayName } from './sendFlowConstants'
+import { isArmadaAddress, sendConfirmedTitle, type SendChainId, sendNetworkDisplayName, type SendFlowVariant } from './sendFlowConstants'
 import styles from './SendConfirmedScreen.module.css'
 
 const TOKEN_BADGE_PX = 40
@@ -19,6 +19,7 @@ export interface SendConfirmedScreenProps {
   chain: SendChainId
   armadaAddress?: string
   confirmedAt: number
+  variant?: SendFlowVariant
   onViewExplorer: () => void
   onGoToDashboard: () => void
 }
@@ -29,6 +30,7 @@ export function SendConfirmedScreen({
   chain,
   armadaAddress,
   confirmedAt,
+  variant = 'send',
   onViewExplorer,
   onGoToDashboard,
 }: SendConfirmedScreenProps) {
@@ -41,7 +43,7 @@ export function SendConfirmedScreen({
   return (
     <div className={styles.column}>
       <div className={modalStepBodyEnter}>
-        <h1 className={styles.title}>Send confirmed</h1>
+        <h1 className={styles.title}>{sendConfirmedTitle(variant)}</h1>
 
         <div className={styles.amountRow}>
           <div className={styles.amountGroup}>

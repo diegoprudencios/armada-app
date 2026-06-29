@@ -6,7 +6,7 @@ import { parseActiveAmount } from '@/utils/amountInput'
 import { calculateSendFee } from '@/utils/sendFee'
 import { formatUsdcAmount } from '@/utils/format'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
-import { isArmadaAddress, sendNetworkDisplayName, type SendChainId } from './sendFlowConstants'
+import { isArmadaAddress, sendNetworkDisplayName, sendReviewConfirmLabel, sendReviewTitle, type SendChainId, type SendFlowVariant } from './sendFlowConstants'
 import styles from './SendReviewScreen.module.css'
 
 const TOKEN_BADGE_PX = 40
@@ -17,6 +17,7 @@ export interface SendReviewScreenProps {
   recipient: string
   chain: SendChainId
   armadaAddress?: string
+  variant?: SendFlowVariant
   onBack: () => void
   onConfirm: () => void
 }
@@ -26,6 +27,7 @@ export function SendReviewScreen({
   recipient,
   chain,
   armadaAddress,
+  variant = 'send',
   onBack,
   onConfirm,
 }: SendReviewScreenProps) {
@@ -37,7 +39,7 @@ export function SendReviewScreen({
   return (
     <div className={styles.column}>
       <div className={modalStepBodyEnter}>
-        <h1 className={styles.title}>Review transfer</h1>
+        <h1 className={styles.title}>{sendReviewTitle(variant)}</h1>
 
         <div className={styles.amountRow}>
           <div className={styles.amountGroup}>
@@ -59,7 +61,7 @@ export function SendReviewScreen({
 
       <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>
         <Button variant="secondary" size="lg" label="Back" showIcon={false} onClick={onBack} />
-        <Button variant="primary" size="lg" label="Confirm send" showIcon={false} onClick={onConfirm} />
+        <Button variant="primary" size="lg" label={sendReviewConfirmLabel(variant)} showIcon={false} onClick={onConfirm} />
       </div>
     </div>
   )

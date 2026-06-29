@@ -3,15 +3,22 @@ import { Button } from '@/components/Button'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import { StatusChip } from '@/components/StatusChip'
 import { TechnicalDetailsDisclosure } from '@/components/TechnicalDetailsDisclosure'
+import {
+  sendProcessingFinalStageLabel,
+  sendProcessingKind,
+  type SendFlowVariant,
+} from '@/pages/sendFlowConstants'
 import styles from './SendProcessingStepper.module.css'
 
 const DEMO_RECORD_ID = '01JKSEND9MVT3SZ6XQ0ZI9XVFAP'
 
-const SEND_STAGES = [
-  { id: 'build-proof', label: 'Preparing transaction' },
-  { id: 'submit-relayer', label: 'Submitting transaction' },
-  { id: 'sent', label: 'Sent' },
-] as const
+function processingStages(variant: SendFlowVariant) {
+  return [
+    { id: 'build-proof', label: 'Preparing transaction' },
+    { id: 'submit-relayer', label: 'Submitting transaction' },
+    { id: 'sent', label: sendProcessingFinalStageLabel(variant) },
+  ] as const
+}
 
 type RowKind = 'done' | 'currentActive' | 'pending'
 
@@ -34,16 +41,19 @@ function RowIcon({ kind }: { kind: RowKind }) {
 
 export interface SendProcessingStepperProps {
   activeStageIndex?: number
+  variant?: SendFlowVariant
   onCancel?: () => void
   className?: string
 }
 
 export function SendProcessingStepper({
   activeStageIndex = 0,
+  variant = 'send',
   onCancel,
   className,
 }: SendProcessingStepperProps) {
-  const activeStage = SEND_STAGES[activeStageIndex] ?? SEND_STAGES[0]
+  const stages = processingStages(variant)
+  const activeStage = stages[activeStageIndex] ?? stages[0]
   const cls = [styles.root, className].filter(Boolean).join(' ')
 
   return (
@@ -56,7 +66,7 @@ export function SendProcessingStepper({
           </header>
 
           <ol className={styles.stages}>
-            {SEND_STAGES.map((stage, index) => {
+            {stages.map((stage, index) => {
               const kind = rowKindFor(index, activeStageIndex)
               const isCurrent = kind === 'currentActive'
               return (
@@ -84,7 +94,7 @@ export function SendProcessingStepper({
               </div>
               <div>
                 <dt>Kind</dt>
-                <dd>send</dd>
+                <dd>{sendProcessingKind(variant)}</dd>
               </div>
               <div>
                 <dt>Stage</dt>
