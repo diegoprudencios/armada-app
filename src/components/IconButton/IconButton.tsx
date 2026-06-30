@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import styles from './IconButton.module.css'
 
-export type IconButtonVariant = 'solid' | 'gradient' | 'ghost'
+export type IconButtonVariant = 'solid' | 'gradient' | 'ghost' | 'secondary'
 
 export interface IconButtonProps {
   variant: IconButtonVariant

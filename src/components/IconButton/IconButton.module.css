@@ -124,3 +124,21 @@
 .ghostSurface:active:not(:disabled) {
   background: var(--semantic-component-button-ghost-bg-active);
 }
+
+.secondary {
+  border: none;
+  background: var(--primitives-color-purple-200);
+  color: var(--semantic-component-button-gradient-text);
+}
+
+.secondary:hover:not(:disabled) {
+  background: var(--primitives-color-purple-300);
+}
+
+.secondary:active:not(:disabled) {
+  background: var(--primitives-color-purple-400);
+}
+
+.secondary:disabled {
+  color: var(--semantic-component-button-gradient-text-disabled);
+}

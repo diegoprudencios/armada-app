@@ -9,6 +9,17 @@ export function formatWalletBalance(value: number): string {
   return formatUsdcAmount(value, 2)
 }
 
+/** Ellipsis in the middle for long strings (addresses, URLs). */
+export function truncateMiddle(text: string, maxLength = 52): string {
+  if (text.length <= maxLength) return text
+
+  const ellipsis = '…'
+  const visible = maxLength - ellipsis.length
+  const head = Math.ceil(visible / 2)
+  const tail = Math.floor(visible / 2)
+  return `${text.slice(0, head)}${ellipsis}${text.slice(-tail)}`
+}
+
 export function truncateAddress(address: string): string {
   if (address.length <= 13) return address
   return `${address.slice(0, 6)}...${address.slice(-5)}`

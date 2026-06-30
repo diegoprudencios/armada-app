@@ -176,10 +176,6 @@
   }
 }
 
-.amountSuffix {
-  white-space: pre;
-}
-
 .emptyState {
   display: flex;
   flex-direction: column;

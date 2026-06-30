@@ -11,10 +11,11 @@ export interface SidePanelProps {
   onClose: () => void
   title?: string
   ariaLabel?: string
+  panelClassName?: string
   children: ReactNode
 }
 
-export function SidePanel({ open, onClose, title, ariaLabel, children }: SidePanelProps) {
+export function SidePanel({ open, onClose, title, ariaLabel, panelClassName, children }: SidePanelProps) {
   const titleId = useId()
   const [mounted, setMounted] = useState(open)
   const [exiting, setExiting] = useState(false)
@@ -54,7 +55,9 @@ export function SidePanel({ open, onClose, title, ariaLabel, children }: SidePan
   if (!mounted) return null
 
   const scrimClassName = [styles.scrim, exiting && styles.scrimExit].filter(Boolean).join(' ')
-  const panelClassName = [styles.panel, exiting && styles.panelExit].filter(Boolean).join(' ')
+  const panelClassNameResolved = [styles.panel, panelClassName, exiting && styles.panelExit]
+    .filter(Boolean)
+    .join(' ')
 
   return createPortal(
     <div className={scrimClassName} role="presentation" onClick={onClose}>
@@ -63,7 +66,7 @@ export function SidePanel({ open, onClose, title, ariaLabel, children }: SidePan
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
         aria-label={title ? undefined : ariaLabel}
-        className={panelClassName}
+        className={panelClassNameResolved}
         onClick={(event) => event.stopPropagation()}
       >
         {title ? (

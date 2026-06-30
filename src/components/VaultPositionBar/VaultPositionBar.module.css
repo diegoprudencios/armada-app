@@ -112,6 +112,30 @@ button.root:hover::before {
   letter-spacing: inherit;
 }
 
+.trail {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.earned {
+  display: flex;
+  align-items: baseline;
+  flex-shrink: 0;
+  font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.earnedPositive {
+  color: var(--semantic-color-status-success);
+}
+
 .apr {
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(var(--primitives-fontSize-sm) * 1px);

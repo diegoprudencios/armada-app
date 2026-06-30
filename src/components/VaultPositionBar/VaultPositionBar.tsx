@@ -2,7 +2,12 @@ import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
 import { RollingBalanceValue } from '@/components/RollingBalanceValue'
-import { DEMO_EARN_APY } from '@/pages/earnFlowConstants'
+import {
+  DEMO_EARN_APY,
+  estimateVaultEarnedSoFar,
+  formatEarnedSoFarAmount,
+  formatVaultEarningLabel,
+} from '@/pages/earnFlowConstants'
 import { formatUsdcAmount } from '@/utils/format'
 import usdcAmount from '@/styles/usdcAmount.module.css'
 import styles from './VaultPositionBar.module.css'
@@ -10,6 +15,7 @@ import styles from './VaultPositionBar.module.css'
 export interface VaultPositionBarProps {
   balance: number
   apy?: number
+  earnedAmount?: number
   vaultRollActive?: boolean
   vaultRollFromValue?: string
   vaultRollTrigger?: number
@@ -20,6 +26,7 @@ export interface VaultPositionBarProps {
 export function VaultPositionBar({
   balance,
   apy = DEMO_EARN_APY,
+  earnedAmount,
   vaultRollActive = false,
   vaultRollFromValue,
   vaultRollTrigger = 0,
@@ -29,7 +36,10 @@ export function VaultPositionBar({
   if (balance <= 0 && !vaultRollActive) return null
 
   const formattedBalance = formatUsdcAmount(balance)
+  const resolvedEarned = earnedAmount ?? estimateVaultEarnedSoFar(balance, apy)
+  const formattedEarned = formatEarnedSoFarAmount(resolvedEarned)
   const amountLabel = balanceRevealed ? `${formattedBalance} USDC` : 'Vault balance hidden'
+  const earnedLabel = balanceRevealed ? `${formattedEarned} earned` : 'Earned amount hidden'
 
   const amountDisplay =
     vaultRollActive && vaultRollFromValue !== undefined && balanceRevealed ? (
@@ -45,8 +55,6 @@ export function VaultPositionBar({
       <BalanceScrambleValue value={formattedBalance} revealed={balanceRevealed} />
     )
 
-  const apyLabel = `Earning ${apy.toFixed(1)}% APR`
-
   const content = (
     <>
       <div className={styles.lead}>
@@ -58,11 +66,19 @@ export function VaultPositionBar({
             {amountDisplay}
             <span className={styles.amountSuffix}>USDC</span>
           </span>
-          <span className={styles.apr}>{apyLabel}</span>
+          <span className={styles.apr}>{formatVaultEarningLabel(apy)}</span>
         </div>
       </div>
 
-      <ChevronRightIcon className={styles.chevron} strokeWidth={2} aria-hidden />
+      <div className={styles.trail}>
+        <span
+          className={[styles.earned, usdcAmount.font, styles.earnedPositive].join(' ')}
+          aria-label={earnedLabel}
+        >
+          <BalanceScrambleValue value={formattedEarned} revealed={balanceRevealed} />
+        </span>
+        <ChevronRightIcon className={styles.chevron} strokeWidth={2} aria-hidden />
+      </div>
     </>
   )
 

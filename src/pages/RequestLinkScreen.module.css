@@ -40,15 +40,100 @@
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
 }
 
-.linkValue {
+.linkCardSubtitle {
   margin: 0;
-  font-family: var(--semantic-typography-mono-sm-font-family);
-  font-size: var(--semantic-typography-mono-sm-font-size);
+  font-family: var(--semantic-typography-ui-body-sm-font-family);
+  font-size: var(--semantic-typography-ui-body-sm-font-size);
+  font-weight: var(--semantic-typography-ui-body-sm-font-weight);
+  line-height: var(--semantic-typography-ui-body-sm-line-height);
+  letter-spacing: var(--semantic-typography-ui-body-sm-letter-spacing);
+  color: var(--semantic-color-text-muted);
+  text-align: center;
+}
+
+.amountRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-block: var(--primitives-spacing-10);
+}
+
+.amountGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+}
+
+.tokenBadge {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+  border-radius: calc(var(--semantic-borderRadius-full) * 1px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tokenBadgeIcon {
+  flex-shrink: 0;
+  display: block;
+}
+
+.tokenBadgeIcon :global(svg) {
+  display: block;
+}
+
+.amountValue {
+  display: block;
+  font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
+  font-size: var(--primitives-spacing-10);
   font-weight: var(--primitives-fontWeight-medium);
-  line-height: var(--semantic-typography-mono-sm-line-height);
-  letter-spacing: var(--semantic-typography-mono-sm-letter-spacing);
+  line-height: var(--primitives-spacing-10);
+  min-height: var(--primitives-spacing-10);
+  letter-spacing: 0;
   color: var(--semantic-color-text-primary);
-  word-break: break-all;
+}
+
+.linkValue {
+  position: relative;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+  font-family: var(--semantic-typography-mono-md-font-family);
+  font-size: var(--semantic-typography-mono-md-font-size);
+  font-weight: var(--semantic-typography-mono-md-font-weight);
+  line-height: var(--semantic-typography-mono-md-line-height);
+  letter-spacing: var(--semantic-typography-mono-md-letter-spacing);
+  color: var(--semantic-color-text-primary);
+  text-align: center;
+}
+
+.linkRuler {
+  position: absolute;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.linkStart,
+.linkEnd {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.linkEllipsis {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .metaRow {
@@ -67,16 +152,6 @@
   color: var(--semantic-color-text-muted);
 }
 
-.metaValue {
-  margin: 0;
-  font-family: var(--semantic-typography-mono-sm-font-family);
-  font-size: var(--semantic-typography-mono-sm-font-size);
-  font-weight: var(--primitives-fontWeight-medium);
-  line-height: var(--semantic-typography-mono-sm-line-height);
-  color: var(--semantic-color-text-primary);
-  text-align: right;
-}
-
 .metaValueNote {
   margin: 0;
   flex: 1;
@@ -89,29 +164,36 @@
   text-align: right;
 }
 
-.revokeButton {
+.linkCardActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-3);
+  width: 100%;
+}
+
+.linkCardActionButton {
+  width: 100%;
+}
+
+.expiryCaption {
   margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
-  font-weight: var(--primitives-fontWeight-medium);
-  line-height: var(--primitives-lineHeight-tight);
+  font-family: var(--semantic-typography-ui-body-sm-font-family);
+  font-size: var(--semantic-typography-ui-body-sm-font-size);
+  font-weight: var(--semantic-typography-ui-body-sm-font-weight);
+  line-height: var(--semantic-typography-ui-body-sm-line-height);
+  letter-spacing: var(--semantic-typography-ui-body-sm-letter-spacing);
   color: var(--semantic-color-text-muted);
-  text-decoration: underline;
-  text-underline-offset: calc(var(--primitives-spacing-1) * 0.5);
-  cursor: pointer;
+  text-align: center;
 }
 
-.revokeButton:hover {
-  color: var(--semantic-color-text-primary);
+.revokeButtonDestructive {
+  border: 1px solid var(--semantic-color-status-error);
+  color: var(--semantic-color-status-error);
+  background: color-mix(in srgb, var(--semantic-color-status-error) 8%, transparent);
 }
 
-.revokeButton:focus-visible {
-  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
-  outline-offset: calc(var(--primitives-spacing-1) * 1px);
-  border-radius: calc(var(--primitives-spacing-1) * 1px);
+.revokeButtonDestructive:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--semantic-color-status-error) 14%, transparent);
 }
 
 .revokeConfirm {
@@ -138,10 +220,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--primitives-spacing-2);
-  width: 100%;
-}
-
-.copyLinkButton {
   width: 100%;
 }
 

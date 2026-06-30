@@ -6,6 +6,7 @@ export interface StepsProps {
   status?: 'default' | 'error' | 'confirmed'
   /** Fixed flow title (e.g. "Deposit") — when set, shown left instead of the active step name. */
   flowLabel?: string
+  hideStepCount?: boolean
 }
 
 export function Steps({
@@ -13,6 +14,7 @@ export function Steps({
   currentStep,
   status = 'default',
   flowLabel,
+  hideStepCount = false,
 }: StepsProps) {
   const stepName = flowLabel
     ? flowLabel.toUpperCase()
@@ -28,7 +30,7 @@ export function Steps({
     <div className={styles.container}>
       <div className={styles.headerRow}>
         <span className={styles.stepName}>{stepName}</span>
-        <span className={styles.stepCount}>{stepCount}</span>
+        {hideStepCount ? null : <span className={styles.stepCount}>{stepCount}</span>}
       </div>
       <div className={styles.progressBar}>
         {steps.map((_, index) => {

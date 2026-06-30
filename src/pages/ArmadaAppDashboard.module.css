@@ -194,6 +194,7 @@
 @media (max-width: 767px) {
   .shell {
     min-height: 100dvh;
+    overflow-x: clip;
     padding-block-start: calc(var(--primitives-spacing-4) + var(--mobile-safe-area-top));
     padding-block-end: calc(var(--primitives-spacing-6) + var(--mobile-safe-area-bottom));
   }

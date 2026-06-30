@@ -1,0 +1,999 @@
+.panelLayout {
+  --wallet-row-surface: var(--primitives-color-purple-50);
+  --wallet-icon-surface: var(--primitives-color-purple-100);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.scrollContent {
+  flex: 1;
+  min-height: 0;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.walletMenuPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-5);
+  min-height: 0;
+  min-width: 0;
+  max-width: 100%;
+  padding-top: calc(var(--primitives-spacing-5) + var(--mobile-safe-area-top));
+}
+
+.panelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--primitives-spacing-3);
+}
+
+.panelHeaderMain {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-4);
+  min-width: 0;
+  flex: 1;
+}
+
+.walletSummaryPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  align-self: flex-start;
+  padding:
+    var(--primitives-spacing-1)
+    var(--primitives-spacing-3)
+    var(--primitives-spacing-1)
+    var(--primitives-spacing-2);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid
+    color-mix(in srgb, var(--semantic-color-border-subtle) 60%, transparent);
+  background: var(--semantic-color-surface-default);
+  font-family: var(--semantic-typography-ui-label-sm-font-family);
+  font-size: var(--semantic-typography-ui-label-sm-font-size);
+  font-weight: var(--semantic-typography-ui-label-sm-font-weight);
+  letter-spacing: var(--semantic-typography-ui-label-sm-letter-spacing);
+  color: var(--semantic-color-text-primary);
+}
+
+.walletIconStack {
+  display: inline-flex;
+  align-items: center;
+}
+
+.walletIconStackItem {
+  display: inline-flex;
+  margin-left: calc(var(--primitives-spacing-2) * -1);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: color-mix(in srgb, var(--semantic-color-surface-bg) 55%, transparent);
+  box-shadow: 0 0 0 calc(var(--primitives-borderWidth-default) * 1px)
+    color-mix(in srgb, var(--semantic-color-border-subtle) 50%, transparent);
+}
+
+.walletIconStackItem:first-child {
+  margin-left: 0;
+}
+
+.balanceRow {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-4);
+  max-width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.totalBalanceCluster {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  min-width: 0;
+  flex: 0 0 auto;
+  width: fit-content;
+}
+
+.headerUsdcBadge {
+  width: calc(var(--primitives-spacing-8) * 1px);
+  height: calc(var(--primitives-spacing-8) * 1px);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  overflow: hidden;
+}
+
+.headerUsdcIcon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.headerUsdcIcon :global(svg) {
+  display: block;
+}
+
+.balanceActions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-4);
+  flex: 0 0 auto;
+}
+
+.totalBalance {
+  margin: 0;
+  display: inline-flex;
+  min-width: 0;
+  width: fit-content;
+  font-family: var(--semantic-typography-mono-lg-font-family);
+  font-size: var(--semantic-typography-mono-lg-font-size);
+  font-weight: var(--semantic-typography-mono-lg-font-weight);
+  line-height: var(--semantic-typography-mono-lg-line-height);
+  letter-spacing: var(--semantic-typography-mono-lg-letter-spacing);
+  color: var(--semantic-color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.refreshButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--primitives-spacing-8) * 1px);
+  height: calc(var(--primitives-spacing-8) * 1px);
+  padding: 0;
+  border: none;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: transparent;
+  color: var(--semantic-color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.refreshButton:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.balanceCaption {
+  margin: var(--primitives-spacing-1) 0 0;
+  font-family: var(--semantic-typography-ui-body-sm-font-family);
+  font-size: var(--semantic-typography-ui-body-sm-font-size);
+  font-weight: var(--semantic-typography-ui-body-sm-font-weight);
+  line-height: var(--semantic-typography-ui-body-sm-line-height);
+  color: var(--semantic-color-text-muted);
+}
+
+.closeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--mobile-touch-target-min);
+  height: var(--mobile-touch-target-min);
+  margin: calc(var(--primitives-spacing-3) * -1) calc(var(--primitives-spacing-3) * -1) 0 0;
+  padding: 0;
+  border: none;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: transparent;
+  color: var(--semantic-color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.closeButton:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.connectedWalletsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-3);
+}
+
+.walletList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-2);
+  width: 100%;
+  min-width: 0;
+}
+
+.walletListItem {
+  min-width: 0;
+}
+
+.walletCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-3);
+  padding: var(--primitives-spacing-3);
+  border-radius: calc(var(--primitives-spacing-5) / 2);
+  background: var(--wallet-row-surface);
+  min-width: 0;
+  max-width: 100%;
+}
+
+.walletCardTop {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-3);
+  min-width: 0;
+}
+
+.iconBadge {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
+  background: var(--wallet-icon-surface);
+  color: var(--semantic-color-text-primary);
+}
+
+.listPrimary {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-primary);
+}
+
+.listSecondary {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-weight: var(--primitives-fontWeight-regular);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-muted);
+}
+
+.listAmount {
+  margin: 0;
+  flex-shrink: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-primary);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.walletAddressGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-1);
+  min-width: 0;
+  flex: 1;
+}
+
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(var(--primitives-spacing-8) * 1px);
+  height: calc(var(--primitives-spacing-8) * 1px);
+  padding: 0;
+  border: none;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: transparent;
+  color: var(--semantic-color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.copyButton:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.walletCardBottom {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  flex-wrap: wrap;
+}
+
+.walletCardActions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-3);
+  margin-left: auto;
+}
+
+.textAction {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--semantic-typography-ui-label-sm-font-family);
+  font-size: var(--semantic-typography-ui-label-sm-font-size);
+  font-weight: var(--semantic-typography-ui-label-sm-font-weight);
+  color: var(--semantic-color-text-lavender);
+  cursor: pointer;
+}
+
+.textAction:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+  border-radius: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.connectSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-2);
+}
+
+.ethereumDepositHint {
+  margin: 0;
+  font-family: var(--semantic-typography-ui-body-sm-font-family);
+  font-size: var(--semantic-typography-ui-body-sm-font-size);
+  font-weight: var(--semantic-typography-ui-body-sm-font-weight);
+  line-height: var(--semantic-typography-ui-body-sm-line-height);
+  color: var(--semantic-color-text-muted);
+}
+
+.ethereumPanelToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.ethereumPanelToolbar .closeButton {
+  margin: 0;
+}
+
+.ethereumPanelBody {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.ethereumPanelContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.ethereumWalletIdentity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitives-spacing-3);
+  width: 100%;
+  text-align: center;
+}
+
+.ethereumWalletHeroIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.ethereumWalletAddress {
+  margin: 0;
+  font-family: var(--semantic-typography-mono-lg-font-family);
+  font-size: var(--semantic-typography-mono-lg-font-size);
+  font-weight: var(--semantic-typography-mono-lg-font-weight);
+  line-height: var(--semantic-typography-mono-lg-line-height);
+  letter-spacing: var(--semantic-typography-mono-lg-letter-spacing);
+  color: var(--semantic-color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.ethereumActionRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitives-spacing-3);
+  margin-top: var(--primitives-spacing-10);
+}
+
+.ethereumUsdcRow {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-3);
+  width: 100%;
+  margin-top: var(--primitives-spacing-10);
+  padding: var(--primitives-spacing-3);
+  border-radius: calc(var(--primitives-spacing-5) / 2);
+  background: var(--wallet-row-surface);
+  box-sizing: border-box;
+}
+
+.ethereumUsdcChainIcon {
+  --ethereum-chain-overlay-size: var(--primitives-spacing-6);
+  position: relative;
+  flex-shrink: 0;
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  margin-right: calc(var(--ethereum-chain-overlay-size) / 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ethereumUsdcChainGlyph {
+  display: block;
+  flex-shrink: 0;
+}
+
+.ethereumUsdcChainGlyph :global(svg) {
+  display: block;
+}
+
+.ethereumUsdcChainOverlay {
+  position: absolute;
+  right: calc(var(--ethereum-chain-overlay-size) / -2);
+  bottom: calc(var(--primitives-spacing-1) * -0.25);
+  width: var(--ethereum-chain-overlay-size);
+  height: var(--ethereum-chain-overlay-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: var(--semantic-color-surface-default);
+  box-shadow: 0 0 0 calc(var(--primitives-borderWidth-default) * 1px)
+    color-mix(in srgb, var(--semantic-color-border-subtle) 50%, transparent);
+  line-height: 0;
+  overflow: hidden;
+}
+
+.ethereumUsdcChainOverlayGlyph {
+  display: block;
+  flex-shrink: 0;
+}
+
+.ethereumUsdcChainOverlayGlyph :global(svg) {
+  display: block;
+}
+
+.ethereumPanelBody .connectedWalletsSection,
+.ethereumPanelBody .ethereumDepositButton {
+  width: 100%;
+}
+
+.ethereumPanelBody .connectedWalletsSection {
+  gap: 0;
+}
+
+.ethereumDepositButton {
+  width: 100%;
+  margin-top: var(--primitives-spacing-4);
+}
+
+.ethereumDepositButtonIcon {
+  width: 100%;
+  height: 100%;
+}
+
+.walletNetworkIconHero {
+  width: calc(var(--primitives-spacing-12) + var(--primitives-spacing-2));
+  height: calc(var(--primitives-spacing-12) + var(--primitives-spacing-2));
+}
+
+.walletNetworkIcon {
+  --wallet-network-overlay-size: var(--primitives-spacing-6);
+  position: relative;
+  flex-shrink: 0;
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  margin-right: calc(var(--wallet-network-overlay-size) / 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.walletNetworkPrimary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.walletNetworkOverlay {
+  position: absolute;
+  right: calc(var(--wallet-network-overlay-size) / -2);
+  bottom: calc(var(--primitives-spacing-1) * -0.25);
+  width: var(--wallet-network-overlay-size);
+  height: var(--wallet-network-overlay-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: var(--semantic-color-surface-default);
+  box-shadow: 0 0 0 calc(var(--primitives-borderWidth-default) * 1px)
+    color-mix(in srgb, var(--semantic-color-border-subtle) 50%, transparent);
+  line-height: 0;
+  overflow: hidden;
+}
+
+.walletNetworkOverlayGlyph {
+  display: block;
+  flex-shrink: 0;
+}
+
+.walletNetworkOverlayGlyph :global(svg) {
+  display: block;
+}
+
+.tabBar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--primitives-spacing-3);
+  min-width: 0;
+  border-bottom: calc(var(--primitives-borderWidth-default) * 1px) solid
+    color-mix(in srgb, var(--semantic-color-border-subtle) 70%, transparent);
+}
+
+.balancesHeading {
+  margin: 0;
+  padding: 0 0 var(--primitives-spacing-3);
+  min-width: 0;
+  font-family: var(--semantic-typography-ui-body-lg-font-family);
+  font-size: var(--semantic-typography-ui-body-lg-font-size);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--semantic-typography-ui-body-lg-line-height);
+  color: var(--semantic-color-text-primary);
+  position: relative;
+}
+
+.balancesHeading::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--primitives-borderWidth-default) * -1px);
+  height: calc(var(--primitives-borderWidth-thick) * 1px);
+  background: var(--semantic-color-text-primary);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--primitives-spacing-5);
+  min-width: 0;
+}
+
+.tab {
+  margin: 0;
+  padding: 0 0 var(--primitives-spacing-3);
+  border: none;
+  background: none;
+  font-family: var(--semantic-typography-ui-body-lg-font-family);
+  font-size: var(--semantic-typography-ui-body-lg-font-size);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--semantic-typography-ui-body-lg-line-height);
+  color: var(--semantic-color-text-muted);
+  cursor: pointer;
+  position: relative;
+}
+
+.tabActive {
+  color: var(--semantic-color-text-primary);
+}
+
+.tabActive::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--primitives-borderWidth-default) * -1px);
+  height: calc(var(--primitives-borderWidth-thick) * 1px);
+  background: var(--semantic-color-text-primary);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+}
+
+.tab:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.filterMenuRoot {
+  position: relative;
+  flex-shrink: 0;
+  margin-bottom: var(--primitives-spacing-3);
+}
+
+.filterMenuTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--primitives-spacing-2);
+  flex: none;
+  width: auto;
+  max-width: min(100%, calc(var(--primitives-spacing-20) * 3));
+  padding-inline: var(--primitives-spacing-3);
+}
+
+.filterMenuLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filterMenuChevron {
+  width: calc(var(--primitives-fontSize-sm) * 1px);
+  height: calc(var(--primitives-fontSize-sm) * 1px);
+  flex-shrink: 0;
+  color: var(--semantic-color-text-muted);
+}
+
+.filterMenuList {
+  position: absolute;
+  top: calc(100% + var(--primitives-spacing-2));
+  right: 0;
+  z-index: 10;
+  min-width: 100%;
+  margin: 0;
+  padding: var(--primitives-spacing-1);
+  list-style: none;
+  border-radius: calc(var(--primitives-spacing-4) * 1px);
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-default);
+  background: var(--semantic-color-surface-default);
+  box-sizing: border-box;
+}
+
+.filterMenuOption {
+  display: block;
+  width: 100%;
+  padding: var(--primitives-spacing-2) var(--primitives-spacing-3);
+  border: none;
+  border-radius: calc(var(--primitives-spacing-3) * 1px);
+  background: transparent;
+  font-family: var(--semantic-typography-ui-body-sm-font-family);
+  font-size: var(--semantic-typography-ui-body-sm-font-size);
+  color: var(--semantic-color-text-primary);
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filterMenuOption:hover {
+  background: var(--semantic-color-surface-hover);
+}
+
+.filterMenuOption:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * -1px);
+}
+
+.tabPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-4);
+  min-height: 0;
+}
+
+.tokenSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-3);
+}
+
+.tokenList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-2);
+  width: 100%;
+}
+
+.tokenRow {
+  --wallet-deposit-slide: calc(var(--primitives-spacing-20) + var(--primitives-spacing-2));
+  position: relative;
+  min-height: var(--primitives-spacing-16);
+  border-radius: calc(var(--primitives-spacing-5) / 2);
+  background: var(--wallet-row-surface);
+  overflow: hidden;
+}
+
+.tokenDeposit {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  width: var(--wallet-deposit-slide);
+  margin: 0;
+  padding-inline: var(--primitives-spacing-5);
+  border-radius: 0 calc(var(--primitives-spacing-5) / 2) calc(var(--primitives-spacing-5) / 2) 0;
+  font-size: var(--semantic-component-button-primary-sm-font-size);
+}
+
+.tokenRowContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-4);
+  min-height: var(--primitives-spacing-16);
+  padding: var(--primitives-spacing-3);
+  background: var(--wallet-row-surface);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.tokenIdentity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-1);
+  min-width: 0;
+  flex: 1;
+}
+
+.tokenBalance {
+  margin: 0;
+  flex-shrink: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-primary);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.tokenHoldingIcon {
+  --token-wallet-overlay-size: var(--primitives-spacing-6);
+  position: relative;
+  flex-shrink: 0;
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  margin-right: calc(var(--token-wallet-overlay-size) / 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tokenHoldingUsdc {
+  display: block;
+  flex-shrink: 0;
+}
+
+.tokenHoldingUsdc :global(svg) {
+  display: block;
+}
+
+.tokenHoldingWallet {
+  position: absolute;
+  right: calc(var(--token-wallet-overlay-size) / -2);
+  bottom: calc(var(--primitives-spacing-1) * -0.25);
+  width: var(--token-wallet-overlay-size);
+  height: var(--token-wallet-overlay-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tokenRow:hover .tokenRowContent,
+  .tokenRow:focus-within .tokenRowContent {
+    transform: translateX(calc(var(--wallet-deposit-slide) * -1));
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .tokenRow:hover .tokenRowContent,
+  .tokenRow:focus-within .tokenRowContent {
+    transform: none;
+  }
+}
+
+.panelFooter {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-4);
+  margin-top: auto;
+  padding:
+    var(--primitives-spacing-4) 0
+    calc(var(--primitives-spacing-5) + var(--mobile-safe-area-bottom));
+  border-top: calc(var(--primitives-borderWidth-default) * 1px) solid
+    color-mix(in srgb, var(--semantic-color-border-subtle) 70%, transparent);
+}
+
+.menuSectionLabel {
+  display: block;
+  margin-bottom: var(--primitives-spacing-2);
+  font-family: var(--semantic-typography-ui-label-xs-font-family);
+  font-size: var(--semantic-typography-ui-label-xs-font-size);
+  font-weight: var(--semantic-typography-ui-label-xs-font-weight);
+  letter-spacing: var(--semantic-typography-ui-label-xs-letter-spacing);
+  text-transform: uppercase;
+  color: var(--semantic-color-text-muted);
+}
+
+.segmented {
+  display: flex;
+  gap: var(--primitives-spacing-1);
+  padding: var(--primitives-spacing-1);
+  border-radius: calc(var(--primitives-spacing-5) / 2);
+  background: var(--wallet-row-surface);
+}
+
+.segment {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitives-spacing-2);
+  min-height: var(--primitives-spacing-10);
+  padding-inline: var(--primitives-spacing-3);
+  border: none;
+  border-radius: calc(var(--primitives-spacing-4) * 1px);
+  background: transparent;
+  font-family: var(--semantic-typography-ui-label-sm-font-family);
+  font-size: var(--semantic-typography-ui-label-sm-font-size);
+  font-weight: var(--semantic-typography-ui-label-sm-font-weight);
+  color: var(--semantic-color-text-muted);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.segmentActive {
+  background: color-mix(in srgb, var(--semantic-color-surface-bg) 55%, transparent);
+  color: var(--semantic-color-text-primary);
+}
+
+.swatchGradient,
+.swatchSolid {
+  width: calc(var(--primitives-spacing-4) * 1px);
+  height: calc(var(--primitives-spacing-4) * 1px);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  flex-shrink: 0;
+}
+
+.swatchGradient {
+  background: linear-gradient(
+    135deg,
+    var(--primitives-color-purple-400),
+    var(--primitives-color-purple-700)
+  );
+}
+
+.swatchSolid {
+  background: color-mix(in srgb, var(--primitives-color-neutral-100) 55%, transparent);
+  box-shadow: inset 0 0 0 calc(var(--primitives-borderWidth-default) * 1px)
+    color-mix(in srgb, var(--semantic-color-border-subtle) 50%, transparent);
+}
+
+.activityFilter {
+  display: none;
+}
+
+.activityList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-2);
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-3);
+  padding: var(--primitives-spacing-3);
+  border-radius: calc(var(--primitives-spacing-5) / 2);
+  background: var(--wallet-row-surface);
+}
+
+.activityIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: var(--wallet-icon-surface);
+  color: var(--semantic-color-text-primary);
+  flex-shrink: 0;
+}
+
+.activityBody {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--primitives-spacing-1) * 0.5);
+  min-width: 0;
+  flex: 1;
+}
+
+.activityLabel {
+  margin: 0;
+  font-family: var(--semantic-typography-ui-body-sm-font-family);
+  font-size: var(--semantic-typography-ui-body-sm-font-size);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-primary);
+}
+
+.activityMeta {
+  margin: 0;
+  font-family: var(--semantic-typography-ui-body-sm-font-family);
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  line-height: var(--primitives-lineHeight-tight);
+  color: var(--semantic-color-text-muted);
+}
+
+.activityAmount {
+  margin: 0;
+  font-family: var(--semantic-typography-mono-sm-font-family);
+  font-size: var(--semantic-typography-mono-sm-font-size);
+  font-weight: var(--primitives-fontWeight-medium);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.activityAmountPositive {
+  color: var(--semantic-color-status-success);
+}
+
+.activityAmountNegative {
+  color: var(--semantic-color-text-primary);
+}
+
+.activityEmpty {
+  margin: 0;
+  padding: var(--primitives-spacing-4);
+  font-family: var(--semantic-typography-ui-body-sm-font-family);
+  font-size: var(--semantic-typography-ui-body-sm-font-size);
+  color: var(--semantic-color-text-muted);
+  text-align: center;
+}
+
+.demoNote {
+  margin: 0;
+  font-family: var(--semantic-typography-ui-body-sm-font-family);
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  color: var(--semantic-color-text-muted);
+}
+
+@media (max-width: 767px) {
+  .walletMenuPanel {
+    padding-top: 0;
+  }
+
+  .closeButton {
+    display: none;
+  }
+
+  .panelFooter {
+    padding-bottom: var(--primitives-spacing-4);
+  }
+}
+
+@media (hover: none) {
+  .tokenRow:hover .tokenRowContent,
+  .tokenRow:focus-within .tokenRowContent {
+    transform: translateX(calc(var(--wallet-deposit-slide) * -0.85));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tokenRowContent {
+    transition: none;
+  }
+}

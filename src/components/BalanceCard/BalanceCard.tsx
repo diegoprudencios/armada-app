@@ -13,7 +13,6 @@ import {
 } from '@heroicons/react/24/outline'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
-import { BottomSheet } from '@/components/BottomSheet'
 import { IconButton } from '@/components/IconButton'
 import { RollingBalanceValue, type BalanceRollMode } from '@/components/RollingBalanceValue'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
@@ -189,6 +188,8 @@ export function BalanceCard({
   const [background] = useDashboardBackground()
   const isSolidBackground = background === 'solid'
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
+  const [moreMenuHoverSuppressed, setMoreMenuHoverSuppressed] = useState(false)
+  const moreMenuRootRef = useRef<HTMLDivElement>(null)
   const [internalBalanceHidden, setInternalBalanceHidden] = useState(false)
   const balanceHiddenControlled = balanceHiddenProp !== undefined
   const balanceHidden = balanceHiddenControlled ? balanceHiddenProp : internalBalanceHidden
@@ -214,6 +215,51 @@ export function BalanceCard({
       if (armadaAddressCopyTimerRef.current) clearTimeout(armadaAddressCopyTimerRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    if (!moreMenuOpen) return
+
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target
+      if (!(target instanceof Node)) return
+      if (moreMenuRootRef.current?.contains(target)) return
+      setMoreMenuOpen(false)
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setMoreMenuOpen(false)
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [moreMenuOpen])
+
+  function toggleMoreMenu() {
+    if (isMobileLayout) {
+      setMoreMenuOpen((open) => !open)
+      return
+    }
+
+    setMoreMenuOpen(false)
+    setMoreMenuHoverSuppressed(true)
+  }
+
+  function closeMoreMenu() {
+    setMoreMenuOpen(false)
+    setMoreMenuHoverSuppressed(true)
+    const active = document.activeElement
+    if (active instanceof HTMLElement && moreMenuRootRef.current?.contains(active)) {
+      active.blur()
+    }
+  }
+
+  function handleMoreMenuPointerLeave() {
+    setMoreMenuHoverSuppressed(false)
+  }
 
   async function copyArmadaAddress() {
     if (!armadaAddress) return
@@ -307,7 +353,7 @@ export function BalanceCard({
       onEarn={onEarn}
       onWithdraw={onWithdraw}
       onToggleActivity={onToggleActivity}
-      onSelect={() => setMoreMenuOpen(false)}
+      onSelect={closeMoreMenu}
     />
   )
 
@@ -541,21 +587,27 @@ export function BalanceCard({
               </div>
             </>
           )}
-          <div className={`${styles.actionEnter} ${styles.moreMenuRoot}`}>
-            {!isMobileLayout ? (
-              <div className={`${styles.moreMenu} ${styles.moreMenuDesktop}`} role="menu" aria-label="More options">
+          <div className={styles.actionEnter}>
+            <div
+              ref={moreMenuRootRef}
+              className={styles.moreMenuRoot}
+              data-menu-open={moreMenuOpen ? 'true' : 'false'}
+              data-hover-suppressed={moreMenuHoverSuppressed ? 'true' : 'false'}
+              onPointerLeave={handleMoreMenuPointerLeave}
+            >
+              <div className={styles.moreMenu} role="menu" aria-label="More options">
                 {moreMenuItems}
               </div>
-            ) : null}
-            <IconButton
-              variant="ghost"
-              className={styles.actionMore}
-              icon={<EllipsisHorizontalIcon className={styles.actionIcon} strokeWidth={2} />}
-              aria-label="More options"
-              aria-expanded={isMobileLayout ? moreMenuOpen : undefined}
-              aria-haspopup={isMobileLayout ? 'dialog' : 'menu'}
-              onClick={isMobileLayout ? () => setMoreMenuOpen(true) : undefined}
-            />
+              <IconButton
+                variant="ghost"
+                className={styles.actionMore}
+                icon={<EllipsisHorizontalIcon className={styles.actionIcon} strokeWidth={2} />}
+                aria-label="More options"
+                aria-expanded={moreMenuOpen}
+                aria-haspopup="menu"
+                onClick={toggleMoreMenu}
+              />
+            </div>
           </div>
           </div>
 
@@ -580,19 +632,6 @@ export function BalanceCard({
           ) : null}
         </div>
       </div>
-
-      {isMobileLayout ? (
-        <BottomSheet
-          open={moreMenuOpen}
-          onClose={() => setMoreMenuOpen(false)}
-          title="More options"
-          ariaLabel="More options"
-        >
-          <div className={styles.moreMenuSheet} role="menu">
-            {moreMenuItems}
-          </div>
-        </BottomSheet>
-      ) : null}
     </div>
   )
 }

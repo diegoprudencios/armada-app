@@ -91,6 +91,7 @@
 }
 
 .body {
+  overflow-x: clip;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-inline: var(--primitives-spacing-5);

@@ -3,11 +3,11 @@ import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { revokePaymentLink } from '@/utils/payViaLink'
 import { RequestLinkScreen } from './RequestLinkScreen'
+import { RequestPaidConfirmedScreen } from './RequestPaidConfirmedScreen'
 import { RequestReceiveScreen } from './RequestReceiveScreen'
 import {
   buildPayViaLinkUrl,
   createPaymentRequestId,
-  createPaymentRoutingAddress,
   requestLinkExpiryMs,
   REQUEST_PROGRESS_STEPS,
   type RequestLinkExpiryId,
@@ -18,11 +18,11 @@ import styles from './RequestModalFlow.module.css'
 const REQUEST_STEP_NUMBER: Record<RequestModalStep, number> = {
   receive: 1,
   link: 2,
+  confirmed: 2,
 }
 
 export type RequestLinkPayload = {
   paymentLink: string
-  routingAddress: string
   requestId: string
   expiresAt: number
 }
@@ -31,17 +31,16 @@ export interface RequestModalFlowProps {
   step: RequestModalStep
   privateAddress: string
   amount: string
-  anyAmount: boolean
   note: string
   expiryId: RequestLinkExpiryId
   paymentLink: string
-  routingAddress: string
   requestId: string
   expiresAt: number
   linkRevoked: boolean
+  confirmedAt?: number | null
+  receiptTxHash?: string
   onClose: () => void
   onAmountChange: (amount: string) => void
-  onAnyAmountChange: (anyAmount: boolean) => void
   onNoteChange: (note: string) => void
   onExpiryChange: (expiryId: RequestLinkExpiryId) => void
   onCreateLink: (payload: RequestLinkPayload) => void
@@ -53,17 +52,16 @@ export function RequestModalFlow({
   step,
   privateAddress,
   amount,
-  anyAmount,
   note,
   expiryId,
   paymentLink,
-  routingAddress,
   requestId,
   expiresAt,
   linkRevoked,
+  confirmedAt,
+  receiptTxHash,
   onClose,
   onAmountChange,
-  onAnyAmountChange,
   onNoteChange,
   onExpiryChange,
   onCreateLink,
@@ -73,6 +71,7 @@ export function RequestModalFlow({
   const [exiting, setExiting] = useState(false)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
+  const isConfirmed = step === 'confirmed'
 
   const requestClose = useCallback(() => {
     setExiting((current) => (current ? current : true))
@@ -86,20 +85,18 @@ export function RequestModalFlow({
 
   function handleCreateLink() {
     const nextRequestId = createPaymentRequestId()
-    const nextRoutingAddress = createPaymentRoutingAddress(nextRequestId, privateAddress)
     const nextExpiresAt = Date.now() + requestLinkExpiryMs(expiryId)
     const trimmedNote = note.trim()
     const nextPaymentLink = buildPayViaLinkUrl({
-      routingAddress: nextRoutingAddress,
+      recipientAddress: privateAddress,
       requestId: nextRequestId,
       expiresAt: nextExpiresAt,
-      amount: anyAmount ? undefined : amount,
+      amount,
       note: trimmedNote || undefined,
     })
 
     onCreateLink({
       paymentLink: nextPaymentLink,
-      routingAddress: nextRoutingAddress,
       requestId: nextRequestId,
       expiresAt: nextExpiresAt,
     })
@@ -117,13 +114,34 @@ export function RequestModalFlow({
     requestClose()
   }
 
+  function handleConfirmedGoToDashboard() {
+    onDone()
+    requestClose()
+  }
+
   function renderStep() {
+    if (step === 'confirmed') {
+      return (
+        <RequestPaidConfirmedScreen
+          amount={amount}
+          note={note.trim() || undefined}
+          txHash={receiptTxHash ?? ''}
+          confirmedAt={confirmedAt ?? Date.now()}
+          onViewExplorer={() => {
+            if (receiptTxHash) {
+              window.open(`https://etherscan.io/tx/${receiptTxHash}`, '_blank', 'noopener,noreferrer')
+            }
+          }}
+          onGoToDashboard={handleConfirmedGoToDashboard}
+        />
+      )
+    }
+
     if (step === 'link') {
       return (
         <RequestLinkScreen
           paymentLink={paymentLink}
-          routingAddress={routingAddress}
-          amount={anyAmount ? undefined : amount}
+          amount={amount}
           note={note.trim() || undefined}
           expiresAt={expiresAt}
           revoked={linkRevoked}
@@ -137,11 +155,9 @@ export function RequestModalFlow({
       <RequestReceiveScreen
         privateAddress={privateAddress}
         amount={amount}
-        anyAmount={anyAmount}
         note={note}
         expiryId={expiryId}
         onAmountChange={onAmountChange}
-        onAnyAmountChange={onAnyAmountChange}
         onNoteChange={onNoteChange}
         onExpiryChange={onExpiryChange}
         onCreateLink={handleCreateLink}
@@ -160,7 +176,10 @@ export function RequestModalFlow({
       <ModalShell
         steps={[...REQUEST_PROGRESS_STEPS]}
         currentStep={REQUEST_STEP_NUMBER[step]}
-        flowLabel="Receive"
+        status={isConfirmed ? 'confirmed' : 'default'}
+        hideSteps={isConfirmed}
+        contentOffset="default"
+        flowLabel="Request"
         exiting={exiting}
         onClose={requestClose}
       >

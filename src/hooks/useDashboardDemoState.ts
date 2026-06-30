@@ -18,10 +18,12 @@ import {
 } from '@/utils/demoDashboardSession'
 import { getCurrentEnvironment } from '@/utils/environment'
 import { returnToLanding } from '@/utils/appNavigation'
+import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
 import {
-  resolveDemoWalletAddress,
-  type DemoWalletProvider,
-} from '@/pages/depositFlowConstants'
+  createConnectedWallet,
+  demoWalletFromConnected,
+  type ConnectedWallet,
+} from '@/utils/walletMenu'
 import type { SendChainId } from '@/pages/sendFlowConstants'
 import type { EarnModalStep, EarnTab } from '@/pages/earnFlowConstants'
 import type { WithdrawModalStep } from '@/pages/withdrawFlowConstants'
@@ -34,17 +36,30 @@ import type { DashboardActivityItem } from '@/constants/dashboardActivity'
 import {
   createDepositActivity,
   createEarnActivity,
+  createReceiveLinkActivity,
+  createRequestLinkActivity,
   createSendActivity,
   createWithdrawActivity,
+  createDemoTxHash,
+  findRequestLinkActivity,
   prependActivity,
+  resolveActivityTxHash,
+  updateRequestLinkActivityByRequestId,
 } from '@/utils/dashboardActivity'
-import { clearPendingPayViaLink, readPendingPayViaLink } from '@/utils/payViaLink'
+import {
+  clearPendingPayViaLink,
+  isPaymentLinkRevoked,
+  readPendingPayViaLink,
+  type PendingPayViaLink,
+} from '@/utils/payViaLink'
+import { isDemoPreviewActivityItem, withDemoPreviewReceiveItem } from '@/constants/activityList'
 
 export type DepositStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 export type SendStep = 'recipient' | 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 export type EarnStep = EarnModalStep
 export type WithdrawStep = WithdrawModalStep
 export type RequestStep = RequestModalStep
+export type ReceivePaymentStep = 'confirmed'
 
 type BalanceRollState = {
   trigger: number
@@ -55,6 +70,14 @@ type BalanceRollState = {
 
 function readInitialWallet(): DemoWallet | null {
   return readDemoDashboardSession()?.wallet ?? null
+}
+
+function readInitialConnectedWallets(): ConnectedWallet[] {
+  return readDemoDashboardSession()?.connectedWallets ?? []
+}
+
+function readInitialActiveWalletId(): string | null {
+  return readDemoDashboardSession()?.activeWalletId ?? null
 }
 
 function readInitialBalance(fallback: number): number {
@@ -90,6 +113,8 @@ export function useDashboardDemoState(initialBalance = 0) {
   const isMock = environment === 'mock'
 
   const [wallet, setWallet] = useState<DemoWallet | null>(readInitialWallet)
+  const [connectedWallets, setConnectedWallets] = useState<ConnectedWallet[]>(readInitialConnectedWallets)
+  const [activeWalletId, setActiveWalletId] = useState<string | null>(readInitialActiveWalletId)
   const [dashboardBalance, setDashboardBalance] = useState(() => readInitialBalance(initialBalance))
   const [hasCompletedDeposit, setHasCompletedDeposit] = useState(readInitialHasCompletedDeposit)
   const [connectOpen, setConnectOpen] = useState(false)
@@ -117,14 +142,20 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [withdrawConfirmedAt, setWithdrawConfirmedAt] = useState<number | null>(null)
   const [requestStep, setRequestStep] = useState<RequestStep | null>(null)
   const [requestAmount, setRequestAmount] = useState('')
-  const [requestAnyAmount, setRequestAnyAmount] = useState(false)
   const [requestNote, setRequestNote] = useState('')
   const [requestExpiryId, setRequestExpiryId] = useState<RequestLinkExpiryId>(DEFAULT_REQUEST_LINK_EXPIRY_ID)
   const [requestPaymentLink, setRequestPaymentLink] = useState('')
-  const [requestRoutingAddress, setRequestRoutingAddress] = useState('')
   const [requestId, setRequestId] = useState('')
   const [requestExpiresAt, setRequestExpiresAt] = useState(0)
   const [requestLinkRevoked, setRequestLinkRevoked] = useState(false)
+  const [requestConfirmedAt, setRequestConfirmedAt] = useState<number | null>(null)
+  const [requestReceiptTxHash, setRequestReceiptTxHash] = useState('')
+  const [receivePaymentStep, setReceivePaymentStep] = useState<ReceivePaymentStep | null>(null)
+  const [receivePaymentAmount, setReceivePaymentAmount] = useState('')
+  const [receivePaymentSender, setReceivePaymentSender] = useState('')
+  const [receivePaymentChain, setReceivePaymentChain] = useState<SendChainId>('ethereum')
+  const [receivePaymentConfirmedAt, setReceivePaymentConfirmedAt] = useState<number | null>(null)
+  const [receivePaymentTxHash, setReceivePaymentTxHash] = useState('')
   const [balanceRoll, setBalanceRoll] = useState<BalanceRollState>({
     trigger: 0,
     mode: 'fromZero',
@@ -133,6 +164,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   const pendingSendRef = useRef(0)
   const pendingEarnRef = useRef<{ amount: number; tab: EarnTab } | null>(null)
   const pendingWithdrawRef = useRef(0)
+  const pendingPayViaLinkRef = useRef<PendingPayViaLink | null>(null)
   const activityReceiptRef = useRef(false)
   const activityRevealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -178,6 +210,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     const pendingPay = readPendingPayViaLink()
     if (!pendingPay || !wallet) return
 
+    pendingPayViaLinkRef.current = pendingPay
     setSendRecipient(pendingPay.recipient)
     setSendAmount(pendingPay.amount ?? '')
     setSendChain('ethereum')
@@ -189,27 +222,58 @@ export function useDashboardDemoState(initialBalance = 0) {
     if (!isMock) return
     writeDemoDashboardSession({
       wallet,
+      connectedWallets,
+      activeWalletId,
       balance: dashboardBalance,
       earningBalance,
       hasCompletedDeposit,
-      recentActivity,
+      recentActivity: recentActivity.filter((item) => !isDemoPreviewActivityItem(item)),
     })
-  }, [isMock, wallet, dashboardBalance, earningBalance, hasCompletedDeposit, recentActivity])
+  }, [
+    isMock,
+    wallet,
+    connectedWallets,
+    activeWalletId,
+    dashboardBalance,
+    earningBalance,
+    hasCompletedDeposit,
+    recentActivity,
+  ])
 
   function openConnect() {
     setConnectOpen(true)
   }
 
   function connectWallet(provider: DemoWalletProvider) {
-    const address = resolveDemoWalletAddress(provider)
-    if (!address) return
+    const nextWallet = createConnectedWallet(provider)
+    if (!nextWallet) return
 
-    setWallet({ address, provider })
+    const existing = connectedWallets.find((entry) => entry.id === nextWallet.id)
+    if (existing) {
+      setActiveWalletId(existing.id)
+      setWallet(demoWalletFromConnected(existing))
+      setConnectOpen(false)
+      return
+    }
+
+    setConnectedWallets([...connectedWallets, nextWallet])
+    setActiveWalletId(nextWallet.id)
+    setWallet(demoWalletFromConnected(nextWallet))
     setConnectOpen(false)
   }
 
-  function disconnectWallet() {
+  function selectActiveWallet(walletId: string) {
+    const selected = connectedWallets.find((entry) => entry.id === walletId)
+    if (!selected) return
+
+    setActiveWalletId(walletId)
+    setWallet(demoWalletFromConnected(selected))
+  }
+
+  function resetDashboardSession() {
     setWallet(null)
+    setConnectedWallets([])
+    setActiveWalletId(null)
     setDashboardBalance(initialBalance)
     setEarningBalance(0)
     setHasCompletedDeposit(false)
@@ -225,6 +289,29 @@ export function useDashboardDemoState(initialBalance = 0) {
     closeWithdraw()
     closeRequest()
     returnToLanding()
+  }
+
+  function disconnectWallet(walletId?: string) {
+    const targetId = walletId ?? activeWalletId
+    if (!targetId) {
+      resetDashboardSession()
+      return
+    }
+
+    const next = connectedWallets.filter((entry) => entry.id !== targetId)
+    if (next.length === 0) {
+      resetDashboardSession()
+      return
+    }
+
+    const nextActive =
+      targetId === activeWalletId
+        ? next[0]
+        : next.find((entry) => entry.id === activeWalletId) ?? next[0]
+
+    setConnectedWallets(next)
+    setActiveWalletId(nextActive.id)
+    setWallet(demoWalletFromConnected(nextActive))
   }
 
   function openSend() {
@@ -260,14 +347,55 @@ export function useDashboardDemoState(initialBalance = 0) {
     setSendConfirmedAt(null)
 
     if (sent > 0) {
-      setRecentActivity((items) => prependActivity(items, createSendActivity(sent, recipient, chain)))
+      const pendingPay = pendingPayViaLinkRef.current
+      const txHash = createDemoTxHash()
+      const paidAt = Date.now()
+
+      setRecentActivity((items) => {
+        let next = items
+
+        if (pendingPay) {
+          next = updateRequestLinkActivityByRequestId(next, pendingPay.requestId, {
+            status: 'paid',
+            label: 'Payment link received',
+            paidAt,
+            paidAmount: sent,
+            txHash,
+            amount: sent,
+            occurredAt: paidAt,
+          })
+          next = prependActivity(
+            next,
+            createReceiveLinkActivity({
+              requestId: pendingPay.requestId,
+              paidAmount: sent,
+              note: pendingPay.note,
+              txHash,
+              paidAt,
+            }),
+          )
+        } else {
+          next = prependActivity(items, createSendActivity(sent, recipient, chain))
+        }
+
+        return next
+      })
+
       const fromValue = formatUsdcAmount(dashboardBalance)
-      setDashboardBalance((prev) => prev - sent)
-      setBalanceRoll((roll) => ({
-        trigger: roll.trigger + 1,
-        mode: 'fromValue',
-        fromValue,
-      }))
+      setDashboardBalance((prev) => {
+        const afterSend = prev - sent
+        return pendingPay ? afterSend + sent : afterSend
+      })
+
+      if (!pendingPay) {
+        setBalanceRoll((roll) => ({
+          trigger: roll.trigger + 1,
+          mode: 'fromValue',
+          fromValue,
+        }))
+      }
+
+      pendingPayViaLinkRef.current = null
     }
   }
 
@@ -287,6 +415,17 @@ export function useDashboardDemoState(initialBalance = 0) {
     }
     setDepositAmount('')
     setDepositChain('sepolia')
+    setDepositStep('amount')
+  }
+
+  function openDepositFromWallet(walletId: string, chain: DepositChainId) {
+    const selected = connectedWallets.find((entry) => entry.id === walletId)
+    if (!selected) return
+
+    setActiveWalletId(walletId)
+    setWallet(demoWalletFromConnected(selected))
+    setDepositAmount('')
+    setDepositChain(chain)
     setDepositStep('amount')
   }
 
@@ -463,11 +602,9 @@ export function useDashboardDemoState(initialBalance = 0) {
       return
     }
     setRequestAmount('')
-    setRequestAnyAmount(false)
     setRequestNote('')
     setRequestExpiryId(DEFAULT_REQUEST_LINK_EXPIRY_ID)
     setRequestPaymentLink('')
-    setRequestRoutingAddress('')
     setRequestId('')
     setRequestExpiresAt(0)
     setRequestLinkRevoked(false)
@@ -475,38 +612,135 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function closeRequest() {
+    if (activityReceiptRef.current) {
+      activityReceiptRef.current = false
+      setRequestStep(null)
+      setRequestAmount('')
+      setRequestNote('')
+      setRequestExpiryId(DEFAULT_REQUEST_LINK_EXPIRY_ID)
+      setRequestPaymentLink('')
+      setRequestId('')
+      setRequestExpiresAt(0)
+      setRequestLinkRevoked(false)
+      setRequestConfirmedAt(null)
+      setRequestReceiptTxHash('')
+      return
+    }
+
     setRequestStep(null)
     setRequestAmount('')
-    setRequestAnyAmount(false)
     setRequestNote('')
     setRequestExpiryId(DEFAULT_REQUEST_LINK_EXPIRY_ID)
     setRequestPaymentLink('')
-    setRequestRoutingAddress('')
     setRequestId('')
     setRequestExpiresAt(0)
     setRequestLinkRevoked(false)
+    setRequestConfirmedAt(null)
+    setRequestReceiptTxHash('')
   }
 
   function completeRequestLink(payload: {
     paymentLink: string
-    routingAddress: string
     requestId: string
     expiresAt: number
   }) {
     setRequestPaymentLink(payload.paymentLink)
-    setRequestRoutingAddress(payload.routingAddress)
     setRequestId(payload.requestId)
     setRequestExpiresAt(payload.expiresAt)
     setRequestLinkRevoked(false)
     setRequestStep('link')
+
+    const requestedAmount = parseActiveAmount(requestAmount)
+    const trimmedNote = requestNote.trim()
+    setRecentActivity((items) =>
+      prependActivity(
+        items,
+        createRequestLinkActivity({
+          requestId: payload.requestId,
+          paymentLink: payload.paymentLink,
+          expiresAt: payload.expiresAt,
+          requestedAmount,
+          note: trimmedNote || undefined,
+        }),
+      ),
+    )
   }
 
   function markRequestLinkRevoked() {
     setRequestLinkRevoked(true)
+    if (!requestId) return
+
+    setRecentActivity((items) =>
+      updateRequestLinkActivityByRequestId(items, requestId, {
+        status: 'revoked',
+        label: 'Payment link revoked',
+      }),
+    )
+  }
+
+  function openReceivePaymentReceiptFromActivity(
+    sender: string,
+    amount: number,
+    chain: SendChainId,
+    confirmedAt: number,
+    txHash: string,
+  ) {
+    setReceivePaymentAmount(amount > 0 ? String(amount) : '')
+    setReceivePaymentSender(sender)
+    setReceivePaymentChain(chain)
+    setReceivePaymentConfirmedAt(confirmedAt)
+    setReceivePaymentTxHash(txHash)
+    setReceivePaymentStep('confirmed')
+  }
+
+  function closeReceivePayment() {
+    if (activityReceiptRef.current) {
+      activityReceiptRef.current = false
+      setReceivePaymentStep(null)
+      setReceivePaymentAmount('')
+      setReceivePaymentSender('')
+      setReceivePaymentChain('ethereum')
+      setReceivePaymentConfirmedAt(null)
+      setReceivePaymentTxHash('')
+      return
+    }
+
+    setReceivePaymentStep(null)
+    setReceivePaymentAmount('')
+    setReceivePaymentSender('')
+    setReceivePaymentChain('ethereum')
+    setReceivePaymentConfirmedAt(null)
+    setReceivePaymentTxHash('')
+  }
+
+  function openRequestReceiptFromActivity(
+    requestIdValue: string,
+    paidAmount: number,
+    note: string | undefined,
+    confirmedAt: number,
+    txHash: string,
+  ) {
+    setRequestAmount(paidAmount > 0 ? String(paidAmount) : '')
+    setRequestNote(note ?? '')
+    setRequestId(requestIdValue)
+    setRequestConfirmedAt(confirmedAt)
+    setRequestReceiptTxHash(txHash)
+    setRequestStep('confirmed')
+  }
+
+  function openRequestShareFromActivity(item: Extract<DashboardActivityItem, { kind: 'requestLink' }>) {
+    setRequestAmount(item.requestedAmount > 0 ? String(item.requestedAmount) : '')
+    setRequestNote(item.note ?? '')
+    setRequestPaymentLink(item.paymentLink)
+    setRequestId(item.requestId)
+    setRequestExpiresAt(item.expiresAt)
+    setRequestLinkRevoked(item.status === 'revoked' || isPaymentLinkRevoked(item.requestId))
+    setRequestStep('link')
   }
 
   const earnSourceBalance = earnTab === 'add' ? dashboardBalance : earningBalance
   const showDepositTooltip = Boolean(wallet) && !hasCompletedDeposit
+  const displayRecentActivity = isMock ? withDemoPreviewReceiveItem(recentActivity) : recentActivity
 
   function toggleActivity() {
     setActivityVisible((visible) => {
@@ -521,6 +755,34 @@ export function useDashboardDemoState(initialBalance = 0) {
     if (!wallet) return
 
     activityReceiptRef.current = true
+
+    if (isDemoPreviewActivityItem(item)) {
+      if (item.kind === 'receiveLink') {
+        openRequestReceiptFromActivity(
+          item.requestId,
+          item.paidAmount,
+          undefined,
+          item.occurredAt,
+          item.txHash,
+        )
+        return
+      }
+
+      if (item.kind === 'receive') {
+        openReceivePaymentReceiptFromActivity(
+          item.sender,
+          item.amount,
+          item.chain,
+          item.occurredAt,
+          item.txHash,
+        )
+        return
+      }
+
+      activityReceiptRef.current = false
+      return
+    }
+
     const amountLabel = String(Math.abs(item.amount))
 
     switch (item.kind) {
@@ -550,6 +812,40 @@ export function useDashboardDemoState(initialBalance = 0) {
         setWithdrawConfirmedAt(item.occurredAt)
         setWithdrawStep('confirmed')
         return
+      case 'requestLink': {
+        if (item.status === 'paid') {
+          openRequestReceiptFromActivity(
+            item.requestId,
+            item.paidAmount ?? item.requestedAmount,
+            item.note,
+            item.paidAt ?? item.occurredAt,
+            resolveActivityTxHash(item),
+          )
+          return
+        }
+        openRequestShareFromActivity(item)
+        return
+      }
+      case 'receiveLink': {
+        const linkedRequest = findRequestLinkActivity(recentActivity, item.requestId)
+        openRequestReceiptFromActivity(
+          item.requestId,
+          item.paidAmount,
+          item.note ?? linkedRequest?.note,
+          item.occurredAt,
+          item.txHash,
+        )
+        return
+      }
+      case 'receive':
+        openReceivePaymentReceiptFromActivity(
+          item.sender,
+          item.amount,
+          item.chain,
+          item.occurredAt,
+          item.txHash,
+        )
+        return
       default:
         activityReceiptRef.current = false
     }
@@ -557,6 +853,8 @@ export function useDashboardDemoState(initialBalance = 0) {
 
   return {
     wallet,
+    connectedWallets,
+    activeWalletId,
     dashboardBalance,
     hasCompletedDeposit,
     connectOpen,
@@ -580,25 +878,34 @@ export function useDashboardDemoState(initialBalance = 0) {
     withdrawConfirmedAt,
     requestStep,
     requestAmount,
-    requestAnyAmount,
     requestNote,
     requestExpiryId,
     requestPaymentLink,
-    requestRoutingAddress,
     requestId,
     requestExpiresAt,
     requestLinkRevoked,
+    requestConfirmedAt,
+    requestReceiptTxHash,
+    receivePaymentStep,
+    receivePaymentAmount,
+    receivePaymentSender,
+    receivePaymentChain,
+    receivePaymentConfirmedAt,
+    receivePaymentTxHash,
     earningBalance,
     activityVisible,
     recentActivity,
+    displayRecentActivity,
     balanceHidden,
     earnSourceBalance,
     balanceRoll,
     showDepositTooltip,
     openConnect,
     connectWallet,
+    selectActiveWallet,
     disconnectWallet,
     openDeposit,
+    openDepositFromWallet,
     closeDeposit,
     completeDeposit,
     openSend,
@@ -614,6 +921,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     closeRequest,
     completeRequestLink,
     markRequestLinkRevoked,
+    closeReceivePayment,
     setDepositAmount,
     setDepositChain,
     setDepositStep,
@@ -633,7 +941,6 @@ export function useDashboardDemoState(initialBalance = 0) {
     setWithdrawStep,
     setWithdrawConfirmedAt,
     setRequestAmount,
-    setRequestAnyAmount,
     setRequestNote,
     setRequestExpiryId,
     setBalanceHidden,

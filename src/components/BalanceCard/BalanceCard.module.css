@@ -566,8 +566,16 @@
   height: var(--primitives-spacing-4);
 }
 
-.moreMenuRoot:hover .moreMenu,
-.moreMenuRoot:focus-within .moreMenu {
+@media (hover: hover) {
+  .moreMenuRoot:hover:not([data-hover-suppressed='true']) .moreMenu {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+  }
+}
+
+.moreMenuRoot:focus-within:not([data-hover-suppressed='true']) .moreMenu,
+.moreMenuRoot[data-menu-open='true'] .moreMenu {
   opacity: 1;
   pointer-events: auto;
   visibility: visible;
@@ -696,10 +704,6 @@
     flex: 1 1 0;
     min-width: 0;
     display: flex;
-  }
-
-  .moreMenuDesktop {
-    display: none;
   }
 
   .balanceClusterPrivate {

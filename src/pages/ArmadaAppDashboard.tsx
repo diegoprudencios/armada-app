@@ -10,7 +10,7 @@ import { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
 import { useRequireConnectedWallet } from '@/hooks/useRequireConnectedWallet'
 import { DashboardOverlays } from './DashboardOverlays'
 import { DashboardCardStack } from './DashboardCardStack'
-import { DEPOSIT_WALLET_BALANCE, DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
+import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
 import styles from './ArmadaAppDashboard.module.css'
 
 export interface ArmadaAppDashboardProps {
@@ -30,12 +30,17 @@ export function ArmadaAppDashboard({
   const state = useDashboardDemoState(initialBalance)
   const {
     wallet,
+    connectedWallets,
+    activeWalletId,
     dashboardBalance,
     hasCompletedDeposit,
     balanceRoll,
     showDepositTooltip,
     openConnect,
+    connectWallet,
+    selectActiveWallet,
     disconnectWallet,
+    openDepositFromWallet,
     openDeposit,
     openSend,
     openRequest,
@@ -44,7 +49,7 @@ export function ArmadaAppDashboard({
     earningBalance,
     activityVisible,
     toggleActivity,
-    recentActivity,
+    displayRecentActivity,
     balanceHidden,
     setBalanceHidden,
     openActivityReceipt,
@@ -71,10 +76,15 @@ export function ArmadaAppDashboard({
       <DashboardScrollTopFade enabled={showActivity} />
       <div className={styles.headerBand}>
         <DashboardHeader
-          wallet={wallet}
-          usdcBalance={Number(DEPOSIT_WALLET_BALANCE)}
+          wallets={connectedWallets}
+          activeWalletId={activeWalletId}
           onConnect={openConnect}
-          onDisconnect={disconnectWallet}
+          onSelectWallet={selectActiveWallet}
+          onDisconnectWallet={disconnectWallet}
+          onConnectWallet={connectWallet}
+          onDeposit={openDepositFromWallet}
+          balanceHidden={balanceHidden}
+          onBalanceHiddenChange={setBalanceHidden}
         />
       </div>
       <DashboardCardStack
@@ -110,7 +120,7 @@ export function ArmadaAppDashboard({
         }
         activityList={
           <RecentActivityList
-            items={recentActivity}
+            items={displayRecentActivity}
             balanceRevealed={!balanceHidden}
             onItemClick={openActivityReceipt}
           />

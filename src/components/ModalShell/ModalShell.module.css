@@ -107,6 +107,10 @@
   }
 }
 
+.headerNoSteps {
+  justify-content: space-between;
+}
+
 .logoSlot {
   flex-shrink: 0;
   padding-top: 3px;

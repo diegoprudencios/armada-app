@@ -4,13 +4,20 @@
   gap: var(--primitives-spacing-2);
   width: 100%;
   margin-bottom: var(--primitives-spacing-4);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.root::-webkit-scrollbar {
+  display: none;
 }
 
 .filterBtn {
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 auto;
   height: var(--primitives-spacing-10);
-  padding: 0 var(--primitives-spacing-2);
+  padding: 0 var(--primitives-spacing-3);
   border-radius: calc(var(--semantic-borderRadius-item) * 1px);
   border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-default);
   cursor: pointer;
@@ -21,6 +28,7 @@
   font-weight: var(--primitives-fontWeight-medium);
   line-height: var(--primitives-lineHeight-tight);
   text-align: center;
+  white-space: nowrap;
   transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 

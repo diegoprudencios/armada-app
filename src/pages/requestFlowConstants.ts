@@ -1,6 +1,8 @@
+import { getPublicAppOrigin } from '@/utils/appOrigin'
+
 export const REQUEST_PROGRESS_STEPS = ['Receive', 'Share link'] as const
 
-export type RequestModalStep = 'receive' | 'link'
+export type RequestModalStep = 'receive' | 'link' | 'confirmed'
 
 export const REQUEST_LINK_EXPIRY_OPTIONS = [
   { id: '1d', label: '1 day', ms: 86_400_000 },
@@ -22,22 +24,8 @@ export function createPaymentRequestId(): string {
   return `req_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`
 }
 
-/**
- * Demo one-time routing address for payment links.
- * Production: Armada registers an alias server-side; the link never exposes the user's primary shielded address.
- */
-export function createPaymentRoutingAddress(requestId: string, recipientAddress: string): string {
-  const mixed = Array.from({ length: 58 }, (_, index) => {
-    const a = requestId.charCodeAt(index % requestId.length)
-    const b = recipientAddress.charCodeAt(index % recipientAddress.length)
-    return ((a ^ b ^ index) % 16).toString(16)
-  }).join('')
-
-  return `zK${mixed}`
-}
-
 export type BuildPayViaLinkInput = {
-  routingAddress: string
+  recipientAddress: string
   requestId: string
   expiresAt: number
   amount?: string
@@ -45,14 +33,14 @@ export type BuildPayViaLinkInput = {
 }
 
 export function buildPayViaLinkUrl({
-  routingAddress,
+  recipientAddress,
   requestId,
   expiresAt,
   amount,
   note,
 }: BuildPayViaLinkInput): string {
-  const url = new URL('/pay-via-link', window.location.origin)
-  url.searchParams.set('to', routingAddress)
+  const url = new URL('/pay-via-link', getPublicAppOrigin())
+  url.searchParams.set('to', recipientAddress)
   url.searchParams.set('id', requestId)
   url.searchParams.set('expires', String(expiresAt))
 

@@ -1,3 +1,5 @@
+import { formatUsdcAmount } from '@/utils/format'
+
 export const EARN_PROGRESS_STEPS = ['Amount', 'Review', 'Confirm'] as const
 
 export type EarnTab = 'add' | 'withdraw'
@@ -46,4 +48,23 @@ export function earnProcessingTitle(tab: EarnTab): string {
 export function formatDemoApy(apy: number): string {
   if (apy <= 0) return 'Unavailable'
   return `~${apy.toFixed(1)}%`
+}
+
+/** Demo accrued yield for vault bar — ~30 days at the quoted APY. */
+export function estimateVaultEarnedSoFar(
+  balance: number,
+  apy: number = DEMO_EARN_APY,
+  daysAccrued = 30,
+): number {
+  if (balance <= 0 || apy <= 0) return 0
+  return balance * (apy / 100) * (daysAccrued / 365)
+}
+
+export function formatVaultEarningLabel(apy: number): string {
+  return `Earning ${apy.toFixed(1)}% APR`
+}
+
+export function formatEarnedSoFarAmount(value: number): string {
+  if (value <= 0) return '+0'
+  return `+${formatUsdcAmount(value)}`
 }

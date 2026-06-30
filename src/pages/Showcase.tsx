@@ -22,8 +22,8 @@ import { Tooltip } from '@/components/Tooltip'
 import { WalletButton } from '@/components/WalletButton'
 import WalletItem from '@/components/WalletItem/WalletItem'
 import { WalletConfirmList } from '@/components/WalletConfirmList'
-import { WalletPillMenu } from '@/components/WalletPillMenu'
-import { WalletProviderIcon } from '@/components/WalletPillMenu/WalletPillMenu'
+import { WalletPillMenu, WalletProviderIcon } from '@/components/WalletPillMenu'
+import { createConnectedWallet } from '@/utils/walletMenu'
 import {
   DEMO_ARMADA_ADDRESS,
   DEMO_WALLET_ADDRESS,
@@ -278,11 +278,14 @@ export function Showcase() {
         </div>
         <SubLabel>WalletPillMenu (connected)</SubLabel>
         <WalletPillMenu
-          displayAddress="0x6545…4534"
-          copyAddress={DEMO_WALLET_ADDRESS}
-          walletProvider="metamask"
-          usdcBalance={123283.23}
-          onDisconnect={() => undefined}
+          wallets={[createConnectedWallet('metamask')!]}
+          activeWalletId={createConnectedWallet('metamask')!.id}
+          onSelectWallet={() => undefined}
+          onDisconnectWallet={() => undefined}
+          onConnectWallet={() => undefined}
+          onDeposit={() => undefined}
+          balanceHidden={false}
+          onBalanceHiddenChange={() => undefined}
         />
       </ShowcaseSection>
 

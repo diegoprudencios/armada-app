@@ -6,6 +6,7 @@ import { EarnModalFlow } from './EarnModalFlow'
 import { SendModalFlow } from './SendModalFlow'
 import { WithdrawModalFlow } from './WithdrawModalFlow'
 import { RequestModalFlow } from './RequestModalFlow'
+import { ReceivePaymentModalFlow } from './ReceivePaymentModalFlow'
 
 type DashboardDemoState = ReturnType<typeof useDashboardDemoState>
 
@@ -40,14 +41,20 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     withdrawConfirmedAt,
     requestStep,
     requestAmount,
-    requestAnyAmount,
     requestNote,
     requestExpiryId,
     requestPaymentLink,
-    requestRoutingAddress,
     requestId,
     requestExpiresAt,
     requestLinkRevoked,
+    requestConfirmedAt,
+    requestReceiptTxHash,
+    receivePaymentStep,
+    receivePaymentAmount,
+    receivePaymentSender,
+    receivePaymentChain,
+    receivePaymentConfirmedAt,
+    receivePaymentTxHash,
     connectWallet,
     closeDeposit,
     completeDeposit,
@@ -61,6 +68,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     closeRequest,
     completeRequestLink,
     markRequestLinkRevoked,
+    closeReceivePayment,
     setDepositAmount,
     setDepositChain,
     setDepositStep,
@@ -80,7 +88,6 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     setWithdrawStep,
     setWithdrawConfirmedAt,
     setRequestAmount,
-    setRequestAnyAmount,
     setRequestNote,
     setRequestExpiryId,
   } = state
@@ -214,22 +221,33 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           step={requestStep}
           privateAddress={DEMO_ARMADA_ADDRESS}
           amount={requestAmount}
-          anyAmount={requestAnyAmount}
           note={requestNote}
           expiryId={requestExpiryId}
           paymentLink={requestPaymentLink}
-          routingAddress={requestRoutingAddress}
           requestId={requestId}
           expiresAt={requestExpiresAt}
           linkRevoked={requestLinkRevoked}
+          confirmedAt={requestConfirmedAt}
+          receiptTxHash={requestReceiptTxHash}
           onClose={closeRequest}
           onAmountChange={setRequestAmount}
-          onAnyAmountChange={setRequestAnyAmount}
           onNoteChange={setRequestNote}
           onExpiryChange={setRequestExpiryId}
           onCreateLink={completeRequestLink}
           onLinkRevoked={markRequestLinkRevoked}
           onDone={closeRequest}
+        />
+      ) : null}
+
+      {receivePaymentStep ? (
+        <ReceivePaymentModalFlow
+          amount={receivePaymentAmount}
+          sender={receivePaymentSender}
+          chain={receivePaymentChain}
+          txHash={receivePaymentTxHash}
+          confirmedAt={receivePaymentConfirmedAt ?? Date.now()}
+          armadaAddress={DEMO_ARMADA_ADDRESS}
+          onClose={closeReceivePayment}
         />
       ) : null}
     </>

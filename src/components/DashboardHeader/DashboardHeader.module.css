@@ -57,7 +57,7 @@
   }
 
   .wallet {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     max-width: none;
     display: flex;
     justify-content: flex-end;

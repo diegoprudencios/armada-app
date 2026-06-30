@@ -11,10 +11,18 @@ export interface BottomSheetProps {
   onClose: () => void
   title?: string
   ariaLabel?: string
+  sheetClassName?: string
   children: ReactNode
 }
 
-export function BottomSheet({ open, onClose, title, ariaLabel, children }: BottomSheetProps) {
+export function BottomSheet({
+  open,
+  onClose,
+  title,
+  ariaLabel,
+  sheetClassName,
+  children,
+}: BottomSheetProps) {
   const titleId = useId()
   const [mounted, setMounted] = useState(open)
   const [exiting, setExiting] = useState(false)
@@ -54,7 +62,9 @@ export function BottomSheet({ open, onClose, title, ariaLabel, children }: Botto
   if (!mounted) return null
 
   const scrimClassName = [styles.scrim, exiting && styles.scrimExit].filter(Boolean).join(' ')
-  const sheetClassName = [styles.sheet, exiting && styles.sheetExit].filter(Boolean).join(' ')
+  const sheetClassNameResolved = [styles.sheet, sheetClassName, exiting && styles.sheetExit]
+    .filter(Boolean)
+    .join(' ')
 
   return createPortal(
     <div className={scrimClassName} role="presentation" onClick={onClose}>
@@ -63,7 +73,7 @@ export function BottomSheet({ open, onClose, title, ariaLabel, children }: Botto
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
         aria-label={title ? undefined : ariaLabel}
-        className={sheetClassName}
+        className={sheetClassNameResolved}
         onClick={(event) => event.stopPropagation()}
       >
         <div className={styles.handleRow} aria-hidden>

@@ -1,5 +1,7 @@
 import type { DashboardActivityItem } from '@/constants/dashboardActivity'
 import { normalizeActivityItems } from '@/utils/dashboardActivity'
+import type { ConnectedWallet } from '@/utils/walletMenu'
+import { normalizeConnectedWallets } from '@/utils/walletMenu'
 
 export type DemoWallet = {
   address: string
@@ -9,6 +11,8 @@ export type DemoWallet = {
 export type DemoDashboardSession = {
   version: 1
   wallet: DemoWallet | null
+  connectedWallets?: ConnectedWallet[]
+  activeWalletId?: string | null
   balance: number
   earningBalance: number
   hasCompletedDeposit: boolean
@@ -71,9 +75,24 @@ export function readDemoDashboardSession(): DemoDashboardSession | null {
     const parsed = JSON.parse(raw) as DemoDashboardSession
     if (parsed.version !== STORAGE_VERSION) return null
 
+    const { wallets: connectedWallets, activeWalletId } = normalizeConnectedWallets(
+      parsed.connectedWallets,
+      parsed.activeWalletId,
+      parsed.wallet,
+    )
+
+    const activeWallet =
+      connectedWallets.find((entry) => entry.id === activeWalletId) ??
+      connectedWallets[0] ??
+      null
+
     return {
       version: STORAGE_VERSION,
-      wallet: parsed.wallet,
+      wallet: activeWallet
+        ? { address: activeWallet.address, provider: activeWallet.provider }
+        : parsed.wallet,
+      connectedWallets,
+      activeWalletId: activeWallet?.id ?? null,
       balance: parsed.balance ?? 0,
       earningBalance: parsed.earningBalance ?? 0,
       hasCompletedDeposit: parsed.hasCompletedDeposit ?? false,

@@ -16,6 +16,8 @@ export interface ModalShellProps {
   currentStep: number
   status?: 'default' | 'confirmed'
   flowLabel?: string
+  hideStepCount?: boolean
+  hideSteps?: boolean
   contentOffset?: ModalShellContentOffset
   exiting?: boolean
   onClose: () => void
@@ -27,16 +29,21 @@ export function ModalShell({
   currentStep,
   status = 'default',
   flowLabel = 'Deposit',
+  hideStepCount = false,
+  hideSteps = false,
   contentOffset = 'default',
   exiting = false,
   onClose,
   children,
 }: ModalShellProps) {
-  const headerClassName = [styles.header, exiting && styles.headerExit].filter(Boolean).join(' ')
+  const headerClassName = [styles.header, hideSteps && styles.headerNoSteps, exiting && styles.headerExit]
+    .filter(Boolean)
+    .join(' ')
 
+  const resolvedContentOffset = hideSteps ? 'default' : contentOffset
   const contentClassName = [
     styles.content,
-    contentOffset === 'confirmation' ? styles.contentConfirmation : styles.contentDefault,
+    resolvedContentOffset === 'confirmation' ? styles.contentConfirmation : styles.contentDefault,
     exiting && styles.contentExit,
   ]
     .filter(Boolean)
@@ -48,14 +55,17 @@ export function ModalShell({
         <div className={styles.logoSlot}>
           <ArmadaLogo variant="mark" markTone="white" className={styles.logo} />
         </div>
-        <div className={styles.stepsWrap}>
-          <Steps
-            steps={steps}
-            currentStep={currentStep}
-            status={status}
-            flowLabel={status === 'confirmed' ? undefined : flowLabel}
-          />
-        </div>
+        {hideSteps ? null : (
+          <div className={styles.stepsWrap}>
+            <Steps
+              steps={steps}
+              currentStep={currentStep}
+              status={status}
+              flowLabel={status === 'confirmed' ? undefined : flowLabel}
+              hideStepCount={hideStepCount}
+            />
+          </div>
+        )}
         <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
           <XMarkIcon className={styles.closeIcon} strokeWidth={1.5} aria-hidden />
         </button>

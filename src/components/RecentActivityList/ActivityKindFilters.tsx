@@ -1,13 +1,18 @@
 import type { DashboardActivityKind } from '@/constants/dashboardActivity'
 import styles from './ActivityKindFilters.module.css'
 
-export type ActivityKindFilter = 'all' | DashboardActivityKind
+export type ActivityKindFilter =
+  | 'all'
+  | 'received'
+  | Exclude<DashboardActivityKind, 'receive' | 'receiveLink'>
 
 const FILTERS: Array<{ id: ActivityKindFilter; label: string }> = [
   { id: 'all', label: 'All' },
   { id: 'deposit', label: 'Deposit' },
   { id: 'withdraw', label: 'Withdraw' },
   { id: 'send', label: 'Sent' },
+  { id: 'requestLink', label: 'Requests' },
+  { id: 'received', label: 'Received' },
   { id: 'earn', label: 'Earn' },
 ]
 

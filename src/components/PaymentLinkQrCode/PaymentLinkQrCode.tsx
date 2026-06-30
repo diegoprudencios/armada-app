@@ -4,11 +4,16 @@ import styles from './PaymentLinkQrCode.module.css'
 export interface PaymentLinkQrCodeProps {
   value: string
   label?: string
+  className?: string
 }
 
-export function PaymentLinkQrCode({ value, label = 'Payment link QR code' }: PaymentLinkQrCodeProps) {
+export function PaymentLinkQrCode({
+  value,
+  label = 'Payment link QR code',
+  className,
+}: PaymentLinkQrCodeProps) {
   return (
-    <div className={styles.root} role="img" aria-label={label}>
+    <div className={[styles.root, className].filter(Boolean).join(' ')} role="img" aria-label={label}>
       <QRCodeSVG
         value={value}
         size={200}

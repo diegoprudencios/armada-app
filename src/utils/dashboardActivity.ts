@@ -4,8 +4,12 @@ import {
   type DashboardActivityItem,
   type DashboardDepositActivityItem,
   type DashboardEarnActivityItem,
+  type DashboardReceiveActivityItem,
+  type DashboardReceiveLinkActivityItem,
+  type DashboardRequestLinkActivityItem,
   type DashboardSendActivityItem,
   type DashboardWithdrawActivityItem,
+  type RequestLinkActivityStatus,
 } from '@/constants/dashboardActivity'
 import { networkDisplayName } from '@/pages/depositFlowConstants'
 import type { EarnTab } from '@/pages/earnFlowConstants'
@@ -48,15 +52,24 @@ export function matchesActivityTxHashSearch(item: DashboardActivityItem, query: 
 
 export function matchesActivityKindFilter(
   item: DashboardActivityItem,
-  filter: 'all' | DashboardActivityItem['kind'],
+  filter: 'all' | DashboardActivityItem['kind'] | 'received',
 ): boolean {
-  return filter === 'all' || item.kind === filter
+  if (filter === 'all') return true
+  if (filter === 'received') return item.kind === 'receive' || item.kind === 'receiveLink'
+  return item.kind === filter
 }
 
 function withResolvedTxHash(item: DashboardActivityItem): DashboardActivityItem {
   const record = item as DashboardActivityItem & { txHash?: string }
   if (record.txHash) return item
   return { ...item, txHash: deriveDemoTxHash(item.id) }
+}
+
+function requestLinkLabel(_requestedAmount: number, status: RequestLinkActivityStatus): string {
+  if (status === 'paid') return 'Payment link received'
+  if (status === 'revoked') return 'Payment link revoked'
+  if (status === 'expired') return 'Payment link expired'
+  return 'Payment link'
 }
 
 export function createSendActivity(
@@ -137,6 +150,102 @@ export function createWithdrawActivity(
   }
 }
 
+export function createRequestLinkActivity({
+  requestId,
+  paymentLink,
+  expiresAt,
+  requestedAmount,
+  note,
+}: {
+  requestId: string
+  paymentLink: string
+  expiresAt: number
+  requestedAmount: number
+  note?: string
+}): DashboardRequestLinkActivityItem {
+  return {
+    id: createActivityId(),
+    kind: 'requestLink',
+    label: requestLinkLabel(requestedAmount, 'pending'),
+    amount: requestedAmount,
+    occurredAt: Date.now(),
+    requestId,
+    paymentLink,
+    expiresAt,
+    requestedAmount,
+    note,
+    status: 'pending',
+  }
+}
+
+export function createReceiveLinkActivity({
+  requestId,
+  paidAmount,
+  note,
+  txHash,
+  paidAt,
+}: {
+  requestId: string
+  paidAmount: number
+  note?: string
+  txHash: string
+  paidAt: number
+}): DashboardReceiveLinkActivityItem {
+  return {
+    id: createActivityId(),
+    kind: 'receiveLink',
+    label: 'Received via payment link',
+    amount: paidAmount,
+    occurredAt: paidAt,
+    requestId,
+    paidAmount,
+    note,
+    txHash,
+  }
+}
+
+export function createReceiveActivity(
+  amount: number,
+  sender: string,
+  chain: SendChainId,
+): DashboardReceiveActivityItem {
+  return {
+    id: createActivityId(),
+    kind: 'receive',
+    label: 'Received payment',
+    amount,
+    occurredAt: Date.now(),
+    sender: sender.trim(),
+    chain,
+    txHash: createDemoTxHash(),
+  }
+}
+
+export function updateRequestLinkActivityByRequestId(
+  items: readonly DashboardActivityItem[],
+  requestId: string,
+  patch: Partial<
+    Pick<
+      DashboardRequestLinkActivityItem,
+      'status' | 'label' | 'paidAt' | 'paidAmount' | 'txHash' | 'amount' | 'occurredAt'
+    >
+  >,
+): DashboardActivityItem[] {
+  return items.map((item) =>
+    item.kind === 'requestLink' && item.requestId === requestId ? { ...item, ...patch } : item,
+  )
+}
+
+export function findRequestLinkActivity(
+  items: readonly DashboardActivityItem[],
+  requestId: string,
+): DashboardRequestLinkActivityItem | undefined {
+  return items.find(
+    (item): item is DashboardRequestLinkActivityItem =>
+      item.kind === 'requestLink' && item.requestId === requestId,
+  )
+}
+
 export function prependActivity(
   items: readonly DashboardActivityItem[],
   item: DashboardActivityItem,
@@ -146,6 +255,12 @@ export function prependActivity(
 
 const SEND_CHAINS = new Set<SendChainId>(['ethereum', 'arbitrum', 'base'])
 const DEPOSIT_CHAINS = new Set<DepositChainId>(['sepolia', 'base', 'arbitrum'])
+const REQUEST_LINK_STATUSES = new Set<RequestLinkActivityStatus>([
+  'pending',
+  'paid',
+  'revoked',
+  'expired',
+])
 
 export function isOpenableActivityItem(item: unknown): item is DashboardActivityItem {
   if (!item || typeof item !== 'object') return false
@@ -175,6 +290,28 @@ export function isOpenableActivityItem(item: unknown): item is DashboardActivity
       return (
         typeof record.recipient === 'string' &&
         typeof record.chain === 'string' &&
+        SEND_CHAINS.has(record.chain as SendChainId)
+      )
+    case 'requestLink':
+      return (
+        typeof record.requestId === 'string' &&
+        typeof record.paymentLink === 'string' &&
+        typeof record.expiresAt === 'number' &&
+        typeof record.requestedAmount === 'number' &&
+        typeof record.status === 'string' &&
+        REQUEST_LINK_STATUSES.has(record.status as RequestLinkActivityStatus)
+      )
+    case 'receiveLink':
+      return (
+        typeof record.requestId === 'string' &&
+        typeof record.paidAmount === 'number' &&
+        typeof record.txHash === 'string'
+      )
+    case 'receive':
+      return (
+        typeof record.sender === 'string' &&
+        typeof record.chain === 'string' &&
+        typeof record.txHash === 'string' &&
         SEND_CHAINS.has(record.chain as SendChainId)
       )
     default:

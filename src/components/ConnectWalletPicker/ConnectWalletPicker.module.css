@@ -1,0 +1,62 @@
+.root {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.trigger {
+  margin: 0;
+  padding: var(--primitives-spacing-2);
+  border: none;
+  background: none;
+  font-family: var(--semantic-typography-ui-label-sm-font-family);
+  font-size: var(--semantic-typography-ui-label-sm-font-size);
+  font-weight: var(--semantic-typography-ui-label-sm-font-weight);
+  color: var(--semantic-color-text-lavender);
+  cursor: pointer;
+}
+
+.trigger:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+  border-radius: calc(var(--primitives-spacing-1) * 1px);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 209;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+.dropdown {
+  margin: 0;
+  padding: var(--primitives-spacing-1);
+  list-style: none;
+  border-radius: calc(var(--semantic-borderRadius-card) * 1px);
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-default);
+  background: var(--semantic-color-surface-default);
+  box-shadow:
+    0 var(--primitives-spacing-3) var(--primitives-spacing-6)
+    color-mix(in srgb, var(--semantic-color-surface-bg) 55%, transparent);
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.walletList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-1);
+  width: 100%;
+}
+
+.sheetWalletList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-3);
+  width: 100%;
+}

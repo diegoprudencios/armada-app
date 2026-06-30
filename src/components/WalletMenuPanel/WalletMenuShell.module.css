@@ -1,0 +1,6 @@
+.shellPanel {
+  box-shadow: none;
+  background: var(--semantic-color-surface-default);
+  overflow-x: clip;
+  max-width: 100%;
+}

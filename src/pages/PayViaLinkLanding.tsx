@@ -27,7 +27,7 @@ export function PayViaLinkLanding() {
           </div>
           <h1 className={styles.errorTitle}>This payment link is invalid</h1>
           <p className={styles.body}>
-            Check that the link includes a valid routing address, then try again.
+            Check that the link is complete, then try again.
           </p>
           <Button
             variant="secondary"

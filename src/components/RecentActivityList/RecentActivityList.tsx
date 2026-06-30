@@ -1,9 +1,11 @@
 import { useState, type ComponentType, type SVGProps } from 'react'
 import {
+  ArrowDownIcon,
   ArrowLeftIcon,
   ArrowRightIcon,
   ChartBarIcon,
   ClockIcon,
+  LinkIcon,
   PlusIcon,
 } from '@heroicons/react/24/outline'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
@@ -13,6 +15,7 @@ import {
 } from '@/constants/activityList'
 import type { DashboardActivityItem, DashboardActivityKind } from '@/constants/dashboardActivity'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
+import { formatPaymentLinkExpiry } from '@/pages/requestFlowConstants'
 import { formatUsdcAmount } from '@/utils/format'
 import { formatTimeAgo } from '@/utils/formatTimeAgo'
 import usdcAmount from '@/styles/usdcAmount.module.css'
@@ -27,6 +30,9 @@ const ACTIVITY_ICONS: Record<
   deposit: PlusIcon,
   earn: ChartBarIcon,
   withdraw: ArrowLeftIcon,
+  requestLink: LinkIcon,
+  receiveLink: ArrowDownIcon,
+  receive: ArrowDownIcon,
 }
 
 function formatSignedAmount(amount: number): string {
@@ -34,6 +40,28 @@ function formatSignedAmount(amount: number): string {
   if (amount > 0) return `+${absolute}`
   if (amount < 0) return `-${absolute}`
   return absolute
+}
+
+function formatActivitySubtitle(item: DashboardActivityItem): string {
+  const timeAgo = formatTimeAgo(item.occurredAt)
+
+  if (item.kind === 'requestLink' && item.status === 'pending') {
+    return `${timeAgo} • Pending • ${formatPaymentLinkExpiry(item.expiresAt)}`
+  }
+
+  return timeAgo
+}
+
+function activityAmountTone(item: DashboardActivityItem, balanceRevealed: boolean): string {
+  if (!balanceRevealed) return ''
+
+  if (item.kind === 'requestLink' && item.status === 'pending') {
+    return ''
+  }
+
+  if (item.amount > 0) return styles.amountPositive
+  if (item.amount < 0) return styles.amountNegative
+  return ''
 }
 
 export type RecentActivityListVariant = 'preview' | 'full'
@@ -57,13 +85,8 @@ function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityList
       {items.map((item) => {
         const Icon = ACTIVITY_ICONS[item.kind]
         const signedAmount = formatSignedAmount(item.amount)
-        const amountLabel = `${signedAmount} USDC`
-        const amountTone =
-          balanceRevealed && item.amount > 0
-            ? styles.amountPositive
-            : balanceRevealed && item.amount < 0
-              ? styles.amountNegative
-              : ''
+        const amountLabel = signedAmount
+        const amountTone = activityAmountTone(item, balanceRevealed)
 
         return (
           <li key={item.id}>
@@ -77,14 +100,13 @@ function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityList
               </span>
               <div className={styles.copy}>
                 <span className={styles.label}>{item.label}</span>
-                <span className={styles.time}>{formatTimeAgo(item.occurredAt)}</span>
+                <span className={styles.time}>{formatActivitySubtitle(item)}</span>
               </div>
               <span
                 className={[styles.amount, usdcAmount.font, amountTone].filter(Boolean).join(' ')}
                 aria-label={balanceRevealed ? amountLabel : 'Amount hidden'}
               >
                 <BalanceScrambleValue value={signedAmount} revealed={balanceRevealed} />
-                <span className={styles.amountSuffix}> USDC</span>
               </span>
             </button>
           </li>
@@ -125,14 +147,14 @@ export function RecentActivityList({
           </div>
         ) : null}
 
-        {items.length === 0 ? (
+        {previewItems.length === 0 ? (
           <div className={styles.emptyState}>
             <span className={styles.emptyIconBadge} aria-hidden>
               <ClockIcon className={styles.emptyIcon} strokeWidth={1.5} />
             </span>
             <p className={styles.emptyTitle}>No activity yet</p>
             <p className={styles.emptyBody}>
-              Deposits, sends, and earn moves will show up here.
+              Deposits, sends, payment links, and earn moves will show up here.
             </p>
           </div>
         ) : (

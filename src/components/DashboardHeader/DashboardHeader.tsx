@@ -2,25 +2,36 @@ import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { WalletButton } from '@/components/WalletButton'
 import { WalletPillMenu } from '@/components/WalletPillMenu'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
-import { truncateAddress } from '@/utils/format'
-import type { DemoWallet } from '@/utils/demoDashboardSession'
+import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
+import type { ConnectedWallet } from '@/utils/walletMenu'
 import styles from './DashboardHeader.module.css'
 
 const DASHBOARD_LIGHT_LOGO_SRC = `${import.meta.env.BASE_URL}armada-logo-dashboard-light.png`
 
 export interface DashboardHeaderProps {
-  wallet: DemoWallet | null
-  usdcBalance?: number
+  wallets: readonly ConnectedWallet[]
+  activeWalletId: string | null
   onConnect?: () => void
-  onDisconnect?: () => void
+  onSelectWallet: (walletId: string) => void
+  onDisconnectWallet: (walletId: string) => void
+  onConnectWallet: (provider: DemoWalletProvider) => void
+  onDeposit: (walletId: string, chain: DepositChainId) => void
+  balanceHidden?: boolean
+  onBalanceHiddenChange?: (hidden: boolean) => void
 }
 
-/** Logo left + wallet pill right — nav stripped; uses real WalletPillMenu dropdown. */
+/** Logo left + wallet pill right — opens wallet side panel / bottom sheet. */
 export function DashboardHeader({
-  wallet,
-  usdcBalance = 0,
+  wallets,
+  activeWalletId,
   onConnect,
-  onDisconnect,
+  onSelectWallet,
+  onDisconnectWallet,
+  onConnectWallet,
+  onDeposit,
+  balanceHidden,
+  onBalanceHiddenChange,
 }: DashboardHeaderProps) {
   const isMobile = useMobileLayout()
 
@@ -43,13 +54,16 @@ export function DashboardHeader({
         )}
       </div>
       <div className={styles.wallet}>
-        {wallet ? (
+        {wallets.length > 0 ? (
           <WalletPillMenu
-            displayAddress={truncateAddress(wallet.address)}
-            copyAddress={wallet.address}
-            walletProvider={wallet.provider}
-            usdcBalance={usdcBalance}
-            onDisconnect={onDisconnect}
+            wallets={wallets}
+            activeWalletId={activeWalletId}
+            onSelectWallet={onSelectWallet}
+            onDisconnectWallet={onDisconnectWallet}
+            onConnectWallet={onConnectWallet}
+            onDeposit={onDeposit}
+            balanceHidden={balanceHidden}
+            onBalanceHiddenChange={onBalanceHiddenChange}
           />
         ) : (
           <WalletButton
