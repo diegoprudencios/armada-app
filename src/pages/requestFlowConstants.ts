@@ -24,6 +24,9 @@ export function createPaymentRequestId(): string {
   return `req_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`
 }
 
+/** Mock-only delay before a created payment link auto-settles as paid on the dashboard. */
+export const DEMO_REQUEST_LINK_PAYMENT_DELAY_MS = 60_000
+
 export type BuildPayViaLinkInput = {
   recipientAddress: string
   requestId: string

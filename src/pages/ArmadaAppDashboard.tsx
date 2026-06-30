@@ -49,7 +49,7 @@ export function ArmadaAppDashboard({
     earningBalance,
     activityVisible,
     toggleActivity,
-    displayRecentActivity,
+    recentActivity,
     balanceHidden,
     setBalanceHidden,
     openActivityReceipt,
@@ -120,7 +120,7 @@ export function ArmadaAppDashboard({
         }
         activityList={
           <RecentActivityList
-            items={displayRecentActivity}
+            items={recentActivity}
             balanceRevealed={!balanceHidden}
             onItemClick={openActivityReceipt}
           />

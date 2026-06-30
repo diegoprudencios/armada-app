@@ -30,13 +30,14 @@ import type { WithdrawModalStep } from '@/pages/withdrawFlowConstants'
 import type { RequestModalStep } from '@/pages/requestFlowConstants'
 import {
   DEFAULT_REQUEST_LINK_EXPIRY_ID,
+  DEMO_REQUEST_LINK_PAYMENT_DELAY_MS,
   type RequestLinkExpiryId,
 } from '@/pages/requestFlowConstants'
 import type { DashboardActivityItem } from '@/constants/dashboardActivity'
 import {
+  addReceiveLinkPaymentToActivities,
   createDepositActivity,
   createEarnActivity,
-  createReceiveLinkActivity,
   createRequestLinkActivity,
   createSendActivity,
   createWithdrawActivity,
@@ -46,13 +47,7 @@ import {
   resolveActivityTxHash,
   updateRequestLinkActivityByRequestId,
 } from '@/utils/dashboardActivity'
-import {
-  clearPendingPayViaLink,
-  isPaymentLinkRevoked,
-  readPendingPayViaLink,
-  type PendingPayViaLink,
-} from '@/utils/payViaLink'
-import { isDemoPreviewActivityItem, withDemoPreviewReceiveItem } from '@/constants/activityList'
+import { clearPendingPayViaLink, isPaymentLinkRevoked, readPendingPayViaLink, type PendingPayViaLink } from '@/utils/payViaLink'
 
 export type DepositStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 export type SendStep = 'recipient' | 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
@@ -167,6 +162,78 @@ export function useDashboardDemoState(initialBalance = 0) {
   const pendingPayViaLinkRef = useRef<PendingPayViaLink | null>(null)
   const activityReceiptRef = useRef(false)
   const activityRevealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const linkPaymentTimerRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
+
+  function clearLinkPaymentTimer(requestId: string) {
+    const timer = linkPaymentTimerRef.current.get(requestId)
+    if (!timer) return
+
+    clearTimeout(timer)
+    linkPaymentTimerRef.current.delete(requestId)
+  }
+
+  function clearAllLinkPaymentTimers() {
+    linkPaymentTimerRef.current.forEach((timer) => clearTimeout(timer))
+    linkPaymentTimerRef.current.clear()
+  }
+
+  function creditRequestLinkPayment(requestId: string, paidAmount: number, note?: string): boolean {
+    if (isPaymentLinkRevoked(requestId)) return false
+
+    const txHash = createDemoTxHash()
+    const paidAt = Date.now()
+    let creditedAmount = 0
+
+    setRecentActivity((items) => {
+      const result = addReceiveLinkPaymentToActivities(
+        items,
+        requestId,
+        paidAmount,
+        note,
+        paidAt,
+        txHash,
+      )
+      if (!result) return items
+
+      creditedAmount = result.paidAmount
+      return result.items
+    })
+
+    if (creditedAmount <= 0) return false
+
+    setDashboardBalance((prev) => {
+      const fromValue = formatUsdcAmount(prev)
+      const next = prev + creditedAmount
+      setBalanceRoll((roll) => ({
+        trigger: roll.trigger + 1,
+        mode: 'fromValue',
+        fromValue,
+      }))
+      if (hasCompletedDeposit && !readActivityUserHidden()) {
+        scheduleActivityReveal(activityRevealDelayAfterRollMs(formatUsdcAmount(next)))
+      }
+      return next
+    })
+
+    return true
+  }
+
+  function scheduleRequestLinkPaymentDemo(payload: {
+    requestId: string
+    paidAmount: number
+    note?: string
+  }) {
+    if (!isMock) return
+
+    clearLinkPaymentTimer(payload.requestId)
+
+    const timer = setTimeout(() => {
+      linkPaymentTimerRef.current.delete(payload.requestId)
+      creditRequestLinkPayment(payload.requestId, payload.paidAmount, payload.note)
+    }, DEMO_REQUEST_LINK_PAYMENT_DELAY_MS)
+
+    linkPaymentTimerRef.current.set(payload.requestId, timer)
+  }
 
   function clearActivityRevealTimer() {
     if (activityRevealTimerRef.current) {
@@ -204,7 +271,10 @@ export function useDashboardDemoState(initialBalance = 0) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => () => clearActivityRevealTimer(), [])
+  useEffect(() => () => {
+    clearActivityRevealTimer()
+    clearAllLinkPaymentTimers()
+  }, [])
 
   useEffect(() => {
     const pendingPay = readPendingPayViaLink()
@@ -227,7 +297,7 @@ export function useDashboardDemoState(initialBalance = 0) {
       balance: dashboardBalance,
       earningBalance,
       hasCompletedDeposit,
-      recentActivity: recentActivity.filter((item) => !isDemoPreviewActivityItem(item)),
+      recentActivity,
     })
   }, [
     isMock,
@@ -271,6 +341,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   function resetDashboardSession() {
+    clearAllLinkPaymentTimers()
     setWallet(null)
     setConnectedWallets([])
     setActiveWalletId(null)
@@ -351,34 +422,24 @@ export function useDashboardDemoState(initialBalance = 0) {
       const txHash = createDemoTxHash()
       const paidAt = Date.now()
 
-      setRecentActivity((items) => {
-        let next = items
+      if (pendingPay) {
+        clearLinkPaymentTimer(pendingPay.requestId)
+      }
 
+      setRecentActivity((items) => {
         if (pendingPay) {
-          next = updateRequestLinkActivityByRequestId(next, pendingPay.requestId, {
-            status: 'paid',
-            label: 'Payment link received',
+          const result = addReceiveLinkPaymentToActivities(
+            items,
+            pendingPay.requestId,
+            sent,
+            pendingPay.note,
             paidAt,
-            paidAmount: sent,
             txHash,
-            amount: sent,
-            occurredAt: paidAt,
-          })
-          next = prependActivity(
-            next,
-            createReceiveLinkActivity({
-              requestId: pendingPay.requestId,
-              paidAmount: sent,
-              note: pendingPay.note,
-              txHash,
-              paidAt,
-            }),
           )
-        } else {
-          next = prependActivity(items, createSendActivity(sent, recipient, chain))
+          return result ? result.items : items
         }
 
-        return next
+        return prependActivity(items, createSendActivity(sent, recipient, chain))
       })
 
       const fromValue = formatUsdcAmount(dashboardBalance)
@@ -664,11 +725,19 @@ export function useDashboardDemoState(initialBalance = 0) {
         }),
       ),
     )
+
+    scheduleRequestLinkPaymentDemo({
+      requestId: payload.requestId,
+      paidAmount: requestedAmount,
+      note: trimmedNote || undefined,
+    })
   }
 
   function markRequestLinkRevoked() {
     setRequestLinkRevoked(true)
     if (!requestId) return
+
+    clearLinkPaymentTimer(requestId)
 
     setRecentActivity((items) =>
       updateRequestLinkActivityByRequestId(items, requestId, {
@@ -740,7 +809,6 @@ export function useDashboardDemoState(initialBalance = 0) {
 
   const earnSourceBalance = earnTab === 'add' ? dashboardBalance : earningBalance
   const showDepositTooltip = Boolean(wallet) && !hasCompletedDeposit
-  const displayRecentActivity = isMock ? withDemoPreviewReceiveItem(recentActivity) : recentActivity
 
   function toggleActivity() {
     setActivityVisible((visible) => {
@@ -755,33 +823,6 @@ export function useDashboardDemoState(initialBalance = 0) {
     if (!wallet) return
 
     activityReceiptRef.current = true
-
-    if (isDemoPreviewActivityItem(item)) {
-      if (item.kind === 'receiveLink') {
-        openRequestReceiptFromActivity(
-          item.requestId,
-          item.paidAmount,
-          undefined,
-          item.occurredAt,
-          item.txHash,
-        )
-        return
-      }
-
-      if (item.kind === 'receive') {
-        openReceivePaymentReceiptFromActivity(
-          item.sender,
-          item.amount,
-          item.chain,
-          item.occurredAt,
-          item.txHash,
-        )
-        return
-      }
-
-      activityReceiptRef.current = false
-      return
-    }
 
     const amountLabel = String(Math.abs(item.amount))
 
@@ -819,7 +860,7 @@ export function useDashboardDemoState(initialBalance = 0) {
             item.paidAmount ?? item.requestedAmount,
             item.note,
             item.paidAt ?? item.occurredAt,
-            resolveActivityTxHash(item),
+            item.txHash ?? resolveActivityTxHash(item),
           )
           return
         }
@@ -895,7 +936,6 @@ export function useDashboardDemoState(initialBalance = 0) {
     earningBalance,
     activityVisible,
     recentActivity,
-    displayRecentActivity,
     balanceHidden,
     earnSourceBalance,
     balanceRoll,

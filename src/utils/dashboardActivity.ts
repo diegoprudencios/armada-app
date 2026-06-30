@@ -65,11 +65,16 @@ function withResolvedTxHash(item: DashboardActivityItem): DashboardActivityItem 
   return { ...item, txHash: deriveDemoTxHash(item.id) }
 }
 
-function requestLinkLabel(_requestedAmount: number, status: RequestLinkActivityStatus): string {
-  if (status === 'paid') return 'Payment link received'
+export function resolveRequestLinkActivityLabel(
+  status: RequestLinkActivityStatus,
+): string {
   if (status === 'revoked') return 'Payment link revoked'
   if (status === 'expired') return 'Payment link expired'
-  return 'Payment link'
+  return 'Payment link created'
+}
+
+function requestLinkLabel(_requestedAmount: number, status: RequestLinkActivityStatus): string {
+  return resolveRequestLinkActivityLabel(status)
 }
 
 export function createSendActivity(
@@ -246,6 +251,45 @@ export function findRequestLinkActivity(
   )
 }
 
+export function addReceiveLinkPaymentToActivities(
+  items: readonly DashboardActivityItem[],
+  requestId: string,
+  paidAmount: number,
+  note: string | undefined,
+  paidAt: number,
+  txHash: string,
+): { items: DashboardActivityItem[]; paidAmount: number } | null {
+  if (items.some((item) => item.kind === 'receiveLink' && item.requestId === requestId)) {
+    return null
+  }
+
+  const existing = findRequestLinkActivity(items, requestId)
+  if (!existing || existing.status === 'revoked' || existing.status === 'paid') return null
+
+  const resolvedAmount =
+    paidAmount > 0 ? paidAmount : existing.requestedAmount > 0 ? existing.requestedAmount : 100
+  const resolvedNote = note ?? existing.note
+
+  let next = updateRequestLinkActivityByRequestId(items, requestId, {
+    status: 'paid',
+    paidAt,
+    paidAmount: resolvedAmount,
+    txHash,
+  })
+  next = prependActivity(
+    next,
+    createReceiveLinkActivity({
+      requestId,
+      paidAmount: resolvedAmount,
+      note: resolvedNote,
+      txHash,
+      paidAt,
+    }),
+  )
+
+  return { items: next, paidAmount: resolvedAmount }
+}
+
 export function prependActivity(
   items: readonly DashboardActivityItem[],
   item: DashboardActivityItem,
@@ -319,7 +363,15 @@ export function isOpenableActivityItem(item: unknown): item is DashboardActivity
   }
 }
 
+function withResolvedActivityItem(item: DashboardActivityItem): DashboardActivityItem {
+  const withHash = withResolvedTxHash(item)
+  if (withHash.kind === 'requestLink') {
+    return { ...withHash, label: resolveRequestLinkActivityLabel(withHash.status) }
+  }
+  return withHash
+}
+
 export function normalizeActivityItems(items: unknown): DashboardActivityItem[] {
   if (!Array.isArray(items)) return []
-  return items.filter(isOpenableActivityItem).map(withResolvedTxHash)
+  return items.filter(isOpenableActivityItem).map(withResolvedActivityItem)
 }

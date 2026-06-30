@@ -17,6 +17,7 @@ import type { DashboardActivityItem, DashboardActivityKind } from '@/constants/d
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { formatPaymentLinkExpiry } from '@/pages/requestFlowConstants'
 import { formatUsdcAmount } from '@/utils/format'
+import { resolveRequestLinkActivityLabel } from '@/utils/dashboardActivity'
 import { formatTimeAgo } from '@/utils/formatTimeAgo'
 import usdcAmount from '@/styles/usdcAmount.module.css'
 import { ActivityAllPanel } from './ActivityAllPanel'
@@ -35,11 +36,24 @@ const ACTIVITY_ICONS: Record<
   receive: ArrowDownIcon,
 }
 
-function formatSignedAmount(amount: number): string {
-  const absolute = formatUsdcAmount(Math.abs(amount))
-  if (amount > 0) return `+${absolute}`
-  if (amount < 0) return `-${absolute}`
+function formatActivityAmount(item: DashboardActivityItem): string {
+  const absolute = formatUsdcAmount(Math.abs(item.amount))
+
+  if (item.kind === 'requestLink') {
+    return absolute
+  }
+
+  if (item.amount > 0) return `+${absolute}`
+  if (item.amount < 0) return `-${absolute}`
   return absolute
+}
+
+function activityDisplayLabel(item: DashboardActivityItem): string {
+  if (item.kind === 'requestLink') {
+    return resolveRequestLinkActivityLabel(item.status)
+  }
+
+  return item.label
 }
 
 function formatActivitySubtitle(item: DashboardActivityItem): string {
@@ -55,7 +69,7 @@ function formatActivitySubtitle(item: DashboardActivityItem): string {
 function activityAmountTone(item: DashboardActivityItem, balanceRevealed: boolean): string {
   if (!balanceRevealed) return ''
 
-  if (item.kind === 'requestLink' && item.status === 'pending') {
+  if (item.kind === 'requestLink') {
     return ''
   }
 
@@ -84,8 +98,7 @@ function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityList
     <ul className={styles.list}>
       {items.map((item) => {
         const Icon = ACTIVITY_ICONS[item.kind]
-        const signedAmount = formatSignedAmount(item.amount)
-        const amountLabel = signedAmount
+        const amountLabel = formatActivityAmount(item)
         const amountTone = activityAmountTone(item, balanceRevealed)
 
         return (
@@ -99,14 +112,14 @@ function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityList
                 <Icon className={styles.icon} strokeWidth={1.5} />
               </span>
               <div className={styles.copy}>
-                <span className={styles.label}>{item.label}</span>
+                <span className={styles.label}>{activityDisplayLabel(item)}</span>
                 <span className={styles.time}>{formatActivitySubtitle(item)}</span>
               </div>
               <span
                 className={[styles.amount, usdcAmount.font, amountTone].filter(Boolean).join(' ')}
                 aria-label={balanceRevealed ? amountLabel : 'Amount hidden'}
               >
-                <BalanceScrambleValue value={signedAmount} revealed={balanceRevealed} />
+                <BalanceScrambleValue value={amountLabel} revealed={balanceRevealed} />
               </span>
             </button>
           </li>
