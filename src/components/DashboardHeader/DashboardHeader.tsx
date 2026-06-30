@@ -39,7 +39,16 @@ export function DashboardHeader({
     <header className={styles.header}>
       <div className={styles.logo}>
         {isMobile ? (
-          <ArmadaLogo variant="mark" markTone="white" className={styles.logoMark} />
+          <>
+            <ArmadaLogo className={`${styles.logoFullMobile} ${styles.logoDark}`} />
+            <img
+              className={`${styles.logoFullMobile} ${styles.logoLight}`}
+              src={DASHBOARD_LIGHT_LOGO_SRC}
+              alt="Armada"
+              width={149}
+              height={36}
+            />
+          </>
         ) : (
           <>
             <ArmadaLogo className={`${styles.logoFull} ${styles.logoDark}`} />

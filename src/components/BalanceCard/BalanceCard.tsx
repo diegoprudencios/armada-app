@@ -24,6 +24,7 @@ import {
 } from './balanceRevealMotion'
 import { SendButton } from '@/components/SendButton'
 import { Tooltip } from '@/components/Tooltip'
+import { BottomSheet } from '@/components/BottomSheet'
 import { VaultPositionBar } from '@/components/VaultPositionBar'
 import { useDashboardBackground } from '@/hooks/useDashboardBackground'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
@@ -217,7 +218,7 @@ export function BalanceCard({
   }, [])
 
   useEffect(() => {
-    if (!moreMenuOpen) return
+    if (!moreMenuOpen || isMobileLayout) return
 
     function handlePointerDown(event: PointerEvent) {
       const target = event.target
@@ -236,7 +237,7 @@ export function BalanceCard({
       window.removeEventListener('pointerdown', handlePointerDown)
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [moreMenuOpen])
+  }, [moreMenuOpen, isMobileLayout])
 
   function toggleMoreMenu() {
     if (isMobileLayout) {
@@ -595,9 +596,11 @@ export function BalanceCard({
               data-hover-suppressed={moreMenuHoverSuppressed ? 'true' : 'false'}
               onPointerLeave={handleMoreMenuPointerLeave}
             >
-              <div className={styles.moreMenu} role="menu" aria-label="More options">
-                {moreMenuItems}
-              </div>
+              {!isMobileLayout ? (
+                <div className={styles.moreMenu} role="menu" aria-label="More options">
+                  {moreMenuItems}
+                </div>
+              ) : null}
               <IconButton
                 variant="ghost"
                 className={styles.actionMore}
@@ -632,6 +635,14 @@ export function BalanceCard({
           ) : null}
         </div>
       </div>
+
+      {isMobileLayout ? (
+        <BottomSheet open={moreMenuOpen} onClose={closeMoreMenu} ariaLabel="More options">
+          <div className={styles.moreMenuSheet} role="menu">
+            {moreMenuItems}
+          </div>
+        </BottomSheet>
+      ) : null}
     </div>
   )
 }

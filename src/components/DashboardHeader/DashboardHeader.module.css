@@ -23,11 +23,11 @@
   max-width: 100%;
 }
 
-.logoMark {
-  width: var(--primitives-spacing-11);
-  height: var(--primitives-spacing-11);
+.logoFullMobile {
+  height: calc(var(--primitives-spacing-8) + var(--primitives-spacing-1));
+  width: auto;
+  max-width: 100%;
   flex-shrink: 0;
-  color: var(--semantic-color-text-primary);
 }
 
 .logoLight {
