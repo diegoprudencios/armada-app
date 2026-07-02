@@ -11,9 +11,11 @@ import {
 } from '@/components/DepositFlow/steps/DepositStep2Review'
 import { DepositStep3Processing } from '@/components/DepositFlow/steps/DepositStep3Processing'
 import { DEPOSIT_PROGRESS_STEPS, DEPOSIT_WALLET_BALANCE } from '@/pages/depositFlowConstants'
+import { maxDepositAmount } from '@/utils/depositFee'
 import styles from './DepositFlow.module.css'
 
 const BALANCE = DEPOSIT_WALLET_BALANCE
+const BALANCE_NUM = Number(DEPOSIT_WALLET_BALANCE)
 const FEE = '0.00'
 const CHAIN_LABEL = 'Sepolia'
 
@@ -29,7 +31,7 @@ export function DepositFlow({ onClose, initialAmount = '1000' }: DepositFlowProp
   const [chain, setChain] = useState<DepositChainId>('sepolia')
 
   function handleMax() {
-    setAmount(BALANCE)
+    setAmount(String(maxDepositAmount(BALANCE_NUM)))
   }
 
   return (

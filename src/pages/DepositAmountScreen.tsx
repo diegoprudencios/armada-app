@@ -4,9 +4,13 @@ import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import type { DepositChainId } from '@/components/DepositAmountCard'
 import { Button } from '@/components/Button'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
-import { hasActiveAmount, amountExceedsBalance, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
+import { hasActiveAmount, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
 import { formatProtocolFeeLabel } from '@/utils/protocolFee'
-import { calculateDepositFee } from '@/utils/depositFee'
+import {
+  calculateDepositFee,
+  depositAmountExceedsBalance,
+  maxDepositAmount,
+} from '@/utils/depositFee'
 import { formatUsdcAmount, formatWalletBalance } from '@/utils/format'
 import styles from './DepositAmountScreen.module.css'
 
@@ -34,27 +38,31 @@ export function DepositAmountScreen({
   const amountInputId = useId()
   const amountInputRef = useRef<HTMLInputElement>(null)
   const balanceDisplay = formatWalletBalance(balance)
-  const balanceInputValue = balanceDisplay.replace(/,/g, '')
   const showFee = hasActiveAmount(amount)
-  const exceedsBalance = amountExceedsBalance(amount, balance)
+  const amountNum = parseActiveAmount(amount)
+  const exceedsBalance = depositAmountExceedsBalance(amountNum, balance)
   const canReview = showFee && !exceedsBalance
   const reviewLabel = showFee ? 'Review' : 'Input amount'
-  const feeUsdc = calculateDepositFee(parseActiveAmount(amount))
+  const feeUsdc = calculateDepositFee(amountNum)
   const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const showFeeRow = showFee && feeUsdc > 0
+  const maxDeposit = maxDepositAmount(balance)
 
   function handleAmountChange(raw: string) {
     const next = sanitizeAmountInput(raw)
     onAmountChange(hasActiveAmount(next) ? next : '')
   }
 
+  function formatDepositInput(value: number): string {
+    return formatWalletBalance(value).replace(/,/g, '')
+  }
+
   function applyPercent(percent: number) {
-    const next = balance * percent
-    onAmountChange(formatWalletBalance(next).replace(/,/g, ''))
+    onAmountChange(formatDepositInput(maxDeposit * percent))
   }
 
   function handleMax() {
-    onAmountChange(balanceInputValue)
+    onAmountChange(formatDepositInput(maxDeposit))
   }
 
   useEffect(() => {

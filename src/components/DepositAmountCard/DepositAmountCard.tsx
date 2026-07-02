@@ -5,7 +5,8 @@ import NetworkArbitrumSepolia from '@web3icons/react/icons/networks/NetworkArbit
 import NetworkBaseSepolia from '@web3icons/react/icons/networks/NetworkBaseSepolia'
 import NetworkSepolia from '@web3icons/react/icons/networks/NetworkSepolia'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
-import { hasActiveAmount, amountExceedsBalance, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
+import { hasActiveAmount, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
+import { depositAmountExceedsBalance } from '@/utils/depositFee'
 import styles from './DepositAmountCard.module.css'
 
 const ICON_SIZE = 32
@@ -82,7 +83,8 @@ export function DepositAmountCard({
 
   const showActiveAmount = hasActiveAmount(amount)
   const availableBalance = parseActiveAmount(balance.replace(/,/g, ''))
-  const exceedsBalance = amountExceedsBalance(amount, availableBalance)
+  const amountNum = parseActiveAmount(amount)
+  const exceedsBalance = depositAmountExceedsBalance(amountNum, availableBalance)
   const showAllocation = showActiveAmount && maxArm != null && maxArm > 0 && !exceedsBalance
   const allocationCap = maxArm ?? 0
   const depositAmount = showAllocation
