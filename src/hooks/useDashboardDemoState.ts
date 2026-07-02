@@ -10,6 +10,7 @@ import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import {
   readActivityUserHidden,
+  readActivityPanelVisible,
   readDemoDashboardSession,
   writeActivityPanelVisible,
   writeActivityUserHidden,
@@ -103,6 +104,12 @@ function readInitialRecentActivity(): DashboardActivityItem[] {
   return []
 }
 
+function readInitialActivityVisible(): boolean {
+  if (readActivityUserHidden()) return false
+  if (readInitialRecentActivity().length === 0) return false
+  return readActivityPanelVisible()
+}
+
 export function useDashboardDemoState(initialBalance = 0) {
   const [environment] = useEnvironment()
   const isMock = environment === 'mock'
@@ -128,7 +135,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [withdrawAmount, setWithdrawAmount] = useState('')
   const [withdrawChain, setWithdrawChain] = useState<SendChainId>('ethereum')
   const [earningBalance, setEarningBalance] = useState(readInitialEarningBalance)
-  const [activityVisible, setActivityVisible] = useState(false)
+  const [activityVisible, setActivityVisible] = useState(readInitialActivityVisible)
   const [recentActivity, setRecentActivity] = useState<DashboardActivityItem[]>(readInitialRecentActivity)
   const [balanceHidden, setBalanceHidden] = useState(false)
   const [depositConfirmedAt, setDepositConfirmedAt] = useState<number | null>(null)
@@ -209,7 +216,7 @@ export function useDashboardDemoState(initialBalance = 0) {
         mode: 'fromValue',
         fromValue,
       }))
-      if (hasCompletedDeposit && !readActivityUserHidden()) {
+      if (!readActivityUserHidden()) {
         scheduleActivityReveal(activityRevealDelayAfterRollMs(formatUsdcAmount(next)))
       }
       return next
@@ -264,10 +271,12 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   useEffect(() => {
-    if (!hasCompletedDeposit || readActivityUserHidden()) return
-    scheduleActivityReveal(activityRevealDelayMs())
-    return clearActivityRevealTimer
-    // Reveal once on mount when the session already completed a deposit.
+    if (readActivityUserHidden()) return
+    if (readInitialRecentActivity().length > 0) {
+      scheduleActivityReveal(activityRevealDelayMs())
+      return clearActivityRevealTimer
+    }
+    // Reveal once on mount when the session already has activity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -457,6 +466,9 @@ export function useDashboardDemoState(initialBalance = 0) {
       }
 
       pendingPayViaLinkRef.current = null
+      if (!readActivityUserHidden()) {
+        scheduleActivityReveal(activityRevealDelayMs())
+      }
     }
   }
 
@@ -577,6 +589,9 @@ export function useDashboardDemoState(initialBalance = 0) {
         fromValue: balanceFrom,
         vaultFromValue: vaultFrom,
       }))
+      if (!readActivityUserHidden()) {
+        scheduleActivityReveal(activityRevealDelayMs())
+      }
       return
     }
 
@@ -590,6 +605,9 @@ export function useDashboardDemoState(initialBalance = 0) {
       fromValue: balanceFrom,
       vaultFromValue: vaultFrom,
     }))
+    if (!readActivityUserHidden()) {
+      scheduleActivityReveal(activityRevealDelayMs())
+    }
   }
 
   function completeEarn() {
@@ -606,7 +624,7 @@ export function useDashboardDemoState(initialBalance = 0) {
       openConnect()
       return
     }
-    if (!hasCompletedDeposit || dashboardBalance <= 0) return
+    if (dashboardBalance <= 0) return
     setWithdrawRecipient(wallet.address)
     setWithdrawAmount('')
     setWithdrawChain('ethereum')
@@ -645,6 +663,9 @@ export function useDashboardDemoState(initialBalance = 0) {
         mode: 'fromValue',
         fromValue,
       }))
+      if (!readActivityUserHidden()) {
+        scheduleActivityReveal(activityRevealDelayMs())
+      }
     }
   }
 
@@ -731,6 +752,10 @@ export function useDashboardDemoState(initialBalance = 0) {
       paidAmount: requestedAmount,
       note: trimmedNote || undefined,
     })
+
+    if (!readActivityUserHidden()) {
+      scheduleActivityReveal(activityRevealDelayMs())
+    }
   }
 
   function markRequestLinkRevoked() {
@@ -808,7 +833,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   }
 
   const earnSourceBalance = earnTab === 'add' ? dashboardBalance : earningBalance
-  const showDepositTooltip = Boolean(wallet) && !hasCompletedDeposit
+  const showDepositTooltip = Boolean(wallet) && dashboardBalance <= 0
 
   function toggleActivity() {
     setActivityVisible((visible) => {

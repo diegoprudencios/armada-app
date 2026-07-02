@@ -33,7 +33,6 @@ export function ArmadaAppDashboardV2({
     connectedWallets,
     activeWalletId,
     dashboardBalance,
-    hasCompletedDeposit,
     balanceRoll,
     showDepositTooltip,
     openConnect,
@@ -59,7 +58,7 @@ export function ArmadaAppDashboardV2({
 
   if (!wallet) return null
 
-  const showActivity = activityVisible && hasCompletedDeposit
+  const showActivity = activityVisible && recentActivity.length > 0
 
   return (
     <div
@@ -102,7 +101,7 @@ export function ArmadaAppDashboardV2({
             balanceRollTrigger={balanceRoll.trigger}
             balanceRollMode={balanceRoll.mode}
             balanceRollFromValue={balanceRoll.fromValue}
-            hasCompletedDeposit={hasCompletedDeposit}
+            hasActivityItems={recentActivity.length > 0}
             actionLayout="v2"
             onSend={onSend ?? openSend}
             onDeposit={openDeposit}

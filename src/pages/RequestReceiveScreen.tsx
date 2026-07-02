@@ -82,7 +82,8 @@ export function RequestReceiveScreen({
         <h1 className={styles.title}>Request funds via link</h1>
 
         <div className={styles.linkCard}>
-          <div className={styles.amountGroup}>
+          <div className={styles.amountRow}>
+            <div className={styles.amountGroup}>
             <div className={styles.tokenBadge} aria-hidden>
               <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
             </div>
@@ -98,9 +99,9 @@ export function RequestReceiveScreen({
                 value={amount}
                 onChange={(event) => handleAmountChange(event.target.value)}
                 aria-label="Requested amount in USDC"
-                size={Math.max(1, amount.length || 1)}
               />
             </div>
+          </div>
           </div>
 
           <div className={[styles.fieldBlock, styles.noteFieldBlock].join(' ')}>

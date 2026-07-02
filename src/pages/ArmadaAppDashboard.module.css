@@ -104,7 +104,11 @@
 }
 
 .primaryStack {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: var(--primitives-spacing-8);
 }
 
 .cardStackBalance,
@@ -114,15 +118,17 @@
 }
 
 .cardStackBalance {
-  order: 1;
-}
-
-.cardStackActivity {
-  order: 2;
+  flex-shrink: 0;
 }
 
 .cardStackTooltip {
-  order: 3;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.cardStackActivity {
+  flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
@@ -183,11 +189,6 @@
         var(--primitives-spacing-6) + var(--primitives-spacing-1) * 0.5
     );
   }
-
-  .cardStackTooltip {
-    display: flex;
-    justify-content: center;
-  }
 }
 
 /* Mobile layout — keep in sync with MOBILE_LAYOUT_MAX_WIDTH_PX (767). */
@@ -221,30 +222,7 @@
   }
 
   .primaryStack {
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-    width: 100%;
     gap: var(--primitives-spacing-3);
-  }
-
-  .cardStackBalance,
-  .cardStackActivity,
-  .cardStackTooltip {
-    order: unset;
-  }
-
-  .cardStackBalance {
-    flex-shrink: 0;
-    width: 100%;
-  }
-
-  .cardStackTooltip {
-    flex-shrink: 0;
-  }
-
-  .cardStackActivity {
-    flex-shrink: 0;
   }
 
   .tooltipEnter {

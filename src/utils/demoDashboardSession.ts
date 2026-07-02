@@ -24,7 +24,7 @@ const ACTIVITY_VISIBLE_KEY = 'armada-app-dashboard-activity-visible'
 const ACTIVITY_USER_HIDDEN_KEY = 'armada-app-dashboard-activity-user-hidden'
 const STORAGE_VERSION = 1 as const
 
-/** Activity panel is hidden by default; auto-shown after the first deposit. */
+/** Activity panel is hidden by default; auto-shown when the first activity item is recorded. */
 export function readActivityPanelVisible(): boolean {
   if (typeof window === 'undefined') return false
 

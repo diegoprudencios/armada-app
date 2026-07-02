@@ -42,7 +42,8 @@ export interface BalanceCardProps {
   balanceRollTrigger?: number
   balanceRollMode?: BalanceRollMode
   balanceRollFromValue?: string
-  hasCompletedDeposit?: boolean
+  /** When true, show hide/show activity in the ellipses menu. */
+  hasActivityItems?: boolean
   /** v2: deposit in ellipses menu; request as lavender pill beside send. */
   actionLayout?: BalanceCardActionLayout
   onSend?: () => void
@@ -78,7 +79,7 @@ function estimateDepositRollDurationMs(formattedBalance: string): number {
 
 interface BalanceCardMoreMenuItemsProps {
   isV2Actions: boolean
-  hasCompletedDeposit: boolean
+  hasActivityItems: boolean
   activityVisible: boolean
   canWithdraw: boolean
   onDeposit?: () => void
@@ -90,7 +91,7 @@ interface BalanceCardMoreMenuItemsProps {
 
 function BalanceCardMoreMenuItems({
   isV2Actions,
-  hasCompletedDeposit,
+  hasActivityItems,
   activityVisible,
   canWithdraw,
   onDeposit,
@@ -140,7 +141,7 @@ function BalanceCardMoreMenuItems({
           <span className={styles.moreMenuLabel}>Withdraw</span>
         </span>
       </button>
-      {hasCompletedDeposit ? (
+      {hasActivityItems ? (
         <button
           type="button"
           className={styles.moreMenuItem}
@@ -166,7 +167,7 @@ export function BalanceCard({
   balanceRollTrigger = 0,
   balanceRollMode = 'fromZero',
   balanceRollFromValue,
-  hasCompletedDeposit = false,
+  hasActivityItems = false,
   actionLayout = 'default',
   onSend,
   onDeposit,
@@ -186,6 +187,7 @@ export function BalanceCard({
 }: BalanceCardProps) {
   const isV2Actions = actionLayout === 'v2'
   const isMobileLayout = useMobileLayout()
+  const hasFunds = balance > 0
   const [background] = useDashboardBackground()
   const isSolidBackground = background === 'solid'
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
@@ -321,7 +323,7 @@ export function BalanceCard({
     vaultRollFromValue !== undefined &&
     balanceRollTrigger > completedRollTrigger
   const showRollingBalance = balanceIntroPlaying || depositRollActive
-  const sendClassName = [styles.sendButton, !hasCompletedDeposit && styles.actionAmber]
+  const sendClassName = [styles.sendButton, !hasFunds && styles.actionAmber]
     .filter(Boolean)
     .join(' ')
 
@@ -347,9 +349,9 @@ export function BalanceCard({
   const moreMenuItems = (
     <BalanceCardMoreMenuItems
       isV2Actions={isV2Actions}
-      hasCompletedDeposit={hasCompletedDeposit}
+      hasActivityItems={hasActivityItems}
       activityVisible={activityVisible}
-      canWithdraw={hasCompletedDeposit && balance > 0}
+      canWithdraw={hasFunds}
       onDeposit={onDeposit}
       onEarn={onEarn}
       onWithdraw={onWithdraw}
@@ -527,7 +529,7 @@ export function BalanceCard({
           >
           <div className={styles.actionEnter}>
             <SendButton
-              variant={hasCompletedDeposit ? 'gradient' : 'solid'}
+              variant={hasFunds ? 'gradient' : 'solid'}
               className={sendClassName}
               onClick={onSend}
             />
@@ -547,8 +549,8 @@ export function BalanceCard({
               <div className={styles.actionEnter}>
                 {isMobileLayout ? (
                   <IconButton
-                    variant={hasCompletedDeposit ? 'solid' : 'gradient'}
-                    className={hasCompletedDeposit ? styles.actionAmber : undefined}
+                    variant={hasFunds ? 'solid' : 'gradient'}
+                    className={hasFunds ? styles.actionAmber : undefined}
                     icon={<PlusIcon className={styles.actionIcon} strokeWidth={1.5} />}
                     aria-label="Deposit"
                     onClick={onDeposit}
@@ -556,8 +558,8 @@ export function BalanceCard({
                 ) : (
                   <Tooltip variant="action" content="Deposit">
                     <IconButton
-                      variant={hasCompletedDeposit ? 'solid' : 'gradient'}
-                      className={hasCompletedDeposit ? styles.actionAmber : undefined}
+                      variant={hasFunds ? 'solid' : 'gradient'}
+                      className={hasFunds ? styles.actionAmber : undefined}
                       icon={<PlusIcon className={styles.actionIcon} strokeWidth={1.5} />}
                       aria-label="Deposit"
                       onClick={onDeposit}

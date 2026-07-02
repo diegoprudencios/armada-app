@@ -420,9 +420,9 @@ export function Showcase() {
         </div>
         <div className={styles.balanceFrame}>
           <BalanceCard
-            balance={123283.23}
+            balance={hasDeposit ? 123283.23 : 0}
             actionLayout={balanceLayout}
-            hasCompletedDeposit={hasDeposit}
+            hasActivityItems={activityVisible}
             vaultBalance={showVaultPosition ? 250 : 0}
             activityVisible={activityVisible}
             onToggleActivity={() => setActivityVisible((value) => !value)}
