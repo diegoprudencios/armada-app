@@ -1,13 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
-  EyeIcon,
-  EyeSlashIcon,
-} from '@heroicons/react/24/solid'
-import {
   ArrowDownIcon,
   ArrowLeftIcon,
   ChartBarIcon,
   EllipsisHorizontalIcon,
+  EyeIcon,
+  EyeSlashIcon,
   PlusIcon,
   QueueListIcon,
 } from '@heroicons/react/24/outline'
@@ -306,7 +304,7 @@ export function BalanceCard({
 
   useLayoutEffect(() => {
     if (balanceIntroPlaying) return
-    const width = balanceValueSizerRef.current?.getBoundingClientRect().width
+    const width = balanceValueSizerRef.current?.scrollWidth
     if (!width) return
     setLockedWidth(width)
   }, [balanceIntroPlaying, formattedBalance])
@@ -323,6 +321,7 @@ export function BalanceCard({
     vaultRollFromValue !== undefined &&
     balanceRollTrigger > completedRollTrigger
   const showRollingBalance = balanceIntroPlaying || depositRollActive
+  const lockBalanceWidth = showRollingBalance || vaultTransferRollActive
   const sendClassName = [styles.sendButton, !hasFunds && styles.actionAmber]
     .filter(Boolean)
     .join(' ')
@@ -378,7 +377,13 @@ export function BalanceCard({
       <span
         ref={balanceValueRef}
         className={styles.balanceValue}
-        style={balanceIntroPlaying ? undefined : { width: lockedWidth ?? 'max-content' }}
+        style={
+          balanceIntroPlaying
+            ? undefined
+            : lockBalanceWidth
+              ? { width: lockedWidth ?? 'max-content' }
+              : undefined
+        }
         aria-label={showBalance ? formattedBalance : 'Balance hidden'}
       >
         <span ref={balanceValueSizerRef} className={styles.balanceValueSizer} aria-hidden>
@@ -490,9 +495,9 @@ export function BalanceCard({
               }}
             >
               {balanceHidden ? (
-                <EyeSlashIcon className={styles.badgeIcon} />
+                <EyeSlashIcon className={styles.badgeIcon} strokeWidth={1.5} aria-hidden />
               ) : (
-                <EyeIcon className={styles.badgeIcon} />
+                <EyeIcon className={styles.badgeIcon} strokeWidth={1.5} aria-hidden />
               )}
             </button>
           </div>

@@ -200,8 +200,8 @@
 }
 
 .eyeBadge {
-  width: var(--primitives-spacing-8);
-  height: var(--primitives-spacing-8);
+  width: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
+  height: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
   background: color-mix(in srgb, var(--semantic-component-button-gradient-default-from) 20%, transparent);
   border: none;
   padding: 0;
@@ -290,13 +290,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .balanceCluster {
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
   align-items: center;
   gap: var(--primitives-spacing-2);
+  max-width: 100%;
 }
 
 .balanceCluster .tokenBadge {
@@ -368,6 +370,7 @@
   visibility: hidden;
   white-space: nowrap;
   line-height: var(--primitives-spacing-10);
+  width: max-content;
 }
 
 .balanceClusterPrivate {
