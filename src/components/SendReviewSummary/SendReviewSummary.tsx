@@ -1,6 +1,7 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
+import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import { isArmadaAddress } from '@/pages/sendFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
 import styles from './SendReviewSummary.module.css'
@@ -24,7 +25,7 @@ export function SendReviewSummary({
 }: SendReviewSummaryProps) {
   const isPrivate = isArmadaAddress(recipientAddress)
   const total = amount + feeUsdc
-  const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
+  const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const totalLabel = `${formatUsdcAmount(total, 2)} USDC`
 
   return (

@@ -5,6 +5,7 @@ import type { DepositChainId } from '@/components/DepositAmountCard'
 import { Button } from '@/components/Button'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import { hasActiveAmount, amountExceedsBalance, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
+import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import { calculateDepositFee } from '@/utils/depositFee'
 import { formatUsdcAmount, formatWalletBalance } from '@/utils/format'
 import styles from './DepositAmountScreen.module.css'
@@ -39,7 +40,8 @@ export function DepositAmountScreen({
   const canReview = showFee && !exceedsBalance
   const reviewLabel = showFee ? 'Review' : 'Input amount'
   const feeUsdc = calculateDepositFee(parseActiveAmount(amount))
-  const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
+  const feeLabel = formatProtocolFeeLabel(feeUsdc)
+  const showFeeRow = showFee && feeUsdc > 0
 
   function handleAmountChange(raw: string) {
     const next = sanitizeAmountInput(raw)
@@ -123,8 +125,8 @@ export function DepositAmountScreen({
             </div>
 
             <div
-              className={[styles.feeReveal, showFee && styles.feeRevealOpen].filter(Boolean).join(' ')}
-              aria-hidden={!showFee}
+              className={[styles.feeReveal, showFeeRow && styles.feeRevealOpen].filter(Boolean).join(' ')}
+              aria-hidden={!showFeeRow}
             >
               <div className={styles.feeRow}>
                 <span className={styles.feeLabel}>Fee</span>

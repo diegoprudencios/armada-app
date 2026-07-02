@@ -1,6 +1,4 @@
-import { calculateDepositFee } from './depositFee'
-
-/** Placeholder send fee — same mock logic as deposit until real pricing exists. */
-export function calculateSendFee(amount: number): number {
-  return calculateDepositFee(amount)
+/** Send and vault moves have no protocol fee in the demo. */
+export function calculateSendFee(_amount: number): number {
+  return 0
 }

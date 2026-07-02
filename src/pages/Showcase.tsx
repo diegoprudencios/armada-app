@@ -330,7 +330,7 @@ export function Showcase() {
           <DepositReviewSummary
             networkName="Ethereum Sepolia"
             amount={1000}
-            feeUsdc={2}
+            feeUsdc={5}
             walletAddress={DEMO_WALLET_ADDRESS}
             walletProvider="metamask"
             armadaAddress={DEMO_ARMADA_ADDRESS}

@@ -2,6 +2,7 @@ import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { WalletProviderIcon } from '@/components/WalletPillMenu/WalletPillMenu'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
+import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import usdcAmount from '@/styles/usdcAmount.module.css'
 import styles from './DepositReviewSummary.module.css'
 
@@ -27,7 +28,7 @@ export function DepositReviewSummary({
   confirmedAt,
 }: DepositReviewSummaryProps) {
   const total = amount + feeUsdc
-  const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
+  const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const totalLabel = `${formatUsdcAmount(total, 2)} USDC`
 
   return (

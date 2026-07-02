@@ -1,6 +1,12 @@
 import { ConnectWalletOverlay } from '@/components/ConnectWalletOverlay'
+import { demoUsdcBalanceForProvider } from '@/constants/walletMenu'
 import type { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
-import { DEPOSIT_WALLET_BALANCE, DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
+import {
+  DEMO_ADDRESS_BY_PROVIDER,
+  DEPOSIT_WALLET_BALANCE,
+  DEMO_ARMADA_ADDRESS,
+  type DemoWalletProvider,
+} from './depositFlowConstants'
 import { DepositModalFlow } from './DepositModalFlow'
 import { EarnModalFlow } from './EarnModalFlow'
 import { SendModalFlow } from './SendModalFlow'
@@ -9,6 +15,13 @@ import { RequestModalFlow } from './RequestModalFlow'
 import { ReceivePaymentModalFlow } from './ReceivePaymentModalFlow'
 
 type DashboardDemoState = ReturnType<typeof useDashboardDemoState>
+
+function depositWalletBalanceForProvider(provider: string | undefined): number {
+  if (provider && provider in DEMO_ADDRESS_BY_PROVIDER) {
+    return demoUsdcBalanceForProvider(provider as DemoWalletProvider)
+  }
+  return Number(DEPOSIT_WALLET_BALANCE)
+}
 
 export interface DashboardOverlaysProps {
   state: DashboardDemoState
@@ -101,7 +114,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           step={depositStep}
           amount={depositAmount}
           chain={depositChain}
-          depositWalletBalance={Number(DEPOSIT_WALLET_BALANCE)}
+          depositWalletBalance={depositWalletBalanceForProvider(wallet?.provider)}
           walletAddress={wallet?.address}
           walletProvider={wallet?.provider}
           confirmedAt={depositConfirmedAt}
@@ -133,7 +146,6 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           chain={sendChain}
           armadaBalance={dashboardBalance}
           armadaAddress={DEMO_ARMADA_ADDRESS}
-          walletAddress={wallet?.address}
           confirmedAt={sendConfirmedAt}
           onClose={closeSend}
           onRecipientChange={setSendRecipient}
@@ -146,9 +158,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
             setSendStep('review')
           }}
           onReviewBack={() => setSendStep('amount')}
-          onReviewConfirm={() => setSendStep('wallet')}
-          onWalletComplete={() => setSendStep('processing')}
-          onWalletCancel={() => setSendStep('review')}
+          onReviewConfirm={() => setSendStep('processing')}
           onProcessingCancel={() => setSendStep('review')}
           onProcessingComplete={() => {
             setSendConfirmedAt(Date.now())
@@ -191,7 +201,6 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           chain={withdrawChain}
           armadaBalance={dashboardBalance}
           armadaAddress={DEMO_ARMADA_ADDRESS}
-          walletAddress={wallet?.address}
           confirmedAt={withdrawConfirmedAt}
           onClose={closeWithdraw}
           onRecipientChange={setWithdrawRecipient}
@@ -204,9 +213,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
             setWithdrawStep('review')
           }}
           onReviewBack={() => setWithdrawStep('amount')}
-          onReviewConfirm={() => setWithdrawStep('wallet')}
-          onWalletComplete={() => setWithdrawStep('processing')}
-          onWalletCancel={() => setWithdrawStep('review')}
+          onReviewConfirm={() => setWithdrawStep('processing')}
           onProcessingCancel={() => setWithdrawStep('review')}
           onProcessingComplete={() => {
             setWithdrawConfirmedAt(Date.now())

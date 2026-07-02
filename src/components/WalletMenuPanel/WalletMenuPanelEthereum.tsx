@@ -24,7 +24,6 @@ import { WalletProviderIcon } from '@/components/WalletPillMenu/WalletPillMenu'
 import {
   WALLET_PANEL_ETHEREUM_CHAIN,
   WALLET_PANEL_ETHEREUM_NETWORK_LABEL,
-  ethereumUsdcBalanceForWallet,
 } from '@/constants/walletMenu'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
 import type { WalletMenuPanelProps } from './WalletMenuPanel'
@@ -54,7 +53,7 @@ export function WalletMenuPanelEthereum({
 
   const wallet =
     wallets.find((entry) => entry.id === activeWalletId) ?? wallets[0] ?? null
-  const ethereumBalance = wallet ? ethereumUsdcBalanceForWallet(wallet.id) : 0
+  const ethereumBalance = wallet?.usdcBalance ?? 0
   const balanceLabel = formatUsdcAmount(ethereumBalance)
 
   useEffect(() => {

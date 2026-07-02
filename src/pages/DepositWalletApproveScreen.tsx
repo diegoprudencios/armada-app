@@ -18,6 +18,8 @@ export interface DepositWalletApproveScreenProps {
   walletAddress?: string
   signStepLabel?: string
   computeFeeUsdc?: (amount: number) => number
+  /** When true, only the sign transaction is shown (no USDC approve step). */
+  skipApproval?: boolean
   onComplete: () => void
   onCancel: () => void
 }
@@ -28,30 +30,36 @@ export function DepositWalletApproveScreen({
   walletAddress,
   signStepLabel = 'Sign deposit transaction',
   computeFeeUsdc = calculateDepositFee,
+  skipApproval = false,
   onComplete,
   onCancel,
 }: DepositWalletApproveScreenProps) {
   const amountNum = parseActiveAmount(amount)
-  const totalUsdc = amountNum + computeFeeUsdc(amountNum)
-  const amountLabel = formatUsdcAmount(totalUsdc)
+  const feeUsdc = computeFeeUsdc(amountNum)
+  const totalUsdc = amountNum + feeUsdc
+  const amountLabel = formatUsdcAmount(skipApproval ? amountNum : totalUsdc)
   const completeTimerRef = useRef(0)
 
   const [promptPhase, setPromptPhase] = useState<WalletPromptPhase>('waiting')
-  const [steps, setSteps] = useState<WalletStep[]>([
-    { label: `Approve ${amountLabel} USDC`, status: 'loading' },
-    { label: signStepLabel, status: 'pending' },
-  ])
+  const [steps, setSteps] = useState<WalletStep[]>(() =>
+    skipApproval
+      ? [{ label: signStepLabel, status: 'loading' }]
+      : [
+          { label: `Approve ${amountLabel} USDC`, status: 'loading' },
+          { label: signStepLabel, status: 'pending' },
+        ],
+  )
 
   useEffect(() => {
     const openTimer = window.setTimeout(() => {
-      setPromptPhase('approve')
+      setPromptPhase(skipApproval ? 'sign' : 'approve')
     }, POPUP_OPEN_MS)
 
     return () => {
       window.clearTimeout(openTimer)
       window.clearTimeout(completeTimerRef.current)
     }
-  }, [])
+  }, [skipApproval])
 
   function handleApprove() {
     setSteps([
@@ -62,10 +70,14 @@ export function DepositWalletApproveScreen({
   }
 
   function handleSign() {
-    setSteps([
-      { label: `Approve ${amountLabel} USDC`, status: 'done' },
-      { label: signStepLabel, status: 'done' },
-    ])
+    setSteps(
+      skipApproval
+        ? [{ label: signStepLabel, status: 'done' }]
+        : [
+            { label: `Approve ${amountLabel} USDC`, status: 'done' },
+            { label: signStepLabel, status: 'done' },
+          ],
+    )
     setPromptPhase('closed')
     completeTimerRef.current = window.setTimeout(onComplete, COMPLETE_DELAY_MS)
   }

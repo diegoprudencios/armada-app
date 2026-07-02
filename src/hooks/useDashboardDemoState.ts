@@ -51,7 +51,7 @@ import {
 import { clearPendingPayViaLink, isPaymentLinkRevoked, readPendingPayViaLink, type PendingPayViaLink } from '@/utils/payViaLink'
 
 export type DepositStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
-export type SendStep = 'recipient' | 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
+export type SendStep = 'recipient' | 'amount' | 'review' | 'processing' | 'confirmed'
 export type EarnStep = EarnModalStep
 export type WithdrawStep = WithdrawModalStep
 export type RequestStep = RequestModalStep

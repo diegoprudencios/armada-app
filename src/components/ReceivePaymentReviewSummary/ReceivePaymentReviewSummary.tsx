@@ -2,6 +2,7 @@ import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { isArmadaAddress, sendNetworkDisplayName, type SendChainId } from '@/pages/sendFlowConstants'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
+import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import usdcAmount from '@/styles/usdcAmount.module.css'
 import styles from '../DepositReviewSummary/DepositReviewSummary.module.css'
 
@@ -25,7 +26,7 @@ export function ReceivePaymentReviewSummary({
   const isPrivate = isArmadaAddress(sender)
   const networkName = isPrivate ? undefined : sendNetworkDisplayName(chain)
   const feeUsdc = 0
-  const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
+  const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const totalLabel = `${formatUsdcAmount(amount, 2)} USDC`
 
   return (

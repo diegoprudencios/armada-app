@@ -1,27 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
-import { DepositWalletApproveScreen } from './DepositWalletApproveScreen'
 import { SendAmountScreen } from './SendAmountScreen'
 import { SendProcessingScreen } from './SendProcessingScreen'
 import { SendRecipientScreen } from './SendRecipientScreen'
 import { SendReviewScreen } from './SendReviewScreen'
 import {
-  isArmadaAddress,
   SEND_PROGRESS_STEPS,
-  sendNetworkDisplayName,
   type SendChainId,
 } from './sendFlowConstants'
 import styles from './SendModalFlow.module.css'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
 
-export type SendModalStep = 'recipient' | 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
+export type SendModalStep = 'recipient' | 'amount' | 'review' | 'processing' | 'confirmed'
 
 const SEND_STEP_NUMBER: Record<SendModalStep, number> = {
   recipient: 1,
   amount: 2,
   review: 3,
-  wallet: 4,
   processing: 4,
   confirmed: 4,
 }
@@ -33,8 +29,6 @@ export interface SendModalFlowProps {
   chain: SendChainId
   armadaBalance: number
   armadaAddress?: string
-  walletAddress?: string
-  walletProvider?: string
   confirmedAt?: number | null
   onClose: () => void
   onRecipientChange: (recipient: string) => void
@@ -45,8 +39,6 @@ export interface SendModalFlowProps {
   onAmountReview: (amount: string) => void
   onReviewBack: () => void
   onReviewConfirm: () => void
-  onWalletComplete: () => void
-  onWalletCancel: () => void
   onProcessingCancel: () => void
   onProcessingComplete: () => void
   onConfirmedViewExplorer?: () => void
@@ -60,7 +52,6 @@ export function SendModalFlow({
   chain,
   armadaBalance,
   armadaAddress,
-  walletAddress,
   confirmedAt,
   onClose,
   onRecipientChange,
@@ -71,8 +62,6 @@ export function SendModalFlow({
   onAmountReview,
   onReviewBack,
   onReviewConfirm,
-  onWalletComplete,
-  onWalletCancel,
   onProcessingCancel,
   onProcessingComplete,
   onConfirmedViewExplorer,
@@ -83,8 +72,6 @@ export function SendModalFlow({
   onCloseRef.current = onClose
   const isConfirmStep = step === 'processing' || step === 'confirmed'
   const isConfirmed = step === 'confirmed'
-  const isPrivateRecipient = isArmadaAddress(recipient)
-  const walletNetworkName = isPrivateRecipient ? 'Armada' : sendNetworkDisplayName(chain)
 
   const requestClose = useCallback(() => {
     setExiting((current) => (current ? current : true))
@@ -122,17 +109,6 @@ export function SendModalFlow({
             armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
             onBack={onReviewBack}
             onConfirm={onReviewConfirm}
-          />
-        )
-      case 'wallet':
-        return (
-          <DepositWalletApproveScreen
-            amount={amount}
-            networkName={walletNetworkName}
-            walletAddress={walletAddress}
-            signStepLabel="Sign send transaction"
-            onComplete={onWalletComplete}
-            onCancel={onWalletCancel}
           />
         )
       case 'processing':

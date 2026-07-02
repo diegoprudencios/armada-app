@@ -4,6 +4,7 @@ import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import { hasActiveAmount, amountExceedsBalance, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
+import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import { calculateSendFee } from '@/utils/sendFee'
 import { formatUsdcAmount, formatWalletBalance } from '@/utils/format'
 import {
@@ -44,11 +45,12 @@ export function EarnAmountScreen({
   const amountInputRef = useRef<HTMLInputElement>(null)
   const balanceDisplay = formatWalletBalance(balance)
   const balanceInputValue = balanceDisplay.replace(/,/g, '')
-  const showFee = hasActiveAmount(amount)
+  const hasAmount = hasActiveAmount(amount)
   const exceedsBalance = amountExceedsBalance(amount, balance)
-  const canReview = showFee && !exceedsBalance
+  const canReview = hasAmount && !exceedsBalance
   const feeUsdc = calculateSendFee(parseActiveAmount(amount))
-  const feeLabel = `${formatUsdcAmount(feeUsdc, 2)} USDC`
+  const feeLabel = formatProtocolFeeLabel(feeUsdc)
+  const showFeeRow = hasAmount && feeUsdc > 0
 
   function handleAmountChange(raw: string) {
     const next = sanitizeAmountInput(raw)
@@ -153,8 +155,8 @@ export function EarnAmountScreen({
             </div>
 
             <div
-              className={[styles.feeReveal, showFee && styles.feeRevealOpen].filter(Boolean).join(' ')}
-              aria-hidden={!showFee}
+              className={[styles.feeReveal, showFeeRow && styles.feeRevealOpen].filter(Boolean).join(' ')}
+              aria-hidden={!showFeeRow}
             >
               <div className={styles.feeRow}>
                 <span className={styles.feeLabel}>Fee</span>
