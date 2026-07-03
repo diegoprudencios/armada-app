@@ -110,6 +110,28 @@ function readInitialActivityVisible(): boolean {
   return readActivityPanelVisible()
 }
 
+/** Heal demo sessions where receive-link activity was saved but balance was not credited. */
+function healUncreditedReceiveLinkBalance(
+  items: readonly DashboardActivityItem[],
+  balance: number,
+): number {
+  if (balance > 0) return balance
+  if (!items.some((item) => item.kind === 'receiveLink')) return balance
+  if (items.some((item) => item.kind === 'deposit' || item.kind === 'send' || item.kind === 'withdraw')) {
+    return balance
+  }
+
+  return items
+    .filter((item): item is Extract<DashboardActivityItem, { kind: 'receiveLink' }> => item.kind === 'receiveLink')
+    .reduce((sum, item) => sum + item.paidAmount, 0)
+}
+
+function readHealedInitialBalance(fallback: number): number {
+  if (getCurrentEnvironment() !== 'mock') return fallback
+  const stored = readDemoDashboardSession()?.balance ?? fallback
+  return healUncreditedReceiveLinkBalance(readInitialRecentActivity(), stored)
+}
+
 export function useDashboardDemoState(initialBalance = 0) {
   const [environment] = useEnvironment()
   const isMock = environment === 'mock'
@@ -117,7 +139,7 @@ export function useDashboardDemoState(initialBalance = 0) {
   const [wallet, setWallet] = useState<DemoWallet | null>(readInitialWallet)
   const [connectedWallets, setConnectedWallets] = useState<ConnectedWallet[]>(readInitialConnectedWallets)
   const [activeWalletId, setActiveWalletId] = useState<string | null>(readInitialActiveWalletId)
-  const [dashboardBalance, setDashboardBalance] = useState(() => readInitialBalance(initialBalance))
+  const [dashboardBalance, setDashboardBalance] = useState(() => readHealedInitialBalance(initialBalance))
   const [hasCompletedDeposit, setHasCompletedDeposit] = useState(readInitialHasCompletedDeposit)
   const [connectOpen, setConnectOpen] = useState(false)
   const [depositStep, setDepositStep] = useState<DepositStep | null>(null)
@@ -167,6 +189,8 @@ export function useDashboardDemoState(initialBalance = 0) {
   const pendingEarnRef = useRef<{ amount: number; tab: EarnTab } | null>(null)
   const pendingWithdrawRef = useRef(0)
   const pendingPayViaLinkRef = useRef<PendingPayViaLink | null>(null)
+  const recentActivityRef = useRef(recentActivity)
+  recentActivityRef.current = recentActivity
   const activityReceiptRef = useRef(false)
   const activityRevealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const linkPaymentTimerRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
@@ -184,45 +208,83 @@ export function useDashboardDemoState(initialBalance = 0) {
     linkPaymentTimerRef.current.clear()
   }
 
-  function creditRequestLinkPayment(requestId: string, paidAmount: number, note?: string): boolean {
-    if (isPaymentLinkRevoked(requestId)) return false
-
-    const txHash = createDemoTxHash()
-    const paidAt = Date.now()
-    let creditedAmount = 0
-
-    setRecentActivity((items) => {
-      const result = addReceiveLinkPaymentToActivities(
-        items,
-        requestId,
-        paidAmount,
-        note,
-        paidAt,
-        txHash,
-      )
-      if (!result) return items
-
-      creditedAmount = result.paidAmount
-      return result.items
-    })
-
-    if (creditedAmount <= 0) return false
+  function creditBalanceIncrease(amount: number) {
+    if (amount <= 0) return
 
     setDashboardBalance((prev) => {
-      const fromValue = formatUsdcAmount(prev)
-      const next = prev + creditedAmount
+      const next = prev + amount
       setBalanceRoll((roll) => ({
         trigger: roll.trigger + 1,
         mode: 'fromValue',
-        fromValue,
+        fromValue: formatUsdcAmount(prev),
       }))
       if (!readActivityUserHidden()) {
         scheduleActivityReveal(activityRevealDelayAfterRollMs(formatUsdcAmount(next)))
       }
       return next
     })
+  }
 
-    return true
+  function tryApplyReceiveLinkPayment(
+    requestId: string,
+    paidAmount: number,
+    note?: string,
+  ): number {
+    if (isPaymentLinkRevoked(requestId)) return 0
+
+    const result = addReceiveLinkPaymentToActivities(
+      recentActivityRef.current,
+      requestId,
+      paidAmount,
+      note,
+      Date.now(),
+      createDemoTxHash(),
+    )
+    if (!result) return 0
+
+    recentActivityRef.current = result.items
+    setRecentActivity(result.items)
+    creditBalanceIncrease(result.paidAmount)
+    return result.paidAmount
+  }
+
+  function ensureReceiveLinkBalanceCredited(requestId: string) {
+    const receive = recentActivityRef.current.find(
+      (item): item is Extract<DashboardActivityItem, { kind: 'receiveLink' }> =>
+        item.kind === 'receiveLink' && item.requestId === requestId,
+    )
+    if (!receive) return
+
+    setDashboardBalance((prev) => {
+      if (prev >= receive.paidAmount) return prev
+
+      const next = receive.paidAmount
+      setBalanceRoll((roll) => ({
+        trigger: roll.trigger + 1,
+        mode: 'fromValue',
+        fromValue: formatUsdcAmount(prev),
+      }))
+      if (!readActivityUserHidden()) {
+        scheduleActivityReveal(activityRevealDelayAfterRollMs(formatUsdcAmount(next)))
+      }
+      return next
+    })
+  }
+
+  function settleReceiveLinkPayment(
+    requestId: string,
+    paidAmount: number,
+    note?: string,
+  ) {
+    clearLinkPaymentTimer(requestId)
+    const credited = tryApplyReceiveLinkPayment(requestId, paidAmount, note)
+    if (credited <= 0) {
+      ensureReceiveLinkBalanceCredited(requestId)
+    }
+  }
+
+  function creditRequestLinkPayment(requestId: string, paidAmount: number, note?: string): boolean {
+    return tryApplyReceiveLinkPayment(requestId, paidAmount, note) > 0
   }
 
   function scheduleRequestLinkPaymentDemo(payload: {
@@ -428,47 +490,13 @@ export function useDashboardDemoState(initialBalance = 0) {
 
     if (sent > 0) {
       const pendingPay = pendingPayViaLinkRef.current
-      const txHash = createDemoTxHash()
-      const paidAt = Date.now()
-      let linkPaymentRecorded = false
 
       if (pendingPay) {
-        clearLinkPaymentTimer(pendingPay.requestId)
-      }
+        settleReceiveLinkPayment(pendingPay.requestId, sent, pendingPay.note)
+        pendingPayViaLinkRef.current = null
+      } else {
+        setRecentActivity((items) => prependActivity(items, createSendActivity(sent, recipient, chain)))
 
-      setRecentActivity((items) => {
-        if (pendingPay) {
-          const result = addReceiveLinkPaymentToActivities(
-            items,
-            pendingPay.requestId,
-            sent,
-            pendingPay.note,
-            paidAt,
-            txHash,
-          )
-          if (!result) return items
-
-          linkPaymentRecorded = true
-          return result.items
-        }
-
-        return prependActivity(items, createSendActivity(sent, recipient, chain))
-      })
-
-      if (pendingPay && linkPaymentRecorded) {
-        setDashboardBalance((prev) => {
-          const next = prev + sent
-          setBalanceRoll((roll) => ({
-            trigger: roll.trigger + 1,
-            mode: 'fromValue',
-            fromValue: formatUsdcAmount(prev),
-          }))
-          if (!readActivityUserHidden()) {
-            scheduleActivityReveal(activityRevealDelayAfterRollMs(formatUsdcAmount(next)))
-          }
-          return next
-        })
-      } else if (!pendingPay) {
         setDashboardBalance((prev) => {
           setBalanceRoll((roll) => ({
             trigger: roll.trigger + 1,
@@ -481,8 +509,6 @@ export function useDashboardDemoState(initialBalance = 0) {
           scheduleActivityReveal(activityRevealDelayMs())
         }
       }
-
-      pendingPayViaLinkRef.current = null
     }
   }
 
@@ -490,9 +516,17 @@ export function useDashboardDemoState(initialBalance = 0) {
     if (activityReceiptRef.current) return
 
     const sent = parseActiveAmount(sendAmount)
-    if (sent > 0) {
-      pendingSendRef.current = sent
+    if (sent <= 0) return
+
+    const pendingPay = pendingPayViaLinkRef.current
+    if (pendingPay) {
+      settleReceiveLinkPayment(pendingPay.requestId, sent, pendingPay.note)
+      pendingPayViaLinkRef.current = null
+      pendingSendRef.current = 0
+      return
     }
+
+    pendingSendRef.current = sent
   }
 
   function openDeposit() {
