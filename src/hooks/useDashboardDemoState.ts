@@ -430,6 +430,7 @@ export function useDashboardDemoState(initialBalance = 0) {
       const pendingPay = pendingPayViaLinkRef.current
       const txHash = createDemoTxHash()
       const paidAt = Date.now()
+      let linkPaymentRecorded = false
 
       if (pendingPay) {
         clearLinkPaymentTimer(pendingPay.requestId)
@@ -445,30 +446,43 @@ export function useDashboardDemoState(initialBalance = 0) {
             paidAt,
             txHash,
           )
-          return result ? result.items : items
+          if (!result) return items
+
+          linkPaymentRecorded = true
+          return result.items
         }
 
         return prependActivity(items, createSendActivity(sent, recipient, chain))
       })
 
-      const fromValue = formatUsdcAmount(dashboardBalance)
-      setDashboardBalance((prev) => {
-        const afterSend = prev - sent
-        return pendingPay ? afterSend + sent : afterSend
-      })
-
-      if (!pendingPay) {
-        setBalanceRoll((roll) => ({
-          trigger: roll.trigger + 1,
-          mode: 'fromValue',
-          fromValue,
-        }))
+      if (pendingPay && linkPaymentRecorded) {
+        setDashboardBalance((prev) => {
+          const next = prev + sent
+          setBalanceRoll((roll) => ({
+            trigger: roll.trigger + 1,
+            mode: 'fromValue',
+            fromValue: formatUsdcAmount(prev),
+          }))
+          if (!readActivityUserHidden()) {
+            scheduleActivityReveal(activityRevealDelayAfterRollMs(formatUsdcAmount(next)))
+          }
+          return next
+        })
+      } else if (!pendingPay) {
+        setDashboardBalance((prev) => {
+          setBalanceRoll((roll) => ({
+            trigger: roll.trigger + 1,
+            mode: 'fromValue',
+            fromValue: formatUsdcAmount(prev),
+          }))
+          return prev - sent
+        })
+        if (!readActivityUserHidden()) {
+          scheduleActivityReveal(activityRevealDelayMs())
+        }
       }
 
       pendingPayViaLinkRef.current = null
-      if (!readActivityUserHidden()) {
-        scheduleActivityReveal(activityRevealDelayMs())
-      }
     }
   }
 
