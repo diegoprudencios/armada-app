@@ -68,6 +68,18 @@ function prefersReducedMotion(): boolean {
 }
 
 const BALANCE_CLUSTER_GAP_PX = 8
+const BALANCE_BASE_FONT_SIZE_PX = 40
+const BALANCE_MIN_FONT_SIZE_PX = 24
+
+function fitBalanceFontSize(rowWidth: number, naturalTextWidth: number): number {
+  const maxTextWidth = Math.max(0, rowWidth - TOKEN_BADGE_PX - BALANCE_CLUSTER_GAP_PX)
+  if (maxTextWidth === 0 || naturalTextWidth <= maxTextWidth) {
+    return BALANCE_BASE_FONT_SIZE_PX
+  }
+
+  const scaled = (BALANCE_BASE_FONT_SIZE_PX * maxTextWidth) / naturalTextWidth
+  return Math.max(BALANCE_MIN_FONT_SIZE_PX, scaled)
+}
 
 function estimateDepositRollDurationMs(formattedBalance: string): number {
   const digitCount = formattedBalance.replace(/\D/g, '').length
@@ -203,9 +215,11 @@ export function BalanceCard({
   }
   const [peekBalance, setPeekBalance] = useState(false)
   const [balanceIntroPlaying, setBalanceIntroPlaying] = useState(() => !prefersReducedMotion())
+  const balanceRowRef = useRef<HTMLDivElement>(null)
   const balanceValueRef = useRef<HTMLSpanElement>(null)
   const balanceValueSizerRef = useRef<HTMLSpanElement>(null)
   const [balanceOffset, setBalanceOffset] = useState('0px')
+  const [balanceFontSize, setBalanceFontSize] = useState(BALANCE_BASE_FONT_SIZE_PX)
   const [lockedWidth, setLockedWidth] = useState<number | null>(null)
   const [completedRollTrigger, setCompletedRollTrigger] = useState(0)
   const [armadaAddressCopied, setArmadaAddressCopied] = useState(false)
@@ -307,7 +321,34 @@ export function BalanceCard({
     const width = balanceValueSizerRef.current?.scrollWidth
     if (!width) return
     setLockedWidth(width)
-  }, [balanceIntroPlaying, formattedBalance])
+  }, [balanceIntroPlaying, formattedBalance, balanceFontSize])
+
+  useLayoutEffect(() => {
+    if (balanceIntroPlaying) {
+      setBalanceFontSize(BALANCE_BASE_FONT_SIZE_PX)
+      return
+    }
+
+    const row = balanceRowRef.current
+    const balanceValue = balanceValueRef.current
+    const sizer = balanceValueSizerRef.current
+    if (!row || !balanceValue || !sizer) return
+
+    const updateFit = () => {
+      balanceValue.style.setProperty('font-size', `${BALANCE_BASE_FONT_SIZE_PX}px`)
+      balanceValue.style.setProperty('line-height', `${BALANCE_BASE_FONT_SIZE_PX}px`)
+      const naturalWidth = sizer.scrollWidth
+      balanceValue.style.removeProperty('font-size')
+      balanceValue.style.removeProperty('line-height')
+      setBalanceFontSize(fitBalanceFontSize(row.clientWidth, naturalWidth))
+    }
+
+    updateFit()
+
+    const observer = new ResizeObserver(updateFit)
+    observer.observe(row)
+    return () => observer.disconnect()
+  }, [formattedBalance, balanceIntroPlaying])
 
   const showBalance = !balanceHidden || peekBalance
   const depositRollActive =
@@ -378,11 +419,14 @@ export function BalanceCard({
         ref={balanceValueRef}
         className={styles.balanceValue}
         style={
-          balanceIntroPlaying
-            ? undefined
-            : lockBalanceWidth
-              ? { width: lockedWidth ?? 'max-content' }
-              : undefined
+          {
+            '--balance-font-size': `${balanceFontSize}px`,
+            ...(balanceIntroPlaying
+              ? undefined
+              : lockBalanceWidth
+                ? { width: lockedWidth ?? 'max-content' }
+                : undefined),
+          } as React.CSSProperties
         }
         aria-label={showBalance ? formattedBalance : 'Balance hidden'}
       >
@@ -504,7 +548,7 @@ export function BalanceCard({
         </div>
 
         <div className={styles.cardBodyBalance}>
-          <div className={styles.balanceRow} {...balancePeekHandlers}>
+          <div className={styles.balanceRow} ref={balanceRowRef} {...balancePeekHandlers}>
             {balanceIntroPlaying ? (
               <div
                 className={[styles.balanceCluster, styles.balanceClusterIntro].join(' ')}
