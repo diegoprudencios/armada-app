@@ -128,8 +128,8 @@ export function sendProgressCardCopy(mode: SendProcessingCopyMode): TxProgressCa
   if (mode === 'private') {
     return {
       tag: 'Private send in progress',
-      title: 'This transfer is fully private',
-      titleBreakAfter: 'is',
+      title: 'Sending your USDC privately',
+      titleBreakAfter: 'your',
       subtitle: 'Only you and the recipient can see this payment.',
     }
   }
@@ -145,8 +145,8 @@ export function earnProgressCardCopy(tab: EarnTab): TxProgressCardCopy {
   if (tab === 'add') {
     return {
       tag: earnProcessingTitle('add'),
-      title: 'Your funds are entering the vault',
-      titleBreakAfter: 'are',
+      title: 'Depositing funds into the vault',
+      titleBreakAfter: 'funds',
       subtitle: 'USDC is being deposited to start earning yield.',
     }
   }
