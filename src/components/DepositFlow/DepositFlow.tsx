@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Steps } from '@/components/Steps'
 import type { DepositChainId } from '@/components/DepositAmountCard'
+import { DepositProcessingStepper } from '@/components/DepositProcessingStepper'
 import {
   DepositStep1AmountContent,
   DepositStep1AmountFooter,
@@ -9,7 +10,7 @@ import {
   DepositStep2ReviewContent,
   DepositStep2ReviewFooter,
 } from '@/components/DepositFlow/steps/DepositStep2Review'
-import { DepositStep3Processing } from '@/components/DepositFlow/steps/DepositStep3Processing'
+import { scheduleTxProcessingDemo } from '@/constants/txProcessingTiming'
 import { DEPOSIT_PROGRESS_STEPS, DEPOSIT_WALLET_BALANCE } from '@/pages/depositFlowConstants'
 import { maxDepositAmount } from '@/utils/depositFee'
 import styles from './DepositFlow.module.css'
@@ -29,6 +30,22 @@ export function DepositFlow({ onClose, initialAmount = '1000' }: DepositFlowProp
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [amount, setAmount] = useState(initialAmount)
   const [chain, setChain] = useState<DepositChainId>('sepolia')
+  const [activeStageIndex, setActiveStageIndex] = useState(0)
+  const [completed, setCompleted] = useState(false)
+
+  useEffect(() => {
+    if (step !== 3) {
+      setActiveStageIndex(0)
+      setCompleted(false)
+      return
+    }
+
+    return scheduleTxProcessingDemo({
+      onStageChange: setActiveStageIndex,
+      onCompleted: () => setCompleted(true),
+      onComplete: () => undefined,
+    })
+  }, [step])
 
   function handleMax() {
     setAmount(String(maxDepositAmount(BALANCE_NUM)))
@@ -60,7 +77,9 @@ export function DepositFlow({ onClose, initialAmount = '1000' }: DepositFlowProp
           <DepositStep2ReviewContent amount={amount} chain={CHAIN_LABEL} />
         ) : null}
 
-        {step === 3 ? <DepositStep3Processing onCancel={onClose} /> : null}
+        {step === 3 ? (
+          <DepositProcessingStepper activeStageIndex={activeStageIndex} completed={completed} />
+        ) : null}
 
         {step === 1 ? (
           <DepositStep1AmountFooter

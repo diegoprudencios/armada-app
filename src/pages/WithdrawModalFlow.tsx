@@ -35,7 +35,6 @@ export interface WithdrawModalFlowProps {
   onAmountReview: (amount: string) => void
   onReviewBack: () => void
   onReviewConfirm: () => void
-  onProcessingCancel: () => void
   onProcessingComplete: () => void
   onConfirmedViewExplorer?: () => void
   onConfirmedGoToDashboard: () => void
@@ -58,7 +57,6 @@ export function WithdrawModalFlow({
   onAmountReview,
   onReviewBack,
   onReviewConfirm,
-  onProcessingCancel,
   onProcessingComplete,
   onConfirmedViewExplorer,
   onConfirmedGoToDashboard,
@@ -119,7 +117,6 @@ export function WithdrawModalFlow({
             confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
             variant="withdraw"
-            onCancel={onProcessingCancel}
             onComplete={onProcessingComplete}
             onViewExplorer={onConfirmedViewExplorer}
             onGoToDashboard={handleConfirmedGoToDashboard}

@@ -62,7 +62,7 @@ export function EarnConfirmedScreen({
           onClick={onViewExplorer}
         />
         <Button
-          variant="gradient"
+          variant="primary"
           size="lg"
           label="Go to dashboard"
           showIcon={false}

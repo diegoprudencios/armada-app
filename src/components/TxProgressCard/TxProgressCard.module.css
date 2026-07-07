@@ -1,0 +1,131 @@
+.card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 420px;
+  margin-inline: auto;
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+  display: flex;
+  overflow: hidden;
+
+  /* EXCEPTION — brand gradient as surface for the in-progress emotional beat. */
+  background: linear-gradient(
+    165deg,
+    var(--semantic-color-brand-lavender) 0%,
+    #d9a7c9 35%,
+    #e8bfa8 65%,
+    var(--semantic-color-brand-amber) 100%
+  );
+}
+
+.tickRing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 56%;
+  height: 56%;
+  transform: translate(-50%, -50%);
+}
+
+.tick {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.5px;
+  height: 16px;
+  border-radius: calc(var(--primitives-borderRadius-sm) * 0.5px);
+  /* EXCEPTION — ticks stay white on the fixed light gradient surface. */
+  background: #ffffff;
+  transform-origin: 50% 105px;
+  transform: translate(-50%, -105px) rotate(calc(var(--i) * 6deg));
+  opacity: 0.4;
+  animation: tickSweep 2.1s linear infinite;
+  animation-delay: calc(var(--i) * 0.035s);
+}
+
+@keyframes tickSweep {
+  0% {
+    opacity: 1;
+    width: 3px;
+  }
+
+  12% {
+    opacity: 0.7;
+    width: 2.25px;
+  }
+
+  30% {
+    opacity: 0.45;
+    width: 1.5px;
+  }
+
+  100% {
+    opacity: 0.4;
+    width: 1.5px;
+  }
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-items: center;
+  width: 100%;
+  min-height: 100%;
+  padding: var(--primitives-spacing-6) var(--primitives-spacing-8);
+  text-align: center;
+}
+
+.tag {
+  margin: 0;
+  align-self: start;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  line-height: var(--primitives-lineHeight-none);
+  letter-spacing: var(--semantic-typography-ui-label-tag-letter-spacing);
+  text-transform: uppercase;
+  /* EXCEPTION — tag stays white on the fixed light gradient surface. */
+  color: #ffffff;
+}
+
+.titleBlock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding-inline: var(--primitives-spacing-3);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-display), serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-4xl) * 1px);
+  line-height: 1.1;
+  letter-spacing: var(--primitives-letterSpacing-tight);
+  /* EXCEPTION — headline stays white on the fixed light gradient surface. */
+  color: #ffffff;
+}
+
+.subtitle {
+  margin: 0;
+  align-self: end;
+  width: 100%;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  line-height: 1.4;
+  white-space: nowrap;
+  /* EXCEPTION — dark subtitle on the fixed light gradient surface. */
+  color: rgb(14 13 15 / 65%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tick {
+    animation: none;
+    opacity: 0.55;
+    width: 1.5px;
+  }
+}

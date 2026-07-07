@@ -129,7 +129,6 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onReviewConfirm={() => setDepositStep('wallet')}
           onWalletComplete={() => setDepositStep('processing')}
           onWalletCancel={() => setDepositStep('review')}
-          onProcessingCancel={() => setDepositStep('review')}
           onProcessingComplete={() => {
             setDepositConfirmedAt(Date.now())
             setDepositStep('confirmed')
@@ -159,7 +158,6 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           }}
           onReviewBack={() => setSendStep('amount')}
           onReviewConfirm={() => setSendStep('processing')}
-          onProcessingCancel={() => setSendStep('review')}
           onProcessingComplete={() => {
             setSendConfirmedAt(Date.now())
             setSendStep('confirmed')
@@ -184,7 +182,6 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           }}
           onReviewBack={() => setEarnStep('amount')}
           onReviewConfirm={() => setEarnStep('processing')}
-          onProcessingCancel={() => setEarnStep('review')}
           onProcessingComplete={() => {
             setEarnConfirmedAt(Date.now())
             setEarnStep('confirmed')
@@ -214,7 +211,6 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           }}
           onReviewBack={() => setWithdrawStep('amount')}
           onReviewConfirm={() => setWithdrawStep('processing')}
-          onProcessingCancel={() => setWithdrawStep('review')}
           onProcessingComplete={() => {
             setWithdrawConfirmedAt(Date.now())
             setWithdrawStep('confirmed')

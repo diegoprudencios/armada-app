@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
 import { DepositProcessingStepper } from '@/components/DepositProcessingStepper'
+import { scheduleTxProcessingDemo } from '@/constants/txProcessingTiming'
 import { DepositConfirmedScreen } from '@/pages/DepositConfirmedScreen'
 import styles from './DepositProcessingScreen.module.css'
-
-const DEMO_PROCESSING_MS = 8000
-const STAGE_ADVANCE_MS = 2500
 
 export interface DepositProcessingScreenProps {
   amount: string
@@ -14,7 +12,6 @@ export interface DepositProcessingScreenProps {
   armadaAddress?: string
   confirmedAt: number
   confirmed?: boolean
-  onCancel: () => void
   onComplete: () => void
   onViewExplorer?: () => void
   onGoToDashboard: () => void
@@ -28,25 +25,21 @@ export function DepositProcessingScreen({
   armadaAddress,
   confirmedAt,
   confirmed = false,
-  onCancel,
   onComplete,
   onViewExplorer,
   onGoToDashboard,
 }: DepositProcessingScreenProps) {
   const [activeStageIndex, setActiveStageIndex] = useState(0)
+  const [completed, setCompleted] = useState(false)
 
   useEffect(() => {
     if (confirmed) return
 
-    const stageTimers = [
-      window.setTimeout(() => setActiveStageIndex(1), STAGE_ADVANCE_MS),
-      window.setTimeout(() => setActiveStageIndex(2), STAGE_ADVANCE_MS * 2),
-    ]
-    const completeTimer = window.setTimeout(onComplete, DEMO_PROCESSING_MS)
-    return () => {
-      stageTimers.forEach(window.clearTimeout)
-      window.clearTimeout(completeTimer)
-    }
+    return scheduleTxProcessingDemo({
+      onStageChange: setActiveStageIndex,
+      onCompleted: () => setCompleted(true),
+      onComplete,
+    })
   }, [confirmed, onComplete])
 
   if (confirmed) {
@@ -66,7 +59,7 @@ export function DepositProcessingScreen({
 
   return (
     <div className={styles.column}>
-      <DepositProcessingStepper activeStageIndex={activeStageIndex} onCancel={onCancel} />
+      <DepositProcessingStepper activeStageIndex={activeStageIndex} completed={completed} />
     </div>
   )
 }

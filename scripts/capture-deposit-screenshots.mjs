@@ -36,7 +36,7 @@ async function goToReview(page) {
 async function goToProcessing(page) {
   await goToReview(page)
   await page.getByRole('button', { name: 'Confirm deposit' }).click()
-  await page.getByText('Pending').waitFor()
+  await page.getByText('Your assets are being shielded.').waitFor()
 }
 
 async function goToConfirmed(page) {

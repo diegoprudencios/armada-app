@@ -34,7 +34,6 @@ export function DepositFlowDemo() {
       onReviewConfirm={() => setStep('wallet')}
       onWalletComplete={() => setStep('processing')}
       onWalletCancel={() => setStep('review')}
-      onProcessingCancel={() => setStep('review')}
       onProcessingComplete={() => {
         setConfirmedAt(Date.now())
         setStep('confirmed')

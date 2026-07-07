@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:processing": "vite --open /tx-processing.html",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tokens:sync": "node scripts/sync-tokens.mjs"

@@ -74,7 +74,7 @@ export function DepositConfirmedScreen({
             onClick={onViewExplorer}
           />
           <Button
-            variant="gradient"
+            variant="primary"
             size="lg"
             label="Go to dashboard"
             showIcon={false}

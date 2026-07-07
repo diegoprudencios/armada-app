@@ -57,7 +57,7 @@ export function RequestPaidConfirmedScreen({
 
       <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>
         <Button variant="secondary" size="lg" label="View on explorer" showIcon={false} onClick={onViewExplorer} />
-        <Button variant="gradient" size="lg" label="Go to dashboard" showIcon={false} onClick={onGoToDashboard} />
+        <Button variant="primary" size="lg" label="Go to dashboard" showIcon={false} onClick={onGoToDashboard} />
       </div>
     </div>
   )

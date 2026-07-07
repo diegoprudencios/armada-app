@@ -81,3 +81,15 @@ export function sendProcessingFinalStageLabel(variant: SendFlowVariant): string 
 export function sendProcessingKind(variant: SendFlowVariant): string {
   return variant === 'withdraw' ? 'unshield-local' : 'send'
 }
+
+/** Processing copy bucket for send — private Armada, external 0x, or withdraw flow. */
+export type SendProcessingCopyMode = 'private' | 'external' | 'withdraw'
+
+export function sendProcessingCopyMode(
+  variant: SendFlowVariant,
+  recipient?: string,
+): SendProcessingCopyMode {
+  if (variant === 'withdraw') return 'withdraw'
+  if (recipient && isArmadaAddress(recipient)) return 'private'
+  return 'external'
+}

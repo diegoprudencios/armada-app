@@ -26,7 +26,6 @@ export interface EarnModalFlowProps {
   onAmountReview: (amount: string) => void
   onReviewBack: () => void
   onReviewConfirm: () => void
-  onProcessingCancel: () => void
   onProcessingComplete: () => void
   onConfirmedViewExplorer?: () => void
   onConfirmedGoToDashboard: () => void
@@ -44,7 +43,6 @@ export function EarnModalFlow({
   onAmountReview,
   onReviewBack,
   onReviewConfirm,
-  onProcessingCancel,
   onProcessingComplete,
   onConfirmedViewExplorer,
   onConfirmedGoToDashboard,
@@ -89,7 +87,6 @@ export function EarnModalFlow({
             amount={amount}
             confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
-            onCancel={onProcessingCancel}
             onComplete={onProcessingComplete}
             onViewExplorer={onConfirmedViewExplorer}
             onGoToDashboard={handleConfirmedGoToDashboard}

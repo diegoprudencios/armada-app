@@ -38,7 +38,6 @@ export interface DepositModalFlowProps {
   onReviewConfirm: () => void
   onWalletComplete: () => void
   onWalletCancel: () => void
-  onProcessingCancel: () => void
   onProcessingComplete: () => void
   onConfirmedViewExplorer?: () => void
   onConfirmedGoToDashboard: () => void
@@ -59,7 +58,6 @@ export function DepositModalFlow({
   onReviewConfirm,
   onWalletComplete,
   onWalletCancel,
-  onProcessingCancel,
   onProcessingComplete,
   onConfirmedViewExplorer,
   onConfirmedGoToDashboard,
@@ -118,7 +116,6 @@ export function DepositModalFlow({
             walletProvider={walletProvider}
             confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
-            onCancel={onProcessingCancel}
             onComplete={onProcessingComplete}
             onViewExplorer={onConfirmedViewExplorer}
             onGoToDashboard={handleConfirmedGoToDashboard}

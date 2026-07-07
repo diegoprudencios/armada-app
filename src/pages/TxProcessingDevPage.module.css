@@ -1,0 +1,130 @@
+.toolbar {
+  position: fixed;
+  left: 50%;
+  bottom: var(--primitives-spacing-5);
+  z-index: 200;
+  transform: translateX(-50%);
+  width: min(100% - var(--primitives-spacing-8), 640px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-3);
+  padding: var(--primitives-spacing-4) var(--primitives-spacing-5);
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+  background: color-mix(in srgb, var(--semantic-color-surface-default) 92%, transparent);
+  border: 1px solid var(--semantic-color-border-default);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.toolbarMinimized {
+  gap: var(--primitives-spacing-2);
+  width: auto;
+  min-width: min(100% - var(--primitives-spacing-8), 420px);
+}
+
+.toolbarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--primitives-spacing-3);
+}
+
+.toolbarLabel {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  letter-spacing: var(--primitives-letterSpacing-wider);
+  text-transform: uppercase;
+  color: var(--semantic-color-text-muted);
+}
+
+.minimizeButton {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  background: var(--semantic-color-surface-raised);
+  color: var(--semantic-color-text-secondary);
+  cursor: pointer;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  line-height: 1;
+  padding: var(--primitives-spacing-1) var(--primitives-spacing-3);
+}
+
+.minimizeButton:hover {
+  color: var(--semantic-color-text-primary);
+  border-color: var(--semantic-color-border-lavender);
+}
+
+.minimizedSummary {
+  width: 100%;
+  border: none;
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
+  background: var(--semantic-color-surface-raised);
+  color: var(--semantic-color-text-secondary);
+  cursor: pointer;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  line-height: 1.4;
+  padding: var(--primitives-spacing-2) var(--primitives-spacing-3);
+  text-align: left;
+}
+
+.minimizedSummary:hover {
+  color: var(--semantic-color-text-primary);
+  background: color-mix(in srgb, var(--semantic-color-brand-lavender) 8%, var(--semantic-color-surface-raised));
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-2);
+}
+
+.controlCaption {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  color: var(--semantic-color-text-muted);
+}
+
+.controlHint {
+  margin: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-regular);
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  color: var(--semantic-color-text-muted);
+  line-height: 1.4;
+}
+
+.pillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--primitives-spacing-2);
+}
+
+.pill {
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  background: var(--semantic-color-surface-raised);
+  color: var(--semantic-color-text-secondary);
+  cursor: pointer;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  line-height: 1;
+  padding: var(--primitives-spacing-2) var(--primitives-spacing-3);
+}
+
+.pill:hover {
+  color: var(--semantic-color-text-primary);
+  border-color: var(--semantic-color-border-lavender);
+}
+
+.pillActive {
+  color: var(--semantic-color-text-primary);
+  border-color: var(--semantic-color-brand-lavender);
+  background: color-mix(in srgb, var(--semantic-color-brand-lavender) 12%, transparent);
+}

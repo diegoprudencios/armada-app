@@ -361,7 +361,6 @@ export function Showcase() {
           <div className={styles.narrow}>
             <DepositProcessingStepper
               activeStageIndex={processingStage}
-              onCancel={() => undefined}
             />
           </div>
         </div>

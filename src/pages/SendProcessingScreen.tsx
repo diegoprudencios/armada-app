@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react'
 import { SendProcessingStepper } from '@/components/SendProcessingStepper'
+import { scheduleTxProcessingDemo } from '@/constants/txProcessingTiming'
 import { SendConfirmedScreen } from '@/pages/SendConfirmedScreen'
 import type { SendChainId, SendFlowVariant } from './sendFlowConstants'
 import styles from './SendProcessingScreen.module.css'
-
-const DEMO_PROCESSING_MS = 8000
-const STAGE_ADVANCE_MS = 2500
 
 export interface SendProcessingScreenProps {
   amount: string
@@ -15,7 +13,6 @@ export interface SendProcessingScreenProps {
   confirmedAt: number
   confirmed?: boolean
   variant?: SendFlowVariant
-  onCancel: () => void
   onComplete: () => void
   onViewExplorer?: () => void
   onGoToDashboard: () => void
@@ -29,25 +26,21 @@ export function SendProcessingScreen({
   confirmedAt,
   confirmed = false,
   variant = 'send',
-  onCancel,
   onComplete,
   onViewExplorer,
   onGoToDashboard,
 }: SendProcessingScreenProps) {
   const [activeStageIndex, setActiveStageIndex] = useState(0)
+  const [completed, setCompleted] = useState(false)
 
   useEffect(() => {
     if (confirmed) return
 
-    const stageTimers = [
-      window.setTimeout(() => setActiveStageIndex(1), STAGE_ADVANCE_MS),
-      window.setTimeout(() => setActiveStageIndex(2), STAGE_ADVANCE_MS * 2),
-    ]
-    const completeTimer = window.setTimeout(onComplete, DEMO_PROCESSING_MS)
-    return () => {
-      stageTimers.forEach(window.clearTimeout)
-      window.clearTimeout(completeTimer)
-    }
+    return scheduleTxProcessingDemo({
+      onStageChange: setActiveStageIndex,
+      onCompleted: () => setCompleted(true),
+      onComplete,
+    })
   }, [confirmed, onComplete])
 
   if (confirmed) {
@@ -67,7 +60,12 @@ export function SendProcessingScreen({
 
   return (
     <div className={styles.column}>
-      <SendProcessingStepper activeStageIndex={activeStageIndex} variant={variant} onCancel={onCancel} />
+      <SendProcessingStepper
+        activeStageIndex={activeStageIndex}
+        completed={completed}
+        variant={variant}
+        recipient={recipient}
+      />
     </div>
   )
 }
