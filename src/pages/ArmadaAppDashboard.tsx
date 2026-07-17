@@ -8,6 +8,7 @@ import { DepositTooltip } from '@/components/DepositTooltip'
 import { RecentActivityList } from '@/components/RecentActivityList'
 import { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
 import { useRequireConnectedWallet } from '@/hooks/useRequireConnectedWallet'
+import { getDashboardVersionFromPath } from '@/utils/dashboardVersion'
 import { DashboardOverlays } from './DashboardOverlays'
 import { DashboardCardStack } from './DashboardCardStack'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
@@ -20,7 +21,7 @@ export interface ArmadaAppDashboardProps {
   onMore?: () => void
 }
 
-/** Dashboard layout v1 — shared shell with v2; default balance card actions. */
+/** Dashboard shell — v01/v02 layout selected from `/dashboard` vs `/dashboard-v2`. */
 export function ArmadaAppDashboard({
   balance: initialBalance = 0,
   onSend,
@@ -58,11 +59,14 @@ export function ArmadaAppDashboard({
 
   if (!wallet) return null
 
+  const dashboardVersion = getDashboardVersionFromPath()
+  const isV2 = dashboardVersion === 'v2'
   const showActivity = activityVisible && recentActivity.length > 0
 
   return (
     <div
       className={styles.shell}
+      data-dashboard-version={dashboardVersion}
       data-activity-visible={showActivity ? 'true' : 'false'}
       style={
         showActivity
@@ -87,6 +91,7 @@ export function ArmadaAppDashboard({
         />
       </div>
       <DashboardCardStack
+        stackClassName={isV2 ? styles.cardStackV2 : undefined}
         showDepositTooltip={showDepositTooltip}
         activityVisible={showActivity}
         tooltipEnterStyle={
@@ -101,6 +106,7 @@ export function ArmadaAppDashboard({
             balanceRollMode={balanceRoll.mode}
             balanceRollFromValue={balanceRoll.fromValue}
             hasActivityItems={recentActivity.length > 0}
+            actionLayout={isV2 ? 'v2' : undefined}
             onSend={onSend ?? openSend}
             onDeposit={openDeposit}
             onRequest={onRequest ?? openRequest}
@@ -124,7 +130,9 @@ export function ArmadaAppDashboard({
             onItemClick={openActivityReceipt}
           />
         }
-        depositTooltip={<DepositTooltip onDeposit={openDeposit} />}
+        depositTooltip={
+          <DepositTooltip variant={isV2 ? 'v2' : undefined} onDeposit={openDeposit} />
+        }
       />
 
       <DashboardOverlays state={state} />
