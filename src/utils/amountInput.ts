@@ -1,6 +1,13 @@
+import { formatWalletBalance } from '@/utils/format'
+
+/** Strip thousand-separator commas; canonical storage uses digits + optional decimal dot. */
+export function stripAmountGrouping(value: string): string {
+  return value.replace(/,/g, '')
+}
+
 /** Sanitize free-form decimal entry (digits + single dot, max 2 decimal places). */
 export function sanitizeAmountInput(raw: string): string {
-  const normalized = raw.replace(/,/g, '')
+  const normalized = stripAmountGrouping(raw)
   let out = ''
   let seenDecimal = false
   let decimalPlaces = 0
@@ -21,9 +28,30 @@ export function sanitizeAmountInput(raw: string): string {
   return out
 }
 
+/** Format sanitized amount for display with en-US thousand grouping (1,000 / 1,000,000). */
+export function formatAmountInputDisplay(sanitized: string): string {
+  if (!sanitized) return ''
+
+  const decimalIndex = sanitized.indexOf('.')
+  const intPart = decimalIndex === -1 ? sanitized : sanitized.slice(0, decimalIndex)
+  const decSuffix = decimalIndex === -1 ? '' : sanitized.slice(decimalIndex)
+
+  if (!intPart) {
+    return decSuffix ? `0${decSuffix}` : ''
+  }
+
+  const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return `${formattedInt}${decSuffix}`
+}
+
+/** Normalize numeric entry from buttons (Max / %) to sanitized storage. */
+export function formatSanitizedAmountFromNumber(value: number): string {
+  return sanitizeAmountInput(formatWalletBalance(value))
+}
+
 /** True when the user has a non-zero amount or is mid-decimal entry (e.g. "0."). */
 export function hasActiveAmount(value: string): boolean {
-  const trimmed = value.trim()
+  const trimmed = stripAmountGrouping(value).trim()
   if (!trimmed || trimmed === '.') return false
   if (trimmed.endsWith('.')) return true
   const num = parseFloat(trimmed)
@@ -33,7 +61,7 @@ export function hasActiveAmount(value: string): boolean {
 /** Parse active input to a capped numeric amount; zero when inactive or invalid. */
 export function parseActiveAmount(value: string, cap = Infinity): number {
   if (!hasActiveAmount(value)) return 0
-  const num = parseFloat(value)
+  const num = parseFloat(stripAmountGrouping(value))
   if (Number.isNaN(num)) return 0
   return Math.min(Math.max(0, num), cap)
 }

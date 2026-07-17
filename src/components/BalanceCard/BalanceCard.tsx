@@ -9,8 +9,7 @@ import {
   PlusIcon,
   QueueListIcon,
 } from '@heroicons/react/24/outline'
-import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
-import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { ShieldedUsdcBadge } from '@/components/ShieldedUsdcBadge'
 import { IconButton } from '@/components/IconButton'
 import { RollingBalanceValue, type BalanceRollMode } from '@/components/RollingBalanceValue'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
@@ -29,9 +28,9 @@ import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { formatUsdcAmount, truncateArmadaAddress } from '@/utils/format'
 import styles from './BalanceCard.module.css'
 
-const TOKEN_BADGE_PX = 40
-/** @web3icons branded assets use an 18px circle in a 24px viewBox — scale up to fill the badge. */
-const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
+const SHIELDED_BALANCE_BADGE_PX =
+  /* spacing-10 − spacing-1 — keep in sync with BalanceCard.module.css .shieldedBalanceBadge */
+  36
 
 export type BalanceCardActionLayout = 'default' | 'v2'
 
@@ -67,12 +66,11 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
-const BALANCE_CLUSTER_GAP_PX = 8
 const BALANCE_BASE_FONT_SIZE_PX = 40
 const BALANCE_MIN_FONT_SIZE_PX = 24
 
 function fitBalanceFontSize(rowWidth: number, naturalTextWidth: number): number {
-  const maxTextWidth = Math.max(0, rowWidth - TOKEN_BADGE_PX - BALANCE_CLUSTER_GAP_PX)
+  const maxTextWidth = Math.max(0, rowWidth)
   if (maxTextWidth === 0 || naturalTextWidth <= maxTextWidth) {
     return BALANCE_BASE_FONT_SIZE_PX
   }
@@ -218,7 +216,6 @@ export function BalanceCard({
   const balanceRowRef = useRef<HTMLDivElement>(null)
   const balanceValueRef = useRef<HTMLSpanElement>(null)
   const balanceValueSizerRef = useRef<HTMLSpanElement>(null)
-  const [balanceOffset, setBalanceOffset] = useState('0px')
   const [balanceFontSize, setBalanceFontSize] = useState(BALANCE_BASE_FONT_SIZE_PX)
   const [lockedWidth, setLockedWidth] = useState<number | null>(null)
   const [completedRollTrigger, setCompletedRollTrigger] = useState(0)
@@ -310,13 +307,6 @@ export function BalanceCard({
   }, [balanceRollTrigger, completedRollTrigger, formattedBalance])
 
   useLayoutEffect(() => {
-    if (!balanceIntroPlaying) return
-    const width = balanceValueRef.current?.getBoundingClientRect().width
-    if (!width) return
-    setBalanceOffset(`${(width + BALANCE_CLUSTER_GAP_PX) / 2}px`)
-  }, [balanceIntroPlaying, formattedBalance])
-
-  useLayoutEffect(() => {
     if (balanceIntroPlaying) return
     const width = balanceValueSizerRef.current?.scrollWidth
     if (!width) return
@@ -401,61 +391,42 @@ export function BalanceCard({
   )
 
   const balanceClusterLayers = (
-    <>
-      <div
-        className={styles.tokenBadge}
-        onAnimationEnd={
-          balanceIntroPlaying
-            ? (event) => {
-                if (event.target !== event.currentTarget) return
-                setBalanceIntroPlaying(false)
-              }
-            : undefined
-        }
-      >
-        <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
-      </div>
-      <span
-        ref={balanceValueRef}
-        className={styles.balanceValue}
-        style={
-          {
-            '--balance-font-size': `${balanceFontSize}px`,
-            ...(balanceIntroPlaying
-              ? undefined
-              : lockBalanceWidth
-                ? { width: lockedWidth ?? 'max-content' }
-                : undefined),
-          } as React.CSSProperties
-        }
-        aria-label={showBalance ? formattedBalance : 'Balance hidden'}
-      >
-        <span ref={balanceValueSizerRef} className={styles.balanceValueSizer} aria-hidden>
-          {formattedBalance}
-        </span>
-        <span
-          className={[
-            styles.balanceValueLayer,
-            styles.balanceValueLayerVisible,
-          ].join(' ')}
-        >
-          {showRollingBalance ? (
-            <RollingBalanceValue
-              value={formattedBalance}
-              enableRoll={balanceIntroPlaying ? balance > 0 : depositRollActive}
-              mode={balanceRollMode}
-              fromValue={balanceRollFromValue}
-              rollTrigger={balanceRollTrigger}
-            />
-          ) : (
-            <BalanceScrambleValue
-              value={formattedBalance}
-              revealed={showBalance}
-            />
-          )}
-        </span>
+    <span
+      ref={balanceValueRef}
+      className={styles.balanceValue}
+      style={
+        {
+          '--balance-font-size': `${balanceFontSize}px`,
+          ...(balanceIntroPlaying
+            ? undefined
+            : lockBalanceWidth
+              ? { width: lockedWidth ?? 'max-content' }
+              : undefined),
+        } as React.CSSProperties
+      }
+      aria-label={showBalance ? formattedBalance : 'Balance hidden'}
+    >
+      <span ref={balanceValueSizerRef} className={styles.balanceValueSizer} aria-hidden>
+        {formattedBalance}
       </span>
-    </>
+      <span className={[styles.balanceValueLayer, styles.balanceValueLayerVisible].join(' ')}>
+        {showRollingBalance ? (
+          <RollingBalanceValue
+            value={formattedBalance}
+            enableRoll={balanceIntroPlaying ? balance > 0 : depositRollActive}
+            mode={balanceRollMode}
+            fromValue={balanceRollFromValue}
+            rollTrigger={balanceRollTrigger}
+          />
+        ) : (
+          <BalanceScrambleValue value={formattedBalance} revealed={showBalance} />
+        )}
+      </span>
+    </span>
+  )
+
+  const shieldedBalanceBadge = (
+    <ShieldedUsdcBadge size={SHIELDED_BALANCE_BADGE_PX} className={styles.shieldedBalanceBadge} />
   )
 
   const showVaultPosition = vaultBalance > 0 || vaultTransferRollActive
@@ -500,9 +471,13 @@ export function BalanceCard({
       >
         <div className={styles.cardBodyTop}>
           <div className={styles.topRow}>
-            <div className={`${styles.iconBadge} ${styles.brandBadge}`} aria-hidden>
-              <ArmadaLogo variant="mark" markTone="white" className={styles.brandMark} />
-            </div>
+            {isMobileLayout ? (
+              shieldedBalanceBadge
+            ) : (
+              <Tooltip variant="centered" content="This is your shielded balance">
+                {shieldedBalanceBadge}
+              </Tooltip>
+            )}
             <div className={styles.labelStack}>
               <span className={styles.label}>Private USDC Balance</span>
               {armadaAddress ? (
@@ -550,10 +525,7 @@ export function BalanceCard({
         <div className={styles.cardBodyBalance}>
           <div className={styles.balanceRow} ref={balanceRowRef} {...balancePeekHandlers}>
             {balanceIntroPlaying ? (
-              <div
-                className={[styles.balanceCluster, styles.balanceClusterIntro].join(' ')}
-                style={{ '--balance-offset': balanceOffset } as React.CSSProperties}
-              >
+              <div className={[styles.balanceCluster, styles.balanceClusterIntro].join(' ')}>
                 {balanceClusterLayers}
               </div>
             ) : (

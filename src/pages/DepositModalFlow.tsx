@@ -64,6 +64,7 @@ export function DepositModalFlow({
 }: DepositModalFlowProps) {
   const [exiting, setExiting] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const amountInputRef = useRef<HTMLInputElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
   const isConfirmStep = step === 'processing' || step === 'confirmed'
@@ -128,6 +129,7 @@ export function DepositModalFlow({
             balance={depositWalletBalance}
             amount={amount}
             chain={chain}
+            amountInputRef={amountInputRef}
             onAmountChange={onAmountChange}
             onCancel={requestClose}
             onReview={onAmountReview}
@@ -141,7 +143,7 @@ export function DepositModalFlow({
       label="Deposit"
       exiting={exiting}
       onClose={requestClose}
-      initialFocusRef={closeButtonRef}
+      initialFocusRef={step === 'amount' ? amountInputRef : closeButtonRef}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell

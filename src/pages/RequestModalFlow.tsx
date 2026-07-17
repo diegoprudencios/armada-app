@@ -70,6 +70,7 @@ export function RequestModalFlow({
 }: RequestModalFlowProps) {
   const [exiting, setExiting] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const amountInputRef = useRef<HTMLInputElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
   const isConfirmed = step === 'confirmed'
@@ -158,6 +159,7 @@ export function RequestModalFlow({
         amount={amount}
         note={note}
         expiryId={expiryId}
+        amountInputRef={amountInputRef}
         onAmountChange={onAmountChange}
         onNoteChange={onNoteChange}
         onExpiryChange={onExpiryChange}
@@ -171,7 +173,7 @@ export function RequestModalFlow({
       label="Request"
       exiting={exiting}
       onClose={requestClose}
-      initialFocusRef={closeButtonRef}
+      initialFocusRef={step === 'receive' ? amountInputRef : closeButtonRef}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell

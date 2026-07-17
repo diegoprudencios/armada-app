@@ -1,3 +1,4 @@
+import type { Ref } from 'react'
 import { AmountInputScreen } from '@/components/AmountInputScreen'
 import { AMOUNT_EXCEEDS_BALANCE_MESSAGE } from '@/utils/amountFieldA11y'
 import { calculateSendFee } from '@/utils/sendFee'
@@ -16,6 +17,7 @@ export interface EarnAmountScreenProps {
   balance: number
   amount: string
   apy?: number
+  amountInputRef?: Ref<HTMLInputElement>
   onTabChange: (tab: EarnTab) => void
   onAmountChange: (amount: string) => void
   onCancel: () => void
@@ -27,6 +29,7 @@ export function EarnAmountScreen({
   balance,
   amount,
   apy = DEMO_EARN_APY,
+  amountInputRef,
   onTabChange,
   onAmountChange,
   onCancel,
@@ -76,6 +79,7 @@ export function EarnAmountScreen({
       calculateFee={calculateSendFee}
       primaryLabelMode="static"
       focusKey={tab}
+      amountInputRef={amountInputRef}
       columnClassName={flowStep.column}
       titleClassName={flowStep.title}
       headerSlot={headerSlot}

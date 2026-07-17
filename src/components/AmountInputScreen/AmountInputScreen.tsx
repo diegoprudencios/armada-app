@@ -1,4 +1,12 @@
-import { useEffect, useId, useRef, type ReactNode } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  type MutableRefObject,
+  type ReactNode,
+  type Ref,
+} from 'react'
 import { WalletIcon } from '@heroicons/react/24/solid'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
@@ -6,6 +14,8 @@ import { AmountExceededWarning } from '@/components/AmountExceededWarning'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import {
   amountExceedsBalance,
+  formatAmountInputDisplay,
+  formatSanitizedAmountFromNumber,
   hasActiveAmount,
   parseActiveAmount,
   sanitizeAmountInput,
@@ -40,12 +50,14 @@ export interface AmountInputScreenProps {
   footerSlot?: ReactNode
   /** Re-focus amount input when this value changes (e.g. Earn tab). */
   focusKey?: unknown
+  /** Optional ref for modal initial focus on open. */
+  amountInputRef?: Ref<HTMLInputElement>
   columnClassName?: string
   titleClassName?: string
 }
 
 function formatAmountInputValue(value: number): string {
-  return formatWalletBalance(value).replace(/,/g, '')
+  return formatSanitizedAmountFromNumber(value)
 }
 
 function resolveMaxAmount(balance: number, balanceMode: AmountInputBalanceMode): number {
@@ -78,12 +90,26 @@ export function AmountInputScreen({
   headerSlot,
   footerSlot,
   focusKey,
+  amountInputRef: amountInputRefProp,
   columnClassName,
   titleClassName,
 }: AmountInputScreenProps) {
   const amountInputId = useId()
   const amountErrorId = useId()
-  const amountInputRef = useRef<HTMLInputElement>(null)
+  const internalAmountInputRef = useRef<HTMLInputElement | null>(null)
+
+  const setAmountInputRef = useCallback(
+    (node: HTMLInputElement | null) => {
+      internalAmountInputRef.current = node
+      if (!amountInputRefProp) return
+      if (typeof amountInputRefProp === 'function') {
+        amountInputRefProp(node)
+      } else if (amountInputRefProp) {
+        ;(amountInputRefProp as MutableRefObject<HTMLInputElement | null>).current = node
+      }
+    },
+    [amountInputRefProp],
+  )
   const balanceDisplay = formatWalletBalance(balance)
   const hasAmount = hasActiveAmount(amount)
   const exceedsBalance = resolveExceedsBalance(amount, balance, balanceMode)
@@ -94,6 +120,7 @@ export function AmountInputScreen({
   const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const showFeeRow = hasAmount && feeUsdc > 0
   const maxAmount = resolveMaxAmount(balance, balanceMode)
+  const displayAmount = formatAmountInputDisplay(amount)
 
   function handleAmountChange(raw: string) {
     const next = sanitizeAmountInput(raw)
@@ -109,7 +136,7 @@ export function AmountInputScreen({
   }
 
   useEffect(() => {
-    amountInputRef.current?.focus()
+    internalAmountInputRef.current?.focus()
   }, [focusKey])
 
   const rootClassName = [styles.column, columnClassName].filter(Boolean).join(' ')
@@ -133,7 +160,7 @@ export function AmountInputScreen({
               </div>
               <div className={styles.amountField}>
                 <input
-                  ref={amountInputRef}
+                  ref={setAmountInputRef}
                   id={amountInputId}
                   className={[styles.amountInput, exceedsBalance && styles.amountInputError]
                     .filter(Boolean)
@@ -142,12 +169,12 @@ export function AmountInputScreen({
                   inputMode="decimal"
                   autoComplete="off"
                   placeholder="0"
-                  value={amount}
+                  value={displayAmount}
                   onChange={(event) => handleAmountChange(event.target.value)}
                   aria-label={amountAriaLabel}
                   aria-invalid={exceedsBalance || undefined}
                   aria-describedby={exceedsBalance ? amountErrorId : undefined}
-                  size={Math.max(1, amount.length || 1)}
+                  size={Math.max(1, displayAmount.length || 1)}
                 />
               </div>
             </div>

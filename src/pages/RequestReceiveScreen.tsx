@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState, type MutableRefObject, type Ref } from 'react'
 import { CheckIcon, ClipboardDocumentIcon } from '@heroicons/react/24/outline'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import balanceCardStyles from '@/components/BalanceCard/BalanceCard.module.css'
@@ -6,7 +6,7 @@ import { Button } from '@/components/Button'
 import { IconButton } from '@/components/IconButton'
 import { modalStepBodyEnter } from '@/components/ModalShell'
 import walletPanelStyles from '@/components/WalletMenuPanel/WalletMenuPanel.module.css'
-import { hasActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
+import { formatAmountInputDisplay, hasActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
 import { truncateArmadaAddress } from '@/utils/format'
 import {
   DEFAULT_REQUEST_LINK_EXPIRY_ID,
@@ -24,6 +24,7 @@ export interface RequestReceiveScreenProps {
   amount: string
   note: string
   expiryId: RequestLinkExpiryId
+  amountInputRef?: Ref<HTMLInputElement>
   onAmountChange: (amount: string) => void
   onNoteChange: (note: string) => void
   onExpiryChange: (expiryId: RequestLinkExpiryId) => void
@@ -35,6 +36,7 @@ export function RequestReceiveScreen({
   amount,
   note,
   expiryId,
+  amountInputRef: amountInputRefProp,
   onAmountChange,
   onNoteChange,
   onExpiryChange,
@@ -42,9 +44,24 @@ export function RequestReceiveScreen({
 }: RequestReceiveScreenProps) {
   const amountInputId = useId()
   const noteInputId = useId()
-  const amountInputRef = useRef<HTMLInputElement>(null)
+  const internalAmountInputRef = useRef<HTMLInputElement | null>(null)
+
+  const setAmountInputRef = useCallback(
+    (node: HTMLInputElement | null) => {
+      internalAmountInputRef.current = node
+      if (!amountInputRefProp) return
+      if (typeof amountInputRefProp === 'function') {
+        amountInputRefProp(node)
+      } else if (amountInputRefProp) {
+        ;(amountInputRefProp as MutableRefObject<HTMLInputElement | null>).current = node
+      }
+    },
+    [amountInputRefProp],
+  )
+
   const [addressCopied, setAddressCopied] = useState(false)
   const addressCopyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const displayAmount = formatAmountInputDisplay(amount)
   const canCreateLink = hasActiveAmount(amount)
   const ctaLabel = canCreateLink ? 'Create link' : 'Input amount'
   const noteLength = note.length
@@ -70,7 +87,6 @@ export function RequestReceiveScreen({
   }
 
   useEffect(() => {
-    amountInputRef.current?.focus()
     return () => {
       if (addressCopyTimerRef.current) clearTimeout(addressCopyTimerRef.current)
     }
@@ -89,16 +105,17 @@ export function RequestReceiveScreen({
             </div>
             <div className={styles.amountField}>
               <input
-                ref={amountInputRef}
+                ref={setAmountInputRef}
                 id={amountInputId}
                 className={styles.amountInput}
                 type="text"
                 inputMode="decimal"
                 autoComplete="off"
                 placeholder="0"
-                value={amount}
+                value={displayAmount}
                 onChange={(event) => handleAmountChange(event.target.value)}
                 aria-label="Requested amount in USDC"
+                size={Math.max(1, displayAmount.length || 1)}
               />
             </div>
           </div>

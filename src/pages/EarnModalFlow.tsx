@@ -49,6 +49,7 @@ export function EarnModalFlow({
 }: EarnModalFlowProps) {
   const [exiting, setExiting] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const amountInputRef = useRef<HTMLInputElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
   const isConfirmStep = step === 'processing' || step === 'confirmed'
@@ -99,6 +100,7 @@ export function EarnModalFlow({
             tab={tab}
             balance={sourceBalance}
             amount={amount}
+            amountInputRef={amountInputRef}
             onTabChange={onTabChange}
             onAmountChange={onAmountChange}
             onCancel={requestClose}
@@ -113,7 +115,7 @@ export function EarnModalFlow({
       label="Earn"
       exiting={exiting}
       onClose={requestClose}
-      initialFocusRef={closeButtonRef}
+      initialFocusRef={step === 'amount' ? amountInputRef : closeButtonRef}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell

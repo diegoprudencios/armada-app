@@ -20,13 +20,13 @@
   transition: stroke-dasharray 800ms ease, stroke-dashoffset 800ms ease;
 }
 
-.cardShell:has(.brandBadge:hover) .cardStrokeRect {
+.cardShell:has(.shieldedBalanceBadge:hover) .cardStrokeRect {
   stroke-dasharray: 520 2000;
   stroke-dashoffset: -180;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cardShell:has(.brandBadge:hover) .cardStrokeRect {
+  .cardShell:has(.shieldedBalanceBadge:hover) .cardStrokeRect {
     transition: none;
     stroke-dasharray: 2000 0;
     stroke-dashoffset: 0;
@@ -47,6 +47,14 @@
   gap: calc(var(--primitives-spacing-12) + var(--primitives-spacing-3) + var(--primitives-spacing-1));
   box-sizing: border-box;
   animation: balanceCardEnter 480ms cubic-bezier(0.22, 1, 0.36, 1) 220ms both;
+}
+
+:global([data-theme='light']) .card:not(.cardSolid) {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent) 0%,
+    color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent) 100%
+  );
 }
 
 .cardSolid {
@@ -119,31 +127,15 @@
   }
 }
 
-@keyframes tokenSlideLeft {
-  0% {
-    transform: translateX(var(--balance-offset));
-    opacity: 0;
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
 @keyframes balanceFadeIn {
   0% {
     opacity: 0;
-    transform: translateX(-48px);
+    transform: translateY(var(--primitives-spacing-2));
   }
 
   100% {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateY(0);
   }
 }
 
@@ -180,23 +172,10 @@
   color: var(--semantic-component-button-primary-text);
 }
 
-.brandBadge {
+.shieldedBalanceBadge {
   position: relative;
   z-index: 3;
-  width: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
-  height: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
-  background: linear-gradient(
-    to bottom,
-    var(--semantic-component-button-gradient-default-from),
-    var(--semantic-component-button-gradient-default-to)
-  );
-  color: white;
   cursor: default;
-}
-
-.brandMark {
-  width: var(--primitives-spacing-5);
-  height: var(--primitives-spacing-5);
 }
 
 .eyeBadge {
@@ -297,26 +276,16 @@
   display: inline-flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: var(--primitives-spacing-2);
   max-width: 100%;
   min-width: 0;
-}
-
-.balanceCluster .tokenBadge {
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
-}
-
-.balanceClusterIntro .tokenBadge {
-  animation: tokenSlideLeft 920ms cubic-bezier(0.22, 1, 0.36, 1) 1280ms both;
 }
 
 .balanceClusterIntro .balanceValue {
   animation: balanceFadeIn 920ms cubic-bezier(0.22, 1, 0.36, 1) 1280ms both;
 }
 
-.balanceClusterStable .tokenBadge,
 .balanceClusterStable .balanceValue {
   animation: none;
   transform: none;
@@ -331,29 +300,9 @@
 .balanceCluster .balanceValue {
   position: relative;
   z-index: 1;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-width: 0;
   max-width: 100%;
-}
-
-.tokenBadge {
-  width: var(--primitives-spacing-10);
-  height: var(--primitives-spacing-10);
-  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-
-.tokenBadgeIcon {
-  flex-shrink: 0;
-  display: block;
-}
-
-.tokenBadgeIcon :global(svg) {
-  display: block;
 }
 
 .balanceValue {
@@ -469,9 +418,7 @@
 @media (prefers-reduced-motion: reduce) {
   .card,
   .cardBodyTop,
-  .balanceClusterIntro .tokenBadge,
   .balanceClusterIntro .balanceValue,
-  .balanceClusterStable .tokenBadge,
   .balanceClusterStable .balanceValue,
   .actionEnter {
     animation: none;

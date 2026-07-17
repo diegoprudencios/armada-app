@@ -1,0 +1,45 @@
+.root {
+  --shielded-usdc-badge-size: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
+  --shielded-usdc-overlay-size: var(--primitives-spacing-5);
+  position: relative;
+  flex-shrink: 0;
+  width: var(--shielded-usdc-badge-size);
+  height: var(--shielded-usdc-badge-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+
+.tokenGlyph {
+  display: block;
+  flex-shrink: 0;
+}
+
+.tokenGlyph :global(svg) {
+  display: block;
+}
+
+.shieldOverlay {
+  position: absolute;
+  right: calc(var(--shielded-usdc-overlay-size) / -2);
+  bottom: calc(var(--primitives-spacing-1) * -0.25);
+  width: var(--shielded-usdc-overlay-size);
+  height: var(--shielded-usdc-overlay-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: var(--semantic-color-surface-default);
+  box-shadow: 0 0 0 calc(var(--primitives-borderWidth-default) * 1px)
+    color-mix(in srgb, var(--semantic-color-border-subtle) 50%, transparent);
+  line-height: 0;
+  overflow: hidden;
+}
+
+.shieldIcon {
+  width: calc(var(--primitives-spacing-3) + var(--primitives-spacing-1) * 0.5);
+  height: calc(var(--primitives-spacing-3) + var(--primitives-spacing-1) * 0.5);
+  display: block;
+  flex-shrink: 0;
+}
