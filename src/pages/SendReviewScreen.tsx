@@ -54,12 +54,13 @@ export function SendReviewScreen({
       networkName={networkName}
       amount={amountNum}
       feeUsdc={feeUsdc}
+      variant={variant}
       tone={familyMobileLayout ? 'neutral' : 'default'}
     />
   )
 
   if (familyMobileLayout) {
-    // Amount stays on the Send screen behind the sheet — don't repeat it here.
+    // Amount stays on the amount screen behind the sheet — don't repeat it here.
     return (
       <div className={styles.sheetColumn}>
         {summary}

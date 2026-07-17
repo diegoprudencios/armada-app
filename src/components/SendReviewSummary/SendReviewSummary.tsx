@@ -2,7 +2,7 @@ import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
 import { formatProtocolFeeLabel } from '@/utils/protocolFee'
-import { isArmadaAddress } from '@/pages/sendFlowConstants'
+import { isArmadaAddress, type SendFlowVariant } from '@/pages/sendFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
 import styles from './SendReviewSummary.module.css'
 
@@ -13,6 +13,7 @@ export interface SendReviewSummaryProps {
   amount: number
   feeUsdc: number
   confirmedAt?: number
+  variant?: SendFlowVariant
   /** Soft cool-gray fills for the summary table (e.g. white bottom sheet). */
   tone?: 'default' | 'neutral'
 }
@@ -24,11 +25,13 @@ export function SendReviewSummary({
   amount,
   feeUsdc,
   confirmedAt,
+  variant = 'send',
   tone = 'default',
 }: SendReviewSummaryProps) {
   const isPrivate = isArmadaAddress(recipientAddress)
   const total = amount + feeUsdc
   const amountLabel = `${formatUsdcAmount(amount, 2)} USDC`
+  const amountRowLabel = variant === 'withdraw' ? 'Withdrawal amount' : 'Send amount'
   const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const totalLabel = `${formatUsdcAmount(total, 2)} USDC`
   const summaryClassName = [styles.summary, tone === 'neutral' && styles.summaryNeutral]
@@ -66,12 +69,12 @@ export function SendReviewSummary({
           </span>
         </div>
         <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Send amount</span>
-          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{amountLabel}</span>
-        </div>
-        <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Privacy</span>
           <span className={styles.summaryValue}>{isPrivate ? 'Private' : 'Public'}</span>
+        </div>
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>{amountRowLabel}</span>
+          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{amountLabel}</span>
         </div>
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Fees</span>

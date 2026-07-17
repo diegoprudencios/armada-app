@@ -61,6 +61,7 @@ export function SendConfirmedScreen({
           amount={amountNum}
           feeUsdc={feeUsdc}
           confirmedAt={confirmedAt}
+          variant={variant}
         />
       </div>
 

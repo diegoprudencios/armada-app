@@ -122,7 +122,8 @@ export function sendProgressCardCopy(mode: SendProcessingCopyMode): TxProgressCa
   if (mode === 'withdraw') {
     return {
       tag: 'Withdrawal in progress',
-      title: 'Your withdrawal is in progress',
+      title: 'Your withdraw is in progress',
+      titleLines: ['Your withdraw', 'is in progress'],
       subtitle: 'USDC is being sent back to your wallet.',
     }
   }
