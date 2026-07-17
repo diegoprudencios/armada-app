@@ -179,7 +179,6 @@ export function RequestModalFlow({
         currentStep={REQUEST_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
         hideSteps={isConfirmed}
-        contentOffset="default"
         flowLabel="Request"
         exiting={exiting}
         onClose={requestClose}

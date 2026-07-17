@@ -8,13 +8,9 @@
 }
 
 .title {
+  composes: displayLg from '../styles/displayLgTitle.module.css';
   margin: 0;
   width: 100%;
-  font-family: var(--primitives-fontFamily-display), serif;
-  font-weight: var(--primitives-fontWeight-regular);
-  font-size: calc(var(--primitives-fontSize-3xl) * 1px);
-  line-height: 1.25;
-  letter-spacing: var(--primitives-letterSpacing-tight);
   color: var(--semantic-color-text-primary);
   text-align: center;
 }

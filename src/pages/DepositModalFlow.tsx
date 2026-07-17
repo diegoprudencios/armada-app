@@ -149,7 +149,6 @@ export function DepositModalFlow({
         currentStep={DEPOSIT_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
         flowLabel="Deposit"
-        contentOffset={isConfirmed ? 'confirmation' : 'default'}
         exiting={exiting}
         onClose={requestClose}
         closeButtonRef={closeButtonRef}

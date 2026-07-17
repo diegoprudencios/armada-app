@@ -57,7 +57,6 @@ export function ReceivePaymentModalFlow({
         currentStep={1}
         status="confirmed"
         hideSteps
-        contentOffset="default"
         exiting={exiting}
         onClose={requestClose}
         closeButtonRef={closeButtonRef}

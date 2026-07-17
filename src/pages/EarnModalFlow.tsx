@@ -121,7 +121,6 @@ export function EarnModalFlow({
         currentStep={EARN_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
         flowLabel="Earn"
-        contentOffset={isConfirmed ? 'confirmation' : 'default'}
         exiting={exiting}
         onClose={requestClose}
         closeButtonRef={closeButtonRef}

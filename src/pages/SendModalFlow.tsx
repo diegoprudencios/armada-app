@@ -151,7 +151,6 @@ export function SendModalFlow({
         currentStep={SEND_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
         flowLabel="Pay"
-        contentOffset={isConfirmed ? 'confirmation' : 'default'}
         exiting={exiting}
         onClose={requestClose}
         closeButtonRef={closeButtonRef}

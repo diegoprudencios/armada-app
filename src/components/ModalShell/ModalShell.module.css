@@ -166,6 +166,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--primitives-spacing-8);
+  margin-top: calc(var(--primitives-spacing-16) + var(--primitives-spacing-2));
 }
 
 .stepShell {
@@ -221,16 +222,4 @@
     opacity: 0;
     transform: none;
   }
-}
-
-.contentDefault {
-  margin-top: calc(
-    var(--primitives-spacing-12) + var(--primitives-spacing-6) + var(--primitives-spacing-1) * 0.5
-  );
-}
-
-.contentConfirmation {
-  margin-top: calc(
-    var(--primitives-spacing-16) + var(--primitives-spacing-12) + var(--primitives-spacing-1)
-  );
 }

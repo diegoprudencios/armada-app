@@ -151,7 +151,6 @@ export function WithdrawModalFlow({
         currentStep={WITHDRAW_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
         flowLabel="Withdraw"
-        contentOffset={isConfirmed ? 'confirmation' : 'default'}
         exiting={exiting}
         onClose={requestClose}
         closeButtonRef={closeButtonRef}

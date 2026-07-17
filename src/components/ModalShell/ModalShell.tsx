@@ -9,8 +9,6 @@ export const modalActionRowEnter = styles.actionRowEnter
 export const modalStepShell = styles.stepShell
 export const modalStepBodyEnter = styles.stepBodyEnter
 
-export type ModalShellContentOffset = 'default' | 'confirmation'
-
 export interface ModalShellProps {
   steps: string[]
   currentStep: number
@@ -18,7 +16,6 @@ export interface ModalShellProps {
   flowLabel?: string
   hideStepCount?: boolean
   hideSteps?: boolean
-  contentOffset?: ModalShellContentOffset
   exiting?: boolean
   onClose: () => void
   closeButtonRef?: Ref<HTMLButtonElement>
@@ -32,7 +29,6 @@ export function ModalShell({
   flowLabel = 'Deposit',
   hideStepCount = false,
   hideSteps = false,
-  contentOffset = 'default',
   exiting = false,
   onClose,
   closeButtonRef,
@@ -44,14 +40,7 @@ export function ModalShell({
     .filter(Boolean)
     .join(' ')
 
-  const resolvedContentOffset = hideSteps ? 'default' : contentOffset
-  const contentClassName = [
-    styles.content,
-    resolvedContentOffset === 'confirmation' ? styles.contentConfirmation : styles.contentDefault,
-    exiting && styles.contentExit,
-  ]
-    .filter(Boolean)
-    .join(' ')
+  const contentClassName = [styles.content, exiting && styles.contentExit].filter(Boolean).join(' ')
 
   return (
     <div className={styles.shell} style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}>
