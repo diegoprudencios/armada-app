@@ -1,10 +1,11 @@
 import { formatUsdcAmount } from '@/utils/format'
+import { shouldUseKeypadMobileChrome } from '@/utils/amountEntryMode'
 
 export const EARN_PROGRESS_STEPS = ['Amount', 'Review', 'Confirm'] as const
 
 export type EarnTab = 'add' | 'withdraw'
 
-/** Desktop: amount → review → … Mobile keypad: choose → amount → review → … */
+/** Desktop: amount → review → … Mobile: choose → amount → review → … */
 export type EarnModalStep = 'choose' | 'amount' | 'review' | 'processing' | 'confirmed'
 
 export const EARN_TABS: ReadonlyArray<{ id: EarnTab; label: string }> = [
@@ -15,12 +16,9 @@ export const EARN_TABS: ReadonlyArray<{ id: EarnTab; label: string }> = [
 /** Demo vault APY — matches BalanceCard ellipses menu meta. */
 export const DEMO_EARN_APY = 4.2
 
-/** True when Earn should open the chooser sheet first (`?keypad=1` + mobile). */
+/** True when Earn should open the chooser sheet first (mobile keypad by default). */
 export function shouldOpenEarnChooser(search = window.location.search): boolean {
-  const value = new URLSearchParams(search).get('keypad')
-  const keypadOn = value === '1' || value === 'true'
-  if (!keypadOn || typeof window === 'undefined') return false
-  return window.matchMedia('(max-width: 767px)').matches
+  return shouldUseKeypadMobileChrome(search)
 }
 export const EARN_PROCESSING_STAGES = [
   { id: 'build-proof', label: 'Preparing transaction' },

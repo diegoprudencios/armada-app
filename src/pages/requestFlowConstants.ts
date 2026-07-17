@@ -1,8 +1,9 @@
 import { getPublicAppOrigin } from '@/utils/appOrigin'
+import { shouldUseKeypadMobileChrome } from '@/utils/amountEntryMode'
 
 export const REQUEST_PROGRESS_STEPS = ['Receive', 'Share link'] as const
 
-/** Desktop: receive → link → confirmed. Mobile keypad: choose → amount → details → link → confirmed. */
+/** Desktop: receive → link → confirmed. Mobile: choose → amount → details → link → confirmed. */
 export type RequestModalStep =
   | 'choose'
   | 'receive'
@@ -11,12 +12,9 @@ export type RequestModalStep =
   | 'link'
   | 'confirmed'
 
-/** True when Request should open the chooser sheet first (`?keypad=1` + mobile). */
+/** True when Request should open the chooser sheet first (mobile keypad by default). */
 export function shouldOpenRequestChooser(search = window.location.search): boolean {
-  const value = new URLSearchParams(search).get('keypad')
-  const keypadOn = value === '1' || value === 'true'
-  if (!keypadOn || typeof window === 'undefined') return false
-  return window.matchMedia('(max-width: 767px)').matches
+  return shouldUseKeypadMobileChrome(search)
 }
 
 export const REQUEST_LINK_EXPIRY_OPTIONS = [

@@ -6,6 +6,7 @@ import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
+import { resolveAmountEntryMode } from '@/utils/amountEntryMode'
 import { DepositAmountScreen } from './DepositAmountScreen'
 import { DepositProcessingScreen } from './DepositProcessingScreen'
 import { DepositReviewScreen } from './DepositReviewScreen'
@@ -19,8 +20,7 @@ import {
 export type DepositModalStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 
 function depositAmountEntryModeFromSearch(search = window.location.search): AmountInputEntryMode {
-  const value = new URLSearchParams(search).get('keypad')
-  return value === '1' || value === 'true' ? 'keypad' : 'input'
+  return resolveAmountEntryMode(search)
 }
 
 const DEPOSIT_STEP_NUMBER: Record<DepositModalStep, number> = {

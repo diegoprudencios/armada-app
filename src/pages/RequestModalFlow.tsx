@@ -6,6 +6,7 @@ import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
+import { resolveAmountEntryMode } from '@/utils/amountEntryMode'
 import { revokePaymentLink } from '@/utils/payViaLink'
 import { RequestAmountScreen } from './RequestAmountScreen'
 import chooserStyles from './RequestChooserSheet.module.css'
@@ -41,8 +42,7 @@ const REQUEST_SIMPLE_HEADER_TITLE: Partial<Record<RequestModalStep, string>> = {
 const COPY_FEEDBACK_MS = 900
 
 function requestAmountEntryModeFromSearch(search = window.location.search): AmountInputEntryMode {
-  const value = new URLSearchParams(search).get('keypad')
-  return value === '1' || value === 'true' ? 'keypad' : 'input'
+  return resolveAmountEntryMode(search)
 }
 
 export type RequestLinkPayload = {

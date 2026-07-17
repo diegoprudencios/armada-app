@@ -5,6 +5,7 @@ import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
+import { resolveAmountEntryMode } from '@/utils/amountEntryMode'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
 import { SendAmountScreen } from './SendAmountScreen'
 import { SendProcessingScreen } from './SendProcessingScreen'
@@ -15,8 +16,7 @@ import { SEND_PROGRESS_STEPS, type SendChainId } from './sendFlowConstants'
 export type SendModalStep = 'recipient' | 'amount' | 'review' | 'processing' | 'confirmed'
 
 function sendAmountEntryModeFromSearch(search = window.location.search): AmountInputEntryMode {
-  const value = new URLSearchParams(search).get('keypad')
-  return value === '1' || value === 'true' ? 'keypad' : 'input'
+  return resolveAmountEntryMode(search)
 }
 
 const SEND_STEP_NUMBER: Record<SendModalStep, number> = {
