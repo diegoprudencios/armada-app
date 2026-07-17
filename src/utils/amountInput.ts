@@ -66,6 +66,27 @@ export function parseActiveAmount(value: string, cap = Infinity): number {
   return Math.min(Math.max(0, num), cap)
 }
 
+/** Append a digit from a custom keypad (max 2 decimal places). */
+export function applyKeypadDigit(current: string, digit: string): string {
+  if (!/^\d$/.test(digit)) return sanitizeAmountInput(current)
+  return sanitizeAmountInput(`${stripAmountGrouping(current)}${digit}`)
+}
+
+/** Insert a decimal point from a custom keypad. */
+export function applyKeypadDecimal(current: string): string {
+  const normalized = stripAmountGrouping(current)
+  if (!normalized) return '0.'
+  if (normalized.includes('.')) return sanitizeAmountInput(normalized)
+  return sanitizeAmountInput(`${normalized}.`)
+}
+
+/** Remove the last character from keypad entry. */
+export function applyKeypadBackspace(current: string): string {
+  const normalized = stripAmountGrouping(current)
+  if (!normalized) return ''
+  return sanitizeAmountInput(normalized.slice(0, -1))
+}
+
 /** True when the entered amount is greater than the available balance. */
 export function amountExceedsBalance(amount: string, balance: number): boolean {
   if (!hasActiveAmount(amount)) return false

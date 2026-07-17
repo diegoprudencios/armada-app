@@ -4,6 +4,7 @@ import { WalletMetamask } from '@web3icons/react'
 import { registerNestedDialog } from '@/hooks/nestedDialog'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
+import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { useRestoreFocus } from '@/hooks/useRestoreFocus'
 import { DEMO_ARMADA_ADDRESS } from '@/pages/depositFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
@@ -31,6 +32,7 @@ export function MockMetaMaskPopup({
 }: MockMetaMaskPopupProps) {
   const popupRef = useRef<HTMLDivElement>(null)
   const rejectButtonRef = useRef<HTMLButtonElement>(null)
+  const isMobile = useMobileLayout()
   const isApprove = prompt === 'approve'
   const confirmLabel = isApprove ? 'Approve' : 'Confirm'
   const rejectLabel = 'Reject'
@@ -44,16 +46,24 @@ export function MockMetaMaskPopup({
   useEffect(() => registerNestedDialog(), [])
   useEffect(() => {
     rejectButtonRef.current?.focus({ preventScroll: true })
-  }, [])
+  }, [prompt])
 
   const popup = (
     <div
       ref={popupRef}
-      className={styles.popup}
+      className={[styles.popup, isMobile && styles.popupSheet].filter(Boolean).join(' ')}
       role="dialog"
       aria-modal="true"
       aria-label={title}
+      tabIndex={-1}
+      onClick={(event) => event.stopPropagation()}
     >
+      {isMobile ? (
+        <div className={styles.handleRow} aria-hidden>
+          <span className={styles.handle} />
+        </div>
+      ) : null}
+
       <header className={styles.header}>
         <WalletMetamask size={20} aria-hidden />
         <span className={styles.brand}>MetaMask</span>
@@ -131,6 +141,15 @@ export function MockMetaMaskPopup({
       </footer>
     </div>
   )
+
+  if (isMobile) {
+    return createPortal(
+      <div className={styles.scrim} role="presentation" onClick={onReject}>
+        {popup}
+      </div>,
+      document.body,
+    )
+  }
 
   return createPortal(popup, document.body)
 }

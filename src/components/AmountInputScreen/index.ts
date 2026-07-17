@@ -3,4 +3,5 @@ export {
   type AmountInputScreenProps,
   type AmountInputBalanceMode,
   type AmountInputPrimaryLabelMode,
+  type AmountInputEntryMode,
 } from './AmountInputScreen'

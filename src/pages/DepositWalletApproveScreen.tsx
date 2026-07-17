@@ -20,6 +20,8 @@ export interface DepositWalletApproveScreenProps {
   computeFeeUsdc?: (amount: number) => number
   /** When true, only the sign transaction is shown (no USDC approve step). */
   skipApproval?: boolean
+  /** Family mobile keypad: wallet sheet only (amount stays under the scrim). */
+  familyMobileLayout?: boolean
   onComplete: () => void
   onCancel: () => void
 }
@@ -31,6 +33,7 @@ export function DepositWalletApproveScreen({
   signStepLabel = 'Sign deposit transaction',
   computeFeeUsdc = calculateDepositFee,
   skipApproval = false,
+  familyMobileLayout = false,
   onComplete,
   onCancel,
 }: DepositWalletApproveScreenProps) {
@@ -89,6 +92,21 @@ export function DepositWalletApproveScreen({
 
   const showPopup = promptPhase === 'approve' || promptPhase === 'sign'
 
+  const popup = showPopup ? (
+    <MockMetaMaskPopup
+      prompt={promptPhase === 'approve' ? 'approve' : 'sign'}
+      amountLabel={amountLabel}
+      networkName={networkName}
+      accountAddress={walletAddress}
+      onConfirm={promptPhase === 'approve' ? handleApprove : handleSign}
+      onReject={handleReject}
+    />
+  ) : null
+
+  if (familyMobileLayout) {
+    return popup
+  }
+
   return (
     <>
       <div className={styles.column}>
@@ -109,16 +127,7 @@ export function DepositWalletApproveScreen({
         </div>
       </div>
 
-      {showPopup ? (
-        <MockMetaMaskPopup
-          prompt={promptPhase === 'approve' ? 'approve' : 'sign'}
-          amountLabel={amountLabel}
-          networkName={networkName}
-          accountAddress={walletAddress}
-          onConfirm={promptPhase === 'approve' ? handleApprove : handleSign}
-          onReject={handleReject}
-        />
-      ) : null}
+      {popup}
     </>
   )
 }

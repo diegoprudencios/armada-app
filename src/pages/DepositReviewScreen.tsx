@@ -21,6 +21,8 @@ export interface DepositReviewScreenProps {
   walletAddress?: string
   walletProvider?: string
   armadaAddress?: string
+  /** Family mobile keypad: compact content for a bottom sheet over the amount screen. */
+  familyMobileLayout?: boolean
   onBack: () => void
   onConfirm: () => void
 }
@@ -31,38 +33,42 @@ export function DepositReviewScreen({
   walletAddress,
   walletProvider,
   armadaAddress,
+  familyMobileLayout = false,
   onBack,
   onConfirm,
 }: DepositReviewScreenProps) {
   const amountNum = parseActiveAmount(amount)
   const feeUsdc = calculateDepositFee(amountNum)
 
-  return (
-    <div className={styles.column}>
-      <div className={modalStepBodyEnter}>
-        <h1 className={styles.title}>Review your deposit</h1>
-
-        <div className={styles.amountRow}>
-          <div className={styles.amountGroup}>
-            <div className={styles.tokenBadge} aria-hidden>
-              <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
-            </div>
-            <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
-          </div>
+  const amountBlock = (
+    <div className={styles.amountRow}>
+      <div className={styles.amountGroup}>
+        <div className={styles.tokenBadge} aria-hidden>
+          <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
         </div>
-
-        <DepositReviewSummary
-          networkName={networkName}
-          amount={amountNum}
-          feeUsdc={feeUsdc}
-          walletAddress={walletAddress ?? DEMO_WALLET_ADDRESS}
-          walletProvider={walletProvider}
-          armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
-        />
+        <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
       </div>
+    </div>
+  )
 
-      <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>
-          <Button variant="secondary" size="lg" label="Back" showIcon={false} onClick={onBack} />
+  const summary = (
+    <DepositReviewSummary
+      networkName={networkName}
+      amount={amountNum}
+      feeUsdc={feeUsdc}
+      walletAddress={walletAddress ?? DEMO_WALLET_ADDRESS}
+      walletProvider={walletProvider}
+      armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
+      tone={familyMobileLayout ? 'neutral' : 'default'}
+    />
+  )
+
+  if (familyMobileLayout) {
+    // Amount stays on the Deposit screen behind the sheet — don't repeat it here.
+    return (
+      <div className={styles.sheetColumn}>
+        {summary}
+        <div className={styles.sheetActions}>
           <Button
             variant="primary"
             size="lg"
@@ -71,6 +77,28 @@ export function DepositReviewScreen({
             onClick={onConfirm}
           />
         </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.column}>
+      <div className={`${styles.body} ${modalStepBodyEnter}`}>
+        <h1 className={styles.title}>Review your deposit</h1>
+        {amountBlock}
+        {summary}
+      </div>
+
+      <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>
+        <Button variant="secondary" size="lg" label="Back" showIcon={false} onClick={onBack} />
+        <Button
+          variant="primary"
+          size="lg"
+          label="Confirm deposit"
+          showIcon={false}
+          onClick={onConfirm}
+        />
+      </div>
     </div>
   )
 }

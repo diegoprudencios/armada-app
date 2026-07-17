@@ -16,6 +16,20 @@
   );
 }
 
+/* Shell owns the gradient; hero flex-centers this block above the details card. */
+.cardImmersive {
+  aspect-ratio: unset;
+  max-width: none;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  flex: 0 0 auto;
+  margin-inline: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
 .tickRing {
   position: absolute;
   top: 50%;
@@ -23,6 +37,11 @@
   width: 56%;
   height: 56%;
   transform: translate(-50%, -50%);
+}
+
+.cardImmersive .tickRing {
+  width: min(72%, calc(var(--primitives-spacing-24) * 3.5));
+  height: min(72%, calc(var(--primitives-spacing-24) * 3.5));
 }
 
 .tick {
@@ -75,6 +94,17 @@
   text-align: center;
 }
 
+.cardImmersive .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitives-spacing-5);
+  grid-template-rows: unset;
+  min-height: 0;
+  padding-block: var(--primitives-spacing-8);
+}
+
 .tag {
   composes: labelTag from '../../styles/typographyComposites.module.css';
   margin: 0;
@@ -92,11 +122,20 @@
   padding-inline: var(--primitives-spacing-3);
 }
 
+.cardImmersive .titleBlock {
+  flex: 0 0 auto;
+}
+
 .title {
   composes: displayXl from '../../styles/displayXlTitle.module.css';
   margin: 0;
   /* EXCEPTION — headline stays white on the fixed light gradient surface. */
   color: var(--semantic-component-tag-label);
+}
+
+.titleLine {
+  display: block;
+  white-space: nowrap;
 }
 
 .subtitle {
@@ -108,6 +147,13 @@
   white-space: nowrap;
   /* EXCEPTION — dark subtitle on the fixed light gradient surface. */
   color: rgb(14 13 15 / 65%);
+}
+
+.cardImmersive .subtitle {
+  align-self: center;
+  width: auto;
+  max-width: 100%;
+  white-space: normal;
 }
 
 @media (prefers-reduced-motion: reduce) {

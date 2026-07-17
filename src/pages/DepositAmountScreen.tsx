@@ -1,6 +1,9 @@
 import type { Ref } from 'react'
 import type { DepositChainId } from '@/constants/depositChains'
-import { AmountInputScreen } from '@/components/AmountInputScreen'
+import {
+  AmountInputScreen,
+  type AmountInputEntryMode,
+} from '@/components/AmountInputScreen'
 import { calculateDepositFee } from '@/utils/depositFee'
 import { DEPOSIT_EXCEEDS_BALANCE_MESSAGE } from '@/utils/amountFieldA11y'
 
@@ -8,6 +11,8 @@ export interface DepositAmountScreenProps {
   balance: number
   amount: string
   chain?: DepositChainId
+  /** Default `input` keeps the current system-keyboard UI. */
+  entryMode?: AmountInputEntryMode
   amountInputRef?: Ref<HTMLInputElement>
   onAmountChange: (amount: string) => void
   onCancel: () => void
@@ -18,6 +23,7 @@ export function DepositAmountScreen({
   balance,
   amount,
   chain = 'sepolia',
+  entryMode = 'input',
   amountInputRef,
   onAmountChange,
   onCancel,
@@ -28,6 +34,7 @@ export function DepositAmountScreen({
       title="How much do you want to deposit?"
       balance={balance}
       amount={amount}
+      entryMode={entryMode}
       amountInputRef={amountInputRef}
       amountAriaLabel="Deposit amount"
       exceedMessage={DEPOSIT_EXCEEDS_BALANCE_MESSAGE}

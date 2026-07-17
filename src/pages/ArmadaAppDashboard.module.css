@@ -11,7 +11,7 @@
 }
 
 .shell[data-activity-visible='true'] {
-  padding-block-end: var(--dashboard-activity-bottom-spacing, 120px);
+  padding-block-end: var(--dashboard-activity-bottom-spacing, 20px);
 }
 
 .shell::before {
@@ -20,7 +20,7 @@
 
 :global([data-theme='light']) .shell::before {
   content: '';
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 0;
   background: linear-gradient(
@@ -201,7 +201,7 @@
   }
 
   .shell[data-activity-visible='true'] {
-    padding-block-end: calc(var(--dashboard-activity-bottom-spacing, 120px) + var(--mobile-safe-area-bottom));
+    padding-block-end: calc(var(--dashboard-activity-bottom-spacing, 20px) + var(--mobile-safe-area-bottom));
   }
 
   .headerBand {
@@ -211,14 +211,17 @@
   }
 
   .cardStack {
-    flex: 1;
-    min-height: 0;
+    flex: 0 0 auto;
     width: 100%;
     max-width: none;
     align-self: stretch;
     padding-inline: var(--primitives-spacing-4);
     box-sizing: border-box;
-    gap: var(--primitives-spacing-3);
+    gap: var(--primitives-spacing-6);
+  }
+
+  .cardStackActivity {
+    margin-block-start: var(--primitives-spacing-2);
   }
 
   .primaryStack {

@@ -12,6 +12,8 @@ export interface BottomSheetProps {
   onClose: () => void
   title?: string
   ariaLabel?: string
+  /** When `title` is set, show the header close control. Default true. */
+  showClose?: boolean
   sheetClassName?: string
   children: ReactNode
 }
@@ -21,6 +23,7 @@ export function BottomSheet({
   onClose,
   title,
   ariaLabel,
+  showClose = true,
   sheetClassName,
   children,
 }: BottomSheetProps) {
@@ -76,9 +79,11 @@ export function BottomSheet({
             <h2 id={titleId} className={styles.title}>
               {title}
             </h2>
-            <button type="button" className={styles.closeButton} aria-label="Close" onClick={onClose}>
-              <XMarkIcon width={20} height={20} strokeWidth={2} />
-            </button>
+            {showClose ? (
+              <button type="button" className={styles.closeButton} aria-label="Close" onClick={onClose}>
+                <XMarkIcon width={20} height={20} strokeWidth={2} />
+              </button>
+            ) : null}
           </div>
         ) : null}
 

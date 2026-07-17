@@ -3,10 +3,12 @@ import {
   TransactionProgressDisclosure,
   type TransactionProgressVariant,
 } from '@/components/TransactionProgressDisclosure'
-import { TxProgressCard } from '@/components/TxProgressCard'
+import { TxProgressCard, type TxProgressCardVariant } from '@/components/TxProgressCard/TxProgressCard'
 import { resolveStageLabel, type TxProgressCardCopy, type TxProgressStage } from '@/constants/txProcessingCopy'
 import a11y from '@/styles/formA11y.module.css'
 import styles from './TxProcessingLayout.module.css'
+
+export type TxProcessingLayoutVariant = 'default' | 'immersive'
 
 export interface TxProcessingLayoutProps {
   cardCopy: TxProgressCardCopy
@@ -14,6 +16,8 @@ export interface TxProcessingLayoutProps {
   activeStageIndex?: number
   completed?: boolean
   progressVariant?: TransactionProgressVariant
+  /** Family mobile deposit: full-bleed gradient shell, details docked at bottom. */
+  layout?: TxProcessingLayoutVariant
   className?: string
 }
 
@@ -23,9 +27,15 @@ export function TxProcessingLayout({
   activeStageIndex = 0,
   completed = false,
   progressVariant = 'timeline',
+  layout = 'default',
   className,
 }: TxProcessingLayoutProps) {
-  const cls = [styles.root, className].filter(Boolean).join(' ')
+  const immersive = layout === 'immersive'
+  const cardVariant: TxProgressCardVariant = immersive ? 'immersive' : 'card'
+  const cls = [styles.root, immersive && styles.rootImmersive, className].filter(Boolean).join(' ')
+  const bodyClassName = immersive
+    ? [styles.body, styles.bodyImmersive].filter(Boolean).join(' ')
+    : [modalStepBodyEnter, styles.body].filter(Boolean).join(' ')
   const activeStage = stages[activeStageIndex]
   const statusAnnouncement = activeStage
     ? completed && activeStageIndex === stages.length - 1
@@ -33,15 +43,21 @@ export function TxProcessingLayout({
       : `${resolveStageLabel(activeStage, activeStageIndex, stages.length, completed)}. ${activeStage.subtitle}`
     : ''
 
+  const progressCard = <TxProgressCard copy={cardCopy} variant={cardVariant} />
+
   return (
     <div className={cls}>
       <p className={a11y.srOnly} aria-live="polite" aria-atomic="true">
         {statusAnnouncement}
       </p>
-      <div className={`${modalStepBodyEnter} ${styles.body}`}>
-        <TxProgressCard copy={cardCopy} />
+      <div className={bodyClassName}>
+        {immersive ? <div className={styles.heroImmersive}>{progressCard}</div> : progressCard}
 
-        <div className={styles.belowCardStack}>
+        <div
+          className={[styles.belowCardStack, immersive && styles.belowCardStackImmersive]
+            .filter(Boolean)
+            .join(' ')}
+        >
           <TransactionProgressDisclosure
             variant={progressVariant}
             stages={stages}

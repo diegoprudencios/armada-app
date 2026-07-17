@@ -51,6 +51,7 @@ export function FlowModalOverlay({
         aria-label={label}
         aria-hidden={nestedDialogCount > 0 ? true : undefined}
         className={styles.dialog}
+        tabIndex={-1}
       >
         {children}
       </div>

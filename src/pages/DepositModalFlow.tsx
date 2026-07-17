@@ -1,8 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { DepositChainId } from '@/constants/depositChains'
+import type { AmountInputEntryMode } from '@/components/AmountInputScreen'
+import { BottomSheet } from '@/components/BottomSheet'
 import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
+import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { DepositAmountScreen } from './DepositAmountScreen'
 import { DepositProcessingScreen } from './DepositProcessingScreen'
 import { DepositReviewScreen } from './DepositReviewScreen'
@@ -15,12 +18,27 @@ import {
 
 export type DepositModalStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 
+function depositAmountEntryModeFromSearch(search = window.location.search): AmountInputEntryMode {
+  const value = new URLSearchParams(search).get('keypad')
+  return value === '1' || value === 'true' ? 'keypad' : 'input'
+}
+
 const DEPOSIT_STEP_NUMBER: Record<DepositModalStep, number> = {
   amount: 1,
   review: 2,
   wallet: 3,
   processing: 4,
   confirmed: 4,
+}
+
+const DEPOSIT_SIMPLE_HEADER_TITLE: Partial<Record<DepositModalStep, string>> = {
+  amount: 'Deposit',
+  /** Review opens as a sheet over amount — shell title stays Deposit. */
+  review: 'Deposit',
+  wallet: 'Confirm',
+  processing: 'Deposit in progress',
+  /** Confirmed uses the in-screen “Deposit confirmed” headline — no shell title. */
+  confirmed: '',
 }
 
 export interface DepositModalFlowProps {
@@ -67,6 +85,9 @@ export function DepositModalFlow({
   const amountInputRef = useRef<HTMLInputElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
+  const amountEntryMode = useMemo(() => depositAmountEntryModeFromSearch(), [])
+  const isMobile = useMobileLayout()
+  const useFamilyMobileChrome = amountEntryMode === 'keypad' && isMobile
   const isConfirmStep = step === 'processing' || step === 'confirmed'
   const isConfirmed = step === 'confirmed'
 
@@ -85,9 +106,24 @@ export function DepositModalFlow({
     requestClose()
   }
 
+  const amountScreen = (
+    <DepositAmountScreen
+      balance={depositWalletBalance}
+      amount={amount}
+      chain={chain}
+      entryMode={amountEntryMode}
+      amountInputRef={amountEntryMode === 'input' ? amountInputRef : undefined}
+      onAmountChange={onAmountChange}
+      onCancel={requestClose}
+      onReview={onAmountReview}
+    />
+  )
+
   function renderStep() {
     switch (step) {
       case 'review':
+        // Family mobile: keep amount under the review sheet.
+        if (useFamilyMobileChrome) return amountScreen
         return (
           <DepositReviewScreen
             amount={amount}
@@ -99,6 +135,8 @@ export function DepositModalFlow({
           />
         )
       case 'wallet':
+        // Family mobile: keep amount under the wallet approval sheet.
+        if (useFamilyMobileChrome) return amountScreen
         return (
           <DepositWalletApproveScreen
             amount={amount}
@@ -118,32 +156,32 @@ export function DepositModalFlow({
             walletProvider={walletProvider}
             confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
+            familyMobileLayout={useFamilyMobileChrome && step === 'processing'}
             onComplete={onProcessingComplete}
             onViewExplorer={onConfirmedViewExplorer}
             onGoToDashboard={handleConfirmedGoToDashboard}
           />
         )
       default:
-        return (
-          <DepositAmountScreen
-            balance={depositWalletBalance}
-            amount={amount}
-            chain={chain}
-            amountInputRef={amountInputRef}
-            onAmountChange={onAmountChange}
-            onCancel={requestClose}
-            onReview={onAmountReview}
-          />
-        )
+        return amountScreen
     }
   }
+
+  const stepShellKey =
+    isConfirmStep
+      ? 'confirm'
+      : useFamilyMobileChrome && (step === 'review' || step === 'wallet')
+        ? 'amount'
+        : step
 
   return (
     <FlowModalOverlay
       label="Deposit"
       exiting={exiting}
       onClose={requestClose}
-      initialFocusRef={step === 'amount' ? amountInputRef : closeButtonRef}
+      initialFocusRef={
+        step === 'amount' && amountEntryMode === 'input' ? amountInputRef : undefined
+      }
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell
@@ -151,14 +189,61 @@ export function DepositModalFlow({
         currentStep={DEPOSIT_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
         flowLabel="Deposit"
+        chrome={useFamilyMobileChrome ? 'simple' : 'default'}
+        surface={
+          useFamilyMobileChrome && step === 'processing' ? 'immersive' : 'default'
+        }
+        headerTitle={
+          useFamilyMobileChrome ? DEPOSIT_SIMPLE_HEADER_TITLE[step] ?? 'Deposit' : undefined
+        }
+        onBack={
+          useFamilyMobileChrome
+            ? step === 'review'
+              ? onReviewBack
+              : step === 'amount'
+                ? requestClose
+                : undefined
+            : undefined
+        }
         exiting={exiting}
         onClose={requestClose}
         closeButtonRef={closeButtonRef}
       >
-        <div key={isConfirmStep ? 'confirm' : step} className={modalStepShell}>
+        <div key={stepShellKey} className={modalStepShell}>
           {renderStep()}
         </div>
       </ModalShell>
+
+      {useFamilyMobileChrome ? (
+        <>
+          <BottomSheet
+            open={step === 'review'}
+            onClose={onReviewBack}
+            title="Review"
+            showClose={false}
+          >
+            <DepositReviewScreen
+              amount={amount}
+              networkName={networkDisplayName(chain)}
+              walletAddress={walletAddress}
+              walletProvider={walletProvider}
+              familyMobileLayout
+              onBack={onReviewBack}
+              onConfirm={onReviewConfirm}
+            />
+          </BottomSheet>
+          {step === 'wallet' ? (
+            <DepositWalletApproveScreen
+              amount={amount}
+              networkName={networkDisplayName(chain)}
+              walletAddress={walletAddress}
+              familyMobileLayout
+              onComplete={onWalletComplete}
+              onCancel={onWalletCancel}
+            />
+          ) : null}
+        </>
+      ) : null}
     </FlowModalOverlay>
   )
 }

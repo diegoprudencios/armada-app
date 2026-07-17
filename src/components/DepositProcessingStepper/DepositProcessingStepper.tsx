@@ -1,4 +1,4 @@
-import { TxProcessingLayout } from '@/components/TxProcessingLayout'
+import { TxProcessingLayout, type TxProcessingLayoutVariant } from '@/components/TxProcessingLayout/TxProcessingLayout'
 import {
   DEPOSIT_PROCESSING_STAGES,
   DEPOSIT_PROGRESS_CARD_COPY,
@@ -9,6 +9,7 @@ export interface DepositProcessingStepperProps {
   activeStageIndex?: number
   completed?: boolean
   progressVariant?: TransactionProgressVariant
+  layout?: TxProcessingLayoutVariant
   className?: string
 }
 
@@ -16,6 +17,7 @@ export function DepositProcessingStepper({
   activeStageIndex = 0,
   completed = false,
   progressVariant,
+  layout,
   className,
 }: DepositProcessingStepperProps) {
   return (
@@ -26,6 +28,7 @@ export function DepositProcessingStepper({
       activeStageIndex={activeStageIndex}
       completed={completed}
       progressVariant={progressVariant}
+      layout={layout}
     />
   )
 }

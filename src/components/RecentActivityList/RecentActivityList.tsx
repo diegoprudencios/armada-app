@@ -1,4 +1,13 @@
-import { useState, type ComponentType, type SVGProps } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentType,
+  type CSSProperties,
+  type SVGProps,
+  type UIEvent,
+} from 'react'
 import {
   ArrowDownIcon,
   ArrowLeftIcon,
@@ -9,12 +18,8 @@ import {
   PlusIcon,
 } from '@heroicons/react/24/outline'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
-import {
-  ACTIVITY_LIST_DESKTOP_PREVIEW_MAX,
-  ACTIVITY_LIST_MOBILE_PREVIEW_MAX,
-} from '@/constants/activityList'
+import { ACTIVITY_LIST_FADE_HEIGHT_PX } from '@/constants/activityList'
 import type { DashboardActivityItem, DashboardActivityKind } from '@/constants/dashboardActivity'
-import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { formatPaymentLinkExpiry } from '@/pages/requestFlowConstants'
 import { formatUsdcAmount } from '@/utils/format'
 import { resolveRequestLinkActivityLabel } from '@/utils/dashboardActivity'
@@ -135,20 +140,58 @@ export function RecentActivityList({
   variant = 'preview',
   onItemClick,
 }: RecentActivityListProps) {
-  const isMobile = useMobileLayout()
   const [allOpen, setAllOpen] = useState(false)
+  const [showBottomFade, setShowBottomFade] = useState(false)
+  const listScrollRef = useRef<HTMLDivElement>(null)
   const isPreview = variant === 'preview'
-  const previewMax = isMobile ? ACTIVITY_LIST_MOBILE_PREVIEW_MAX : ACTIVITY_LIST_DESKTOP_PREVIEW_MAX
-  const previewItems = isPreview ? items.slice(0, previewMax) : items
   const showViewAll = isPreview
+
+  const updateBottomFade = useCallback(() => {
+    const el = listScrollRef.current
+    if (!el) {
+      setShowBottomFade(false)
+      return
+    }
+    const canScroll = el.scrollHeight > el.clientHeight + 1
+    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 2
+    setShowBottomFade(canScroll && !atBottom)
+  }, [])
+
+  useEffect(() => {
+    if (!isPreview) {
+      setShowBottomFade(false)
+      return
+    }
+    updateBottomFade()
+    const el = listScrollRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(() => updateBottomFade())
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [isPreview, items, updateBottomFade])
+
+  function handleListScroll(event: UIEvent<HTMLDivElement>) {
+    const el = event.currentTarget
+    const canScroll = el.scrollHeight > el.clientHeight + 1
+    const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 2
+    setShowBottomFade(canScroll && !atBottom)
+  }
 
   const rootClassName = [styles.root, isPreview ? styles.rootPreview : styles.rootFull]
     .filter(Boolean)
     .join(' ')
 
+  const previewStyle = {
+    '--activity-list-fade-height': `${ACTIVITY_LIST_FADE_HEIGHT_PX}px`,
+  } as CSSProperties
+
   return (
     <>
-      <section className={rootClassName} aria-label="Recent activity">
+      <section
+        className={rootClassName}
+        aria-label="Recent activity"
+        style={isPreview ? previewStyle : undefined}
+      >
         {isPreview ? (
           <div className={styles.headerRow}>
             <h2 className={styles.heading}>Recent activity</h2>
@@ -160,7 +203,7 @@ export function RecentActivityList({
           </div>
         ) : null}
 
-        {previewItems.length === 0 ? (
+        {items.length === 0 ? (
           <div className={styles.emptyState}>
             <span className={styles.emptyIconBadge} aria-hidden>
               <ClockIcon className={styles.emptyIcon} strokeWidth={1.5} />
@@ -170,9 +213,25 @@ export function RecentActivityList({
               Deposits, sends, payment links, and earn moves will show up here.
             </p>
           </div>
+        ) : isPreview ? (
+          <div className={styles.listViewport}>
+            <div
+              ref={listScrollRef}
+              className={[styles.listScroll, showBottomFade && styles.listScrollFaded]
+                .filter(Boolean)
+                .join(' ')}
+              onScroll={handleListScroll}
+            >
+              <ActivityListItems
+                items={items}
+                balanceRevealed={balanceRevealed}
+                onItemClick={onItemClick}
+              />
+            </div>
+          </div>
         ) : (
           <ActivityListItems
-            items={previewItems}
+            items={items}
             balanceRevealed={balanceRevealed}
             onItemClick={onItemClick}
           />

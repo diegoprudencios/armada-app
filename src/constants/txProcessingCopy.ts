@@ -106,13 +106,15 @@ export interface TxProgressCardCopy {
   tag: string
   title: string
   titleBreakAfter?: string
+  /** Explicit line breaks (takes precedence over `titleBreakAfter`). */
+  titleLines?: readonly string[]
   subtitle: string
 }
 
 export const DEPOSIT_PROGRESS_CARD_COPY: TxProgressCardCopy = {
   tag: 'Deposit in progress',
   title: 'Your assets are being shielded',
-  titleBreakAfter: 'are',
+  titleLines: ['Your assets are', 'being shielded'],
   subtitle: 'You are almost ready to move funds privately.',
 }
 

@@ -1,11 +1,180 @@
 /* Figma frame 383:12296 — DepositCard */
 .column {
+  --amount-surface-muted: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
   width: 100%;
   max-width: 434px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: var(--primitives-spacing-8);
+}
+
+.columnKeypad {
+  max-width: none;
+  min-height: 0;
+  flex: 1;
+  gap: var(--primitives-spacing-5);
+  justify-content: space-between;
+}
+
+.columnFamilyMobile {
+  width: 100%;
+  height: 100%;
+  gap: 0;
+}
+
+.keypadBody {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--primitives-spacing-5);
+  min-height: 0;
+  flex: 1;
+}
+
+.keypadAmountBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitives-spacing-6);
+  width: 100%;
+}
+
+.keypadAmountCenter {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.keypadDock {
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--primitives-spacing-4);
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+  background: var(--amount-surface-muted, color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent));
+  box-sizing: border-box;
+}
+
+.keypadBalanceRow {
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.amountDisplay {
+  margin: 0;
+  width: auto;
+  min-width: 1ch;
+  max-width: 100%;
+  font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
+  font-weight: var(--primitives-fontWeight-medium);
+  font-size: var(--primitives-spacing-10);
+  line-height: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  color: var(--semantic-color-text-primary);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.keypadPad {
+  margin-top: 0;
+  padding-block: var(--primitives-spacing-1);
+  max-width: none;
+}
+
+.keypadDock .keypadPad {
+  width: 100%;
+  max-width: none;
+}
+
+.keypadActions {
+  flex-shrink: 0;
+  width: 100%;
+  padding-top: var(--primitives-spacing-3);
+  padding-bottom: calc(var(--primitives-spacing-5) + var(--mobile-safe-area-bottom, 0px));
+}
+
+.columnFamilyMobile .keypadActions {
+  padding-top: var(--primitives-spacing-5);
+}
+
+
+.columnFamilyMobile .keypadActions .buttonRow {
+  width: 100%;
+}
+
+/* Cascade: header (shell) → amount → wallet balance → keypad → CTA */
+@keyframes familyCascadeEnter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--primitives-spacing-10));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes familyCtaEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  48% {
+    opacity: 1;
+    transform: translateY(calc(var(--primitives-spacing-3) * -1));
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.familyEnterAmount,
+.familyEnterBalance,
+.familyEnterKeypad {
+  opacity: 0;
+  animation: familyCascadeEnter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.familyEnterAmount {
+  animation-delay: 140ms;
+}
+
+.familyEnterBalance {
+  animation-delay: 260ms;
+}
+
+.familyEnterKeypad {
+  animation-delay: 380ms;
+}
+
+.familyEnterCta > * {
+  opacity: 0;
+  animation: familyCtaEnter 520ms cubic-bezier(0.34, 1.15, 0.64, 1) both;
+  animation-delay: 520ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .familyEnterAmount,
+  .familyEnterBalance,
+  .familyEnterKeypad,
+  .familyEnterCta > * {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.buttonRowSingle {
+  width: 100%;
 }
 
 .title {
@@ -191,9 +360,9 @@
   justify-content: center;
   height: var(--primitives-spacing-5);
   padding: 0 var(--primitives-spacing-2);
-  border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-default);
+  border: none;
   border-radius: calc(var(--primitives-borderRadius-full) * 1px);
-  background: transparent;
+  background: var(--amount-surface-muted, color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent));
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-weight: var(--primitives-fontWeight-medium);
   font-size: calc(var(--primitives-fontSize-sm) * 1px);
@@ -223,7 +392,7 @@
   height: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
   padding-inline: var(--primitives-spacing-3);
   border-radius: calc(var(--primitives-borderRadius-sm) * 1px + 1px);
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 60%, transparent);
+  background: var(--amount-surface-muted, color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent));
 }
 
 .feeLabel,
@@ -250,4 +419,10 @@
 .buttonRow > * {
   flex: 1;
   max-width: 211px;
+}
+
+.columnFamilyMobile .buttonRowSingle > * {
+  flex: 1 1 100%;
+  max-width: none;
+  width: 100%;
 }

@@ -1,3 +1,18 @@
+/* EXCEPTION — MetaMask mock intentionally mirrors wallet chrome (not Armada brand surfaces). */
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+  background: color-mix(in srgb, #000 48%, transparent);
+  cursor: pointer;
+  animation: mockMetaMaskScrimIn 220ms ease;
+}
+
 .popup {
   position: fixed;
   top: var(--primitives-spacing-4);
@@ -18,6 +33,48 @@
   animation: mockMetaMaskEnter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.popupSheet {
+  position: relative;
+  top: auto;
+  right: auto;
+  width: 100%;
+  max-width: none;
+  max-height: min(88dvh, calc(100dvh - var(--mobile-safe-area-top, 0px) - var(--primitives-spacing-5)));
+  display: flex;
+  flex-direction: column;
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px)
+    calc(var(--semantic-borderRadius-modal) * 1px) 0 0;
+  border: none;
+  border-top: 1px solid #3b4046;
+  box-shadow: 0 -12px 40px rgb(0 0 0 / 35%);
+  cursor: default;
+  animation: mockMetaMaskSheetIn 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.handleRow {
+  display: flex;
+  justify-content: center;
+  padding-block: var(--primitives-spacing-3) var(--primitives-spacing-1);
+  flex-shrink: 0;
+}
+
+.handle {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-1);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: color-mix(in srgb, #fff 22%, transparent);
+}
+
+@keyframes mockMetaMaskScrimIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes mockMetaMaskEnter {
   from {
     opacity: 0;
@@ -30,13 +87,28 @@
   }
 }
 
+@keyframes mockMetaMaskSheetIn {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
 .header {
   display: flex;
   align-items: center;
   gap: var(--primitives-spacing-2);
-  padding: var(--primitives-spacing-3) var(--primitives-spacing-4);
+  padding: var(--primitives-spacing-3) var(--primitives-spacing-5);
   border-bottom: 1px solid #3b4046;
   background: #121314;
+  flex-shrink: 0;
+}
+
+.popupSheet .header {
+  padding-inline: var(--primitives-spacing-5);
 }
 
 .brand {
@@ -48,8 +120,12 @@
 .body {
   display: flex;
   flex-direction: column;
-  gap: var(--primitives-spacing-4);
-  padding: var(--primitives-spacing-5) var(--primitives-spacing-4);
+  gap: var(--primitives-spacing-5);
+  padding: var(--primitives-spacing-5);
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
 }
 
 .accountRow {
@@ -59,9 +135,9 @@
 }
 
 .accountAvatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 9999px;
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
   background: linear-gradient(135deg, #f6851b 0%, #e2761b 100%);
   flex-shrink: 0;
 }
@@ -69,32 +145,32 @@
 .accountMeta {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--primitives-spacing-1);
   min-width: 0;
 }
 
 .accountName {
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
+  font-size: calc(var(--primitives-fontSize-md) * 1px);
   font-weight: var(--primitives-fontWeight-medium);
   color: #fff;
 }
 
 .accountAddress {
-  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  font-size: calc(var(--primitives-fontSize-sm) * 1px);
   color: #9fa6ae;
   font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
 }
 
 .promptTitle {
   margin: 0;
-  font-size: calc(var(--primitives-fontSize-lg) * 1px);
-  font-weight: var(--primitives-fontWeight-medium);
+  font-size: calc(var(--primitives-fontSize-xl) * 1px);
+  font-weight: var(--primitives-fontWeight-semibold);
   line-height: var(--primitives-lineHeight-snug);
   color: #fff;
 }
 
 .siteOrigin {
-  margin: calc(var(--primitives-spacing-1) * -1) 0 0;
+  margin: var(--primitives-spacing-1) 0 0;
   font-size: calc(var(--primitives-fontSize-sm) * 1px);
   color: #9fa6ae;
 }
@@ -102,9 +178,9 @@
 .details {
   display: flex;
   flex-direction: column;
-  gap: var(--primitives-spacing-3);
-  padding: var(--primitives-spacing-4);
-  border-radius: calc(var(--primitives-borderRadius-md) * 1px);
+  gap: var(--primitives-spacing-4);
+  padding: var(--primitives-spacing-5);
+  border-radius: calc(var(--primitives-borderRadius-xl) * 1px);
   background: #121314;
   border: 1px solid #3b4046;
 }
@@ -114,6 +190,7 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--primitives-spacing-3);
+  min-height: var(--primitives-spacing-5);
 }
 
 .detailLabel {
@@ -137,16 +214,21 @@
 .footer {
   display: flex;
   gap: var(--primitives-spacing-3);
-  padding: 0 var(--primitives-spacing-4) var(--primitives-spacing-4);
+  padding: 0 var(--primitives-spacing-5) var(--primitives-spacing-5);
+  flex-shrink: 0;
+}
+
+.popupSheet .footer {
+  padding-bottom: calc(var(--primitives-spacing-5) + var(--mobile-safe-area-bottom, 0px));
 }
 
 .actionButton {
   flex: 1;
-  min-height: 48px;
+  min-height: var(--mobile-touch-target-min, var(--primitives-spacing-11));
   border-radius: calc(var(--primitives-borderRadius-full) * 1px);
   border: 1px solid transparent;
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
-  font-weight: var(--primitives-fontWeight-medium);
+  font-size: calc(var(--primitives-fontSize-md) * 1px);
+  font-weight: var(--primitives-fontWeight-semibold);
   cursor: pointer;
   transition:
     background-color 120ms ease,
@@ -180,7 +262,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .popup {
+  .scrim,
+  .popup,
+  .popupSheet {
     animation: none;
   }
 

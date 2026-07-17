@@ -16,6 +16,8 @@ export interface DepositReviewSummaryProps {
   walletProvider?: string
   armadaAddress: string
   confirmedAt?: number
+  /** Soft cool-gray fills for the summary table (e.g. white bottom sheet). */
+  tone?: 'default' | 'neutral'
 }
 
 export function DepositReviewSummary({
@@ -26,13 +28,18 @@ export function DepositReviewSummary({
   walletProvider = 'metamask',
   armadaAddress,
   confirmedAt,
+  tone = 'default',
 }: DepositReviewSummaryProps) {
   const total = amount + feeUsdc
+  const amountLabel = `${formatUsdcAmount(amount, 2)} USDC`
   const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const totalLabel = `${formatUsdcAmount(total, 2)} USDC`
+  const summaryClassName = [styles.summary, tone === 'neutral' && styles.summaryNeutral]
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <div className={styles.summary}>
+    <div className={summaryClassName}>
       <div className={styles.summaryBody}>
         {confirmedAt ? <TransactionDateTimeRow confirmedAt={confirmedAt} /> : null}
         <div className={styles.summaryRow}>
@@ -56,6 +63,10 @@ export function DepositReviewSummary({
               <span>{truncateAddress(armadaAddress)}</span>
             </span>
           </span>
+        </div>
+        <div className={styles.summaryRow}>
+          <span className={styles.summaryLabel}>Deposit amount</span>
+          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{amountLabel}</span>
         </div>
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Fees</span>
