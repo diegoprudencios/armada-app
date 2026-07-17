@@ -12,8 +12,8 @@ export interface DepositProcessingScreenProps {
   armadaAddress?: string
   confirmedAt: number
   confirmed?: boolean
-  /** Family mobile keypad: full-bleed gradient processing layout. */
-  familyMobileLayout?: boolean
+  /** Mobile keypad: full-bleed gradient processing layout. */
+  keypadMobileLayout?: boolean
   onComplete: () => void
   onViewExplorer?: () => void
   onGoToDashboard: () => void
@@ -27,7 +27,7 @@ export function DepositProcessingScreen({
   armadaAddress,
   confirmedAt,
   confirmed = false,
-  familyMobileLayout = false,
+  keypadMobileLayout = false,
   onComplete,
   onViewExplorer,
   onGoToDashboard,
@@ -66,7 +66,7 @@ export function DepositProcessingScreen({
     )
   }
 
-  const rootClassName = [styles.column, familyMobileLayout && styles.columnImmersive]
+  const rootClassName = [styles.column, keypadMobileLayout && styles.columnImmersive]
     .filter(Boolean)
     .join(' ')
 
@@ -75,7 +75,7 @@ export function DepositProcessingScreen({
       <DepositProcessingStepper
         activeStageIndex={activeStageIndex}
         completed={completed}
-        layout={familyMobileLayout ? 'immersive' : 'default'}
+        layout={keypadMobileLayout ? 'immersive' : 'default'}
       />
     </div>
   )

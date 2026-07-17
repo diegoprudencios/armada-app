@@ -25,8 +25,8 @@ export interface SendReviewScreenProps {
   chain: SendChainId
   armadaAddress?: string
   variant?: SendFlowVariant
-  /** Family mobile keypad: compact content for a bottom sheet over the amount screen. */
-  familyMobileLayout?: boolean
+  /** Mobile keypad: compact content for a bottom sheet over the amount screen. */
+  keypadMobileLayout?: boolean
   onBack: () => void
   onConfirm: () => void
 }
@@ -37,7 +37,7 @@ export function SendReviewScreen({
   chain,
   armadaAddress,
   variant = 'send',
-  familyMobileLayout = false,
+  keypadMobileLayout = false,
   onBack,
   onConfirm,
 }: SendReviewScreenProps) {
@@ -55,11 +55,11 @@ export function SendReviewScreen({
       amount={amountNum}
       feeUsdc={feeUsdc}
       variant={variant}
-      tone={familyMobileLayout ? 'neutral' : 'default'}
+      tone={keypadMobileLayout ? 'neutral' : 'default'}
     />
   )
 
-  if (familyMobileLayout) {
+  if (keypadMobileLayout) {
     // Amount stays on the amount screen behind the sheet — don't repeat it here.
     return (
       <div className={styles.sheetColumn}>

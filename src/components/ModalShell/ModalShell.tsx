@@ -19,9 +19,9 @@ export interface ModalShellProps {
   flowLabel?: string
   hideStepCount?: boolean
   hideSteps?: boolean
-  /** `simple` = back + centered title + ghost close (no logo/steps). Family-style mobile chrome. */
+  /** `simple` = back + centered title + ghost close (no logo/steps). Mobile keypad chrome. */
   chrome?: ModalShellChrome
-  /** `immersive` = full-bleed brand gradient (family mobile deposit processing). */
+  /** `immersive` = full-bleed brand gradient (mobile keypad processing). */
   surface?: ModalShellSurface
   /** Centered header title when `chrome="simple"`. */
   headerTitle?: string

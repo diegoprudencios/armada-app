@@ -89,7 +89,7 @@ export function DepositModalFlow({
   onCloseRef.current = onClose
   const amountEntryMode = useMemo(() => depositAmountEntryModeFromSearch(), [])
   const isMobile = useMobileLayout()
-  const useFamilyMobileChrome = amountEntryMode === 'keypad' && isMobile
+  const useKeypadMobileChrome = amountEntryMode === 'keypad' && isMobile
   const isConfirmStep = step === 'processing' || step === 'confirmed'
   const isConfirmed = step === 'confirmed'
 
@@ -104,7 +104,7 @@ export function DepositModalFlow({
   }, [exiting])
 
   useEffect(() => {
-    if (!useFamilyMobileChrome) {
+    if (!useKeypadMobileChrome) {
       setReviewSheetOpen(false)
       confirmAfterSheetExitRef.current = false
       return
@@ -116,7 +116,7 @@ export function DepositModalFlow({
     if (!confirmAfterSheetExitRef.current) {
       setReviewSheetOpen(false)
     }
-  }, [step, useFamilyMobileChrome])
+  }, [step, useKeypadMobileChrome])
 
   function handleConfirmedGoToDashboard() {
     onConfirmedGoToDashboard()
@@ -124,7 +124,7 @@ export function DepositModalFlow({
   }
 
   function handleReviewConfirm() {
-    if (!useFamilyMobileChrome) {
+    if (!useKeypadMobileChrome) {
       onReviewConfirm()
       return
     }
@@ -160,8 +160,8 @@ export function DepositModalFlow({
   function renderStep() {
     switch (step) {
       case 'review':
-        // Family mobile: keep amount under the review sheet.
-        if (useFamilyMobileChrome) return amountScreen
+        // Mobile keypad: keep amount under the review sheet.
+        if (useKeypadMobileChrome) return amountScreen
         return (
           <DepositReviewScreen
             amount={amount}
@@ -173,8 +173,8 @@ export function DepositModalFlow({
           />
         )
       case 'wallet':
-        // Family mobile: keep amount under the wallet approval sheet.
-        if (useFamilyMobileChrome) return amountScreen
+        // Mobile keypad: keep amount under the wallet approval sheet.
+        if (useKeypadMobileChrome) return amountScreen
         return (
           <DepositWalletApproveScreen
             amount={amount}
@@ -194,7 +194,7 @@ export function DepositModalFlow({
             walletProvider={walletProvider}
             confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
-            familyMobileLayout={useFamilyMobileChrome && step === 'processing'}
+            keypadMobileLayout={useKeypadMobileChrome && step === 'processing'}
             onComplete={onProcessingComplete}
             onViewExplorer={onConfirmedViewExplorer}
             onGoToDashboard={handleConfirmedGoToDashboard}
@@ -208,7 +208,7 @@ export function DepositModalFlow({
   const stepShellKey =
     isConfirmStep
       ? 'confirm'
-      : useFamilyMobileChrome && (step === 'review' || step === 'wallet')
+      : useKeypadMobileChrome && (step === 'review' || step === 'wallet')
         ? 'amount'
         : step
 
@@ -227,15 +227,15 @@ export function DepositModalFlow({
         currentStep={DEPOSIT_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
         flowLabel="Deposit"
-        chrome={useFamilyMobileChrome ? 'simple' : 'default'}
+        chrome={useKeypadMobileChrome ? 'simple' : 'default'}
         surface={
-          useFamilyMobileChrome && step === 'processing' ? 'immersive' : 'default'
+          useKeypadMobileChrome && step === 'processing' ? 'immersive' : 'default'
         }
         headerTitle={
-          useFamilyMobileChrome ? DEPOSIT_SIMPLE_HEADER_TITLE[step] ?? 'Deposit' : undefined
+          useKeypadMobileChrome ? DEPOSIT_SIMPLE_HEADER_TITLE[step] ?? 'Deposit' : undefined
         }
         onBack={
-          useFamilyMobileChrome
+          useKeypadMobileChrome
             ? step === 'review'
               ? handleReviewBack
               : step === 'amount'
@@ -252,7 +252,7 @@ export function DepositModalFlow({
         </div>
       </ModalShell>
 
-      {useFamilyMobileChrome ? (
+      {useKeypadMobileChrome ? (
         <>
           <BottomSheet
             open={reviewSheetOpen}
@@ -266,7 +266,7 @@ export function DepositModalFlow({
               networkName={networkDisplayName(chain)}
               walletAddress={walletAddress}
               walletProvider={walletProvider}
-              familyMobileLayout
+              keypadMobileLayout
               onBack={handleReviewBack}
               onConfirm={handleReviewConfirm}
             />
@@ -276,7 +276,7 @@ export function DepositModalFlow({
               amount={amount}
               networkName={networkDisplayName(chain)}
               walletAddress={walletAddress}
-              familyMobileLayout
+              keypadMobileLayout
               onComplete={onWalletComplete}
               onCancel={onWalletCancel}
             />

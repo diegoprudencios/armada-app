@@ -16,7 +16,7 @@ export interface TxProcessingLayoutProps {
   activeStageIndex?: number
   completed?: boolean
   progressVariant?: TransactionProgressVariant
-  /** Family mobile deposit: full-bleed gradient shell, details docked at bottom. */
+  /** Mobile keypad: full-bleed gradient shell, details docked at bottom. */
   layout?: TxProcessingLayoutVariant
   className?: string
 }

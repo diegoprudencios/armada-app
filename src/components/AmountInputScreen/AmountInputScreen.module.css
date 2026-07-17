@@ -17,7 +17,7 @@
   justify-content: space-between;
 }
 
-.columnFamilyMobile {
+.columnKeypadMobile {
   width: 100%;
   height: 100%;
   gap: 0;
@@ -98,17 +98,17 @@
   padding-bottom: calc(var(--primitives-spacing-5) + var(--mobile-safe-area-bottom, 0px));
 }
 
-.columnFamilyMobile .keypadActions {
+.columnKeypadMobile .keypadActions {
   padding-top: var(--primitives-spacing-5);
 }
 
 
-.columnFamilyMobile .keypadActions .buttonRow {
+.columnKeypadMobile .keypadActions .buttonRow {
   width: 100%;
 }
 
 /* Cascade: header (shell) → amount → wallet balance → keypad → CTA */
-@keyframes familyCascadeEnter {
+@keyframes keypadCascadeEnter {
   from {
     opacity: 0;
     transform: translateY(var(--primitives-spacing-10));
@@ -120,7 +120,7 @@
   }
 }
 
-@keyframes familyCtaEnter {
+@keyframes keypadCtaEnter {
   0% {
     opacity: 0;
     transform: translateY(0);
@@ -137,36 +137,36 @@
   }
 }
 
-.familyEnterAmount,
-.familyEnterBalance,
-.familyEnterKeypad {
+.keypadEnterAmount,
+.keypadEnterBalance,
+.keypadEnterKeypad {
   opacity: 0;
-  animation: familyCascadeEnter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: keypadCascadeEnter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.familyEnterAmount {
+.keypadEnterAmount {
   animation-delay: 140ms;
 }
 
-.familyEnterBalance {
+.keypadEnterBalance {
   animation-delay: 260ms;
 }
 
-.familyEnterKeypad {
+.keypadEnterKeypad {
   animation-delay: 380ms;
 }
 
-.familyEnterCta > * {
+.keypadEnterCta > * {
   opacity: 0;
-  animation: familyCtaEnter 520ms cubic-bezier(0.34, 1.15, 0.64, 1) both;
+  animation: keypadCtaEnter 520ms cubic-bezier(0.34, 1.15, 0.64, 1) both;
   animation-delay: 520ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .familyEnterAmount,
-  .familyEnterBalance,
-  .familyEnterKeypad,
-  .familyEnterCta > * {
+  .keypadEnterAmount,
+  .keypadEnterBalance,
+  .keypadEnterKeypad,
+  .keypadEnterCta > * {
     animation: none;
     opacity: 1;
     transform: none;
@@ -421,7 +421,7 @@
   max-width: 211px;
 }
 
-.columnFamilyMobile .buttonRowSingle > * {
+.columnKeypadMobile .buttonRowSingle > * {
   flex: 1 1 100%;
   max-width: none;
   width: 100%;

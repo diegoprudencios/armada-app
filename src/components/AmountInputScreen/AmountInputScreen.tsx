@@ -35,7 +35,7 @@ const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
 
 export type AmountInputBalanceMode = 'simple' | 'deposit-fee-aware'
 export type AmountInputPrimaryLabelMode = 'dynamic' | 'static'
-/** `input` = system keyboard (default). `keypad` = Family-style custom pad. */
+/** `input` = system keyboard (default). `keypad` = on-screen numeric pad. */
 export type AmountInputEntryMode = 'input' | 'keypad'
 
 export interface AmountInputScreenProps {
@@ -113,8 +113,8 @@ export function AmountInputScreen({
   const amountDisplayId = useId()
   const internalAmountInputRef = useRef<HTMLInputElement | null>(null)
   const isKeypad = entryMode === 'keypad'
-  /** Family-style: single sticky CTA, no cancel — mobile keypad only. */
-  const isFamilyMobileKeypad = isKeypad && isMobile
+  /** Mobile keypad: single sticky CTA, no cancel. */
+  const isKeypadMobile = isKeypad && isMobile
 
 
   const setAmountInputRef = useCallback(
@@ -173,7 +173,7 @@ export function AmountInputScreen({
   const rootClassName = [
     styles.column,
     isKeypad && styles.columnKeypad,
-    isFamilyMobileKeypad && styles.columnFamilyMobile,
+    isKeypadMobile && styles.columnKeypadMobile,
     columnClassName,
   ]
     .filter(Boolean)
@@ -271,8 +271,8 @@ export function AmountInputScreen({
     </div>
   )
 
-  const actionRow = isFamilyMobileKeypad ? (
-    <div className={`${styles.buttonRow} ${styles.buttonRowSingle} ${styles.familyEnterCta}`}>
+  const actionRow = isKeypadMobile ? (
+    <div className={`${styles.buttonRow} ${styles.buttonRowSingle} ${styles.keypadEnterCta}`}>
       <Button
         variant="primary"
         size="lg"
@@ -308,22 +308,22 @@ export function AmountInputScreen({
     return (
       <div className={rootClassName}>
         <div
-          className={[styles.keypadBody, !isFamilyMobileKeypad && modalStepBodyEnter]
+          className={[styles.keypadBody, !isKeypadMobile && modalStepBodyEnter]
             .filter(Boolean)
             .join(' ')}
         >
           {headerSlot}
-          {isFamilyMobileKeypad ? null : <h1 className={headingClassName}>{title}</h1>}
-          {isFamilyMobileKeypad ? (
+          {isKeypadMobile ? null : <h1 className={headingClassName}>{title}</h1>}
+          {isKeypadMobile ? (
             <>
-              <div className={`${styles.keypadAmountCenter} ${styles.familyEnterAmount}`}>
+              <div className={`${styles.keypadAmountCenter} ${styles.keypadEnterAmount}`}>
                 {amountBlock}
               </div>
               {footerSlot}
-              <div className={`${styles.keypadBalanceRow} ${styles.familyEnterBalance}`}>
+              <div className={`${styles.keypadBalanceRow} ${styles.keypadEnterBalance}`}>
                 {balanceControls}
               </div>
-              <div className={`${styles.keypadDock} ${styles.familyEnterKeypad}`}>
+              <div className={`${styles.keypadDock} ${styles.keypadEnterKeypad}`}>
                 <NumericKeypad className={styles.keypadPad} fullWidth onKey={handleKeypadKey} />
               </div>
             </>

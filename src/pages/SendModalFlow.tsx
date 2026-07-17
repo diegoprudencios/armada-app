@@ -89,7 +89,7 @@ export function SendModalFlow({
   onCloseRef.current = onClose
   const amountEntryMode = useMemo(() => sendAmountEntryModeFromSearch(), [])
   const isMobile = useMobileLayout()
-  const useFamilyMobileChrome = amountEntryMode === 'keypad' && isMobile
+  const useKeypadMobileChrome = amountEntryMode === 'keypad' && isMobile
   const isConfirmStep = step === 'processing' || step === 'confirmed'
   const isConfirmed = step === 'confirmed'
   const resolvedArmadaAddress = armadaAddress ?? DEMO_ARMADA_ADDRESS
@@ -105,7 +105,7 @@ export function SendModalFlow({
   }, [exiting])
 
   useEffect(() => {
-    if (!useFamilyMobileChrome) {
+    if (!useKeypadMobileChrome) {
       setReviewSheetOpen(false)
       confirmAfterSheetExitRef.current = false
       return
@@ -117,7 +117,7 @@ export function SendModalFlow({
     if (!confirmAfterSheetExitRef.current) {
       setReviewSheetOpen(false)
     }
-  }, [step, useFamilyMobileChrome])
+  }, [step, useKeypadMobileChrome])
 
   function handleConfirmedGoToDashboard() {
     onConfirmedGoToDashboard()
@@ -125,7 +125,7 @@ export function SendModalFlow({
   }
 
   function handleReviewConfirm() {
-    if (!useFamilyMobileChrome) {
+    if (!useKeypadMobileChrome) {
       onReviewConfirm()
       return
     }
@@ -172,8 +172,8 @@ export function SendModalFlow({
       case 'amount':
         return amountScreen
       case 'review':
-        // Family mobile: keep amount under the review sheet (including while it exits).
-        if (useFamilyMobileChrome) return amountScreen
+        // Mobile keypad: keep amount under the review sheet (including while it exits).
+        if (useKeypadMobileChrome) return amountScreen
         return (
           <SendReviewScreen
             amount={amount}
@@ -194,7 +194,7 @@ export function SendModalFlow({
             armadaAddress={resolvedArmadaAddress}
             confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
-            familyMobileLayout={useFamilyMobileChrome && step === 'processing'}
+            keypadMobileLayout={useKeypadMobileChrome && step === 'processing'}
             onComplete={onProcessingComplete}
             onViewExplorer={onConfirmedViewExplorer}
             onGoToDashboard={handleConfirmedGoToDashboard}
@@ -208,11 +208,11 @@ export function SendModalFlow({
   const stepShellKey =
     isConfirmStep
       ? 'confirm'
-      : useFamilyMobileChrome && step === 'review'
+      : useKeypadMobileChrome && step === 'review'
         ? 'amount'
         : step
 
-  const familyBack =
+  const keypadBack =
     step === 'review'
       ? handleReviewBack
       : step === 'amount'
@@ -236,14 +236,14 @@ export function SendModalFlow({
         currentStep={SEND_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
         flowLabel="Send"
-        chrome={useFamilyMobileChrome ? 'simple' : 'default'}
+        chrome={useKeypadMobileChrome ? 'simple' : 'default'}
         surface={
-          useFamilyMobileChrome && step === 'processing' ? 'immersive' : 'default'
+          useKeypadMobileChrome && step === 'processing' ? 'immersive' : 'default'
         }
         headerTitle={
-          useFamilyMobileChrome ? SEND_SIMPLE_HEADER_TITLE[step] ?? 'Send' : undefined
+          useKeypadMobileChrome ? SEND_SIMPLE_HEADER_TITLE[step] ?? 'Send' : undefined
         }
-        onBack={useFamilyMobileChrome ? familyBack : undefined}
+        onBack={useKeypadMobileChrome ? keypadBack : undefined}
         exiting={exiting}
         onClose={requestClose}
         closeButtonRef={closeButtonRef}
@@ -253,7 +253,7 @@ export function SendModalFlow({
         </div>
       </ModalShell>
 
-      {useFamilyMobileChrome ? (
+      {useKeypadMobileChrome ? (
         <BottomSheet
           open={reviewSheetOpen}
           onClose={handleReviewBack}
@@ -266,7 +266,7 @@ export function SendModalFlow({
             recipient={recipient}
             chain={chain}
             armadaAddress={resolvedArmadaAddress}
-            familyMobileLayout
+            keypadMobileLayout
             onBack={handleReviewBack}
             onConfirm={handleReviewConfirm}
           />

@@ -88,7 +88,7 @@ export function WithdrawModalFlow({
   onCloseRef.current = onClose
   const amountEntryMode = useMemo(() => withdrawAmountEntryModeFromSearch(), [])
   const isMobile = useMobileLayout()
-  const useFamilyMobileChrome = amountEntryMode === 'keypad' && isMobile
+  const useKeypadMobileChrome = amountEntryMode === 'keypad' && isMobile
   const isConfirmStep = step === 'processing' || step === 'confirmed'
   const isConfirmed = step === 'confirmed'
   const resolvedArmadaAddress = armadaAddress ?? DEMO_ARMADA_ADDRESS
@@ -104,7 +104,7 @@ export function WithdrawModalFlow({
   }, [exiting])
 
   useEffect(() => {
-    if (!useFamilyMobileChrome) {
+    if (!useKeypadMobileChrome) {
       setReviewSheetOpen(false)
       confirmAfterSheetExitRef.current = false
       return
@@ -116,7 +116,7 @@ export function WithdrawModalFlow({
     if (!confirmAfterSheetExitRef.current) {
       setReviewSheetOpen(false)
     }
-  }, [step, useFamilyMobileChrome])
+  }, [step, useKeypadMobileChrome])
 
   function handleConfirmedGoToDashboard() {
     onConfirmedGoToDashboard()
@@ -124,7 +124,7 @@ export function WithdrawModalFlow({
   }
 
   function handleReviewConfirm() {
-    if (!useFamilyMobileChrome) {
+    if (!useKeypadMobileChrome) {
       onReviewConfirm()
       return
     }
@@ -173,8 +173,8 @@ export function WithdrawModalFlow({
       case 'amount':
         return amountScreen
       case 'review':
-        // Family mobile: keep amount under the review sheet (including while it exits).
-        if (useFamilyMobileChrome) return amountScreen
+        // Mobile keypad: keep amount under the review sheet (including while it exits).
+        if (useKeypadMobileChrome) return amountScreen
         return (
           <SendReviewScreen
             amount={amount}
@@ -197,7 +197,7 @@ export function WithdrawModalFlow({
             confirmedAt={confirmedAt ?? Date.now()}
             confirmed={isConfirmed}
             variant="withdraw"
-            familyMobileLayout={useFamilyMobileChrome && step === 'processing'}
+            keypadMobileLayout={useKeypadMobileChrome && step === 'processing'}
             onComplete={onProcessingComplete}
             onViewExplorer={onConfirmedViewExplorer}
             onGoToDashboard={handleConfirmedGoToDashboard}
@@ -211,11 +211,11 @@ export function WithdrawModalFlow({
   const stepShellKey =
     isConfirmStep
       ? 'confirm'
-      : useFamilyMobileChrome && step === 'review'
+      : useKeypadMobileChrome && step === 'review'
         ? 'amount'
         : step
 
-  const familyBack =
+  const keypadBack =
     step === 'review'
       ? handleReviewBack
       : step === 'amount'
@@ -239,14 +239,14 @@ export function WithdrawModalFlow({
         currentStep={WITHDRAW_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
         flowLabel="Withdraw"
-        chrome={useFamilyMobileChrome ? 'simple' : 'default'}
+        chrome={useKeypadMobileChrome ? 'simple' : 'default'}
         surface={
-          useFamilyMobileChrome && step === 'processing' ? 'immersive' : 'default'
+          useKeypadMobileChrome && step === 'processing' ? 'immersive' : 'default'
         }
         headerTitle={
-          useFamilyMobileChrome ? WITHDRAW_SIMPLE_HEADER_TITLE[step] ?? 'Withdraw' : undefined
+          useKeypadMobileChrome ? WITHDRAW_SIMPLE_HEADER_TITLE[step] ?? 'Withdraw' : undefined
         }
-        onBack={useFamilyMobileChrome ? familyBack : undefined}
+        onBack={useKeypadMobileChrome ? keypadBack : undefined}
         exiting={exiting}
         onClose={requestClose}
         closeButtonRef={closeButtonRef}
@@ -256,7 +256,7 @@ export function WithdrawModalFlow({
         </div>
       </ModalShell>
 
-      {useFamilyMobileChrome ? (
+      {useKeypadMobileChrome ? (
         <BottomSheet
           open={reviewSheetOpen}
           onClose={handleReviewBack}
@@ -270,7 +270,7 @@ export function WithdrawModalFlow({
             chain={chain}
             armadaAddress={resolvedArmadaAddress}
             variant="withdraw"
-            familyMobileLayout
+            keypadMobileLayout
             onBack={handleReviewBack}
             onConfirm={handleReviewConfirm}
           />

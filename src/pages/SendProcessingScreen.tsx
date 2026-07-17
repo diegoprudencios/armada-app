@@ -17,8 +17,8 @@ export interface SendProcessingScreenProps {
   confirmedAt: number
   confirmed?: boolean
   variant?: SendFlowVariant
-  /** Family mobile keypad: full-bleed gradient processing layout. */
-  familyMobileLayout?: boolean
+  /** Mobile keypad: full-bleed gradient processing layout. */
+  keypadMobileLayout?: boolean
   onComplete: () => void
   onViewExplorer?: () => void
   onGoToDashboard: () => void
@@ -32,7 +32,7 @@ export function SendProcessingScreen({
   confirmedAt,
   confirmed = false,
   variant = 'send',
-  familyMobileLayout = false,
+  keypadMobileLayout = false,
   onComplete,
   onViewExplorer,
   onGoToDashboard,
@@ -71,7 +71,7 @@ export function SendProcessingScreen({
     )
   }
 
-  const rootClassName = [styles.column, familyMobileLayout && styles.columnImmersive]
+  const rootClassName = [styles.column, keypadMobileLayout && styles.columnImmersive]
     .filter(Boolean)
     .join(' ')
 
@@ -82,7 +82,7 @@ export function SendProcessingScreen({
         completed={completed}
         variant={variant}
         recipient={recipient}
-        layout={familyMobileLayout ? 'immersive' : 'default'}
+        layout={keypadMobileLayout ? 'immersive' : 'default'}
       />
     </div>
   )

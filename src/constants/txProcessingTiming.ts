@@ -1,7 +1,7 @@
 export const TX_PROCESSING_STAGE_ADVANCE_MS = 2500
 export const TX_PROCESSING_COMPLETED_HOLD_MS = 2000
 
-/** Family-style deposit processing: ~15s total (3×4.5s stages + 1.5s completed hold). */
+/** Keypad mobile deposit processing: ~15s total (3×4.5s stages + 1.5s completed hold). */
 export const DEPOSIT_PROCESSING_STAGE_ADVANCE_MS = 4500
 export const DEPOSIT_PROCESSING_COMPLETED_HOLD_MS = 1500
 

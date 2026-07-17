@@ -21,8 +21,8 @@ export interface DepositReviewScreenProps {
   walletAddress?: string
   walletProvider?: string
   armadaAddress?: string
-  /** Family mobile keypad: compact content for a bottom sheet over the amount screen. */
-  familyMobileLayout?: boolean
+  /** Mobile keypad: compact content for a bottom sheet over the amount screen. */
+  keypadMobileLayout?: boolean
   onBack: () => void
   onConfirm: () => void
 }
@@ -33,7 +33,7 @@ export function DepositReviewScreen({
   walletAddress,
   walletProvider,
   armadaAddress,
-  familyMobileLayout = false,
+  keypadMobileLayout = false,
   onBack,
   onConfirm,
 }: DepositReviewScreenProps) {
@@ -59,11 +59,11 @@ export function DepositReviewScreen({
       walletAddress={walletAddress ?? DEMO_WALLET_ADDRESS}
       walletProvider={walletProvider}
       armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
-      tone={familyMobileLayout ? 'neutral' : 'default'}
+      tone={keypadMobileLayout ? 'neutral' : 'default'}
     />
   )
 
-  if (familyMobileLayout) {
+  if (keypadMobileLayout) {
     // Amount stays on the Deposit screen behind the sheet — don't repeat it here.
     return (
       <div className={styles.sheetColumn}>

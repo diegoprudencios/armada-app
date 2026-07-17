@@ -22,8 +22,8 @@ export interface DepositWalletApproveScreenProps {
   skipApproval?: boolean
   /** MetaMask sign prompt “Function” row. */
   functionName?: string
-  /** Family mobile keypad: wallet sheet only (amount stays under the scrim). */
-  familyMobileLayout?: boolean
+  /** Mobile keypad: wallet sheet only (amount stays under the scrim). */
+  keypadMobileLayout?: boolean
   onComplete: () => void
   onCancel: () => void
 }
@@ -36,7 +36,7 @@ export function DepositWalletApproveScreen({
   computeFeeUsdc = calculateDepositFee,
   skipApproval = false,
   functionName = 'deposit',
-  familyMobileLayout = false,
+  keypadMobileLayout = false,
   onComplete,
   onCancel,
 }: DepositWalletApproveScreenProps) {
@@ -107,7 +107,7 @@ export function DepositWalletApproveScreen({
     />
   ) : null
 
-  if (familyMobileLayout) {
+  if (keypadMobileLayout) {
     return popup
   }
 
