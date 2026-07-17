@@ -241,6 +241,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     setRequestAmount: request.setRequestAmount,
     setRequestNote: request.setRequestNote,
     setRequestExpiryId: request.setRequestExpiryId,
+    setRequestStep: request.setRequestStep,
     setBalanceHidden: balances.setBalanceHidden,
     toggleActivity: activity.toggleActivity,
     openActivityReceipt,

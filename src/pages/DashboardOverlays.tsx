@@ -104,6 +104,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     setRequestAmount,
     setRequestNote,
     setRequestExpiryId,
+    setRequestStep,
   } = state
 
   return (
@@ -239,6 +240,13 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onAmountChange={setRequestAmount}
           onNoteChange={setRequestNote}
           onExpiryChange={setRequestExpiryId}
+          onChooseRequestViaLink={() => setRequestStep('amount')}
+          onAmountContinue={(nextAmount) => {
+            setRequestAmount(nextAmount)
+            setRequestStep('details')
+          }}
+          onAmountBack={() => setRequestStep('choose')}
+          onDetailsBack={() => setRequestStep('amount')}
           onCreateLink={completeRequestLink}
           onLinkRevoked={markRequestLinkRevoked}
           onDone={closeRequest}

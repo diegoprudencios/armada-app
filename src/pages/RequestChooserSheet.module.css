@@ -1,0 +1,71 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--primitives-spacing-2);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--mobile-touch-target-min);
+  padding-block: var(--primitives-spacing-2);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
+  transition: transform 0.1s ease;
+}
+
+.item:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.item:disabled {
+  cursor: default;
+}
+
+.itemLead {
+  display: flex;
+  align-items: center;
+  gap: var(--primitives-spacing-3);
+  min-width: 0;
+}
+
+.iconBadge {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(var(--semantic-borderRadius-item) * 1px);
+  background: color-mix(in srgb, var(--primitives-color-purple-500) 15%, transparent);
+  color: var(--semantic-color-text-primary);
+}
+
+.icon {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+}
+
+.label {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-md) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-spacing-6);
+  letter-spacing: var(--primitives-letterSpacing-normal);
+  color: var(--semantic-color-text-primary);
+}
+
+.meta {
+  flex-shrink: 0;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-md) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-spacing-4);
+  letter-spacing: var(--primitives-letterSpacing-wide);
+  color: var(--semantic-color-text-muted);
+}

@@ -53,6 +53,10 @@ export interface AmountInputScreenProps {
   calculateFee: (amount: number) => number
   balanceMode?: AmountInputBalanceMode
   primaryLabelMode?: AmountInputPrimaryLabelMode
+  /** Overrides dynamic/static primary CTA label (e.g. Request uses “Continue”). */
+  primaryActionLabel?: string
+  /** When false, hide wallet balance + percent pills (e.g. Request has no balance cap). */
+  showBalanceControls?: boolean
   entryMode?: AmountInputEntryMode
   headerSlot?: ReactNode
   footerSlot?: ReactNode
@@ -99,6 +103,8 @@ export function AmountInputScreen({
   calculateFee,
   balanceMode = 'simple',
   primaryLabelMode = 'dynamic',
+  primaryActionLabel,
+  showBalanceControls = true,
   entryMode = 'input',
   headerSlot,
   footerSlot,
@@ -131,10 +137,13 @@ export function AmountInputScreen({
   )
   const balanceDisplay = formatWalletBalance(balance)
   const hasAmount = hasActiveAmount(amount)
-  const exceedsBalance = resolveExceedsBalance(amount, balance, balanceMode)
+  const exceedsBalance = showBalanceControls
+    ? resolveExceedsBalance(amount, balance, balanceMode)
+    : false
   const canReview = hasAmount && !exceedsBalance
   const primaryLabel =
-    primaryLabelMode === 'static' ? 'Review' : hasAmount ? 'Review' : 'Input amount'
+    primaryActionLabel ??
+    (primaryLabelMode === 'static' ? 'Review' : hasAmount ? 'Review' : 'Input amount')
   const feeUsdc = calculateFee(parseActiveAmount(amount))
   const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const showFeeRow = hasAmount && feeUsdc > 0
@@ -320,9 +329,11 @@ export function AmountInputScreen({
                 {amountBlock}
               </div>
               {footerSlot}
-              <div className={`${styles.keypadBalanceRow} ${styles.keypadEnterBalance}`}>
-                {balanceControls}
-              </div>
+              {showBalanceControls ? (
+                <div className={`${styles.keypadBalanceRow} ${styles.keypadEnterBalance}`}>
+                  {balanceControls}
+                </div>
+              ) : null}
               <div className={`${styles.keypadDock} ${styles.keypadEnterKeypad}`}>
                 <NumericKeypad className={styles.keypadPad} fullWidth onKey={handleKeypadKey} />
               </div>
@@ -331,7 +342,7 @@ export function AmountInputScreen({
             <>
               <div className={styles.keypadAmountBlock}>
                 {amountBlock}
-                {balanceControls}
+                {showBalanceControls ? balanceControls : null}
               </div>
               {footerSlot}
               <NumericKeypad className={styles.keypadPad} onKey={handleKeypadKey} />
@@ -351,7 +362,7 @@ export function AmountInputScreen({
 
         <div className={styles.card}>
           {amountBlock}
-          {balanceControls}
+          {showBalanceControls ? balanceControls : null}
         </div>
 
         {footerSlot}

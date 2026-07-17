@@ -2,11 +2,12 @@ import { useState } from 'react'
 import type { SendChainId } from '@/pages/sendFlowConstants'
 import {
   DEFAULT_REQUEST_LINK_EXPIRY_ID,
+  shouldOpenRequestChooser,
   type RequestLinkExpiryId,
 } from '@/pages/requestFlowConstants'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { readActivityUserHidden } from '@/utils/demoDashboardSession'
-import { createRequestLinkActivity, findRequestLinkActivity, resolveActivityTxHash } from '@/utils/dashboardActivity'
+import { createRequestLinkActivity, findRequestLinkActivity } from '@/utils/dashboardActivity'
 import { isPaymentLinkRevoked } from '@/utils/payViaLink'
 import type { DashboardActivityItem } from '@/constants/dashboardActivity'
 import type { DemoWalletSession } from './useDemoWalletSession'
@@ -68,7 +69,7 @@ export function useRequestFlow({ walletSession, activity }: UseRequestFlowOption
     setRequestId('')
     setRequestExpiresAt(0)
     setRequestLinkRevoked(false)
-    setRequestStep('receive')
+    setRequestStep(shouldOpenRequestChooser() ? 'choose' : 'receive')
   }
 
   function closeRequest() {
@@ -202,6 +203,7 @@ export function useRequestFlow({ walletSession, activity }: UseRequestFlowOption
     setRequestAmount,
     setRequestNote,
     setRequestExpiryId,
+    setRequestStep,
     openRequest,
     closeRequest,
     completeRequestLink,

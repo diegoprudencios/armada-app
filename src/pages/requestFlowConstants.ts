@@ -2,7 +2,22 @@ import { getPublicAppOrigin } from '@/utils/appOrigin'
 
 export const REQUEST_PROGRESS_STEPS = ['Receive', 'Share link'] as const
 
-export type RequestModalStep = 'receive' | 'link' | 'confirmed'
+/** Desktop: receive → link → confirmed. Mobile keypad: choose → amount → details → link → confirmed. */
+export type RequestModalStep =
+  | 'choose'
+  | 'receive'
+  | 'amount'
+  | 'details'
+  | 'link'
+  | 'confirmed'
+
+/** True when Request should open the chooser sheet first (`?keypad=1` + mobile). */
+export function shouldOpenRequestChooser(search = window.location.search): boolean {
+  const value = new URLSearchParams(search).get('keypad')
+  const keypadOn = value === '1' || value === 'true'
+  if (!keypadOn || typeof window === 'undefined') return false
+  return window.matchMedia('(max-width: 767px)').matches
+}
 
 export const REQUEST_LINK_EXPIRY_OPTIONS = [
   { id: '1d', label: '1 day', ms: 86_400_000 },
