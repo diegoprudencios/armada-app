@@ -1,4 +1,4 @@
-import { TxProcessingLayout } from '@/components/TxProcessingLayout'
+import { TxProcessingLayout, type TxProcessingLayoutVariant } from '@/components/TxProcessingLayout'
 import type { TransactionProgressVariant } from '@/components/TransactionProgressDisclosure'
 import { earnProcessingStages, earnProgressCardCopy } from '@/constants/txProcessingCopy'
 import type { EarnTab } from '@/pages/earnFlowConstants'
@@ -8,6 +8,7 @@ export interface EarnProcessingStepperProps {
   activeStageIndex?: number
   completed?: boolean
   progressVariant?: TransactionProgressVariant
+  layout?: TxProcessingLayoutVariant
   className?: string
 }
 
@@ -16,6 +17,7 @@ export function EarnProcessingStepper({
   activeStageIndex = 0,
   completed = false,
   progressVariant,
+  layout = 'default',
   className,
 }: EarnProcessingStepperProps) {
   return (
@@ -26,6 +28,7 @@ export function EarnProcessingStepper({
       activeStageIndex={activeStageIndex}
       completed={completed}
       progressVariant={progressVariant}
+      layout={layout}
     />
   )
 }

@@ -5,6 +5,26 @@
   width: 100%;
 }
 
+.sheetColumn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--primitives-spacing-4);
+  padding-top: var(--primitives-spacing-3);
+}
+
+.sheetActions {
+  width: 100%;
+  display: flex;
+}
+
+.sheetActions > * {
+  flex: 1 1 100%;
+  max-width: none;
+  width: 100%;
+}
+
 .amountGroup {
   display: inline-flex;
   align-items: center;

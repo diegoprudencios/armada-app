@@ -21,7 +21,7 @@ import {
 } from './balanceRevealMotion'
 import { SendButton } from '@/components/SendButton'
 import { Tooltip } from '@/components/Tooltip'
-import { BottomSheet } from '@/components/BottomSheet'
+import { BottomSheet, afterBottomSheetHandoff } from '@/components/BottomSheet'
 import { VaultPositionBar } from '@/components/VaultPositionBar'
 import { useDashboardBackground } from '@/hooks/useDashboardBackground'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
@@ -94,7 +94,8 @@ interface BalanceCardMoreMenuItemsProps {
   onEarn?: () => void
   onWithdraw?: () => void
   onToggleActivity?: () => void
-  onSelect?: () => void
+  /** Close the menu; on mobile, pass the action to run after the sheet exits. */
+  onSelect: (action: () => void) => void
 }
 
 function BalanceCardMoreMenuItems({
@@ -110,8 +111,7 @@ function BalanceCardMoreMenuItems({
 }: BalanceCardMoreMenuItemsProps) {
   function run(action?: () => void) {
     if (!action) return
-    onSelect?.()
-    action()
+    onSelect(action)
   }
 
   return (
@@ -201,6 +201,8 @@ export function BalanceCard({
   const [moreMenuOpen, setMoreMenuOpen] = useState(false)
   const [moreMenuHoverSuppressed, setMoreMenuHoverSuppressed] = useState(false)
   const moreMenuRootRef = useRef<HTMLDivElement>(null)
+  const pendingMoreActionRef = useRef<(() => void) | null>(null)
+  const moreActionHandoffTimerRef = useRef<number | null>(null)
   const [internalBalanceHidden, setInternalBalanceHidden] = useState(false)
   const balanceHiddenControlled = balanceHiddenProp !== undefined
   const balanceHidden = balanceHiddenControlled ? balanceHiddenProp : internalBalanceHidden
@@ -225,6 +227,7 @@ export function BalanceCard({
   useEffect(() => {
     return () => {
       if (armadaAddressCopyTimerRef.current) clearTimeout(armadaAddressCopyTimerRef.current)
+      if (moreActionHandoffTimerRef.current) window.clearTimeout(moreActionHandoffTimerRef.current)
     }
   }, [])
 
@@ -267,6 +270,27 @@ export function BalanceCard({
     if (active instanceof HTMLElement && moreMenuRootRef.current?.contains(active)) {
       active.blur()
     }
+  }
+
+  function requestMoreMenuAction(action: () => void) {
+    if (!isMobileLayout) {
+      closeMoreMenu()
+      action()
+      return
+    }
+    pendingMoreActionRef.current = action
+    closeMoreMenu()
+  }
+
+  function handleMoreMenuExited() {
+    const action = pendingMoreActionRef.current
+    pendingMoreActionRef.current = null
+    if (!action) return
+    if (moreActionHandoffTimerRef.current) window.clearTimeout(moreActionHandoffTimerRef.current)
+    moreActionHandoffTimerRef.current = afterBottomSheetHandoff(() => {
+      moreActionHandoffTimerRef.current = null
+      action()
+    })
   }
 
   function handleMoreMenuPointerLeave() {
@@ -386,7 +410,7 @@ export function BalanceCard({
       onEarn={onEarn}
       onWithdraw={onWithdraw}
       onToggleActivity={onToggleActivity}
-      onSelect={closeMoreMenu}
+      onSelect={requestMoreMenuAction}
     />
   )
 
@@ -660,7 +684,15 @@ export function BalanceCard({
       </div>
 
       {isMobileLayout ? (
-        <BottomSheet open={moreMenuOpen} onClose={closeMoreMenu} ariaLabel="More options">
+        <BottomSheet
+          open={moreMenuOpen}
+          onClose={() => {
+            pendingMoreActionRef.current = null
+            closeMoreMenu()
+          }}
+          onExited={handleMoreMenuExited}
+          ariaLabel="More options"
+        >
           <div className={styles.moreMenuSheet} role="menu">
             {moreMenuItems}
           </div>

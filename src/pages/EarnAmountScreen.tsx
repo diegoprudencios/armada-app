@@ -1,5 +1,8 @@
 import type { Ref } from 'react'
-import { AmountInputScreen } from '@/components/AmountInputScreen'
+import {
+  AmountInputScreen,
+  type AmountInputEntryMode,
+} from '@/components/AmountInputScreen'
 import { AMOUNT_EXCEEDS_BALANCE_MESSAGE } from '@/utils/amountFieldA11y'
 import { calculateSendFee } from '@/utils/sendFee'
 import flowStep from '@/styles/modalFlowStep.module.css'
@@ -17,6 +20,10 @@ export interface EarnAmountScreenProps {
   balance: number
   amount: string
   apy?: number
+  /** Default `input` keeps the current system-keyboard UI. */
+  entryMode?: AmountInputEntryMode
+  /** Mobile keypad: mode is chosen in the Earn sheet — hide Add/Withdraw tabs. */
+  hideModeTabs?: boolean
   amountInputRef?: Ref<HTMLInputElement>
   onTabChange: (tab: EarnTab) => void
   onAmountChange: (amount: string) => void
@@ -29,6 +36,8 @@ export function EarnAmountScreen({
   balance,
   amount,
   apy = DEMO_EARN_APY,
+  entryMode = 'input',
+  hideModeTabs = false,
   amountInputRef,
   onTabChange,
   onAmountChange,
@@ -41,7 +50,7 @@ export function EarnAmountScreen({
     onAmountChange('')
   }
 
-  const headerSlot = (
+  const headerSlot = hideModeTabs ? undefined : (
     <div className={styles.tabs} role="tablist" aria-label="Earn mode">
       {EARN_TABS.map((item) => (
         <button
@@ -59,7 +68,7 @@ export function EarnAmountScreen({
   )
 
   const footerSlot =
-    tab === 'add' ? (
+    tab === 'add' && entryMode !== 'keypad' ? (
       <div className={styles.apyBlock}>
         <span className={styles.apyLabel}>Estimated APY</span>
         <span className={styles.apyValue}>{formatDemoApy(apy)}</span>
@@ -71,22 +80,23 @@ export function EarnAmountScreen({
 
   return (
     <AmountInputScreen
-      title={earnAmountQuestion(tab)}
+      title={entryMode === 'keypad' ? 'How much USDC?' : earnAmountQuestion(tab)}
       balance={balance}
       amount={amount}
+      entryMode={entryMode}
       amountAriaLabel={tab === 'add' ? 'Vault deposit amount' : 'Vault withdrawal amount'}
       exceedMessage={AMOUNT_EXCEEDS_BALANCE_MESSAGE}
       calculateFee={calculateSendFee}
       primaryLabelMode="static"
       focusKey={tab}
       amountInputRef={amountInputRef}
-      columnClassName={flowStep.column}
-      titleClassName={flowStep.title}
+      columnClassName={entryMode === 'keypad' ? undefined : flowStep.column}
+      titleClassName={entryMode === 'keypad' ? undefined : flowStep.title}
       headerSlot={headerSlot}
       footerSlot={footerSlot}
       onAmountChange={onAmountChange}
       onReview={() => onReview(amount)}
-      secondaryAction={{ label: 'Cancel', onClick: onCancel }}
+      secondaryAction={{ label: hideModeTabs ? 'Back' : 'Cancel', onClick: onCancel }}
     />
   )
 }

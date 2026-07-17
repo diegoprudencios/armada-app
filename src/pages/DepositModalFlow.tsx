@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { DepositChainId } from '@/constants/depositChains'
 import type { AmountInputEntryMode } from '@/components/AmountInputScreen'
-import { BottomSheet } from '@/components/BottomSheet'
+import { BottomSheet, afterBottomSheetHandoff } from '@/components/BottomSheet'
 import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
@@ -135,7 +135,9 @@ export function DepositModalFlow({
   function handleReviewSheetExited() {
     if (!confirmAfterSheetExitRef.current) return
     confirmAfterSheetExitRef.current = false
-    onReviewConfirm()
+    afterBottomSheetHandoff(() => {
+      onReviewConfirm()
+    })
   }
 
   function handleReviewBack() {

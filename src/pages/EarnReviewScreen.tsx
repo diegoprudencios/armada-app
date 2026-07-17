@@ -21,6 +21,8 @@ export interface EarnReviewScreenProps {
   tab: EarnTab
   amount: string
   apy?: number
+  /** Mobile keypad: compact content for a bottom sheet over the amount screen. */
+  keypadMobileLayout?: boolean
   onBack: () => void
   onConfirm: () => void
 }
@@ -29,11 +31,46 @@ export function EarnReviewScreen({
   tab,
   amount,
   apy = DEMO_EARN_APY,
+  keypadMobileLayout = false,
   onBack,
   onConfirm,
 }: EarnReviewScreenProps) {
   const amountNum = parseActiveAmount(amount)
   const feeUsdc = calculateSendFee(amountNum)
+  const confirmLabel = earnConfirmLabel(tab)
+
+  const summary = (
+    <EarnReviewSummary
+      tab={tab}
+      amount={amountNum}
+      apy={apy}
+      feeUsdc={feeUsdc}
+      tone={keypadMobileLayout ? 'neutral' : 'default'}
+    />
+  )
+
+  if (keypadMobileLayout) {
+    return (
+      <div className={styles.sheetColumn}>
+        {summary}
+        {tab === 'withdraw' ? (
+          <p className={styles.slippageNotice}>
+            The vault rate moves with each new block. Your final USDC may differ slightly from
+            this quote.
+          </p>
+        ) : null}
+        <div className={styles.sheetActions}>
+          <Button
+            variant="primary"
+            size="lg"
+            label={confirmLabel}
+            showIcon={false}
+            onClick={onConfirm}
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={flowStep.column}>
@@ -49,7 +86,7 @@ export function EarnReviewScreen({
           </div>
         </div>
 
-        <EarnReviewSummary tab={tab} amount={amountNum} apy={apy} feeUsdc={feeUsdc} />
+        {summary}
 
         {tab === 'withdraw' ? (
           <p className={styles.slippageNotice}>
@@ -64,7 +101,7 @@ export function EarnReviewScreen({
         <Button
           variant="primary"
           size="lg"
-          label={earnConfirmLabel(tab)}
+          label={confirmLabel}
           showIcon={false}
           onClick={onConfirm}
         />

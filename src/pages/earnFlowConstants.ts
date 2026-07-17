@@ -4,7 +4,8 @@ export const EARN_PROGRESS_STEPS = ['Amount', 'Review', 'Confirm'] as const
 
 export type EarnTab = 'add' | 'withdraw'
 
-export type EarnModalStep = 'amount' | 'review' | 'processing' | 'confirmed'
+/** Desktop: amount → review → … Mobile keypad: choose → amount → review → … */
+export type EarnModalStep = 'choose' | 'amount' | 'review' | 'processing' | 'confirmed'
 
 export const EARN_TABS: ReadonlyArray<{ id: EarnTab; label: string }> = [
   { id: 'add', label: 'Add funds' },
@@ -14,6 +15,13 @@ export const EARN_TABS: ReadonlyArray<{ id: EarnTab; label: string }> = [
 /** Demo vault APY — matches BalanceCard ellipses menu meta. */
 export const DEMO_EARN_APY = 4.2
 
+/** True when Earn should open the chooser sheet first (`?keypad=1` + mobile). */
+export function shouldOpenEarnChooser(search = window.location.search): boolean {
+  const value = new URLSearchParams(search).get('keypad')
+  const keypadOn = value === '1' || value === 'true'
+  if (!keypadOn || typeof window === 'undefined') return false
+  return window.matchMedia('(max-width: 767px)').matches
+}
 export const EARN_PROCESSING_STAGES = [
   { id: 'build-proof', label: 'Preparing transaction' },
   { id: 'submit-relayer', label: 'Submitting privately' },

@@ -5,7 +5,15 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import styles from './BottomSheet.module.css'
 
-export const BOTTOM_SHEET_EXIT_MS = 240
+/** Matches `.sheetExit` slide duration. */
+export const BOTTOM_SHEET_EXIT_MS = 320
+/** Pause after a sheet finishes closing before opening another. */
+export const BOTTOM_SHEET_HANDOFF_MS = 160
+
+/** Run `callback` after the exit animation plus handoff gap. */
+export function afterBottomSheetHandoff(callback: () => void): number {
+  return window.setTimeout(callback, BOTTOM_SHEET_HANDOFF_MS)
+}
 
 export interface BottomSheetProps {
   open: boolean

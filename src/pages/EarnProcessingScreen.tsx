@@ -10,6 +10,8 @@ export interface EarnProcessingScreenProps {
   amount: string
   confirmedAt: number
   confirmed?: boolean
+  /** Mobile keypad: full-bleed gradient processing layout. */
+  keypadMobileLayout?: boolean
   onComplete: () => void
   onViewExplorer?: () => void
   onGoToDashboard: () => void
@@ -20,6 +22,7 @@ export function EarnProcessingScreen({
   amount,
   confirmedAt,
   confirmed = false,
+  keypadMobileLayout = false,
   onComplete,
   onViewExplorer,
   onGoToDashboard,
@@ -49,9 +52,18 @@ export function EarnProcessingScreen({
     )
   }
 
+  const rootClassName = [styles.column, keypadMobileLayout && styles.columnImmersive]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <div className={styles.column}>
-      <EarnProcessingStepper tab={tab} activeStageIndex={activeStageIndex} completed={completed} />
+    <div className={rootClassName}>
+      <EarnProcessingStepper
+        tab={tab}
+        activeStageIndex={activeStageIndex}
+        completed={completed}
+        layout={keypadMobileLayout ? 'immersive' : 'default'}
+      />
     </div>
   )
 }

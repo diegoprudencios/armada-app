@@ -179,7 +179,18 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           confirmedAt={earnConfirmedAt}
           onClose={closeEarn}
           onTabChange={setEarnTab}
+          onChooseDeposit={() => {
+            setEarnTab('add')
+            setEarnAmount('')
+            setEarnStep('amount')
+          }}
+          onChooseWithdraw={() => {
+            setEarnTab('withdraw')
+            setEarnAmount('')
+            setEarnStep('amount')
+          }}
           onAmountChange={setEarnAmount}
+          onAmountBack={() => setEarnStep('choose')}
           onAmountReview={(nextAmount) => {
             setEarnAmount(nextAmount)
             setEarnStep('review')

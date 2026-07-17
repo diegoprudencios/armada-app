@@ -15,6 +15,10 @@
   background: var(--semantic-color-surface-main);
 }
 
+.summaryNeutral .summaryBody {
+  background: var(--primitives-color-gray-50);
+}
+
 .summaryRow {
   display: flex;
   align-items: center;
@@ -30,6 +34,10 @@
   gap: var(--primitives-spacing-3);
   padding: var(--primitives-spacing-5);
   background: var(--primitives-color-neutral-50);
+}
+
+.summaryNeutral .summaryTotalRow {
+  background: var(--primitives-color-gray-100);
 }
 
 .summaryTotalLabel,

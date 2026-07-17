@@ -13,7 +13,7 @@
 }
 
 .scrimExit {
-  animation: bottomSheetScrimOut 200ms ease forwards;
+  animation: bottomSheetScrimOut 280ms ease forwards;
 }
 
 .sheet {
@@ -34,7 +34,7 @@
 }
 
 .sheetExit {
-  animation: bottomSheetSlideOut 240ms ease forwards;
+  animation: bottomSheetSlideOut 320ms ease forwards;
 }
 
 .handleRow {

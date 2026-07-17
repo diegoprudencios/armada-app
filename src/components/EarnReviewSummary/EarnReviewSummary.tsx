@@ -11,17 +11,29 @@ export interface EarnReviewSummaryProps {
   apy: number
   feeUsdc: number
   confirmedAt?: number
+  /** Soft cool-gray fills for the summary table (e.g. white bottom sheet). */
+  tone?: 'default' | 'neutral'
 }
 
-export function EarnReviewSummary({ tab, amount, apy, feeUsdc, confirmedAt }: EarnReviewSummaryProps) {
+export function EarnReviewSummary({
+  tab,
+  amount,
+  apy,
+  feeUsdc,
+  confirmedAt,
+  tone = 'default',
+}: EarnReviewSummaryProps) {
   const modeLabel = tab === 'add' ? 'Add to vault' : 'Withdraw from vault'
   const amountRowLabel = tab === 'add' ? 'Your deposit' : 'Your withdrawal'
   const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const total = amount + feeUsdc
   const totalLabel = `${formatUsdcAmount(total, 2)} USDC`
+  const summaryClassName = [styles.summary, tone === 'neutral' && styles.summaryNeutral]
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <div className={styles.summary}>
+    <div className={summaryClassName}>
       <div className={styles.summaryBody}>
         {confirmedAt ? <TransactionDateTimeRow confirmedAt={confirmedAt} /> : null}
         <div className={styles.summaryRow}>

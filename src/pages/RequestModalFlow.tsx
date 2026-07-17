@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckIcon, ClipboardDocumentIcon, LinkIcon } from '@heroicons/react/24/outline'
 import type { AmountInputEntryMode } from '@/components/AmountInputScreen'
-import { BottomSheet } from '@/components/BottomSheet'
+import { BottomSheet, afterBottomSheetHandoff } from '@/components/BottomSheet'
 import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
@@ -127,10 +127,12 @@ export function RequestModalFlow({
 
   useEffect(() => {
     if (step === 'choose') {
-      setChooserOpen(true)
-      setAddressCopied(false)
       chooserIntentRef.current = null
-      return
+      const timer = afterBottomSheetHandoff(() => {
+        setChooserOpen(true)
+        setAddressCopied(false)
+      })
+      return () => window.clearTimeout(timer)
     }
     if (chooserIntentRef.current !== 'requestViaLink') {
       setChooserOpen(false)
@@ -189,13 +191,15 @@ export function RequestModalFlow({
   function handleChooserExited() {
     const intent = chooserIntentRef.current
     chooserIntentRef.current = null
-    if (intent === 'requestViaLink') {
-      onChooseRequestViaLink()
-      return
-    }
-    if (intent === 'close' || step === 'choose') {
-      onClose()
-    }
+    afterBottomSheetHandoff(() => {
+      if (intent === 'requestViaLink') {
+        onChooseRequestViaLink()
+        return
+      }
+      if (intent === 'close' || step === 'choose') {
+        onClose()
+      }
+    })
   }
 
   function handleRequestViaLink() {
@@ -355,9 +359,9 @@ export function RequestModalFlow({
         exiting={exiting}
         onClose={requestClose}
         initialFocusRef={
-          (step === 'receive' || (step === 'amount' && amountEntryMode === 'input'))
+          step === 'receive' || (step === 'amount' && amountEntryMode === 'input')
             ? amountInputRef
-            : closeButtonRef
+            : undefined
         }
         style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
       >

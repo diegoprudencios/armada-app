@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import type { EarnTab } from '@/pages/earnFlowConstants'
+import { shouldOpenEarnChooser, type EarnTab } from '@/pages/earnFlowConstants'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import { readActivityUserHidden } from '@/utils/demoDashboardSession'
@@ -34,7 +34,7 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
     if (!walletSession.requireWallet()) return
     setEarnTab(tab)
     setEarnAmount('')
-    setEarnStep('amount')
+    setEarnStep(shouldOpenEarnChooser() ? 'choose' : 'amount')
   }
 
   function closeEarn() {
