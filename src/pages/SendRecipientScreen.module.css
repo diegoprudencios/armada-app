@@ -1,10 +1,27 @@
 .column {
   width: 100%;
   max-width: 434px;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding-bottom: calc(var(--primitives-spacing-5) + var(--mobile-safe-area-bottom, 0px));
+  box-sizing: border-box;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: var(--primitives-spacing-8);
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .title {
@@ -25,7 +42,7 @@
 .addressField {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--primitives-spacing-5);
   width: 100%;
   height: var(--primitives-spacing-16);
   padding: 0 var(--primitives-spacing-5);
@@ -42,12 +59,15 @@
   border: none;
   background: transparent;
   font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
-  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  /* ≥16px prevents iOS Safari zoom-on-focus */
+  font-size: calc(var(--primitives-fontSize-lg) * 1px);
   font-weight: var(--primitives-fontWeight-medium);
   color: var(--semantic-color-text-primary);
   outline: none;
   letter-spacing: 0;
   height: 100%;
+  overflow: hidden;
+  text-overflow: clip;
 }
 
 .addressInput::placeholder {
@@ -85,6 +105,43 @@
 .pasteButton:focus-visible {
   outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
   outline-offset: calc(var(--primitives-spacing-1) * 0.5);
+}
+
+.clearButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--primitives-spacing-8);
+  height: var(--primitives-spacing-8);
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  background: var(--semantic-color-surface-hover);
+  color: var(--semantic-color-text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.clearButton:hover {
+  color: var(--semantic-color-text-primary);
+  background: var(--semantic-color-surface-raised);
+}
+
+.clearButton:active {
+  transform: translateY(1px);
+}
+
+.clearButton:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 0.5);
+}
+
+.clearIcon {
+  width: var(--primitives-spacing-4);
+  height: var(--primitives-spacing-4);
+  display: block;
 }
 
 .networkRoot {
@@ -182,25 +239,15 @@
   background: var(--semantic-color-surface-hover);
 }
 
-.actionRow {
-  display: flex;
-  align-items: center;
-  gap: var(--primitives-spacing-3);
-  width: 100%;
-}
-
 .actionRowReveal {
   --recipient-reveal-duration: 360ms;
   --recipient-reveal-easing: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.actionRowReveal > * {
   opacity: 0;
   animation: recipientActionEnter var(--recipient-reveal-duration) var(--recipient-reveal-easing) both;
   will-change: opacity, transform;
 }
 
-.actionRowReveal > *:nth-child(2) {
+.footer.actionRowReveal {
   animation-delay: 70ms;
 }
 
@@ -216,15 +263,13 @@
   }
 }
 
-.actionRowReveal + .recentSection {
-  opacity: 0.4;
-}
-
 .privacyBadge {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: var(--primitives-spacing-3);
-  flex: 1;
+  width: 100%;
   min-width: 0;
 }
 
@@ -266,8 +311,10 @@
 .privacyCopy {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--primitives-spacing-1);
   min-width: 0;
+  text-align: center;
 }
 
 .privacyTitle {
@@ -276,6 +323,7 @@
   font-weight: var(--primitives-fontWeight-semibold);
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-primary);
+  text-align: center;
 }
 
 .privacySubtitle {
@@ -284,11 +332,27 @@
   font-weight: var(--primitives-fontWeight-regular);
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-secondary);
+  text-align: center;
+}
+
+.footer {
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--primitives-spacing-5);
+  padding-top: var(--primitives-spacing-5);
+  box-sizing: border-box;
 }
 
 .continueButton {
-  flex-shrink: 0;
-  max-width: 140px;
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 100%;
+  max-width: none;
+  min-height: var(--semantic-component-button-primary-lg-height);
+  height: var(--semantic-component-button-primary-lg-height);
 }
 
 .recentSection {
@@ -300,7 +364,11 @@
   transition: opacity 360ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.actionRowReveal + .recentSection:hover {
+.recentSectionDimmed {
+  opacity: 0.4;
+}
+
+.recentSectionDimmed:hover {
   opacity: 1;
   transition-duration: 240ms;
 }
@@ -380,15 +448,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .actionRowReveal > * {
+  .actionRowReveal {
     animation: none;
     opacity: 1;
     transform: none;
     will-change: auto;
-  }
-
-  .actionRowReveal + .recentSection {
-    opacity: 0.4;
   }
 
   .recentSection {

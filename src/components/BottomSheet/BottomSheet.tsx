@@ -5,11 +5,13 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import styles from './BottomSheet.module.css'
 
-const EXIT_MS = 240
+export const BOTTOM_SHEET_EXIT_MS = 240
 
 export interface BottomSheetProps {
   open: boolean
   onClose: () => void
+  /** Fires after the close animation finishes (when `open` becomes false). */
+  onExited?: () => void
   title?: string
   ariaLabel?: string
   /** When `title` is set, show the header close control. Default true. */
@@ -21,6 +23,7 @@ export interface BottomSheetProps {
 export function BottomSheet({
   open,
   onClose,
+  onExited,
   title,
   ariaLabel,
   showClose = true,
@@ -31,7 +34,9 @@ export function BottomSheet({
   const [mounted, setMounted] = useState(open)
   const [exiting, setExiting] = useState(false)
   const onCloseRef = useRef(onClose)
+  const onExitedRef = useRef(onExited)
   onCloseRef.current = onClose
+  onExitedRef.current = onExited
 
   useBodyScrollLock(open || exiting)
   useEscapeKey(onClose, mounted && !exiting)
@@ -49,7 +54,8 @@ export function BottomSheet({
     const timer = window.setTimeout(() => {
       setMounted(false)
       setExiting(false)
-    }, EXIT_MS)
+      onExitedRef.current?.()
+    }, BOTTOM_SHEET_EXIT_MS)
     return () => window.clearTimeout(timer)
   }, [open, mounted])
 

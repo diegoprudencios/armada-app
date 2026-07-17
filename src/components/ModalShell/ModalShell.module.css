@@ -14,7 +14,10 @@
 .shellSimple {
   padding-top: calc(var(--primitives-spacing-4) + var(--mobile-safe-area-top, 0px));
   padding-bottom: 0;
+  height: 100dvh;
   min-height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
 }
 
 /* EXCEPTION — brand gradient fills the processing beat on family mobile deposit. */

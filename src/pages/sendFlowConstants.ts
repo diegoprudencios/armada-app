@@ -5,6 +5,9 @@ import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
 
 export const SEND_PROGRESS_STEPS = ['Recipient', 'Amount', 'Review', 'Confirm'] as const
 
+/** Withdraw keeps the same progress path as send (no wallet step — funds leave Armada). */
+export const WITHDRAW_PROGRESS_STEPS = ['Recipient', 'Amount', 'Review', 'Confirm'] as const
+
 export type SendChainId = 'ethereum' | 'arbitrum' | 'base'
 
 export const DEMO_ZK_RECIPIENT =
@@ -53,10 +56,10 @@ export function isValidRecipientAddress(address: string): boolean {
 export type SendFlowVariant = 'send' | 'withdraw'
 
 export function sendRecipientTitleLead(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Where do you want to send' : 'Who do you want to send'
+  return variant === 'withdraw' ? 'Where do you want to' : 'Who do you want to'
 }
 
-export const SEND_RECIPIENT_TITLE_TAIL = 'your USDC?'
+export const SEND_RECIPIENT_TITLE_TAIL = 'send your USDC?'
 
 export function sendReviewTitle(variant: SendFlowVariant): string {
   return variant === 'withdraw' ? 'Review your withdrawal' : 'Review transfer'

@@ -18,6 +18,8 @@ export interface MockMetaMaskPopupProps {
   amountLabel: string
   networkName?: string
   accountAddress?: string
+  /** Shown on the sign prompt “Function” row. */
+  functionName?: string
   onConfirm: () => void
   onReject: () => void
 }
@@ -27,6 +29,7 @@ export function MockMetaMaskPopup({
   amountLabel,
   networkName = 'Ethereum Sepolia',
   accountAddress,
+  functionName = 'deposit',
   onConfirm,
   onReject,
 }: MockMetaMaskPopupProps) {
@@ -109,7 +112,7 @@ export function MockMetaMaskPopup({
               </div>
               <div className={styles.detailRow}>
                 <span className={styles.detailLabel}>Function</span>
-                <span className={styles.detailValue}>deposit</span>
+                <span className={styles.detailValue}>{functionName}</span>
               </div>
               <div className={styles.detailRow}>
                 <span className={styles.detailLabel}>Amount</span>

@@ -20,6 +20,8 @@ export interface DepositWalletApproveScreenProps {
   computeFeeUsdc?: (amount: number) => number
   /** When true, only the sign transaction is shown (no USDC approve step). */
   skipApproval?: boolean
+  /** MetaMask sign prompt “Function” row. */
+  functionName?: string
   /** Family mobile keypad: wallet sheet only (amount stays under the scrim). */
   familyMobileLayout?: boolean
   onComplete: () => void
@@ -33,6 +35,7 @@ export function DepositWalletApproveScreen({
   signStepLabel = 'Sign deposit transaction',
   computeFeeUsdc = calculateDepositFee,
   skipApproval = false,
+  functionName = 'deposit',
   familyMobileLayout = false,
   onComplete,
   onCancel,
@@ -98,6 +101,7 @@ export function DepositWalletApproveScreen({
       amountLabel={amountLabel}
       networkName={networkName}
       accountAddress={walletAddress}
+      functionName={functionName}
       onConfirm={promptPhase === 'approve' ? handleApprove : handleSign}
       onReject={handleReject}
     />

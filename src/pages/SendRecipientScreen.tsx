@@ -1,13 +1,14 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/solid'
-import { ArrowRightIcon, GlobeAltIcon } from '@heroicons/react/24/outline'
+import { ArrowRightIcon, GlobeAltIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { Button } from '@/components/Button'
 import { modalStepBodyEnter } from '@/components/ModalShell'
 import { useEnvironment } from '@/hooks/useEnvironment'
 import { useListboxKeyboard } from '@/hooks/useListboxKeyboard'
+import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { readRecipientFromClipboard } from '@/utils/clipboardAddress'
-import { truncateAddress } from '@/utils/format'
+import { truncateAddress, truncateMiddleToWidth } from '@/utils/format'
 import {
   DEMO_0X_RECIPIENT,
   DEMO_ZK_RECIPIENT,
@@ -51,18 +52,51 @@ export function SendRecipientScreen({
   const inputRef = useRef<HTMLInputElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [clipboardHasAddress, setClipboardHasAddress] = useState(false)
+  const [inputFocused, setInputFocused] = useState(false)
+  const [fittedAddress, setFittedAddress] = useState(recipient)
   const [environment] = useEnvironment()
+  const isMobile = useMobileLayout()
   const isMock = environment === 'mock'
 
   const trimmed = recipient.trim()
   const hasInput = trimmed.length > 0
   const hasAddress = isValidRecipientAddress(trimmed)
   const showPasteButton = !hasInput && (isMock || clipboardHasAddress)
+  const showRecentList = showRecentAddresses && !(isMobile && hasAddress)
   const isPrivate = hasAddress && isArmadaAddress(trimmed)
   const isPublic = hasAddress && isPublicAddress(trimmed)
+  const inputDisplayValue = inputFocused ? recipient : fittedAddress
   const selectedChain = SEND_CHAIN_OPTIONS.find((option) => option.id === chain) ?? SEND_CHAIN_OPTIONS[0]
   const SelectedNetworkIcon = selectedChain.Icon
   const chainOptionIds = SEND_CHAIN_OPTIONS.map((option) => option.id)
+
+  useLayoutEffect(() => {
+    const input = inputRef.current
+    if (!input) return
+
+    function fitToInputWidth() {
+      const el = inputRef.current
+      if (!el) return
+
+      if (!trimmed) {
+        setFittedAddress(recipient)
+        return
+      }
+
+      const style = getComputedStyle(el)
+      const font = [style.fontStyle, style.fontWeight, style.fontSize, style.fontFamily]
+        .filter(Boolean)
+        .join(' ')
+      setFittedAddress(truncateMiddleToWidth(trimmed, el.clientWidth, font))
+    }
+
+    fitToInputWidth()
+
+    if (typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(fitToInputWidth)
+    observer.observe(input)
+    return () => observer.disconnect()
+  }, [trimmed, recipient, showPasteButton, hasInput, inputFocused])
 
   function selectChain(next: SendChainId) {
     onChainChange(next)
@@ -133,18 +167,30 @@ export function SendRecipientScreen({
       const next = pasteToggleRef.current ? DEMO_0X_RECIPIENT : DEMO_ZK_RECIPIENT
       pasteToggleRef.current = !pasteToggleRef.current
       onRecipientChange(next)
+      inputRef.current?.blur()
       return
     }
 
     const address = await readRecipientFromClipboard()
     if (address) {
       onRecipientChange(address)
+      inputRef.current?.blur()
     }
+  }
+
+  function handleClear() {
+    onRecipientChange('')
+    inputRef.current?.blur()
+  }
+
+  function handleSelectRecent(address: string) {
+    onRecipientChange(address)
+    inputRef.current?.blur()
   }
 
   return (
     <div className={styles.column}>
-      <div className={modalStepBodyEnter}>
+      <div className={`${styles.body} ${modalStepBodyEnter}`}>
         <h1 className={styles.title}>
           {sendRecipientTitleLead(variant)}
           <br />
@@ -158,16 +204,32 @@ export function SendRecipientScreen({
               id={inputId}
               className={styles.addressInput}
               type="text"
-              value={recipient}
+              value={inputDisplayValue}
+              title={trimmed || undefined}
               onChange={(event) => onRecipientChange(event.target.value)}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
               placeholder="Enter address"
               spellCheck={false}
               autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
               aria-label="Recipient address"
             />
             {showPasteButton ? (
               <button type="button" className={styles.pasteButton} onClick={() => void handlePaste()}>
                 Paste
+              </button>
+            ) : null}
+            {hasInput ? (
+              <button
+                type="button"
+                className={styles.clearButton}
+                aria-label="Clear address"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={handleClear}
+              >
+                <XMarkIcon className={styles.clearIcon} strokeWidth={2} aria-hidden />
               </button>
             ) : null}
           </div>
@@ -230,47 +292,7 @@ export function SendRecipientScreen({
           ) : null}
         </div>
 
-        {hasAddress ? (
-          <div className={`${styles.actionRow} ${styles.actionRowReveal}`}>
-            <div className={styles.privacyBadge}>
-              <span
-                className={[
-                  styles.privacyIcon,
-                  isPrivate ? styles.brandBadge : styles.privacyIconPublic,
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                aria-hidden
-              >
-                {isPrivate ? (
-                  <ArmadaLogo variant="mark" markTone="white" className={styles.brandMark} />
-                ) : (
-                  <GlobeAltIcon className={styles.privacyIconSvg} strokeWidth={1.75} />
-                )}
-              </span>
-              <div className={styles.privacyCopy}>
-                <span className={styles.privacyTitle}>
-                  {isPrivate ? 'Private address' : 'Public address'}
-                </span>
-                <span className={styles.privacySubtitle}>
-                  {isPrivate
-                    ? 'Transaction will be fully private'
-                    : "Transfer won't be fully private"}
-                </span>
-              </div>
-            </div>
-            <Button
-              variant="primary"
-              size="lg"
-              label="Continue"
-              showIcon={false}
-              className={styles.continueButton}
-              onClick={onContinue}
-            />
-          </div>
-        ) : null}
-
-        {showRecentAddresses ? (
+        {showRecentList ? (
           <div className={styles.recentSection}>
             <span className={styles.recentLabel}>Recent address</span>
             <ul className={styles.recentList}>
@@ -279,7 +301,7 @@ export function SendRecipientScreen({
                   <button
                     type="button"
                     className={styles.recentItem}
-                    onClick={() => onRecipientChange(item.address)}
+                    onClick={() => handleSelectRecent(item.address)}
                   >
                     <span className={styles.recentIconBadge} aria-hidden>
                       <ArrowRightIcon className={styles.recentIcon} strokeWidth={1.5} />
@@ -293,6 +315,46 @@ export function SendRecipientScreen({
           </div>
         ) : null}
       </div>
+
+      {hasAddress ? (
+        <div className={`${styles.footer} ${styles.actionRowReveal}`}>
+          <div className={styles.privacyBadge}>
+            <span
+              className={[
+                styles.privacyIcon,
+                isPrivate ? styles.brandBadge : styles.privacyIconPublic,
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              aria-hidden
+            >
+              {isPrivate ? (
+                <ArmadaLogo variant="mark" markTone="white" className={styles.brandMark} />
+              ) : (
+                <GlobeAltIcon className={styles.privacyIconSvg} strokeWidth={1.75} />
+              )}
+            </span>
+            <div className={styles.privacyCopy}>
+              <span className={styles.privacyTitle}>
+                {isPrivate ? 'Private address' : 'Public address'}
+              </span>
+              <span className={styles.privacySubtitle}>
+                {isPrivate
+                  ? 'Transaction will be fully private'
+                  : "Transfer won't be fully private"}
+              </span>
+            </div>
+          </div>
+          <Button
+            variant="primary"
+            size="lg"
+            label="Continue"
+            showIcon={false}
+            className={styles.continueButton}
+            onClick={onContinue}
+          />
+        </div>
+      ) : null}
     </div>
   )
 }

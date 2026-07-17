@@ -1,1 +1,2 @@
-export { BottomSheet, type BottomSheetProps } from './BottomSheet'
+export { BottomSheet, BOTTOM_SHEET_EXIT_MS, type BottomSheetProps } from './BottomSheet'
+

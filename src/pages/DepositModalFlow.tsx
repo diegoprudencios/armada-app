@@ -81,6 +81,8 @@ export function DepositModalFlow({
   onConfirmedGoToDashboard,
 }: DepositModalFlowProps) {
   const [exiting, setExiting] = useState(false)
+  const [reviewSheetOpen, setReviewSheetOpen] = useState(false)
+  const confirmAfterSheetExitRef = useRef(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const amountInputRef = useRef<HTMLInputElement>(null)
   const onCloseRef = useRef(onClose)
@@ -101,9 +103,45 @@ export function DepositModalFlow({
     return () => window.clearTimeout(timer)
   }, [exiting])
 
+  useEffect(() => {
+    if (!useFamilyMobileChrome) {
+      setReviewSheetOpen(false)
+      confirmAfterSheetExitRef.current = false
+      return
+    }
+    if (step === 'review') {
+      setReviewSheetOpen(true)
+      return
+    }
+    if (!confirmAfterSheetExitRef.current) {
+      setReviewSheetOpen(false)
+    }
+  }, [step, useFamilyMobileChrome])
+
   function handleConfirmedGoToDashboard() {
     onConfirmedGoToDashboard()
     requestClose()
+  }
+
+  function handleReviewConfirm() {
+    if (!useFamilyMobileChrome) {
+      onReviewConfirm()
+      return
+    }
+    confirmAfterSheetExitRef.current = true
+    setReviewSheetOpen(false)
+  }
+
+  function handleReviewSheetExited() {
+    if (!confirmAfterSheetExitRef.current) return
+    confirmAfterSheetExitRef.current = false
+    onReviewConfirm()
+  }
+
+  function handleReviewBack() {
+    confirmAfterSheetExitRef.current = false
+    setReviewSheetOpen(false)
+    onReviewBack()
   }
 
   const amountScreen = (
@@ -199,7 +237,7 @@ export function DepositModalFlow({
         onBack={
           useFamilyMobileChrome
             ? step === 'review'
-              ? onReviewBack
+              ? handleReviewBack
               : step === 'amount'
                 ? requestClose
                 : undefined
@@ -217,8 +255,9 @@ export function DepositModalFlow({
       {useFamilyMobileChrome ? (
         <>
           <BottomSheet
-            open={step === 'review'}
-            onClose={onReviewBack}
+            open={reviewSheetOpen}
+            onClose={handleReviewBack}
+            onExited={handleReviewSheetExited}
             title="Review"
             showClose={false}
           >
@@ -228,8 +267,8 @@ export function DepositModalFlow({
               walletAddress={walletAddress}
               walletProvider={walletProvider}
               familyMobileLayout
-              onBack={onReviewBack}
-              onConfirm={onReviewConfirm}
+              onBack={handleReviewBack}
+              onConfirm={handleReviewConfirm}
             />
           </BottomSheet>
           {step === 'wallet' ? (

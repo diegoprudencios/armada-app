@@ -1,2 +1,2 @@
-export type { SendModalStep as WithdrawModalStep } from './SendModalFlow'
-export { SEND_PROGRESS_STEPS as WITHDRAW_PROGRESS_STEPS } from './sendFlowConstants'
+export type WithdrawModalStep = 'recipient' | 'amount' | 'review' | 'processing' | 'confirmed'
+export { WITHDRAW_PROGRESS_STEPS } from './sendFlowConstants'

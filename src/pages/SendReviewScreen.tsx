@@ -6,7 +6,14 @@ import { parseActiveAmount } from '@/utils/amountInput'
 import { calculateSendFee } from '@/utils/sendFee'
 import { formatUsdcAmount } from '@/utils/format'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
-import { isArmadaAddress, sendNetworkDisplayName, sendReviewConfirmLabel, sendReviewTitle, type SendChainId, type SendFlowVariant } from './sendFlowConstants'
+import {
+  isArmadaAddress,
+  sendNetworkDisplayName,
+  sendReviewConfirmLabel,
+  sendReviewTitle,
+  type SendChainId,
+  type SendFlowVariant,
+} from './sendFlowConstants'
 import styles from './SendReviewScreen.module.css'
 
 const TOKEN_BADGE_PX = 40
@@ -18,6 +25,8 @@ export interface SendReviewScreenProps {
   chain: SendChainId
   armadaAddress?: string
   variant?: SendFlowVariant
+  /** Family mobile keypad: compact content for a bottom sheet over the amount screen. */
+  familyMobileLayout?: boolean
   onBack: () => void
   onConfirm: () => void
 }
@@ -28,6 +37,7 @@ export function SendReviewScreen({
   chain,
   armadaAddress,
   variant = 'send',
+  familyMobileLayout = false,
   onBack,
   onConfirm,
 }: SendReviewScreenProps) {
@@ -35,6 +45,36 @@ export function SendReviewScreen({
   const feeUsdc = calculateSendFee(amountNum)
   const isPrivate = isArmadaAddress(recipient)
   const networkName = isPrivate ? undefined : sendNetworkDisplayName(chain)
+  const confirmLabel = sendReviewConfirmLabel(variant)
+
+  const summary = (
+    <SendReviewSummary
+      recipientAddress={recipient}
+      armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
+      networkName={networkName}
+      amount={amountNum}
+      feeUsdc={feeUsdc}
+      tone={familyMobileLayout ? 'neutral' : 'default'}
+    />
+  )
+
+  if (familyMobileLayout) {
+    // Amount stays on the Send screen behind the sheet — don't repeat it here.
+    return (
+      <div className={styles.sheetColumn}>
+        {summary}
+        <div className={styles.sheetActions}>
+          <Button
+            variant="primary"
+            size="lg"
+            label={confirmLabel}
+            showIcon={false}
+            onClick={onConfirm}
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.column}>
@@ -50,18 +90,18 @@ export function SendReviewScreen({
           </div>
         </div>
 
-        <SendReviewSummary
-          recipientAddress={recipient}
-          armadaAddress={armadaAddress ?? DEMO_ARMADA_ADDRESS}
-          networkName={networkName}
-          amount={amountNum}
-          feeUsdc={feeUsdc}
-        />
+        {summary}
       </div>
 
       <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>
         <Button variant="secondary" size="lg" label="Back" showIcon={false} onClick={onBack} />
-        <Button variant="primary" size="lg" label={sendReviewConfirmLabel(variant)} showIcon={false} onClick={onConfirm} />
+        <Button
+          variant="primary"
+          size="lg"
+          label={confirmLabel}
+          showIcon={false}
+          onClick={onConfirm}
+        />
       </div>
     </div>
   )
