@@ -54,28 +54,21 @@
 }
 
 .apyLabel {
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-xs) * 1px);
-  font-weight: var(--primitives-fontWeight-medium);
-  letter-spacing: var(--primitives-letterSpacing-wider);
+  composes: labelXs from '../styles/typographyComposites.module.css';
   text-transform: uppercase;
   color: var(--semantic-color-text-muted);
 }
 
 .apyValue {
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-2xl) * 1px);
-  font-weight: var(--primitives-fontWeight-regular);
+  composes: headingLg from '../styles/typographyComposites.module.css';
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-primary);
   font-variant-numeric: tabular-nums;
 }
 
 .apyCaveat {
+  composes: bodySm from '../styles/typographyComposites.module.css';
   margin: var(--primitives-spacing-1) 0 0;
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
-  font-weight: var(--primitives-fontWeight-regular);
   line-height: var(--primitives-lineHeight-normal);
   color: var(--semantic-color-text-muted);
 }

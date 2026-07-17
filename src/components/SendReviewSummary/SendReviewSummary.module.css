@@ -34,9 +34,7 @@
 
 .summaryTotalLabel,
 .summaryTotalValue {
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-weight: var(--primitives-fontWeight-semibold);
-  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  composes: bodySmSemibold from '../../styles/typographyComposites.module.css';
   color: var(--semantic-color-brand-deep);
 }
 
@@ -45,17 +43,13 @@
 }
 
 .summaryLabel {
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-weight: var(--primitives-fontWeight-regular);
-  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  composes: bodySm from '../../styles/typographyComposites.module.css';
   color: var(--semantic-color-text-muted);
   flex-shrink: 0;
 }
 
 .summaryValue {
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-weight: var(--primitives-fontWeight-medium);
-  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  composes: bodySmMedium from '../../styles/typographyComposites.module.css';
   color: var(--semantic-color-text-primary);
   text-align: right;
   min-width: 0;

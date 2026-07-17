@@ -20,10 +20,8 @@
 }
 
 .heading {
+  composes: labelSmRegular from '../../styles/typographyComposites.module.css';
   margin: 0;
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
-  font-weight: var(--primitives-fontWeight-regular);
   color: var(--semantic-color-text-muted);
 }
 
@@ -36,13 +34,11 @@
 }
 
 .viewAllButton {
+  composes: labelSm from '../../styles/typographyComposites.module.css';
   margin: 0;
   padding: 0;
   border: none;
   background: none;
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
-  font-weight: var(--primitives-fontWeight-medium);
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-primary);
   cursor: pointer;
@@ -131,25 +127,20 @@
 }
 
 .label {
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-base) * 1px);
-  font-weight: var(--primitives-fontWeight-medium);
+  composes: bodySmMedium from '../../styles/typographyComposites.module.css';
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-primary);
 }
 
 .time {
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
-  font-weight: var(--primitives-fontWeight-regular);
+  composes: labelSmRegular from '../../styles/typographyComposites.module.css';
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-muted);
 }
 
 .amount {
+  composes: monoSmMedium from '../../styles/typographyComposites.module.css';
   flex-shrink: 0;
-  font-size: calc(var(--primitives-fontSize-base) * 1px);
-  font-weight: var(--primitives-fontWeight-medium);
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-primary);
   text-align: right;
@@ -206,20 +197,16 @@
 }
 
 .emptyTitle {
+  composes: bodySmMedium from '../../styles/typographyComposites.module.css';
   margin: 0;
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-base) * 1px);
-  font-weight: var(--primitives-fontWeight-medium);
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-primary);
 }
 
 .emptyBody {
+  composes: bodySm from '../../styles/typographyComposites.module.css';
   margin: 0;
   max-width: calc(var(--primitives-spacing-20) * 3);
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
-  font-weight: var(--primitives-fontWeight-regular);
   line-height: var(--primitives-lineHeight-normal);
   color: var(--semantic-color-text-muted);
 }

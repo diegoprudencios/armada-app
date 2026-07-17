@@ -76,13 +76,9 @@
 }
 
 .tag {
+  composes: labelTag from '../../styles/typographyComposites.module.css';
   margin: 0;
   align-self: start;
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-weight: var(--primitives-fontWeight-medium);
-  font-size: calc(var(--primitives-fontSize-xs) * 1px);
-  line-height: var(--primitives-lineHeight-none);
-  letter-spacing: var(--semantic-typography-ui-label-tag-letter-spacing);
   text-transform: uppercase;
   /* EXCEPTION — tag stays white on the fixed light gradient surface. */
   color: var(--semantic-component-tag-label);
@@ -97,24 +93,18 @@
 }
 
 .title {
+  composes: displayXl from '../../styles/displayXlTitle.module.css';
   margin: 0;
-  font-family: var(--primitives-fontFamily-display), serif;
-  font-weight: var(--primitives-fontWeight-regular);
-  font-size: calc(var(--primitives-fontSize-4xl) * 1px);
-  line-height: 1.1;
-  letter-spacing: var(--primitives-letterSpacing-tight);
   /* EXCEPTION — headline stays white on the fixed light gradient surface. */
   color: var(--semantic-component-tag-label);
 }
 
 .subtitle {
+  composes: labelSmRegular from '../../styles/typographyComposites.module.css';
   margin: 0;
   align-self: end;
   width: 100%;
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-weight: var(--primitives-fontWeight-regular);
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
-  line-height: 1.4;
+  line-height: var(--primitives-lineHeight-normal);
   white-space: nowrap;
   /* EXCEPTION — dark subtitle on the fixed light gradient surface. */
   color: rgb(14 13 15 / 65%);
