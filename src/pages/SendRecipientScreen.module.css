@@ -181,6 +181,7 @@
 }
 
 .networkOption:hover,
+.networkOptionHighlighted,
 .networkOption[aria-selected='true'] {
   background: var(--semantic-color-surface-hover);
 }

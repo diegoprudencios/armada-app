@@ -4,7 +4,8 @@ import {
   type TransactionProgressVariant,
 } from '@/components/TransactionProgressDisclosure'
 import { TxProgressCard } from '@/components/TxProgressCard'
-import type { TxProgressCardCopy, TxProgressStage } from '@/constants/txProcessingCopy'
+import { resolveStageLabel, type TxProgressCardCopy, type TxProgressStage } from '@/constants/txProcessingCopy'
+import a11y from '@/styles/formA11y.module.css'
 import styles from './TxProcessingLayout.module.css'
 
 export interface TxProcessingLayoutProps {
@@ -25,9 +26,18 @@ export function TxProcessingLayout({
   className,
 }: TxProcessingLayoutProps) {
   const cls = [styles.root, className].filter(Boolean).join(' ')
+  const activeStage = stages[activeStageIndex]
+  const statusAnnouncement = activeStage
+    ? completed && activeStageIndex === stages.length - 1
+      ? resolveStageLabel(activeStage, activeStageIndex, stages.length, true)
+      : `${resolveStageLabel(activeStage, activeStageIndex, stages.length, completed)}. ${activeStage.subtitle}`
+    : ''
 
   return (
     <div className={cls}>
+      <p className={a11y.srOnly} aria-live="polite" aria-atomic="true">
+        {statusAnnouncement}
+      </p>
       <div className={`${modalStepBodyEnter} ${styles.body}`}>
         <TxProgressCard copy={cardCopy} />
 

@@ -43,6 +43,7 @@
   gap: var(--primitives-spacing-2);
   height: var(--primitives-spacing-10);
   flex-shrink: 0;
+  overflow: visible;
 }
 
 .tokenBadge {

@@ -3,6 +3,7 @@ import { WalletIcon } from '@heroicons/react/24/solid'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import type { DepositChainId } from '@/constants/depositChains'
 import { Button } from '@/components/Button'
+import { AmountExceededWarning } from '@/components/AmountExceededWarning'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import { hasActiveAmount, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'
 import { formatProtocolFeeLabel } from '@/utils/protocolFee'
@@ -12,6 +13,7 @@ import {
   maxDepositAmount,
 } from '@/utils/depositFee'
 import { formatUsdcAmount, formatWalletBalance } from '@/utils/format'
+import { DEPOSIT_EXCEEDS_BALANCE_MESSAGE } from '@/utils/amountFieldA11y'
 import styles from './DepositAmountScreen.module.css'
 
 const TOKEN_BADGE_PX = 40
@@ -36,6 +38,7 @@ export function DepositAmountScreen({
   onReview,
 }: DepositAmountScreenProps) {
   const amountInputId = useId()
+  const amountErrorId = useId()
   const amountInputRef = useRef<HTMLInputElement>(null)
   const balanceDisplay = formatWalletBalance(balance)
   const showFee = hasActiveAmount(amount)
@@ -75,29 +78,36 @@ export function DepositAmountScreen({
         <h1 className={styles.title}>How much do you want to deposit?</h1>
 
         <div className={styles.card}>
-          <div className={styles.amountGroup}>
-            <div className={styles.tokenBadge} aria-hidden>
-              <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
+          <AmountExceededWarning
+            id={amountErrorId}
+            visible={exceedsBalance}
+            message={DEPOSIT_EXCEEDS_BALANCE_MESSAGE}
+          >
+            <div className={styles.amountGroup}>
+              <div className={styles.tokenBadge} aria-hidden>
+                <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
+              </div>
+              <div className={styles.amountField}>
+                <input
+                  ref={amountInputRef}
+                  id={amountInputId}
+                  className={[styles.amountInput, exceedsBalance && styles.amountInputError]
+                    .filter(Boolean)
+                    .join(' ')}
+                  type="text"
+                  inputMode="decimal"
+                  autoComplete="off"
+                  placeholder="0"
+                  value={amount}
+                  onChange={(event) => handleAmountChange(event.target.value)}
+                  aria-label="Deposit amount"
+                  aria-invalid={exceedsBalance || undefined}
+                  aria-describedby={exceedsBalance ? amountErrorId : undefined}
+                  size={Math.max(1, amount.length || 1)}
+                />
+              </div>
             </div>
-            <div className={styles.amountField}>
-              <input
-                ref={amountInputRef}
-                id={amountInputId}
-                className={[styles.amountInput, exceedsBalance && styles.amountInputError]
-                  .filter(Boolean)
-                  .join(' ')}
-                type="text"
-                inputMode="decimal"
-                autoComplete="off"
-                placeholder="0"
-                value={amount}
-                onChange={(event) => handleAmountChange(event.target.value)}
-                aria-label="Deposit amount"
-                aria-invalid={exceedsBalance}
-                size={Math.max(1, amount.length || 1)}
-              />
-            </div>
-          </div>
+          </AmountExceededWarning>
 
           <div className={styles.cardFooter}>
             <div className={styles.bottomRow}>

@@ -5,6 +5,7 @@ import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { Button } from '@/components/Button'
 import { modalStepBodyEnter } from '@/components/ModalShell'
 import { useEnvironment } from '@/hooks/useEnvironment'
+import { useListboxKeyboard } from '@/hooks/useListboxKeyboard'
 import { readRecipientFromClipboard } from '@/utils/clipboardAddress'
 import { truncateAddress } from '@/utils/format'
 import {
@@ -61,6 +62,26 @@ export function SendRecipientScreen({
   const isPublic = hasAddress && isPublicAddress(trimmed)
   const selectedChain = SEND_CHAIN_OPTIONS.find((option) => option.id === chain) ?? SEND_CHAIN_OPTIONS[0]
   const SelectedNetworkIcon = selectedChain.Icon
+  const chainOptionIds = SEND_CHAIN_OPTIONS.map((option) => option.id)
+
+  function selectChain(next: SendChainId) {
+    onChainChange(next)
+    setMenuOpen(false)
+  }
+
+  const {
+    highlightIndex: chainHighlightIndex,
+    getOptionId: getChainOptionId,
+    activeDescendantId: chainActiveDescendantId,
+    handleTriggerKeyDown: handleChainTriggerKeyDown,
+    handleListboxKeyDown: handleChainListboxKeyDown,
+  } = useListboxKeyboard({
+    open: menuOpen,
+    options: chainOptionIds,
+    value: chain,
+    onOpenChange: setMenuOpen,
+    onSelect: selectChain,
+  })
 
   useEffect(() => {
     inputRef.current?.focus()
@@ -121,11 +142,6 @@ export function SendRecipientScreen({
     }
   }
 
-  function selectChain(next: SendChainId) {
-    onChainChange(next)
-    setMenuOpen(false)
-  }
-
   return (
     <div className={styles.column}>
       <div className={modalStepBodyEnter}>
@@ -165,6 +181,7 @@ export function SendRecipientScreen({
                 aria-expanded={menuOpen}
                 aria-controls={listboxId}
                 onClick={() => setMenuOpen((open) => !open)}
+                onKeyDown={handleChainTriggerKeyDown}
               >
                 <span className={styles.networkIconSlot} aria-hidden>
                   <SelectedNetworkIcon size={NETWORK_ICON_SIZE} variant="background" />
@@ -174,16 +191,29 @@ export function SendRecipientScreen({
               </button>
 
               {menuOpen ? (
-                <ul id={listboxId} className={styles.networkMenu} role="listbox" aria-label="Network">
-                  {SEND_CHAIN_OPTIONS.map((option) => {
+                <ul
+                  id={listboxId}
+                  className={styles.networkMenu}
+                  role="listbox"
+                  aria-label="Network"
+                  aria-activedescendant={chainActiveDescendantId}
+                  onKeyDown={handleChainListboxKeyDown}
+                >
+                  {SEND_CHAIN_OPTIONS.map((option, index) => {
                     const OptionIcon = option.Icon
                     return (
                       <li key={option.id} role="presentation">
                         <button
                           type="button"
+                          id={getChainOptionId(index)}
                           role="option"
                           aria-selected={option.id === chain}
-                          className={styles.networkOption}
+                          className={[
+                            styles.networkOption,
+                            index === chainHighlightIndex && styles.networkOptionHighlighted,
+                          ]
+                            .filter(Boolean)
+                            .join(' ')}
                           onClick={() => selectChain(option.id)}
                         >
                           <span className={styles.networkIconSlot} aria-hidden>

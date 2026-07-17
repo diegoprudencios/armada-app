@@ -666,7 +666,8 @@
   white-space: nowrap;
 }
 
-.filterMenuOption:hover {
+.filterMenuOption:hover,
+.filterMenuOptionHighlighted {
   background: var(--semantic-color-surface-hover);
 }
 

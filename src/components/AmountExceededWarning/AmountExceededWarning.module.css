@@ -1,0 +1,10 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.tooltip {
+  bottom: calc(100% + var(--primitives-spacing-4));
+}

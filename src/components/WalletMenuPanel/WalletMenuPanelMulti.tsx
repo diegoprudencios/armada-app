@@ -10,6 +10,7 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { ConnectWalletPicker } from '@/components/ConnectWalletPicker'
 import type { DepositChainId } from '@/constants/depositChains'
+import { useListboxKeyboard } from '@/hooks/useListboxKeyboard'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
 import balanceCardStyles from '@/components/BalanceCard/BalanceCard.module.css'
 import { Tag } from '@/components/Tag'
@@ -252,6 +253,7 @@ function WalletFilterMenu({
   wallets: readonly ConnectedWallet[]
   onChange: (next: string) => void
 }) {
+  const listboxId = useId()
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -262,6 +264,30 @@ function WalletFilterMenu({
       : selectedWallet
         ? `${providerLabel(selectedWallet.provider)} · ${truncateAddress(selectedWallet.address)}`
         : 'All wallets'
+
+  const filterOptions = useMemo(
+    () => ['all', ...wallets.map((wallet) => wallet.id)] as const,
+    [wallets],
+  )
+
+  function selectFilter(next: string) {
+    onChange(next)
+    setOpen(false)
+  }
+
+  const {
+    highlightIndex,
+    getOptionId,
+    activeDescendantId,
+    handleTriggerKeyDown,
+    handleListboxKeyDown,
+  } = useListboxKeyboard({
+    open,
+    options: filterOptions,
+    value,
+    onOpenChange: setOpen,
+    onSelect: selectFilter,
+  })
 
   useEffect(() => {
     if (!open) return
@@ -287,44 +313,62 @@ function WalletFilterMenu({
           .join(' ')}
         aria-expanded={open}
         aria-haspopup="listbox"
+        aria-controls={listboxId}
         onClick={() => setOpen((prev) => !prev)}
+        onKeyDown={handleTriggerKeyDown}
       >
         <span className={styles.filterMenuLabel}>{label}</span>
         <ChevronDownIcon className={styles.filterMenuChevron} aria-hidden />
       </button>
 
       {open ? (
-        <ul className={styles.filterMenuList} role="listbox" aria-label="Filter by wallet">
+        <ul
+          id={listboxId}
+          className={styles.filterMenuList}
+          role="listbox"
+          aria-label="Filter by wallet"
+          aria-activedescendant={activeDescendantId}
+          onKeyDown={handleListboxKeyDown}
+        >
           <li role="presentation">
             <button
               type="button"
+              id={getOptionId(0)}
               role="option"
               aria-selected={value === 'all'}
-              className={styles.filterMenuOption}
-              onClick={() => {
-                onChange('all')
-                setOpen(false)
-              }}
+              className={[
+                styles.filterMenuOption,
+                highlightIndex === 0 && styles.filterMenuOptionHighlighted,
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onClick={() => selectFilter('all')}
             >
               All wallets
             </button>
           </li>
-          {wallets.map((wallet) => (
+          {wallets.map((wallet, walletIndex) => {
+            const optionIndex = walletIndex + 1
+            return (
             <li key={wallet.id} role="presentation">
               <button
                 type="button"
+                id={getOptionId(optionIndex)}
                 role="option"
                 aria-selected={value === wallet.id}
-                className={styles.filterMenuOption}
-                onClick={() => {
-                  onChange(wallet.id)
-                  setOpen(false)
-                }}
+                className={[
+                  styles.filterMenuOption,
+                  highlightIndex === optionIndex && styles.filterMenuOptionHighlighted,
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                onClick={() => selectFilter(wallet.id)}
               >
                 {providerLabel(wallet.provider)} · {truncateAddress(wallet.address)}
               </button>
             </li>
-          ))}
+            )
+          })}
         </ul>
       ) : null}
     </div>
