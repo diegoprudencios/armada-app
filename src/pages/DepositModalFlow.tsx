@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
+import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { DepositAmountScreen } from './DepositAmountScreen'
@@ -11,7 +12,6 @@ import {
   DEPOSIT_WALLET_BALANCE,
   networkDisplayName,
 } from './depositFlowConstants'
-import styles from './DepositModalFlow.module.css'
 
 export type DepositModalStep = 'amount' | 'review' | 'wallet' | 'processing' | 'confirmed'
 
@@ -63,6 +63,7 @@ export function DepositModalFlow({
   onConfirmedGoToDashboard,
 }: DepositModalFlowProps) {
   const [exiting, setExiting] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
   const isConfirmStep = step === 'processing' || step === 'confirmed'
@@ -135,12 +136,12 @@ export function DepositModalFlow({
     }
   }
 
-  const overlayClassName = [styles.overlay, exiting && styles.overlayExiting].filter(Boolean).join(' ')
-
   return (
-    <div
-      className={overlayClassName}
-      role="presentation"
+    <FlowModalOverlay
+      label="Deposit"
+      exiting={exiting}
+      onClose={requestClose}
+      initialFocusRef={closeButtonRef}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell
@@ -151,11 +152,12 @@ export function DepositModalFlow({
         contentOffset={isConfirmed ? 'confirmation' : 'default'}
         exiting={exiting}
         onClose={requestClose}
+        closeButtonRef={closeButtonRef}
       >
         <div key={isConfirmStep ? 'confirm' : step} className={modalStepShell}>
           {renderStep()}
         </div>
       </ModalShell>
-    </div>
+    </FlowModalOverlay>
   )
 }

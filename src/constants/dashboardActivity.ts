@@ -1,4 +1,4 @@
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 import type { EarnTab } from '@/pages/earnFlowConstants'
 import type { SendChainId } from '@/pages/sendFlowConstants'
 

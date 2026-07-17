@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 import { DepositModalFlow } from './DepositModalFlow'
 import { DEPOSIT_WALLET_BALANCE } from './depositFlowConstants'
 

@@ -1,4 +1,4 @@
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 import { BottomSheet } from '@/components/BottomSheet'
 import { SidePanel } from '@/components/SidePanel'
 import { useMobileLayout } from '@/hooks/useMobileLayout'

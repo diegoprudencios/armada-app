@@ -21,7 +21,7 @@
 
 .collapsedCard {
   /* EXCEPTION — solid white card on the modal processing surface. */
-  background: #ffffff;
+  background: var(--semantic-color-surface-default);
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
   border-left: 3px solid var(--semantic-color-brand-lavender);
   padding: var(--primitives-spacing-4) var(--primitives-spacing-5);
@@ -65,7 +65,7 @@
 
 .expandedRow {
   /* EXCEPTION — solid white card on the modal processing surface. */
-  background: #ffffff;
+  background: var(--semantic-color-surface-default);
   border-radius: calc(var(--semantic-borderRadius-item) * 1px);
   border: 1px solid var(--semantic-color-border-default);
   padding: var(--primitives-spacing-3) var(--primitives-spacing-4);
@@ -76,7 +76,7 @@
 
 .currentActive {
   border-color: var(--semantic-color-border-lavender);
-  background: color-mix(in srgb, var(--semantic-color-brand-lavender) 8%, #ffffff);
+  background: color-mix(in srgb, var(--semantic-color-brand-lavender) 8%, var(--semantic-color-surface-default));
 }
 
 .done {

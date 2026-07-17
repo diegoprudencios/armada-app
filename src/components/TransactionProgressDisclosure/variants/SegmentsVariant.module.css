@@ -1,7 +1,7 @@
 .root {
   width: 100%;
   /* EXCEPTION — solid white card on the modal processing surface. */
-  background: #ffffff;
+  background: var(--semantic-color-surface-default);
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
   padding: var(--primitives-spacing-4) var(--primitives-spacing-5);
 }

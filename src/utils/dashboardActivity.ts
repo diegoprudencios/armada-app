@@ -1,4 +1,4 @@
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 import {
   MAX_RECENT_ACTIVITY_ITEMS,
   type DashboardActivityItem,

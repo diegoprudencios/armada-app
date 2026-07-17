@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { forwardRef, type ReactNode } from 'react'
 import styles from './WalletItem.module.css'
 
 interface WalletItemProps {
@@ -10,16 +10,18 @@ interface WalletItemProps {
   disabled?: boolean
 }
 
-export default function WalletItem({
-  name,
-  iconSrc,
-  iconComponent,
-  balance,
-  onClick,
-  disabled = false,
-}: WalletItemProps) {
+const WalletItem = forwardRef<HTMLButtonElement, WalletItemProps>(function WalletItem(
+  { name, iconSrc, iconComponent, balance, onClick, disabled = false },
+  ref,
+) {
   return (
-    <button type="button" className={styles.item} onClick={onClick} disabled={disabled}>
+    <button
+      ref={ref}
+      type="button"
+      className={styles.item}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {iconComponent ? (
         <span className={styles.iconSlot}>{iconComponent}</span>
       ) : iconSrc ? (
@@ -33,4 +35,6 @@ export default function WalletItem({
       )}
     </button>
   )
-}
+})
+
+export default WalletItem

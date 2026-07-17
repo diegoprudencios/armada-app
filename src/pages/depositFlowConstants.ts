@@ -1,4 +1,4 @@
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 
 export const DEPOSIT_PROGRESS_STEPS = ['Amount', 'Review', 'Wallet', 'Confirm'] as const
 
@@ -44,5 +44,4 @@ export function networkDisplayName(chain: DepositChainId): string {
   return NETWORK_DISPLAY_NAMES[chain]
 }
 
-/** @web3icons/react network icons — same source as DepositAmountCard. */
-export { DEPOSIT_CHAIN_ICONS } from '@/components/DepositAmountCard/depositChainIcons'
+export { DEPOSIT_CHAIN_ICONS } from '@/constants/depositChains'

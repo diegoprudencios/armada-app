@@ -1,4 +1,4 @@
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
 import type { ConnectedWallet } from '@/utils/walletMenu'
 import { useWalletPanelVersion } from '@/utils/walletPanelVersion'

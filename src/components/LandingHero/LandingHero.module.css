@@ -67,12 +67,14 @@
 .textBlock {
   position: absolute;
   left: var(--primitives-spacing-20);
+  right: var(--primitives-spacing-5);
   bottom: var(--primitives-spacing-20);
   z-index: 2;
   display: flex;
   flex-direction: column;
   gap: var(--primitives-spacing-5);
-  max-width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-1) * 0.5);
+  max-width: calc(var(--primitives-spacing-20) * 12);
+  box-sizing: border-box;
 }
 
 .eyebrow {
@@ -87,9 +89,70 @@
 
 .heading {
   margin: 0;
-  font-family: var(--primitives-fontFamily-display), serif;
-  font-size: calc(var(--primitives-fontSize-5xl) * 1px + var(--primitives-spacing-1) * 0.25);
-  font-weight: var(--primitives-fontWeight-regular);
-  line-height: 1.057;
+  font-family: var(--semantic-typography-display-hero-lg-font-family), serif;
+  font-size: var(--semantic-typography-display-hero-lg-font-size);
+  font-weight: var(--semantic-typography-display-hero-lg-font-weight);
+  line-height: var(--semantic-typography-display-hero-lg-line-height);
+  letter-spacing: var(--semantic-typography-display-hero-lg-letter-spacing);
   color: var(--primitives-color-neutral-50);
+  text-wrap: balance;
+}
+
+@media (max-width: 767px) {
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--primitives-spacing-3);
+    height: auto;
+    padding: var(--primitives-spacing-4);
+    box-sizing: border-box;
+  }
+
+  .logo {
+    position: static;
+    height: var(--primitives-spacing-8);
+    width: auto;
+    max-width: 42%;
+  }
+
+  .openAppButton.openAppButton {
+    position: static;
+    flex-shrink: 0;
+  }
+
+  .textBlock {
+    left: var(--primitives-spacing-4);
+    right: var(--primitives-spacing-4);
+    bottom: var(--primitives-spacing-8);
+    gap: var(--primitives-spacing-4);
+    max-width: none;
+  }
+
+  .eyebrow {
+    font-size: calc(var(--primitives-spacing-4) * 1px);
+    letter-spacing: 0.1em;
+  }
+
+  .heading {
+    font-family: var(--primitives-fontFamily-display), serif;
+    font-size: calc(var(--primitives-fontSize-4xl) * 1px);
+    font-weight: var(--primitives-fontWeight-regular);
+    line-height: 1.12;
+    letter-spacing: var(--primitives-letterSpacing-tight);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .textBlock {
+    left: var(--primitives-spacing-8);
+    right: var(--primitives-spacing-8);
+    max-width: calc(var(--primitives-spacing-20) * 9);
+  }
+
+  .heading {
+    font-size: var(--semantic-typography-display-hero-md-font-size);
+    line-height: var(--semantic-typography-display-hero-md-line-height);
+    letter-spacing: var(--semantic-typography-display-hero-md-letter-spacing);
+  }
 }

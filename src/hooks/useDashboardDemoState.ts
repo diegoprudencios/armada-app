@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 import type { BalanceRollMode } from '@/components/RollingBalanceValue'
 import {
   activityRevealDelayAfterIntroMs,
@@ -383,6 +383,10 @@ export function useDashboardDemoState(initialBalance = 0) {
 
   function openConnect() {
     setConnectOpen(true)
+  }
+
+  function dismissConnect() {
+    setConnectOpen(false)
   }
 
   function connectWallet(provider: DemoWalletProvider) {
@@ -1014,6 +1018,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     balanceRoll,
     showDepositTooltip,
     openConnect,
+    dismissConnect,
     connectWallet,
     selectActiveWallet,
     disconnectWallet,

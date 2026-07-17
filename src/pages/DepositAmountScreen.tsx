@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef } from 'react'
 import { WalletIcon } from '@heroicons/react/24/solid'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 import { Button } from '@/components/Button'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import { hasActiveAmount, parseActiveAmount, sanitizeAmountInput } from '@/utils/amountInput'

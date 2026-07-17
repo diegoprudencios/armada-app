@@ -1,5 +1,10 @@
+import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { WalletMetamask } from '@web3icons/react'
+import { registerNestedDialog } from '@/hooks/nestedDialog'
+import { useEscapeKey } from '@/hooks/useEscapeKey'
+import { useFocusTrap } from '@/hooks/useFocusTrap'
+import { useRestoreFocus } from '@/hooks/useRestoreFocus'
 import { DEMO_ARMADA_ADDRESS } from '@/pages/depositFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
 import { truncateAddress } from '@/utils/format'
@@ -24,14 +29,26 @@ export function MockMetaMaskPopup({
   onConfirm,
   onReject,
 }: MockMetaMaskPopupProps) {
+  const popupRef = useRef<HTMLDivElement>(null)
+  const rejectButtonRef = useRef<HTMLButtonElement>(null)
   const isApprove = prompt === 'approve'
   const confirmLabel = isApprove ? 'Approve' : 'Confirm'
   const rejectLabel = 'Reject'
   const title = isApprove ? 'Spending cap request' : 'Transaction request'
   const accountLabel = accountAddress ? truncateAddress(accountAddress) : 'Account 1'
 
+  useRestoreFocus(true)
+  useEscapeKey(onReject)
+  useFocusTrap(popupRef)
+
+  useEffect(() => registerNestedDialog(), [])
+  useEffect(() => {
+    rejectButtonRef.current?.focus({ preventScroll: true })
+  }, [])
+
   const popup = (
     <div
+      ref={popupRef}
       className={styles.popup}
       role="dialog"
       aria-modal="true"
@@ -100,7 +117,12 @@ export function MockMetaMaskPopup({
       </div>
 
       <footer className={styles.footer}>
-        <button type="button" className={styles.rejectButton} onClick={onReject}>
+        <button
+          ref={rejectButtonRef}
+          type="button"
+          className={styles.rejectButton}
+          onClick={onReject}
+        >
           {rejectLabel}
         </button>
         <button type="button" className={styles.confirmButton} onClick={onConfirm}>

@@ -1,2 +1,0 @@
-export { ParticipantsTable } from './ParticipantsTable'
-

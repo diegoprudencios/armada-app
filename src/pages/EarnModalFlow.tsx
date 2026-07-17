@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { EarnAmountScreen } from './EarnAmountScreen'
 import { EarnProcessingScreen } from './EarnProcessingScreen'
 import { EarnReviewScreen } from './EarnReviewScreen'
 import { EARN_PROGRESS_STEPS, type EarnModalStep, type EarnTab } from './earnFlowConstants'
-import styles from './EarnModalFlow.module.css'
 
 const EARN_STEP_NUMBER: Record<EarnModalStep, number> = {
   amount: 1,
@@ -48,6 +48,7 @@ export function EarnModalFlow({
   onConfirmedGoToDashboard,
 }: EarnModalFlowProps) {
   const [exiting, setExiting] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
   const isConfirmStep = step === 'processing' || step === 'confirmed'
@@ -107,12 +108,12 @@ export function EarnModalFlow({
     }
   }
 
-  const overlayClassName = [styles.overlay, exiting && styles.overlayExiting].filter(Boolean).join(' ')
-
   return (
-    <div
-      className={overlayClassName}
-      role="presentation"
+    <FlowModalOverlay
+      label="Earn"
+      exiting={exiting}
+      onClose={requestClose}
+      initialFocusRef={closeButtonRef}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell
@@ -123,11 +124,12 @@ export function EarnModalFlow({
         contentOffset={isConfirmed ? 'confirmation' : 'default'}
         exiting={exiting}
         onClose={requestClose}
+        closeButtonRef={closeButtonRef}
       >
         <div key={isConfirmStep ? 'confirm' : step} className={modalStepShell}>
           {renderStep()}
         </div>
       </ModalShell>
-    </div>
+    </FlowModalOverlay>
   )
 }

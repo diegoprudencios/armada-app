@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode, type Ref } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { Steps } from '@/components/Steps'
@@ -21,6 +21,7 @@ export interface ModalShellProps {
   contentOffset?: ModalShellContentOffset
   exiting?: boolean
   onClose: () => void
+  closeButtonRef?: Ref<HTMLButtonElement>
   children: ReactNode
 }
 
@@ -34,8 +35,11 @@ export function ModalShell({
   contentOffset = 'default',
   exiting = false,
   onClose,
+  closeButtonRef,
   children,
 }: ModalShellProps) {
+  const fallbackCloseRef = useRef<HTMLButtonElement>(null)
+  const resolvedCloseRef = closeButtonRef ?? fallbackCloseRef
   const headerClassName = [styles.header, hideSteps && styles.headerNoSteps, exiting && styles.headerExit]
     .filter(Boolean)
     .join(' ')
@@ -66,7 +70,13 @@ export function ModalShell({
             />
           </div>
         )}
-        <button type="button" className={styles.close} onClick={onClose} aria-label="Close">
+        <button
+          ref={resolvedCloseRef}
+          type="button"
+          className={styles.close}
+          onClick={onClose}
+          aria-label="Close"
+        >
           <XMarkIcon className={styles.closeIcon} strokeWidth={1.5} aria-hidden />
         </button>
       </header>

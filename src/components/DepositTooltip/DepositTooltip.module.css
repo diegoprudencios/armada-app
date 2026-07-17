@@ -186,12 +186,12 @@
   font-size: calc(var(--primitives-fontSize-md) * 1px);
   line-height: calc(var(--primitives-spacing-4) * 1px);
   letter-spacing: -0.1px;
-  color: #ffffff;
+  color: var(--semantic-component-tag-label);
 }
 
 .body {
   margin: 0;
-  color: #ffffff;
+  color: var(--semantic-component-tag-label);
 }
 
 .rootInteractive {

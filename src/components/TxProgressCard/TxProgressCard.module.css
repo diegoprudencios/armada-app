@@ -12,8 +12,6 @@
   background: linear-gradient(
     165deg,
     var(--semantic-color-brand-lavender) 0%,
-    #d9a7c9 35%,
-    #e8bfa8 65%,
     var(--semantic-color-brand-amber) 100%
   );
 }
@@ -35,7 +33,7 @@
   height: 16px;
   border-radius: calc(var(--primitives-borderRadius-sm) * 0.5px);
   /* EXCEPTION — ticks stay white on the fixed light gradient surface. */
-  background: #ffffff;
+  background: var(--semantic-component-tag-label);
   transform-origin: 50% 105px;
   transform: translate(-50%, -105px) rotate(calc(var(--i) * 6deg));
   opacity: 0.4;
@@ -87,7 +85,7 @@
   letter-spacing: var(--semantic-typography-ui-label-tag-letter-spacing);
   text-transform: uppercase;
   /* EXCEPTION — tag stays white on the fixed light gradient surface. */
-  color: #ffffff;
+  color: var(--semantic-component-tag-label);
 }
 
 .titleBlock {
@@ -106,7 +104,7 @@
   line-height: 1.1;
   letter-spacing: var(--primitives-letterSpacing-tight);
   /* EXCEPTION — headline stays white on the fixed light gradient surface. */
-  color: #ffffff;
+  color: var(--semantic-component-tag-label);
 }
 
 .subtitle {

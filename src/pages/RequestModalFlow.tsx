@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { revokePaymentLink } from '@/utils/payViaLink'
@@ -13,7 +14,6 @@ import {
   type RequestLinkExpiryId,
   type RequestModalStep,
 } from './requestFlowConstants'
-import styles from './RequestModalFlow.module.css'
 
 const REQUEST_STEP_NUMBER: Record<RequestModalStep, number> = {
   receive: 1,
@@ -69,6 +69,7 @@ export function RequestModalFlow({
   onDone,
 }: RequestModalFlowProps) {
   const [exiting, setExiting] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
   const isConfirmed = step === 'confirmed'
@@ -165,12 +166,12 @@ export function RequestModalFlow({
     )
   }
 
-  const overlayClassName = [styles.overlay, exiting && styles.overlayExiting].filter(Boolean).join(' ')
-
   return (
-    <div
-      className={overlayClassName}
-      role="presentation"
+    <FlowModalOverlay
+      label="Request"
+      exiting={exiting}
+      onClose={requestClose}
+      initialFocusRef={closeButtonRef}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell
@@ -182,11 +183,12 @@ export function RequestModalFlow({
         flowLabel="Request"
         exiting={exiting}
         onClose={requestClose}
+        closeButtonRef={closeButtonRef}
       >
         <div key={step} className={modalStepShell}>
           {renderStep()}
         </div>
       </ModalShell>
-    </div>
+    </FlowModalOverlay>
   )
 }

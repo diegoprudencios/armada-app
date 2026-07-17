@@ -80,9 +80,9 @@
 .ghost:disabled { color: var(--semantic-component-button-secondary-text-disabled); }
 
 /* Gradient */
-.gradient { border: none; background: linear-gradient(to right, #F3D0A0 0%, #C491E5 100%); color: var(--semantic-component-button-gradient-text); }
-.gradient:hover:not(:disabled) { background: linear-gradient(to right, #f5d9ae 0%, #d4aff0 100%); }
-.gradient:active:not(:disabled) { background: linear-gradient(to right, #eab86a 0%, #b06fdf 100%); }
+.gradient { border: none; background: linear-gradient(to right, var(--primitives-color-amber-300) 0%, var(--primitives-color-purple-500) 100%); color: var(--semantic-component-button-gradient-text); }
+.gradient:hover:not(:disabled) { background: linear-gradient(to right, var(--primitives-color-amber-200) 0%, var(--primitives-color-purple-200) 100%); }
+.gradient:active:not(:disabled) { background: linear-gradient(to right, var(--primitives-color-amber-400) 0%, var(--primitives-color-purple-400) 100%); }
 
 /* Icon */
 .iconWrap {

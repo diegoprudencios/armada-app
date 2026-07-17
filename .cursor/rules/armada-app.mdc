@@ -19,14 +19,11 @@ alwaysApply: true
 | File | Role |
 |------|------|
 | `src/tokens/armada-tokens.json` | Token Studio source (synced from armada-crowdfund) |
+| `src/constants/depositChains.ts` | `DepositChainId` type + network icons (app-owned) |
 | `src/styles/tokens.css` | Primitives + semantic colors (synced from armada-crowdfund) |
 | `src/styles/typography.css` | Composite typography classes (synced from armada-poc `@armada/ui`) |
 
-After token changes in sibling repos, run:
-
-```bash
-npm run tokens:sync
-```
+After token changes in sibling repos, run `npm run tokens:sync` (also runs automatically before `npm run build`).
 
 ## Styling
 
@@ -37,4 +34,4 @@ npm run tokens:sync
 ## Dev
 
 - `npm run dev` → http://localhost:5177/
-- `npm run build` → `tsc && vite build`
+- `npm run build` → `npm run tokens:sync && tsc && vite build`

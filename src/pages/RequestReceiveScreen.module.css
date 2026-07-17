@@ -142,7 +142,7 @@
   width: calc((100% - var(--primitives-spacing-1) * 2) / 3);
   height: calc(100% - var(--primitives-spacing-1) * 2);
   border-radius: calc(var(--primitives-spacing-5) / 4);
-  background: #ffffff;
+  background: var(--semantic-color-surface-default);
   transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }

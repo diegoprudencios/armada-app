@@ -10,7 +10,7 @@ const pocUiRoot = resolve(root, '../armada-poc/packages/ui')
 const crowdfundCopies = [
   ['src/tokens/armada-tokens.json', 'src/tokens/armada-tokens.json'],
   ['src/styles/tokens.css', 'src/styles/tokens.css'],
-] as const
+]
 
 for (const [relFrom, relTo] of crowdfundCopies) {
   const from = resolve(crowdfundRoot, relFrom)

@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useEscapeKey } from '@/hooks/useEscapeKey'
 import styles from './BottomSheet.module.css'
 
 const EXIT_MS = 240
@@ -30,6 +31,7 @@ export function BottomSheet({
   onCloseRef.current = onClose
 
   useBodyScrollLock(open || exiting)
+  useEscapeKey(onClose, mounted && !exiting)
 
   useEffect(() => {
     if (open) {
@@ -47,17 +49,6 @@ export function BottomSheet({
     }, EXIT_MS)
     return () => window.clearTimeout(timer)
   }, [open, mounted])
-
-  useEffect(() => {
-    if (!mounted || exiting) return
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onCloseRef.current()
-    }
-
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [mounted, exiting])
 
   if (!mounted) return null
 

@@ -69,6 +69,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
     receivePaymentConfirmedAt,
     receivePaymentTxHash,
     connectWallet,
+    dismissConnect,
     closeDeposit,
     completeDeposit,
     closeSend,
@@ -107,7 +108,9 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
 
   return (
     <>
-      {connectOpen ? <ConnectWalletOverlay onSelect={connectWallet} /> : null}
+      {connectOpen ? (
+        <ConnectWalletOverlay onSelect={connectWallet} onDismiss={dismissConnect} />
+      ) : null}
 
       {depositStep ? (
         <DepositModalFlow

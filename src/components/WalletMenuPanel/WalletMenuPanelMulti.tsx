@@ -9,7 +9,7 @@ import {
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { ConnectWalletPicker } from '@/components/ConnectWalletPicker'
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
 import balanceCardStyles from '@/components/BalanceCard/BalanceCard.module.css'
 import { Tag } from '@/components/Tag'

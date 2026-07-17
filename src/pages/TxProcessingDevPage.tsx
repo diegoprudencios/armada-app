@@ -10,7 +10,7 @@ import { SendProcessingStepper } from '@/components/SendProcessingStepper'
 import { DEPOSIT_PROGRESS_STEPS } from '@/pages/depositFlowConstants'
 import { EARN_PROGRESS_STEPS } from '@/pages/earnFlowConstants'
 import { DEMO_0X_RECIPIENT, DEMO_ZK_RECIPIENT, SEND_PROGRESS_STEPS } from '@/pages/sendFlowConstants'
-import overlayStyles from './DepositModalFlow.module.css'
+import overlayStyles from '@/components/FlowModalOverlay/FlowModalOverlay.module.css'
 import styles from './TxProcessingDevPage.module.css'
 
 const STAGE_COUNT = 3

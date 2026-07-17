@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { SendAmountScreen } from './SendAmountScreen'
@@ -7,7 +8,6 @@ import { SendRecipientScreen } from './SendRecipientScreen'
 import { SendReviewScreen } from './SendReviewScreen'
 import { type SendChainId } from './sendFlowConstants'
 import { WITHDRAW_PROGRESS_STEPS, type WithdrawModalStep } from './withdrawFlowConstants'
-import styles from './WithdrawModalFlow.module.css'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
 
 const WITHDRAW_STEP_NUMBER: Record<WithdrawModalStep, number> = {
@@ -62,6 +62,7 @@ export function WithdrawModalFlow({
   onConfirmedGoToDashboard,
 }: WithdrawModalFlowProps) {
   const [exiting, setExiting] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
   const isConfirmStep = step === 'processing' || step === 'confirmed'
@@ -137,12 +138,12 @@ export function WithdrawModalFlow({
     }
   }
 
-  const overlayClassName = [styles.overlay, exiting && styles.overlayExiting].filter(Boolean).join(' ')
-
   return (
-    <div
-      className={overlayClassName}
-      role="presentation"
+    <FlowModalOverlay
+      label="Withdraw"
+      exiting={exiting}
+      onClose={requestClose}
+      initialFocusRef={closeButtonRef}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell
@@ -153,11 +154,12 @@ export function WithdrawModalFlow({
         contentOffset={isConfirmed ? 'confirmation' : 'default'}
         exiting={exiting}
         onClose={requestClose}
+        closeButtonRef={closeButtonRef}
       >
         <div key={isConfirmStep ? 'confirm' : step} className={modalStepShell}>
           {renderStep()}
         </div>
       </ModalShell>
-    </div>
+    </FlowModalOverlay>
   )
 }

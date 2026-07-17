@@ -478,8 +478,8 @@ export function BalanceCard({
       >
         <defs>
           <linearGradient id="balanceCardStroke" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#be87e9" />
-            <stop offset="100%" stopColor="#f3d0a0" />
+            <stop offset="0%" stopColor="var(--primitives-color-purple-300)" />
+            <stop offset="100%" stopColor="var(--primitives-color-amber-300)" />
           </linearGradient>
         </defs>
         <rect

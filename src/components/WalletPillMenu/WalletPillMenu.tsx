@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { DepositChainId } from '@/components/DepositAmountCard'
+import type { DepositChainId } from '@/constants/depositChains'
 import buttonStyles from '@/components/Button/Button.module.css'
 import { WalletMenuShell } from '@/components/WalletMenuPanel'
 import type { DemoWalletProvider } from '@/pages/depositFlowConstants'

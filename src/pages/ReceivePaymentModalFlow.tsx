@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { FlowModalOverlay } from '@/components/FlowModalOverlay'
 import { ModalShell, modalStepShell } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import type { SendChainId } from './sendFlowConstants'
 import { ReceivePaymentConfirmedScreen } from './ReceivePaymentConfirmedScreen'
-import styles from './DepositModalFlow.module.css'
 
 export interface ReceivePaymentModalFlowProps {
   amount: string
@@ -25,6 +25,7 @@ export function ReceivePaymentModalFlow({
   onClose,
 }: ReceivePaymentModalFlowProps) {
   const [exiting, setExiting] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
 
@@ -43,12 +44,12 @@ export function ReceivePaymentModalFlow({
     requestClose()
   }
 
-  const overlayClassName = [styles.overlay, exiting && styles.overlayExiting].filter(Boolean).join(' ')
-
   return (
-    <div
-      className={overlayClassName}
-      role="presentation"
+    <FlowModalOverlay
+      label="Payment received"
+      exiting={exiting}
+      onClose={requestClose}
+      initialFocusRef={closeButtonRef}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell
@@ -59,6 +60,7 @@ export function ReceivePaymentModalFlow({
         contentOffset="default"
         exiting={exiting}
         onClose={requestClose}
+        closeButtonRef={closeButtonRef}
       >
         <div className={modalStepShell}>
           <ReceivePaymentConfirmedScreen
@@ -77,6 +79,6 @@ export function ReceivePaymentModalFlow({
           />
         </div>
       </ModalShell>
-    </div>
+    </FlowModalOverlay>
   )
 }

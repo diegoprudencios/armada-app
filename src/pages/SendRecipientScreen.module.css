@@ -238,7 +238,7 @@
   flex-shrink: 0;
   width: var(--primitives-spacing-10);
   height: var(--primitives-spacing-10);
-  color: #ffffff;
+  color: var(--semantic-component-tag-label);
 }
 
 .brandBadge {
@@ -253,7 +253,7 @@
 .brandMark {
   width: var(--primitives-spacing-5);
   height: var(--primitives-spacing-5);
-  color: #ffffff;
+  color: var(--semantic-component-tag-label);
 }
 
 .privacyIconPublic {

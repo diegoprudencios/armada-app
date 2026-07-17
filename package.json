@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:processing": "vite --open /tx-processing.html",
-    "build": "tsc && vite build",
+    "build": "npm run tokens:sync && tsc && vite build",
     "preview": "vite preview",
     "tokens:sync": "node scripts/sync-tokens.mjs"
   },
