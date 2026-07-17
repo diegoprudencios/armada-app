@@ -140,7 +140,7 @@ export function RecentActivityList({
   const isPreview = variant === 'preview'
   const previewMax = isMobile ? ACTIVITY_LIST_MOBILE_PREVIEW_MAX : ACTIVITY_LIST_DESKTOP_PREVIEW_MAX
   const previewItems = isPreview ? items.slice(0, previewMax) : items
-  const showViewAll = isPreview && items.length > previewMax
+  const showViewAll = isPreview
 
   const rootClassName = [styles.root, isPreview ? styles.rootPreview : styles.rootFull]
     .filter(Boolean)
