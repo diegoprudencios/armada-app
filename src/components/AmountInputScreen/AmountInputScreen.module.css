@@ -9,7 +9,7 @@
 }
 
 .title {
-  composes: displayLg from '../styles/displayLgTitle.module.css';
+  composes: displayLg from '../../styles/displayLgTitle.module.css';
   margin: 0;
   width: 100%;
   color: var(--semantic-color-text-primary);
