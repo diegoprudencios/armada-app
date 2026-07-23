@@ -114,7 +114,7 @@
 .ghostSurface {
   background: var(--semantic-color-surface-default);
   border-color: var(--semantic-component-button-secondary-border);
-  color: var(--semantic-component-button-primary-text);
+  color: var(--semantic-color-text-primary);
 }
 
 .ghostSurface:hover:not(:disabled) {

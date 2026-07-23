@@ -48,20 +48,6 @@
   position: absolute;
   top: var(--primitives-spacing-5);
   right: var(--primitives-spacing-5);
-  background: var(--primitives-color-purple-900);
-  color: var(--primitives-color-neutral-50);
-}
-
-.openAppButton.openAppButton:hover:not(:disabled) {
-  background: var(--primitives-color-purple-900);
-  color: var(--primitives-color-neutral-50);
-  filter: brightness(1.08);
-}
-
-.openAppButton.openAppButton:active:not(:disabled) {
-  background: var(--primitives-color-purple-900);
-  color: var(--primitives-color-neutral-50);
-  filter: brightness(0.95);
 }
 
 .textBlock {
