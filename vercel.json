@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "routes": [
+    { "src": "^/api/testing-feedback$", "dest": "/api/testing-feedback" },
     { "src": "^/pay-via-link/?$", "dest": "/pay-via-link.html" },
     { "src": "^/dashboard-v2/?$", "dest": "/dashboard-v2.html" },
     { "src": "^/dashboard/?$", "dest": "/dashboard.html" },

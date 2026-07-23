@@ -11,6 +11,8 @@ export interface SendButtonProps {
   onClick?: () => void
   disabled?: boolean
   className?: string
+  /** Stable id for research click logging (data-testing-click). */
+  testingClickId?: string
 }
 
 export function SendButton({
@@ -20,6 +22,7 @@ export function SendButton({
   onClick,
   disabled = false,
   className,
+  testingClickId,
 }: SendButtonProps) {
   const classNames = [styles.button, styles[variant], className].filter(Boolean).join(' ')
 
@@ -29,6 +32,7 @@ export function SendButton({
       className={classNames}
       onClick={onClick}
       disabled={disabled}
+      {...(testingClickId ? { 'data-testing-click': testingClickId } : {})}
     >
       <span className={styles.label}>{label}</span>
       <span className={styles.icon} aria-hidden>

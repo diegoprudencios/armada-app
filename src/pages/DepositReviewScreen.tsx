@@ -75,6 +75,7 @@ export function DepositReviewScreen({
             label="Confirm deposit"
             showIcon={false}
             onClick={onConfirm}
+            testingClickId="deposit_confirm_button"
           />
         </div>
       </div>
@@ -97,6 +98,7 @@ export function DepositReviewScreen({
           label="Confirm deposit"
           showIcon={false}
           onClick={onConfirm}
+          testingClickId="deposit_confirm_button"
         />
       </div>
     </div>

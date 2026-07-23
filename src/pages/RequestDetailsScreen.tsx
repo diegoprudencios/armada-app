@@ -121,6 +121,7 @@ export function RequestDetailsScreen({
               disabled={!canCreateLink}
               dimWhenDisabled={false}
               onClick={onCreateLink}
+              testingClickId="request_create_link_button"
             />
           </div>
         </div>
@@ -146,6 +147,7 @@ export function RequestDetailsScreen({
           disabled={!canCreateLink}
           dimWhenDisabled={false}
           onClick={onCreateLink}
+          testingClickId="request_create_link_button"
         />
       </div>
     </div>

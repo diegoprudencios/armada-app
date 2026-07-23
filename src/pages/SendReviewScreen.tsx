@@ -71,6 +71,9 @@ export function SendReviewScreen({
             label={confirmLabel}
             showIcon={false}
             onClick={onConfirm}
+            testingClickId={
+              variant === 'withdraw' ? 'withdraw_og_confirm_button' : 'send_confirm_button'
+            }
           />
         </div>
       </div>
@@ -102,6 +105,9 @@ export function SendReviewScreen({
           label={confirmLabel}
           showIcon={false}
           onClick={onConfirm}
+          testingClickId={
+            variant === 'withdraw' ? 'withdraw_og_confirm_button' : 'send_confirm_button'
+          }
         />
       </div>
     </div>

@@ -1,0 +1,93 @@
+/* Isolated testing-layer palette — gray only, never brand purple/lavender/amber. */
+
+.iconRoot {
+  --tf-font: 'Geist', var(--primitives-fontFamily-ui), sans-serif;
+  --tf-bg: var(--primitives-color-gray-200);
+  --tf-bg-hover: var(--primitives-color-gray-300);
+  --tf-border: var(--primitives-color-gray-400);
+  --tf-text: var(--primitives-color-gray-700);
+  --tf-text-muted: var(--primitives-color-gray-500);
+  --tf-focus: var(--primitives-color-gray-600);
+
+  position: fixed;
+  z-index: 99990;
+  right: calc(var(--primitives-spacing-4) + env(safe-area-inset-right, 0px));
+  bottom: calc(var(--mobile-safe-area-bottom, 0px) + var(--primitives-spacing-4));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--primitives-spacing-1);
+  font-family: var(--tf-font);
+  pointer-events: none;
+}
+
+.fab {
+  pointer-events: auto;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--mobile-touch-target-min, var(--primitives-spacing-11));
+  min-height: var(--mobile-touch-target-min, var(--primitives-spacing-11));
+  width: var(--primitives-spacing-11);
+  height: var(--primitives-spacing-11);
+  padding: 0;
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--tf-border);
+  border-radius: calc(var(--primitives-borderRadius-md) * 1px);
+  background: var(--tf-bg);
+  color: var(--tf-text);
+  cursor: pointer;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.fab:hover,
+.fab:focus-visible,
+.fab[aria-expanded='true'] {
+  background: var(--tf-bg-hover);
+}
+
+.fab:focus {
+  outline: none;
+}
+
+.fab:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 2px) solid var(--tf-focus);
+  outline-offset: calc(var(--primitives-spacing-1) / 2);
+}
+
+.fabIcon {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+  flex-shrink: 0;
+}
+
+.label {
+  pointer-events: none;
+  padding: var(--primitives-spacing-1) var(--primitives-spacing-2);
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--tf-border);
+  border-radius: calc(var(--primitives-borderRadius-sm) * 1px);
+  background: var(--tf-bg);
+  color: var(--tf-text-muted);
+  font-family: var(--tf-font);
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--primitives-lineHeight-normal);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(var(--primitives-spacing-1));
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.labelVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .label {
+    transition: none;
+  }
+}

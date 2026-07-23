@@ -20,6 +20,8 @@ export interface ButtonProps {
   style?: React.CSSProperties
   className?: string
   type?: 'button' | 'submit' | 'reset'
+  /** Stable id for research click logging (data-testing-click). */
+  testingClickId?: string
 }
 
 const ICON_PX: Record<ButtonSize, number> = { sm: 14, md: 16, lg: 18 }
@@ -44,6 +46,7 @@ export function Button({
   className,
   type = 'button',
   style,
+  testingClickId,
 }: ButtonProps) {
   const resolvedIcon = resolveIcon(label, icon, showIcon)
   const iconPx = resolvedIcon === 'arrow-right-micro' ? MICRO_ICON_PX : ICON_PX[size]
@@ -60,7 +63,14 @@ export function Button({
     .join(' ')
 
   return (
-    <button type={type} className={cls} disabled={disabled} onClick={onClick} style={style}>
+    <button
+      type={type}
+      className={cls}
+      disabled={disabled}
+      onClick={onClick}
+      style={style}
+      {...(testingClickId ? { 'data-testing-click': testingClickId } : {})}
+    >
       <span>{label}</span>
       {showIcon && (
         <span className={styles.iconWrap} aria-hidden>

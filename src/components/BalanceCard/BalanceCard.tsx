@@ -117,7 +117,13 @@ function BalanceCardMoreMenuItems({
   return (
     <>
       {isV2Actions ? (
-        <button type="button" className={styles.moreMenuItem} role="menuitem" onClick={() => run(onDeposit)}>
+        <button
+          type="button"
+          className={styles.moreMenuItem}
+          role="menuitem"
+          onClick={() => run(onDeposit)}
+          data-testing-click="deposit_button"
+        >
           <span className={styles.moreMenuItemLead}>
             <span className={styles.moreMenuIconBadge}>
               <PlusIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
@@ -126,7 +132,13 @@ function BalanceCardMoreMenuItems({
           </span>
         </button>
       ) : null}
-      <button type="button" className={styles.moreMenuItem} role="menuitem" onClick={() => run(onEarn)}>
+      <button
+        type="button"
+        className={styles.moreMenuItem}
+        role="menuitem"
+        onClick={() => run(onEarn)}
+        data-testing-click="vault_open_button"
+      >
         <span className={styles.moreMenuItemLead}>
           <span className={styles.moreMenuIconBadge}>
             <ChartBarIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
@@ -135,13 +147,14 @@ function BalanceCardMoreMenuItems({
         </span>
         <span className={styles.moreMenuMeta}>4.2% APR</span>
       </button>
-      <button
-        type="button"
-        className={styles.moreMenuItem}
-        role="menuitem"
-        disabled={!canWithdraw}
-        onClick={() => run(onWithdraw)}
-      >
+        <button
+          type="button"
+          className={styles.moreMenuItem}
+          role="menuitem"
+          disabled={!canWithdraw}
+          onClick={() => run(onWithdraw)}
+          data-testing-click="withdraw_og_button"
+        >
         <span className={styles.moreMenuItemLead}>
           <span className={styles.moreMenuIconBadge}>
             <ArrowLeftIcon className={styles.moreMenuIcon} strokeWidth={1.5} />
@@ -577,6 +590,7 @@ export function BalanceCard({
               variant={hasFunds ? 'gradient' : 'solid'}
               className={sendClassName}
               onClick={onSend}
+              testingClickId="send_button"
             />
           </div>
           {isV2Actions ? (
@@ -587,6 +601,7 @@ export function BalanceCard({
                 icon={<ArrowDownIcon className={styles.pillIcon} strokeWidth={1.5} />}
                 className={sendClassName}
                 onClick={onRequest}
+                testingClickId="request_button"
               />
             </div>
           ) : (
@@ -599,6 +614,7 @@ export function BalanceCard({
                     icon={<PlusIcon className={styles.actionIcon} strokeWidth={1.5} />}
                     aria-label="Deposit"
                     onClick={onDeposit}
+                    testingClickId="deposit_button"
                   />
                 ) : (
                   <Tooltip variant="action" content="Deposit">
@@ -608,6 +624,7 @@ export function BalanceCard({
                       icon={<PlusIcon className={styles.actionIcon} strokeWidth={1.5} />}
                       aria-label="Deposit"
                       onClick={onDeposit}
+                      testingClickId="deposit_button"
                     />
                   </Tooltip>
                 )}

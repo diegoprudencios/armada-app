@@ -6,9 +6,14 @@ import './styles/typography.css'
 import { initDashboardBackground } from '@/utils/dashboardBackground'
 import { initTheme } from '@/utils/theme'
 import { mountRoot } from '@/mountRoot'
+import { TestingFeedbackLayer } from '@/testingFeedback'
 import { ArmadaAppDashboard } from './pages/ArmadaAppDashboard'
 
 initTheme()
 initDashboardBackground()
 
-mountRoot(<ArmadaAppDashboard />)
+mountRoot(
+  <TestingFeedbackLayer>
+    <ArmadaAppDashboard />
+  </TestingFeedbackLayer>,
+)

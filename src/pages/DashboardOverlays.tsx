@@ -2,11 +2,20 @@ import { ConnectWalletOverlay } from '@/components/ConnectWalletOverlay'
 import { demoUsdcBalanceForProvider } from '@/constants/walletMenu'
 import type { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
 import {
+  TESTING_FLOW_QUESTION_SHIELD_EXPECTATION,
+  TESTING_FLOW_QUESTION_VAULT_DEPOSIT,
+  TESTING_FLOW_QUESTION_WITHDRAW_PRIVACY,
+  TESTING_FLOW_QUESTION_REQUEST_COMPREHENSION,
+  testingFlowQuestionSendPrivacyCertainty,
+  useSessionLogger,
+} from '@/testingFeedback'
+import {
   DEMO_ADDRESS_BY_PROVIDER,
   DEPOSIT_WALLET_BALANCE,
   DEMO_ARMADA_ADDRESS,
   type DemoWalletProvider,
 } from './depositFlowConstants'
+import { isArmadaAddress } from './sendFlowConstants'
 import { DepositModalFlow } from './DepositModalFlow'
 import { EarnModalFlow } from './EarnModalFlow'
 import { SendModalFlow } from './SendModalFlow'
@@ -29,6 +38,7 @@ export interface DashboardOverlaysProps {
 
 /** Connect wallet + deposit/send modal flows shared by all dashboard layout variants. */
 export function DashboardOverlays({ state }: DashboardOverlaysProps) {
+  const { notifyFirstDepositComplete, showFlowQuestion } = useSessionLogger()
   const {
     wallet,
     connectOpen,
@@ -136,6 +146,8 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onProcessingComplete={() => {
             setDepositConfirmedAt(Date.now())
             setDepositStep('confirmed')
+            notifyFirstDepositComplete()
+            showFlowQuestion(TESTING_FLOW_QUESTION_SHIELD_EXPECTATION)
           }}
           onConfirmedGoToDashboard={completeDeposit}
         />
@@ -165,6 +177,8 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onProcessingComplete={() => {
             setSendConfirmedAt(Date.now())
             setSendStep('confirmed')
+            const mode = isArmadaAddress(sendRecipient) ? 'private' : 'public'
+            showFlowQuestion(testingFlowQuestionSendPrivacyCertainty(mode))
           }}
           onConfirmedGoToDashboard={completeSend}
         />
@@ -200,6 +214,9 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onProcessingComplete={() => {
             setEarnConfirmedAt(Date.now())
             setEarnStep('confirmed')
+            if (earnTab === 'add') {
+              showFlowQuestion(TESTING_FLOW_QUESTION_VAULT_DEPOSIT)
+            }
           }}
           onConfirmedGoToDashboard={completeEarn}
         />
@@ -229,6 +246,7 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           onProcessingComplete={() => {
             setWithdrawConfirmedAt(Date.now())
             setWithdrawStep('confirmed')
+            showFlowQuestion(TESTING_FLOW_QUESTION_WITHDRAW_PRIVACY)
           }}
           onConfirmedGoToDashboard={completeWithdraw}
         />
@@ -258,7 +276,10 @@ export function DashboardOverlays({ state }: DashboardOverlaysProps) {
           }}
           onAmountBack={() => setRequestStep('choose')}
           onDetailsBack={() => setRequestStep('amount')}
-          onCreateLink={completeRequestLink}
+          onCreateLink={(payload) => {
+            completeRequestLink(payload)
+            showFlowQuestion(TESTING_FLOW_QUESTION_REQUEST_COMPREHENSION)
+          }}
           onLinkRevoked={markRequestLinkRevoked}
           onDone={closeRequest}
         />

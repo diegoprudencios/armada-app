@@ -10,9 +10,10 @@ alwaysApply: true
 ## Required workflow
 
 1. **Read** `../armada-crowdfund/ARMADA_DESIGN_SYSTEM.md` before writing or editing UI.
-2. **Never hardcode** hex colors, raw `px` spacing/sizing, or font sizes — use CSS custom properties from `src/styles/tokens.css`.
-3. **Verify token names** in `src/styles/tokens.css` before using any `var(--…)`.
-4. **Run `npm run build`** before marking any task complete.
+2. **Follow `accessibility-a11y.mdc`** — strictly apply [A11Y.md](https://github.com/fecarrico/A11Y.md/blob/main/docs/en/A11Y.md) for all frontend work.
+3. **Never hardcode** hex colors, raw `px` spacing/sizing, or font sizes — use CSS custom properties from `src/styles/tokens.css`.
+4. **Verify token names** in `src/styles/tokens.css` before using any `var(--…)`.
+5. **Run `npm run build`** before marking any task complete.
 
 ## Tokens
 

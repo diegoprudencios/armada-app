@@ -14,6 +14,8 @@ export interface IconButtonProps {
   className?: string
   iconClassName?: string
   'aria-label': string
+  /** Stable id for research click logging (data-testing-click). */
+  testingClickId?: string
 }
 
 export function IconButton({
@@ -26,6 +28,7 @@ export function IconButton({
   className,
   iconClassName,
   'aria-label': ariaLabel,
+  testingClickId,
 }: IconButtonProps) {
   const classNames = [
     styles.button,
@@ -44,6 +47,7 @@ export function IconButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
+      {...(testingClickId ? { 'data-testing-click': testingClickId } : {})}
     >
       <span className={[styles.icon, iconClassName].filter(Boolean).join(' ')} aria-hidden>
         {icon}

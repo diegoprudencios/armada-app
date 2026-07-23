@@ -66,6 +66,9 @@ export function EarnReviewScreen({
             label={confirmLabel}
             showIcon={false}
             onClick={onConfirm}
+            testingClickId={
+              tab === 'add' ? 'vault_deposit_confirm_button' : 'vault_withdraw_confirm_button'
+            }
           />
         </div>
       </div>
@@ -104,6 +107,9 @@ export function EarnReviewScreen({
           label={confirmLabel}
           showIcon={false}
           onClick={onConfirm}
+          testingClickId={
+            tab === 'add' ? 'vault_deposit_confirm_button' : 'vault_withdraw_confirm_button'
+          }
         />
       </div>
     </div>

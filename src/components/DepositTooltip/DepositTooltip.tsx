@@ -88,7 +88,7 @@ export function DepositTooltip({ variant = 'default', onDeposit }: DepositToolti
           </p>
         </div>
         {isV2 && !isTapTarget ? (
-          <button type="button" className={styles.depositCta} onClick={onDeposit}>
+          <button type="button" className={styles.depositCta} onClick={onDeposit} data-testing-click="deposit_first_button">
             Deposit
           </button>
         ) : null}
@@ -98,7 +98,13 @@ export function DepositTooltip({ variant = 'default', onDeposit }: DepositToolti
 
   if (isTapTarget) {
     return (
-      <button type="button" className={rootClassName} onClick={onDeposit} aria-label="Make your first deposit">
+      <button
+        type="button"
+        className={rootClassName}
+        onClick={onDeposit}
+        aria-label="Make your first deposit"
+        data-testing-click="deposit_first_button"
+      >
         {content}
       </button>
     )

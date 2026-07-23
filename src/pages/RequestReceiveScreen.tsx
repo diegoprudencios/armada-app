@@ -175,6 +175,7 @@ export function RequestReceiveScreen({
             disabled={!canCreateLink}
             dimWhenDisabled={false}
             onClick={onCreateLink}
+            testingClickId="request_create_link_button"
           />
         </div>
 

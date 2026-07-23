@@ -282,6 +282,7 @@ export function EarnModalFlow({
             className={chooserStyles.item}
             role="menuitem"
             onClick={handleChooseDeposit}
+            data-testing-click="vault_deposit_choose_button"
           >
             <span className={chooserStyles.itemLead}>
               <span className={chooserStyles.iconBadge}>
@@ -295,6 +296,7 @@ export function EarnModalFlow({
             className={chooserStyles.item}
             role="menuitem"
             onClick={handleChooseWithdraw}
+            data-testing-click="vault_withdraw_choose_button"
           >
             <span className={chooserStyles.itemLead}>
               <span className={chooserStyles.iconBadge}>
