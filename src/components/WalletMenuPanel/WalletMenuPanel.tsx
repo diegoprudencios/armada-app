@@ -7,6 +7,9 @@ import { WalletMenuPanelFooter } from './WalletMenuPanelFooter'
 import { WalletMenuPanelMulti } from './WalletMenuPanelMulti'
 import styles from './WalletMenuPanel.module.css'
 
+/** Dev toggles for dashboard / wallet-panel versions — re-enable when needed. */
+const SHOW_VERSION_CONTROLS = false
+
 export interface WalletMenuPanelProps {
   wallets: readonly ConnectedWallet[]
   activeWalletId: string | null
@@ -31,10 +34,12 @@ export function WalletMenuPanel(props: WalletMenuPanelProps) {
         <WalletMenuPanelMulti {...props} />
       )}
 
-      <WalletMenuPanelFooter
-        walletPanelVersion={walletPanelVersion}
-        onWalletPanelVersionChange={setWalletPanelVersion}
-      />
+      {SHOW_VERSION_CONTROLS ? (
+        <WalletMenuPanelFooter
+          walletPanelVersion={walletPanelVersion}
+          onWalletPanelVersionChange={setWalletPanelVersion}
+        />
+      ) : null}
     </div>
   )
 }
