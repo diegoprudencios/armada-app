@@ -24,7 +24,10 @@ export function readInitialHasCompletedDeposit(): boolean {
   if (getCurrentEnvironment() !== 'mock') return false
   const stored = readDemoDashboardSession()?.hasCompletedDeposit ?? false
   if (stored) return true
-  return readInitialRecentActivity().some((item) => item.kind === 'deposit')
+  if ((readDemoDashboardSession()?.balance ?? 0) > 0) return true
+  return readInitialRecentActivity().some(
+    (item) => item.kind === 'deposit' || item.kind === 'receiveLink',
+  )
 }
 
 export function readInitialEarningBalance(): number {

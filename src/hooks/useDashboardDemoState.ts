@@ -91,7 +91,10 @@ export function useDashboardDemoState(initialBalance = 0) {
     activity.recentActivity,
   ])
 
-  const showDepositTooltip = Boolean(walletSession.wallet) && !balances.hasCompletedDeposit
+  const showDepositTooltip =
+    Boolean(walletSession.wallet) &&
+    !balances.hasCompletedDeposit &&
+    balances.dashboardBalance <= 0
 
   function openActivityReceipt(item: DashboardActivityItem) {
     if (!walletSession.wallet) return

@@ -35,6 +35,7 @@ export function useDemoBalances({ initialBalance, scheduleActivityReveal }: UseD
   function creditBalanceIncrease(amount: number) {
     if (amount <= 0) return
 
+    setHasCompletedDeposit(true)
     setDashboardBalance((prev) => {
       const next = prev + amount
       setBalanceRoll((roll) => ({
@@ -53,6 +54,7 @@ export function useDemoBalances({ initialBalance, scheduleActivityReveal }: UseD
     setDashboardBalance((prev) => {
       if (prev >= amount) return prev
 
+      setHasCompletedDeposit(true)
       const next = amount
       setBalanceRoll((roll) => ({
         trigger: roll.trigger + 1,
