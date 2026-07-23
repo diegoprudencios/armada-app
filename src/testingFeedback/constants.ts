@@ -57,6 +57,12 @@ export const TESTING_TOAST_AUTO_DISMISS_MS = 15_000
 export const TESTING_OPEN_FEEDBACK_PROMPT =
   'Anything confusing, broken, or worth telling us?'
 
+/**
+ * Master switch for the research feedback layer (icon, toasts, panel, logging).
+ * Keep the module in the repo; flip to `true` when running another testing round.
+ */
+export const TESTING_FEEDBACK_ENABLED = false
+
 /** Window key for live console inspection during testing. */
 export const TESTING_SESSION_WINDOW_KEY = '__ARMADA_TESTING_SESSION__'
 

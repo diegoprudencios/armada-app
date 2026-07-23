@@ -302,10 +302,38 @@ export function TestingSessionLoggerProvider({ children }: TestingSessionLoggerP
   )
 }
 
+const DISABLED_SESSION_LOGGER: SessionLoggerApi = {
+  session: {
+    sessionId: '',
+    sessionStart: 0,
+    sessionEnd: null,
+    deviceInfo: {
+      userAgent: '',
+      platform: '',
+      viewportWidth: 0,
+      viewportHeight: 0,
+    },
+    screensVisited: [],
+    firedFlowQuestions: [],
+    feedbackResponses: [],
+    clickEvents: [],
+  },
+  hasCompletedFirstDeposit: false,
+  notifyFirstDepositComplete: () => undefined,
+  showFlowQuestion: () => undefined,
+  dismissActiveToast: () => undefined,
+  activeToast: null,
+  panelOpen: false,
+  openPanel: () => undefined,
+  closePanel: () => undefined,
+  submitOpenFeedback: () => undefined,
+  submitFlowAnswer: () => undefined,
+  trackScreen: () => undefined,
+  responsesForQuestion: () => [],
+}
+
+/** Safe when the layer is disabled (no provider) — trigger calls become no-ops. */
 export function useSessionLogger(): SessionLoggerApi {
   const ctx = useContext(SessionLoggerContext)
-  if (!ctx) {
-    throw new Error('useSessionLogger must be used within TestingSessionLoggerProvider')
-  }
-  return ctx
+  return ctx ?? DISABLED_SESSION_LOGGER
 }

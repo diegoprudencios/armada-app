@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { TESTING_FEEDBACK_ENABLED } from './constants'
 import { TestingFeedbackIcon } from './TestingFeedbackIcon'
 import { TestingFeedbackPanel } from './TestingFeedbackPanel'
 import { TestingToast } from './TestingToast'
@@ -12,6 +13,8 @@ export interface TestingFeedbackLayerProps {
  * Drop-in research/testing shell. Mount once at the app root when you are ready
  * to enable this layer — does not modify product UI by itself.
  *
+ * Gated by `TESTING_FEEDBACK_ENABLED` in constants.ts.
+ *
  * Usage:
  *   <TestingFeedbackLayer>
  *     <YourApp />
@@ -21,6 +24,10 @@ export interface TestingFeedbackLayerProps {
  *   const { notifyFirstDepositComplete, showFlowQuestion, trackScreen } = useSessionLogger()
  */
 export function TestingFeedbackLayer({ children }: TestingFeedbackLayerProps) {
+  if (!TESTING_FEEDBACK_ENABLED) {
+    return <>{children}</>
+  }
+
   return (
     <TestingSessionLoggerProvider>
       {children}

@@ -57,7 +57,7 @@ export interface BalanceCardProps {
   onToggleActivity?: () => void
   balanceHidden?: boolean
   onBalanceHiddenChange?: (hidden: boolean) => void
-  /** User's shielded Armada address — shown under the balance label when set. */
+  /** User's shielded Armada address — shown above the balance label when set. */
   armadaAddress?: string
 }
 
@@ -516,7 +516,6 @@ export function BalanceCard({
               </Tooltip>
             )}
             <div className={styles.labelStack}>
-              <span className={styles.label}>Private USDC Balance</span>
               {armadaAddress ? (
                 <button
                   type="button"
@@ -539,6 +538,7 @@ export function BalanceCard({
                     : truncateArmadaAddress(armadaAddress)}
                 </button>
               ) : null}
+              <span className={styles.label}>Private USDC Balance</span>
             </div>
             <button
               type="button"

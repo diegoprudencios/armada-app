@@ -27,7 +27,13 @@ function GradientShieldIcon({ className }: { className?: string }) {
           <stop offset="1" stopColor="var(--semantic-component-button-gradient-default-to)" />
         </linearGradient>
       </defs>
-      <path fill={`url(#${gradientId})`} fillRule="evenodd" d={SHIELD_ICON_PATH} clipRule="evenodd" />
+      <path
+        className={styles.shieldPath}
+        fill={`url(#${gradientId})`}
+        fillRule="evenodd"
+        d={SHIELD_ICON_PATH}
+        clipRule="evenodd"
+      />
     </svg>
   )
 }
