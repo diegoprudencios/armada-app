@@ -34,5 +34,6 @@ After token changes in sibling repos, run `npm run tokens:sync` (also runs autom
 
 ## Dev
 
-- `npm run dev` → http://localhost:5177/
+- `npm run dev` → http://localhost:5177/ (app intro landing)
+- Marketing site draft → http://localhost:5177/homepage.html (prod: `/homepage`)
 - `npm run build` → `npm run tokens:sync && tsc && vite build`

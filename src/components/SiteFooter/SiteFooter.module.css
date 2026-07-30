@@ -1,0 +1,164 @@
+/*
+  Marketing footer gradient — Figma brand stops (amber → rose → lavender).
+  Exact stops match logo gem fills (#F8D197 / #CA8AEA); rose midpoint has no token yet.
+*/
+.footer {
+  --footer-gradient-amber: #f8d197;
+  --footer-gradient-rose: #f39db0;
+  --footer-gradient-lavender: #ca8aea;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--primitives-spacing-16);
+  min-height: 70svh;
+  height: 70svh;
+  /* Side/bottom padding 0 so the wordmark can sit flush to edges */
+  padding: var(--primitives-spacing-8) 0 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: linear-gradient(
+    180deg,
+    var(--footer-gradient-lavender) 0%,
+    var(--footer-gradient-rose) 52%,
+    var(--footer-gradient-amber) 100%
+  );
+  color: var(--primitives-color-neutral-50);
+}
+
+.topRow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--primitives-spacing-4);
+  width: 100%;
+  padding: 0 var(--primitives-spacing-6);
+  box-sizing: border-box;
+  z-index: 1;
+}
+
+.logoLink {
+  display: inline-flex;
+  flex-shrink: 0;
+  justify-self: start;
+  line-height: 0;
+  color: var(--primitives-color-neutral-50);
+  border-radius: calc(var(--primitives-borderRadius-sm) * 1px);
+}
+
+.logoLink:focus-visible {
+  outline: 2px solid var(--primitives-color-neutral-50);
+  outline-offset: 4px;
+}
+
+.logo {
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  color: var(--primitives-color-neutral-50);
+}
+
+.nav {
+  justify-self: center;
+  min-width: 0;
+}
+
+.linkList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--primitives-spacing-1) var(--primitives-spacing-5);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--primitives-spacing-10);
+  padding: 0 var(--primitives-spacing-3);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-xs) * 1px);
+  font-weight: var(--primitives-fontWeight-medium);
+  letter-spacing: var(--primitives-letterSpacing-widest);
+  text-transform: uppercase;
+  color: var(--primitives-color-neutral-50);
+  white-space: nowrap;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.link:hover {
+  background: color-mix(in srgb, var(--primitives-color-neutral-50) 12%, transparent);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--semantic-color-border-focus);
+  outline-offset: 2px;
+}
+
+.socialList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: var(--primitives-spacing-1);
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--primitives-spacing-10);
+  height: var(--primitives-spacing-10);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  color: var(--primitives-color-neutral-50);
+  transition: background 150ms ease;
+}
+
+.socialLink:hover {
+  background: color-mix(in srgb, var(--primitives-color-neutral-50) 12%, transparent);
+}
+
+.socialLink:focus-visible {
+  outline: 2px solid var(--semantic-color-border-focus);
+  outline-offset: 2px;
+}
+
+/* Asset is edge-tight (glyphs touch frame). Stretch full width, flush bottom. */
+.wordmark {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: auto;
+  flex-shrink: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (min-width: 768px) {
+  .footer {
+    padding-top: var(--primitives-spacing-10);
+  }
+
+  .topRow {
+    padding: 0 var(--primitives-spacing-8);
+  }
+
+  .linkList {
+    gap: var(--primitives-spacing-2) var(--primitives-spacing-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .footer {
+    padding-top: var(--primitives-spacing-12);
+  }
+
+  .topRow {
+    padding: 0 var(--primitives-spacing-10);
+  }
+}

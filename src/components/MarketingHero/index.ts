@@ -1,0 +1,1 @@
+export { MarketingHero } from './MarketingHero'
