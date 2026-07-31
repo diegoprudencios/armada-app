@@ -2,7 +2,7 @@ import { ArrowRightIcon as ArrowRightMicroIcon } from '@heroicons/react/16/solid
 import { ArrowRightIcon } from '@heroicons/react/24/outline'
 import styles from './Button.module.css'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'gradient'
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'gradient' | 'ink'
 export type ButtonSize = 'sm' | 'md' | 'lg'
 export type ButtonIcon = 'arrow-right' | 'arrow-right-micro'
 
@@ -20,6 +20,10 @@ export interface ButtonProps {
   style?: React.CSSProperties
   className?: string
   type?: 'button' | 'submit' | 'reset'
+  /** When set, renders an anchor instead of a button. */
+  href?: string
+  target?: string
+  rel?: string
   /** Stable id for research click logging (data-testing-click). */
   testingClickId?: string
 }
@@ -46,6 +50,9 @@ export function Button({
   className,
   type = 'button',
   style,
+  href,
+  target,
+  rel,
   testingClickId,
 }: ButtonProps) {
   const resolvedIcon = resolveIcon(label, icon, showIcon)
@@ -62,15 +69,8 @@ export function Button({
     .filter(Boolean)
     .join(' ')
 
-  return (
-    <button
-      type={type}
-      className={cls}
-      disabled={disabled}
-      onClick={onClick}
-      style={style}
-      {...(testingClickId ? { 'data-testing-click': testingClickId } : {})}
-    >
+  const content = (
+    <>
       <span>{label}</span>
       {showIcon && (
         <span className={styles.iconWrap} aria-hidden>
@@ -81,6 +81,45 @@ export function Button({
           )}
         </span>
       )}
+    </>
+  )
+
+  const testingAttrs = testingClickId ? { 'data-testing-click': testingClickId } : {}
+
+  if (href) {
+    return (
+      <a
+        className={cls}
+        href={disabled ? undefined : href}
+        target={target}
+        rel={rel}
+        aria-disabled={disabled || undefined}
+        tabIndex={disabled ? -1 : undefined}
+        onClick={
+          disabled
+            ? (event) => {
+                event.preventDefault()
+              }
+            : onClick
+        }
+        style={style}
+        {...testingAttrs}
+      >
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <button
+      type={type}
+      className={cls}
+      disabled={disabled}
+      onClick={onClick}
+      style={style}
+      {...testingAttrs}
+    >
+      {content}
     </button>
   )
 }

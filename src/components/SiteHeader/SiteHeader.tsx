@@ -256,7 +256,7 @@ export function SiteHeader() {
               ))}
             </ul>
             <Button
-              variant="primary"
+              variant="ink"
               size="md"
               label="Armada App"
               showIcon
@@ -344,7 +344,7 @@ export function SiteHeader() {
             ))}
           </ul>
           <Button
-            variant="primary"
+            variant="ink"
             size="lg"
             label="Armada App"
             showIcon

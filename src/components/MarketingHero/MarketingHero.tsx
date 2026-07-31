@@ -1,4 +1,5 @@
-import heroBackground from '@/assets/landing-hero-bg.webp'
+import heroBackground from '@/assets/new-fleet.webp'
+import { Button } from '@/components/Button'
 import styles from './MarketingHero.module.css'
 
 export function MarketingHero() {
@@ -9,12 +10,24 @@ export function MarketingHero() {
 
       <div className={styles.content}>
         <h1 id="marketing-hero-heading" className={styles.heading}>
-          On-chain money that doesn&apos;t broadcast.
+          Pluggable privacy
+          <br />
+          infrastructure for stablecoins.
         </h1>
         <p className={styles.subhead}>
-          Shielded payment rails for USDC. Built for DAOs, protocols, and the apps that move money
-          between them.
+          Stablecoins are exposed by default. Armada protects USDC balances for on-chain asset
+          managers and private capital platforms.
         </p>
+        <Button
+          variant="primary"
+          size="lg"
+          label="Integrate Armada"
+          showIcon={false}
+          href="https://docs.armada.blue"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.cta}
+        />
       </div>
     </section>
   )

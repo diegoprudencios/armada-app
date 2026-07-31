@@ -2,7 +2,7 @@ import { ArrowUpRightIcon } from '@heroicons/react/24/outline'
 import type { MegaMenuItem, NavMenu } from '@/constants/siteNav'
 import styles from './NavMegaMenu.module.css'
 
-const ICON_PX = 22
+const ICON_PX = 18
 
 type NavMegaMenuProps = {
   menu: NavMenu
