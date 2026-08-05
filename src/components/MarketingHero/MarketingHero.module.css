@@ -16,7 +16,7 @@
   height: 100%;
   max-width: none;
   object-fit: cover;
-  object-position: top center;
+  object-position: bottom center;
 }
 
 .overlay {
@@ -138,17 +138,21 @@
   display: block;
 }
 
-@media (min-width: 1200px) and (max-width: 1439px) {
+@media (min-width: 1200px) and (max-width: 1535px) {
+  .content {
+    /* Sides + bottom 100px; keep top ~60 */
+    padding:
+      calc(var(--primitives-spacing-16) - var(--primitives-spacing-1))
+      calc(var(--primitives-spacing-20) + var(--primitives-spacing-5))
+      calc(var(--primitives-spacing-20) + var(--primitives-spacing-5));
+  }
+
   .heading {
     font-size: calc(var(--primitives-fontSize-3xl) * 1px);
   }
 }
 
-@media (min-width: 1440px) {
-  .background {
-    object-position: center;
-  }
-
+@media (min-width: 1536px) {
   .content {
     /* Sides + bottom 160px; keep top ~60 */
     padding:
