@@ -1,0 +1,16 @@
+/* Local Charis SIL — avoids Google Fonts network / CSP failures on display headlines. */
+@font-face {
+  font-family: 'Charis SIL';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/CharisSIL-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Charis SIL';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/CharisSIL-Bold.ttf') format('truetype');
+}

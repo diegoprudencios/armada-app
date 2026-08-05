@@ -1,0 +1,79 @@
+.root {
+  position: relative;
+  flex-shrink: 0;
+  width: calc(var(--primitives-spacing-20) * 2);
+  height: calc(var(--primitives-spacing-20) * 2);
+  display: grid;
+  place-items: center;
+}
+
+.tickRing {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.tick {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.5px;
+  height: var(--primitives-spacing-3);
+  border-radius: calc(var(--primitives-borderRadius-sm) * 0.5px);
+  /* EXCEPTION — ticks stay white on the fleet photo. */
+  background: var(--semantic-component-tag-label);
+  transform-origin: 50% 68px;
+  transform: translate(-50%, -68px) rotate(calc(var(--i) * 6deg));
+  opacity: 0.4;
+  animation: tickSweep 2.1s linear infinite;
+  animation-delay: calc(var(--i) * 0.035s);
+}
+
+.token {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+@keyframes tickSweep {
+  0% {
+    opacity: 1;
+    width: 3px;
+  }
+
+  12% {
+    opacity: 0.7;
+    width: 2.25px;
+  }
+
+  30% {
+    opacity: 0.45;
+    width: 1.5px;
+  }
+
+  100% {
+    opacity: 0.4;
+    width: 1.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tick {
+    animation: none;
+    opacity: 0.55;
+    width: 1.5px;
+  }
+}
+
+@media (max-width: 767px) {
+  .root {
+    width: calc(var(--primitives-spacing-16) + var(--primitives-spacing-20));
+    height: calc(var(--primitives-spacing-16) + var(--primitives-spacing-20));
+  }
+
+  .tick {
+    height: calc(var(--primitives-spacing-2) + var(--primitives-spacing-1) / 2);
+    transform-origin: 50% 56px;
+    transform: translate(-50%, -56px) rotate(calc(var(--i) * 6deg));
+  }
+}
