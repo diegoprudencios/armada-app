@@ -1,0 +1,70 @@
+.root {
+  /* 0 = full fog; 1 = fully cleared — driven by scroll in FleetFogCompare.tsx */
+  --fog-progress: 0;
+
+  position: relative;
+  margin: 0;
+  width: 100%;
+  height: calc(var(--primitives-spacing-20) * 7 + var(--primitives-spacing-8));
+  overflow: hidden;
+  border-radius: var(--primitives-spacing-5);
+  line-height: 0;
+  background: var(--primitives-color-neutral-0);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Clear on top; fog on the left, clear on the right; split moves L→R on scroll down */
+.clearLayer {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 0 0 calc(var(--fog-progress) * 100%));
+  pointer-events: none;
+}
+
+.split {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--fog-progress) * 100%);
+  z-index: 2;
+  width: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.splitLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  /* EXCEPTION — split marker on photo (compare UI). */
+  background: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root {
+    --fog-progress: 0.4;
+  }
+}
+
+@media (max-width: 1199px) {
+  .root {
+    height: calc(var(--primitives-spacing-20) * 5);
+  }
+}
+
+@media (max-width: 767px) {
+  .root {
+    height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-10));
+    border-radius: var(--primitives-spacing-4);
+  }
+}

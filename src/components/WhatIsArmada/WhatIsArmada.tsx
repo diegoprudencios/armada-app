@@ -1,40 +1,44 @@
-import { ArrowRightIcon } from '@heroicons/react/24/outline'
 import { Button } from '@/components/Button'
 import type { ButtonVariant } from '@/components/Button'
+import { FleetFogCompare } from './FleetFogCompare'
 import styles from './WhatIsArmada.module.css'
 
-type Cta =
-  | {
-      kind: 'button'
-      label: string
-      href: string
-      external?: boolean
-      variant: Extract<ButtonVariant, 'primary' | 'secondary'>
-    }
-  | {
-      kind: 'link'
-      label: string
-      href: string
-      external?: boolean
-    }
+type Cta = {
+  label: string
+  href: string
+  external?: boolean
+  variant: Extract<ButtonVariant, 'primary' | 'secondary' | 'ghost'>
+}
 
 type Block = {
   id: string
-  /** Two lines — rendered with a forced break. */
   title: [string, string]
   body: string
-  ctas?: Cta[]
+  ctas: Cta[]
 }
 
-const BLOCKS: Block[] = [
+const INTRO = {
+  id: 'integrators',
+  title: ["Privacy your users don't have to", 'think about'] as [string, string],
+  body: "Add shielded USDC rails to your product through Armada's SDK, APIs, and compliance tooling. Built for platforms that manage, deploy, and move private capital on-chain.",
+  ctas: [
+    {
+      label: 'Integrate and test',
+      href: 'https://docs.armada.blue',
+      external: true,
+      variant: 'primary' as const,
+    },
+  ],
+}
+
+const FEATURES: Block[] = [
   {
-    id: 'integrators',
-    title: ["Privacy your users don't have to", 'think about'],
-    body: "Add shielded USDC rails to your product through Armada's SDK, APIs, and compliance tooling. Built for platforms that manage, deploy, and move private capital on-chain.",
+    id: 'capital-in-motion',
+    title: ['Protecting capital', 'in motion'],
+    body: 'Shield your relationships: balances, counterparties, allocation activity, and transaction history while continuing to operate with USDC.',
     ctas: [
       {
-        kind: 'button',
-        label: 'Integrate and testing',
+        label: 'Integrate and test',
         href: 'https://docs.armada.blue',
         external: true,
         variant: 'primary',
@@ -42,19 +46,30 @@ const BLOCKS: Block[] = [
     ],
   },
   {
-    id: 'capital-in-motion',
-    title: ['Protecting capital', 'in motion'],
-    body: 'Shield your relationships: balances, counterparties, allocation activity, and transaction history while continuing to operate with USDC.',
-  },
-  {
     id: 'compliance',
     title: ['Compliance without', 'intermediaries'],
-    body: 'Give authorized parties access to the records they need without making financial activity visible to the entire market.',
+    body: "Support policy controls, selective disclosure, transaction records, and reporting workflows through Armada's compliance tooling.",
+    ctas: [
+      {
+        label: 'Integrate and test',
+        href: 'https://docs.armada.blue',
+        external: true,
+        variant: 'primary',
+      },
+    ],
   },
   {
     id: 'beyond-capture',
     title: ['Built beyond', 'capture'],
     body: "Like Ethereum, Armada's shielded pool is neutral infrastructure: no company or governing entity can take control of it.",
+    ctas: [
+      {
+        label: 'Integrate and test',
+        href: 'https://docs.armada.blue',
+        external: true,
+        variant: 'primary',
+      },
+    ],
   },
   {
     id: 'foundations',
@@ -62,74 +77,71 @@ const BLOCKS: Block[] = [
     body: 'Armada builds on established decentralized architecture and cryptographic primitives refined through years of real-world use, adversarial pressure, and continuous iteration.',
     ctas: [
       {
-        kind: 'button',
         label: 'Explore the architecture',
         href: '#architecture',
         variant: 'primary',
       },
       {
-        kind: 'button',
         label: 'Review security',
         href: '#security',
-        variant: 'secondary',
+        variant: 'ghost',
       },
     ],
   },
 ]
 
+function CtaRow({ ctas, align }: { ctas: Cta[]; align: 'center' | 'start' }) {
+  return (
+    <div className={align === 'center' ? styles.ctaRowCenter : styles.ctaRowStart}>
+      {ctas.map((cta) => (
+        <Button
+          key={cta.label}
+          variant={cta.variant === 'ghost' ? 'ghost' : cta.variant}
+          size="lg"
+          label={cta.label}
+          showIcon={false}
+          href={cta.href}
+          className={cta.variant === 'ghost' ? styles.ghostCta : undefined}
+          {...(cta.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        />
+      ))}
+    </div>
+  )
+}
+
 export function WhatIsArmada() {
   return (
     <section className={styles.section} aria-label="What is Armada">
-      {BLOCKS.map((block, index) => (
-        <article
-          key={block.id}
-          id={index === 0 ? 'what-is-armada' : block.id}
-          className={styles.block}
-          aria-labelledby={`${block.id}-heading`}
-        >
-          <div className={styles.panel}>
-            <div className={styles.content}>
-              <h2 id={`${block.id}-heading`} className={styles.title}>
-                {block.title[0]}
-                <br />
-                {block.title[1]}
+      <div className={styles.intro} id="what-is-armada">
+        <h2 id="integrators-heading" className={styles.introTitle}>
+          <span className={styles.titleLine}>{INTRO.title[0]}</span>
+          <span className={styles.titleLine}>{INTRO.title[1]}</span>
+        </h2>
+        <p className={styles.introBody}>{INTRO.body}</p>
+        <CtaRow ctas={INTRO.ctas} align="center" />
+      </div>
+
+      <div className={styles.stack}>
+        <FleetFogCompare />
+
+        {FEATURES.map((block) => (
+          <article
+            key={block.id}
+            id={block.id}
+            className={styles.panel}
+            aria-labelledby={`${block.id}-heading`}
+          >
+            <div className={styles.panelContent}>
+              <h2 id={`${block.id}-heading`} className={styles.panelTitle}>
+                <span className={styles.titleLine}>{block.title[0]}</span>
+                <span className={styles.titleLine}>{block.title[1]}</span>
               </h2>
-              <p className={styles.body}>{block.body}</p>
-              {block.ctas && block.ctas.length > 0 ? (
-                <div className={styles.ctaRow}>
-                  {block.ctas.map((cta) =>
-                    cta.kind === 'button' ? (
-                      <Button
-                        key={cta.label}
-                        variant={cta.variant}
-                        size="lg"
-                        label={cta.label}
-                        showIcon={false}
-                        href={cta.href}
-                        {...(cta.external
-                          ? { target: '_blank', rel: 'noopener noreferrer' }
-                          : {})}
-                      />
-                    ) : (
-                      <a
-                        key={cta.label}
-                        className={styles.cta}
-                        href={cta.href}
-                        {...(cta.external
-                          ? { target: '_blank', rel: 'noopener noreferrer' }
-                          : {})}
-                      >
-                        <span>{cta.label}</span>
-                        <ArrowRightIcon width={16} height={16} aria-hidden />
-                      </a>
-                    ),
-                  )}
-                </div>
-              ) : null}
+              <p className={styles.panelBody}>{block.body}</p>
+              <CtaRow ctas={block.ctas} align="start" />
             </div>
-          </div>
-        </article>
-      ))}
+          </article>
+        ))}
+      </div>
     </section>
   )
 }

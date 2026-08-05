@@ -1,8 +1,11 @@
 .root {
+  --spinner-size: calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
+  --tick-radius: calc(var(--spinner-size) / 2 - var(--primitives-spacing-2));
+
   position: relative;
   flex-shrink: 0;
-  width: calc(var(--primitives-spacing-20) * 2);
-  height: calc(var(--primitives-spacing-20) * 2);
+  width: var(--spinner-size);
+  height: var(--spinner-size);
   display: grid;
   place-items: center;
 }
@@ -18,12 +21,12 @@
   top: 50%;
   left: 50%;
   width: 1.5px;
-  height: var(--primitives-spacing-3);
+  height: var(--primitives-spacing-2);
   border-radius: calc(var(--primitives-borderRadius-sm) * 0.5px);
   /* EXCEPTION — ticks stay white on the fleet photo. */
   background: var(--semantic-component-tag-label);
-  transform-origin: 50% 68px;
-  transform: translate(-50%, -68px) rotate(calc(var(--i) * 6deg));
+  transform-origin: 50% var(--tick-radius);
+  transform: translate(-50%, calc(var(--tick-radius) * -1)) rotate(calc(var(--i) * 6deg));
   opacity: 0.4;
   animation: tickSweep 2.1s linear infinite;
   animation-delay: calc(var(--i) * 0.035s);
@@ -62,18 +65,5 @@
     animation: none;
     opacity: 0.55;
     width: 1.5px;
-  }
-}
-
-@media (max-width: 767px) {
-  .root {
-    width: calc(var(--primitives-spacing-16) + var(--primitives-spacing-20));
-    height: calc(var(--primitives-spacing-16) + var(--primitives-spacing-20));
-  }
-
-  .tick {
-    height: calc(var(--primitives-spacing-2) + var(--primitives-spacing-1) / 2);
-    transform-origin: 50% 56px;
-    transform: translate(-50%, -56px) rotate(calc(var(--i) * 6deg));
   }
 }

@@ -1,158 +1,238 @@
+/*
+  Figma New Website Final (91:718 / 93:187)
+  Page: white
+  Stack: 1502 wide, gap 237
+  Fog: 1502×592, radius 20,   Panels: #f9f3ef, height 667, radius 20, padding-x 120, gap 33
+*/
+
 .section {
+  /* EXCEPTION — Figma marketing page fill (white), not amber-100. */
+  --section-page-bg: #ffffff;
+  /* EXCEPTION — Figma panel fill #f9f3ef (no matching token). */
+  --section-panel-bg: #f9f3ef;
+
   display: flex;
   flex-direction: column;
-  gap: var(--primitives-spacing-20);
-  padding: var(--primitives-spacing-20);
-  background: var(--primitives-color-amber-100);
+  align-items: center;
+  gap: calc(var(--primitives-spacing-20) + var(--primitives-spacing-16) + var(--primitives-spacing-3) / 2);
+  padding:
+    calc(var(--primitives-spacing-20) + var(--primitives-spacing-16) + var(--primitives-spacing-3) / 2)
+    var(--primitives-spacing-20)
+    calc(var(--primitives-spacing-20) * 2);
+  background: var(--section-page-bg);
+  color: #000000;
 }
 
-.block {
+/* —— Intro (centered) —— Figma 91:758: gap 40, title 72 / 1008, body 16 / 525 —— */
+
+.intro {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitives-spacing-10);
   box-sizing: border-box;
-  min-height: 100svh;
-  padding: 0;
-  color: var(--semantic-color-text-primary);
+  width: 100%;
+  max-width: calc(
+    var(--primitives-spacing-20) * 12 + var(--primitives-spacing-12) + var(--primitives-spacing-1) /
+      2
+  );
+  text-align: center;
   scroll-margin-top: 0;
 }
 
-/*
-  Figma panel: 40px radius (= spacing-10),
-  linear white 40% → white 20% top to bottom.
-*/
-.panel {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  box-sizing: border-box;
+.introTitle {
+  margin: 0;
   width: 100%;
-  min-height: 100svh;
-  padding: var(--primitives-spacing-16) var(--primitives-spacing-6) var(--primitives-spacing-12);
-  border-radius: var(--primitives-spacing-10);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent) 0%,
-    color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent) 100%
-  );
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--primitives-spacing-5);
-  width: 100%;
-  max-width: 40rem;
+  font-family: 'Charis SIL', var(--primitives-fontFamily-display), serif;
+  font-size: calc(var(--primitives-fontSize-6xl) * 1px + var(--primitives-spacing-2));
+  font-weight: var(--primitives-fontWeight-regular);
+  line-height: 1.057;
+  letter-spacing: var(--primitives-letterSpacing-tight);
+  color: #000000;
   text-align: center;
 }
 
-/* 72px ≈ midpoint of fontSize-6xl (64) and fontSize-7xl (80) */
-.title {
-  margin: 0;
-  font-family: var(--primitives-fontFamily-display), serif;
-  font-size: calc(
-    ((var(--primitives-fontSize-6xl) + var(--primitives-fontSize-7xl)) / 2) * 1px
-  );
-  font-weight: var(--primitives-fontWeight-regular);
-  line-height: var(--primitives-lineHeight-tight);
-  letter-spacing: var(--primitives-letterSpacing-tight);
-  color: var(--semantic-color-text-primary);
+.titleLine {
+  display: block;
 }
 
-@media (min-width: 1200px) {
-  .content {
-    max-width: calc(
-      var(--primitives-spacing-20) * 12 + var(--primitives-spacing-12) + var(--primitives-spacing-1) /
-        2
-    );
-  }
-
-  .title {
-    min-width: min(
-      100%,
-      calc(
-        var(--primitives-spacing-20) * 12 + var(--primitives-spacing-12) +
-          var(--primitives-spacing-1) / 2
-      )
-    );
-  }
-}
-
-/* 16px ≈ midpoint of fontSize-md (15) and fontSize-lg (17) */
-.body {
+.introBody {
   margin: 0;
-  max-width: 36rem;
+  max-width: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-11));
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(
     ((var(--primitives-fontSize-md) + var(--primitives-fontSize-lg)) / 2) * 1px
   );
-  font-weight: var(--primitives-fontWeight-regular);
-  line-height: var(--primitives-lineHeight-relaxed);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: 1.5;
   letter-spacing: var(--primitives-letterSpacing-normal);
-  color: var(--semantic-color-text-secondary);
+  color: rgba(0, 0, 0, 0.7);
   text-wrap: pretty;
 }
 
-.cta {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--primitives-spacing-2);
-  min-height: var(--primitives-spacing-11);
-  padding: 0 var(--primitives-spacing-3);
-  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: var(--semantic-typography-ui-button-font-size);
-  font-weight: var(--primitives-fontWeight-medium);
-  letter-spacing: var(--primitives-letterSpacing-wide);
-  color: var(--semantic-color-text-primary);
-  transition: background 150ms ease, color 150ms ease;
-}
-
-.ctaRow {
+.ctaRowCenter,
+.ctaRowStart {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  gap: var(--primitives-spacing-5);
+}
+
+.ctaRowCenter {
   justify-content: center;
-  gap: var(--primitives-spacing-3);
-  margin-top: var(--primitives-spacing-2);
 }
 
-.cta:hover {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 35%, transparent);
-  color: var(--semantic-color-brand-action);
+.ctaRowStart {
+  justify-content: flex-start;
 }
 
-.cta:focus-visible {
-  outline: 2px solid var(--semantic-color-border-focus);
-  outline-offset: 2px;
+.ghostCta.ghostCta {
+  background: transparent;
+  color: #000000;
+}
+
+.ghostCta.ghostCta:hover:not(:disabled) {
+  background: color-mix(in srgb, #000000 6%, transparent);
+  color: #000000;
+}
+
+/* —— Feature stack —— Figma 93:187: 1502 wide, gap 237 —— */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--primitives-spacing-20) * 3 - var(--primitives-spacing-1));
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(
+    var(--primitives-spacing-20) * 18 + var(--primitives-spacing-16) - var(--primitives-spacing-1) /
+      2
+  );
+}
+
+/* Panels: #f9f3ef, 667 tall, radius 20, px 120, gap 33, justify-center */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
+  min-height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
+  padding: 0 calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
+  border-radius: var(--primitives-spacing-5);
+  background: var(--section-panel-bg);
+  scroll-margin-top: 0;
+}
+
+.panelContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--primitives-spacing-8) + var(--primitives-spacing-1) / 2);
+  max-width: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-10));
+  text-align: left;
+}
+
+.panelTitle {
+  margin: 0;
+  font-family: 'Charis SIL', var(--primitives-fontFamily-display), serif;
+  font-size: calc(var(--primitives-fontSize-4xl) * 1px + var(--primitives-spacing-3));
+  font-weight: var(--primitives-fontWeight-regular);
+  line-height: 1.057;
+  letter-spacing: var(--primitives-letterSpacing-tight);
+  color: #000000;
+  text-align: left;
+}
+
+.panelBody {
+  margin: 0;
+  max-width: calc(var(--primitives-spacing-20) * 5 - var(--primitives-spacing-1) / 2);
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(
+    ((var(--primitives-fontSize-md) + var(--primitives-fontSize-lg)) / 2) * 1px
+  );
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: 1.5;
+  letter-spacing: var(--primitives-letterSpacing-normal);
+  color: rgba(0, 0, 0, 0.7);
+  text-wrap: pretty;
+}
+
+@media (min-width: 768px) {
+  .introTitle .titleLine,
+  .panelTitle .titleLine {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 1199px) {
+  .section {
+    gap: var(--primitives-spacing-12);
+    padding: var(--primitives-spacing-12) var(--primitives-spacing-6) var(--primitives-spacing-16);
+  }
+
+  .stack {
+    gap: var(--primitives-spacing-12);
+  }
+
+  .fog {
+    height: calc(var(--primitives-spacing-20) * 5);
+  }
+
+  .panel {
+    height: auto;
+    min-height: 0;
+    padding: var(--primitives-spacing-12) var(--primitives-spacing-8);
+  }
+
+  .introTitle {
+    font-size: calc(var(--primitives-fontSize-5xl) * 1px);
+  }
+
+  .panelTitle {
+    font-size: calc(var(--primitives-fontSize-4xl) * 1px);
+  }
 }
 
 @media (max-width: 767px) {
   .section {
+    gap: var(--primitives-spacing-8);
+    padding: var(--primitives-spacing-8) var(--primitives-spacing-4) var(--primitives-spacing-12);
+  }
+
+  .intro {
     gap: var(--primitives-spacing-6);
-    padding: var(--primitives-spacing-6);
   }
 
-  .panel {
-    padding: var(--primitives-spacing-12) var(--primitives-spacing-4) var(--primitives-spacing-8);
-    border-radius: var(--primitives-spacing-8);
-  }
-
-  .title {
+  .introTitle,
+  .panelTitle {
     font-size: calc(var(--primitives-fontSize-4xl) * 1px);
   }
 
-  .body {
-    font-size: calc(var(--primitives-fontSize-md) * 1px);
+  .titleLine {
+    white-space: normal;
   }
-}
 
-@media (min-width: 768px) and (max-width: 1023px) {
+  .fog {
+    height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-10));
+    border-radius: var(--primitives-spacing-4);
+  }
+
   .panel {
-    padding: var(--primitives-spacing-12) var(--primitives-spacing-8);
+    padding: var(--primitives-spacing-10) var(--primitives-spacing-5);
+    border-radius: var(--primitives-spacing-4);
   }
 
-  .title {
-    font-size: calc(var(--primitives-fontSize-5xl) * 1px);
+  .panelContent {
+    gap: var(--primitives-spacing-5);
+    max-width: none;
+  }
+
+  .ctaRowCenter,
+  .ctaRowStart {
+    gap: var(--primitives-spacing-3);
   }
 }

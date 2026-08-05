@@ -3,14 +3,14 @@ import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import styles from './HeroUsdcSpinner.module.css'
 
 const TICK_COUNT = 60
-/** Visible USDC circle ≈ 48px; branded glyph is 18/24 of the SVG box. */
-const TOKEN_SIZE = Math.round((48 * 24) / 18)
+/** Visible USDC circle ≈ 36px at 120px spinner; branded glyph is 18/24 of the SVG box. */
+const TOKEN_SIZE = Math.round((36 * 24) / 18)
 
 export interface HeroUsdcSpinnerProps {
   className?: string
 }
 
-/** 160×160 USDC mark with the app processing tick-ring spinner. */
+/** 120×120 USDC mark with the app processing tick-ring spinner. */
 export function HeroUsdcSpinner({ className }: HeroUsdcSpinnerProps) {
   const ticks = useMemo(() => Array.from({ length: TICK_COUNT }, (_, index) => index), [])
   const rootClassName = [styles.root, className].filter(Boolean).join(' ')
