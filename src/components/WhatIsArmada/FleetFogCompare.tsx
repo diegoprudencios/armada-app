@@ -7,11 +7,15 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
+export interface FleetFogCompareProps {
+  className?: string
+}
+
 /**
  * Scroll-scrubbed fog reveal: fog underneath, clear on top with a mask
  * that expands left→right on scroll, plus a 1px split marker.
  */
-export function FleetFogCompare() {
+export function FleetFogCompare({ className }: FleetFogCompareProps) {
   const rootRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -88,10 +92,12 @@ export function FleetFogCompare() {
     }
   }, [])
 
+  const rootClassName = [styles.root, className].filter(Boolean).join(' ')
+
   return (
     <figure
       ref={rootRef}
-      className={styles.root}
+      className={rootClassName}
       aria-label="Fleet scene clearing as you scroll"
     >
       <img

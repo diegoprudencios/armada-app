@@ -19,7 +19,7 @@ type Block = {
 
 const INTRO = {
   id: 'integrators',
-  title: ["Privacy your users don't have to", 'think about'] as [string, string],
+  title: "Privacy your users don't have to think about",
   body: "Add shielded USDC rails to your product through Armada's SDK, APIs, and compliance tooling. Built for platforms that manage, deploy, and move private capital on-chain.",
   ctas: [
     {
@@ -112,17 +112,23 @@ function CtaRow({ ctas, align }: { ctas: Cta[]; align: 'center' | 'start' }) {
 export function WhatIsArmada() {
   return (
     <section className={styles.section} aria-label="What is Armada">
-      <div className={styles.intro} id="what-is-armada">
-        <h2 id="integrators-heading" className={styles.introTitle}>
-          <span className={styles.titleLine}>{INTRO.title[0]}</span>
-          <span className={styles.titleLine}>{INTRO.title[1]}</span>
-        </h2>
-        <p className={styles.introBody}>{INTRO.body}</p>
-        <CtaRow ctas={INTRO.ctas} align="center" />
-      </div>
-
       <div className={styles.stack}>
-        <FleetFogCompare />
+        <article
+          className={styles.privacyPanel}
+          id="what-is-armada"
+          aria-labelledby="integrators-heading"
+        >
+          <div className={styles.privacyContent}>
+            <h2 id="integrators-heading" className={styles.privacyTitle}>
+              {INTRO.title}
+            </h2>
+            <p className={styles.privacyBody}>{INTRO.body}</p>
+            <CtaRow ctas={INTRO.ctas} align="start" />
+          </div>
+          <div className={styles.privacyMedia}>
+            <FleetFogCompare className={styles.privacyCompare} />
+          </div>
+        </article>
 
         {FEATURES.map((block) => (
           <article

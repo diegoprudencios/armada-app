@@ -1,5 +1,5 @@
 .header {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
@@ -14,9 +14,9 @@
   border-bottom: 1px solid transparent;
 }
 
-.headerConcealed {
-  transform: translateY(-100%);
-  pointer-events: none;
+/* Only applied when the scroll-up solid bar (or mobile menu) is showing */
+.headerDocked {
+  position: fixed;
 }
 
 .headerScrolled {

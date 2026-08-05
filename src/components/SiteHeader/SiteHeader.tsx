@@ -38,8 +38,8 @@ function SocialIcon({ name }: { name: 'discord' | 'x' }) {
 }
 
 export function SiteHeader() {
-  const [scrolled, setScrolled] = useState(false)
-  const [concealed, setConcealed] = useState(false)
+  /** Fixed solid chrome — only while scrolling up (or mobile menu open). */
+  const [floating, setFloating] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [mobileExpandedId, setMobileExpandedId] = useState<string | null>(null)
@@ -78,17 +78,22 @@ export function SiteHeader() {
 
     const onScroll = () => {
       const y = window.scrollY
-      setScrolled(y > SCROLL_THRESHOLD)
+      const nearTop = y <= SCROLL_THRESHOLD
+      const goingDown = y > lastY.current + SCROLL_DELTA
+      const goingUp = y < lastY.current - SCROLL_DELTA
 
       if (mobileOpen || openMenuId) {
-        setConcealed(false)
-      } else if (y < SCROLL_THRESHOLD) {
-        setConcealed(false)
-      } else if (y > lastY.current + SCROLL_DELTA) {
-        setConcealed(true)
-      } else if (y < lastY.current - SCROLL_DELTA) {
-        setConcealed(false)
+        // Keep chrome available while menus are open
+        setFloating(!nearTop)
+      } else if (nearTop) {
+        // Absolute hero header only — never dock a second bar
+        setFloating(false)
+      } else if (goingUp) {
+        setFloating(true)
+      } else if (goingDown) {
+        setFloating(false)
       }
+
       lastY.current = y
     }
 
@@ -98,7 +103,9 @@ export function SiteHeader() {
   }, [mobileOpen, openMenuId])
 
   useEffect(() => {
-    if (mobileOpen || openMenuId) setConcealed(false)
+    if ((mobileOpen || openMenuId) && window.scrollY > SCROLL_THRESHOLD) {
+      setFloating(true)
+    }
   }, [mobileOpen, openMenuId])
 
   useEffect(() => {
@@ -125,7 +132,7 @@ export function SiteHeader() {
     if (!mobileOpen) return
     const panel = panelRef.current
     const focusable = panel?.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled])',
+      'a[href], button:not(:disabled)',
     )
     focusable?.[0]?.focus()
 
@@ -162,10 +169,13 @@ export function SiteHeader() {
     burgerRef.current?.focus()
   }
 
+  // Fixed solid bar only when floating (scroll-up) or mobile menu needs it.
+  // Otherwise stay absolute so nothing flashes in when the hero header leaves.
+  const showSolid = floating || mobileOpen
   const headerClass = [
     styles.header,
-    scrolled && styles.headerScrolled,
-    concealed && styles.headerConcealed,
+    showSolid && styles.headerDocked,
+    showSolid && styles.headerScrolled,
     mobileOpen && styles.headerMenuOpen,
   ]
     .filter(Boolean)
@@ -176,7 +186,7 @@ export function SiteHeader() {
       <header className={headerClass}>
         <div className={styles.inner}>
           <a href="/" className={styles.logoLink} aria-label="Armada home">
-            {scrolled || mobileOpen ? (
+            {showSolid ? (
               <ArmadaLogo variant="full" className={styles.logo} />
             ) : (
               <img

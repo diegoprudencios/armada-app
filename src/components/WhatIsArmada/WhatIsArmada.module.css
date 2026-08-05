@@ -1,8 +1,8 @@
 /*
-  Figma New Website Final (91:718 / 93:187)
+  Figma privacy split (96:972) + feature panels
   Page: white
-  Stack: 1502 wide, gap 237
-  Fog: 1502×592, radius 20,   Panels: #f9f3ef, height 667, radius 20, padding-x 120, gap 33
+  Privacy: 50/50 cream + fog image, radius 20
+  Panels: #f9f3ef, radius 20
 */
 
 .section {
@@ -14,7 +14,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: calc(var(--primitives-spacing-20) + var(--primitives-spacing-16) + var(--primitives-spacing-3) / 2);
+  gap: var(--primitives-spacing-20);
   padding:
     calc(var(--primitives-spacing-20) + var(--primitives-spacing-16) + var(--primitives-spacing-3) / 2)
     var(--primitives-spacing-20)
@@ -23,42 +23,67 @@
   color: #000000;
 }
 
-/* —— Intro (centered) —— Figma 91:758: gap 40, title 72 / 1008, body 16 / 525 —— */
+/* —— Feature stack —— */
 
-.intro {
+.stack {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--primitives-spacing-10);
+  gap: calc(var(--primitives-spacing-20) * 3 - var(--primitives-spacing-1));
   box-sizing: border-box;
   width: 100%;
   max-width: calc(
-    var(--primitives-spacing-20) * 12 + var(--primitives-spacing-12) + var(--primitives-spacing-1) /
+    var(--primitives-spacing-20) * 18 + var(--primitives-spacing-16) - var(--primitives-spacing-1) /
       2
   );
-  text-align: center;
+}
+
+/* —— Privacy split (Figma 96:972) —— */
+
+.privacyPanel {
+  display: grid;
+  /* minmax(0, 1fr) so long title lines can't grow past 50% */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
+  min-height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
+  overflow: hidden;
+  border-radius: var(--primitives-spacing-5);
+  background: var(--section-panel-bg);
   scroll-margin-top: 0;
 }
 
-.introTitle {
+.privacyContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: calc(var(--primitives-spacing-8) + var(--primitives-spacing-1) / 2);
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 0 calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
+}
+
+.privacyTitle {
   margin: 0;
-  width: 100%;
+  max-width: 100%;
   font-family: 'Charis SIL', var(--primitives-fontFamily-display), serif;
-  font-size: calc(var(--primitives-fontSize-6xl) * 1px + var(--primitives-spacing-2));
+  font-size: calc(var(--primitives-fontSize-4xl) * 1px + var(--primitives-spacing-3));
   font-weight: var(--primitives-fontWeight-regular);
   line-height: 1.057;
   letter-spacing: var(--primitives-letterSpacing-tight);
   color: #000000;
-  text-align: center;
+  text-align: left;
 }
 
 .titleLine {
   display: block;
 }
 
-.introBody {
+.privacyBody {
   margin: 0;
-  max-width: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-11));
+  max-width: calc(var(--primitives-spacing-20) * 5 - var(--primitives-spacing-1) / 2);
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(
     ((var(--primitives-fontSize-md) + var(--primitives-fontSize-lg)) / 2) * 1px
@@ -67,7 +92,24 @@
   line-height: 1.5;
   letter-spacing: var(--primitives-letterSpacing-normal);
   color: rgba(0, 0, 0, 0.7);
+  text-align: left;
   text-wrap: pretty;
+}
+
+.privacyMedia {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.privacyCompare {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
 }
 
 .ctaRowCenter,
@@ -96,21 +138,7 @@
   color: #000000;
 }
 
-/* —— Feature stack —— Figma 93:187: 1502 wide, gap 237 —— */
-
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--primitives-spacing-20) * 3 - var(--primitives-spacing-1));
-  box-sizing: border-box;
-  width: 100%;
-  max-width: calc(
-    var(--primitives-spacing-20) * 18 + var(--primitives-spacing-16) - var(--primitives-spacing-1) /
-      2
-  );
-}
-
-/* Panels: #f9f3ef, 667 tall, radius 20, px 120, gap 33, justify-center */
+/* —— Feature panels —— */
 
 .panel {
   display: flex;
@@ -162,9 +190,33 @@
 }
 
 @media (min-width: 768px) {
-  .introTitle .titleLine,
   .panelTitle .titleLine {
     white-space: nowrap;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1535px) {
+  .privacyTitle,
+  .panelTitle {
+    font-size: var(--primitives-spacing-10);
+  }
+
+  .privacyContent {
+    padding: var(--primitives-spacing-20);
+  }
+
+  .privacyPanel,
+  .panel {
+    /* 500px */
+    height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
+    min-height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
+  }
+}
+
+@media (min-width: 1536px) {
+  .privacyTitle,
+  .panelTitle {
+    font-size: calc(var(--primitives-fontSize-4xl) * 1px + var(--primitives-spacing-3));
   }
 }
 
@@ -178,7 +230,17 @@
     gap: var(--primitives-spacing-12);
   }
 
-  .fog {
+  .privacyPanel {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+  }
+
+  .privacyContent {
+    padding: var(--primitives-spacing-12) var(--primitives-spacing-8);
+  }
+
+  .privacyMedia {
     height: calc(var(--primitives-spacing-20) * 5);
   }
 
@@ -188,7 +250,7 @@
     padding: var(--primitives-spacing-12) var(--primitives-spacing-8);
   }
 
-  .introTitle {
+  .privacyTitle {
     font-size: calc(var(--primitives-fontSize-5xl) * 1px);
   }
 
@@ -203,11 +265,21 @@
     padding: var(--primitives-spacing-8) var(--primitives-spacing-4) var(--primitives-spacing-12);
   }
 
-  .intro {
-    gap: var(--primitives-spacing-6);
+  .privacyPanel,
+  .panel {
+    border-radius: var(--primitives-spacing-4);
   }
 
-  .introTitle,
+  .privacyContent {
+    gap: var(--primitives-spacing-5);
+    padding: var(--primitives-spacing-10) var(--primitives-spacing-5);
+  }
+
+  .privacyMedia {
+    height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-10));
+  }
+
+  .privacyTitle,
   .panelTitle {
     font-size: calc(var(--primitives-fontSize-4xl) * 1px);
   }
@@ -216,14 +288,8 @@
     white-space: normal;
   }
 
-  .fog {
-    height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-10));
-    border-radius: var(--primitives-spacing-4);
-  }
-
   .panel {
     padding: var(--primitives-spacing-10) var(--primitives-spacing-5);
-    border-radius: var(--primitives-spacing-4);
   }
 
   .panelContent {
