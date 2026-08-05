@@ -1,6 +1,6 @@
 .root {
-  --spinner-size: calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
-  --tick-radius: calc(var(--spinner-size) / 2 - var(--primitives-spacing-2));
+  --spinner-size: var(--primitives-spacing-16);
+  --tick-radius: calc(var(--spinner-size) / 2 - var(--primitives-spacing-1));
 
   position: relative;
   flex-shrink: 0;
@@ -21,7 +21,7 @@
   top: 50%;
   left: 50%;
   width: 1.5px;
-  height: var(--primitives-spacing-2);
+  height: var(--primitives-spacing-1);
   border-radius: calc(var(--primitives-borderRadius-sm) * 0.5px);
   /* EXCEPTION — ticks stay white on the fleet photo. */
   background: var(--semantic-component-tag-label);
