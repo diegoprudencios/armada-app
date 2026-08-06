@@ -1,8 +1,6 @@
 /*
-  Figma privacy split (96:972) + feature panels
-  Page: white
-  Privacy: 50/50 cream + fog image, radius 20
-  Panels: #f9f3ef, radius 20
+  Privacy intro: centered title → fog → text/CTA (80px gaps)
+  Features: purple-300 → amber-300 vertical gradient behind cream panels
 */
 
 .section {
@@ -17,73 +15,62 @@
   gap: var(--primitives-spacing-20);
   padding:
     calc(var(--primitives-spacing-20) + var(--primitives-spacing-16) + var(--primitives-spacing-3) / 2)
-    var(--primitives-spacing-20)
-    calc(var(--primitives-spacing-20) * 2);
+    0
+    0;
   background: var(--section-page-bg);
   color: #000000;
 }
 
-/* —— Feature stack —— */
+/* —— Intro: title + fog + copy —— */
 
-.stack {
+.intro {
   display: flex;
   flex-direction: column;
-  gap: calc(var(--primitives-spacing-20) * 3 - var(--primitives-spacing-1));
+  align-items: center;
+  gap: var(--primitives-spacing-20);
   box-sizing: border-box;
   width: 100%;
   max-width: calc(
     var(--primitives-spacing-20) * 18 + var(--primitives-spacing-16) - var(--primitives-spacing-1) /
       2
   );
-}
-
-/* —— Privacy split (Figma 96:972) —— */
-
-.privacyPanel {
-  display: grid;
-  /* minmax(0, 1fr) so long title lines can't grow past 50% */
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: stretch;
-  box-sizing: border-box;
-  width: 100%;
-  height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
-  min-height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
-  overflow: hidden;
-  border-radius: var(--primitives-spacing-5);
-  background: var(--section-panel-bg);
+  padding: 0 var(--primitives-spacing-20);
+  text-align: center;
   scroll-margin-top: 0;
 }
 
-.privacyContent {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: calc(var(--primitives-spacing-8) + var(--primitives-spacing-1) / 2);
-  box-sizing: border-box;
-  min-width: 0;
-  padding: 0 calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
-}
-
-.privacyTitle {
+.introTitle {
   margin: 0;
-  max-width: 100%;
+  width: 100%;
+  max-width: calc(
+    var(--primitives-spacing-20) * 12 + var(--primitives-spacing-12) + var(--primitives-spacing-1) /
+      2
+  );
   font-family: 'Charis SIL', var(--primitives-fontFamily-display), serif;
-  font-size: calc(var(--primitives-fontSize-4xl) * 1px + var(--primitives-spacing-3));
+  font-size: calc(var(--primitives-fontSize-6xl) * 1px + var(--primitives-spacing-2));
   font-weight: var(--primitives-fontWeight-regular);
   line-height: 1.057;
   letter-spacing: var(--primitives-letterSpacing-tight);
   color: #000000;
-  text-align: left;
+  text-align: center;
 }
 
-.titleLine {
-  display: block;
+.fog {
+  width: 100%;
 }
 
-.privacyBody {
+.introCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitives-spacing-10);
+  width: 100%;
+  max-width: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-11));
+}
+
+.introBody {
   margin: 0;
-  max-width: calc(var(--primitives-spacing-20) * 5 - var(--primitives-spacing-1) / 2);
+  width: 100%;
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(
     ((var(--primitives-fontSize-md) + var(--primitives-fontSize-lg)) / 2) * 1px
@@ -92,24 +79,11 @@
   line-height: 1.5;
   letter-spacing: var(--primitives-letterSpacing-normal);
   color: rgba(0, 0, 0, 0.7);
-  text-align: left;
   text-wrap: pretty;
 }
 
-.privacyMedia {
-  position: relative;
-  min-width: 0;
-  min-height: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.privacyCompare {
+.titleLine {
   display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
 }
 
 .ctaRowCenter,
@@ -138,7 +112,35 @@
   color: #000000;
 }
 
-/* —— Feature panels —— */
+/* —— Feature band —— Figma: linear #BE87E9 → #F3D0A0 (= purple-300 → amber-300) —— */
+
+.features {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  padding:
+    calc(var(--primitives-spacing-20) * 2)
+    var(--primitives-spacing-20);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primitives-color-purple-300) 40%, transparent) 0%,
+    color-mix(in srgb, var(--primitives-color-amber-300) 40%, transparent) 100%
+  );
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--primitives-spacing-20) * 3 - var(--primitives-spacing-1));
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(
+    var(--primitives-spacing-20) * 18 + var(--primitives-spacing-16) - var(--primitives-spacing-1) /
+      2
+  );
+}
 
 .panel {
   display: flex;
@@ -190,58 +192,44 @@
 }
 
 @media (min-width: 768px) {
+  .introTitle .titleLine,
   .panelTitle .titleLine {
     white-space: nowrap;
   }
 }
 
 @media (min-width: 1200px) and (max-width: 1535px) {
-  .privacyTitle,
+  .introTitle {
+    font-size: var(--primitives-spacing-10);
+  }
+
   .panelTitle {
     font-size: var(--primitives-spacing-10);
   }
 
-  .privacyContent {
-    padding: var(--primitives-spacing-20);
-  }
-
-  .privacyPanel,
   .panel {
-    /* 500px */
     height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
     min-height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
-  }
-}
-
-@media (min-width: 1536px) {
-  .privacyTitle,
-  .panelTitle {
-    font-size: calc(var(--primitives-fontSize-4xl) * 1px + var(--primitives-spacing-3));
   }
 }
 
 @media (max-width: 1199px) {
   .section {
     gap: var(--primitives-spacing-12);
-    padding: var(--primitives-spacing-12) var(--primitives-spacing-6) var(--primitives-spacing-16);
+    padding-top: var(--primitives-spacing-12);
+  }
+
+  .intro {
+    gap: var(--primitives-spacing-12);
+    padding: 0 var(--primitives-spacing-6);
+  }
+
+  .features {
+    padding: var(--primitives-spacing-16) var(--primitives-spacing-6);
   }
 
   .stack {
     gap: var(--primitives-spacing-12);
-  }
-
-  .privacyPanel {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 0;
-  }
-
-  .privacyContent {
-    padding: var(--primitives-spacing-12) var(--primitives-spacing-8);
-  }
-
-  .privacyMedia {
-    height: calc(var(--primitives-spacing-20) * 5);
   }
 
   .panel {
@@ -250,7 +238,7 @@
     padding: var(--primitives-spacing-12) var(--primitives-spacing-8);
   }
 
-  .privacyTitle {
+  .introTitle {
     font-size: calc(var(--primitives-fontSize-5xl) * 1px);
   }
 
@@ -262,24 +250,23 @@
 @media (max-width: 767px) {
   .section {
     gap: var(--primitives-spacing-8);
-    padding: var(--primitives-spacing-8) var(--primitives-spacing-4) var(--primitives-spacing-12);
+    padding-top: var(--primitives-spacing-8);
   }
 
-  .privacyPanel,
-  .panel {
-    border-radius: var(--primitives-spacing-4);
+  .intro {
+    gap: var(--primitives-spacing-8);
+    padding: 0 var(--primitives-spacing-4);
   }
 
-  .privacyContent {
-    gap: var(--primitives-spacing-5);
-    padding: var(--primitives-spacing-10) var(--primitives-spacing-5);
+  .features {
+    padding: var(--primitives-spacing-12) var(--primitives-spacing-4);
   }
 
-  .privacyMedia {
-    height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-10));
+  .introCopy {
+    gap: var(--primitives-spacing-6);
   }
 
-  .privacyTitle,
+  .introTitle,
   .panelTitle {
     font-size: calc(var(--primitives-fontSize-4xl) * 1px);
   }
@@ -290,6 +277,7 @@
 
   .panel {
     padding: var(--primitives-spacing-10) var(--primitives-spacing-5);
+    border-radius: var(--primitives-spacing-4);
   }
 
   .panelContent {

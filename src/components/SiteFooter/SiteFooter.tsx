@@ -1,20 +1,7 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { NAV_MENUS } from '@/constants/siteNav'
 import wordmarkWhite from '@/assets/armada-wordmark-white.svg'
 import styles from './SiteFooter.module.css'
-
-type FooterLink = {
-  label: string
-  href: string
-  external?: boolean
-}
-
-const FOOTER_LINKS: FooterLink[] = [
-  { label: 'ARM Token', href: 'https://gov.armada.blue', external: true },
-  { label: 'Community', href: '#community' },
-  { label: 'Integrate Private USDC', href: 'https://docs.armada.blue', external: true },
-  { label: 'Resources', href: '#resources' },
-  { label: 'Docs', href: 'https://docs.armada.blue', external: true },
-]
 
 const SOCIAL_LINKS = [
   { label: 'Discord', href: '#discord', icon: 'discord' as const },
@@ -44,19 +31,28 @@ export function SiteFooter() {
           <ArmadaLogo variant="mark" markTone="white" className={styles.logo} />
         </a>
 
-        <nav className={styles.nav} aria-label="Footer">
-          <ul className={styles.linkList}>
-            {FOOTER_LINKS.map((link) => (
-              <li key={link.label}>
-                <a
-                  className={styles.link}
-                  href={link.href}
-                  {...(link.external
-                    ? { target: '_blank', rel: 'noopener noreferrer' }
-                    : {})}
-                >
-                  {link.label}
-                </a>
+        <nav className={styles.nav} aria-label="Site map">
+          <ul className={styles.sitemap}>
+            {NAV_MENUS.map((menu) => (
+              <li key={menu.id} className={styles.column}>
+                <h2 className={styles.columnTitle} id={`footer-${menu.id}`}>
+                  {menu.label}
+                </h2>
+                <ul className={styles.columnLinks} aria-labelledby={`footer-${menu.id}`}>
+                  {menu.items.map((item) => (
+                    <li key={item.id}>
+                      <a
+                        className={styles.link}
+                        href={item.href}
+                        {...(item.external
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : {})}
+                      >
+                        {item.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>

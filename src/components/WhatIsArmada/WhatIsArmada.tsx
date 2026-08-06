@@ -19,7 +19,7 @@ type Block = {
 
 const INTRO = {
   id: 'integrators',
-  title: "Privacy your users don't have to think about",
+  title: ["Privacy your users don't", 'have to think about'] as [string, string],
   body: "Add shielded USDC rails to your product through Armada's SDK, APIs, and compliance tooling. Built for platforms that manage, deploy, and move private capital on-chain.",
   ctas: [
     {
@@ -112,41 +112,40 @@ function CtaRow({ ctas, align }: { ctas: Cta[]; align: 'center' | 'start' }) {
 export function WhatIsArmada() {
   return (
     <section className={styles.section} aria-label="What is Armada">
-      <div className={styles.stack}>
-        <article
-          className={styles.privacyPanel}
-          id="what-is-armada"
-          aria-labelledby="integrators-heading"
-        >
-          <div className={styles.privacyContent}>
-            <h2 id="integrators-heading" className={styles.privacyTitle}>
-              {INTRO.title}
-            </h2>
-            <p className={styles.privacyBody}>{INTRO.body}</p>
-            <CtaRow ctas={INTRO.ctas} align="start" />
-          </div>
-          <div className={styles.privacyMedia}>
-            <FleetFogCompare className={styles.privacyCompare} />
-          </div>
-        </article>
+      <div className={styles.intro} id="what-is-armada">
+        <h2 id="integrators-heading" className={styles.introTitle}>
+          <span className={styles.titleLine}>{INTRO.title[0]}</span>
+          <span className={styles.titleLine}>{INTRO.title[1]}</span>
+        </h2>
 
-        {FEATURES.map((block) => (
-          <article
-            key={block.id}
-            id={block.id}
-            className={styles.panel}
-            aria-labelledby={`${block.id}-heading`}
-          >
-            <div className={styles.panelContent}>
-              <h2 id={`${block.id}-heading`} className={styles.panelTitle}>
-                <span className={styles.titleLine}>{block.title[0]}</span>
-                <span className={styles.titleLine}>{block.title[1]}</span>
-              </h2>
-              <p className={styles.panelBody}>{block.body}</p>
-              <CtaRow ctas={block.ctas} align="start" />
-            </div>
-          </article>
-        ))}
+        <FleetFogCompare className={styles.fog} />
+
+        <div className={styles.introCopy}>
+          <p className={styles.introBody}>{INTRO.body}</p>
+          <CtaRow ctas={INTRO.ctas} align="center" />
+        </div>
+      </div>
+
+      <div className={styles.features}>
+        <div className={styles.stack}>
+          {FEATURES.map((block) => (
+            <article
+              key={block.id}
+              id={block.id}
+              className={styles.panel}
+              aria-labelledby={`${block.id}-heading`}
+            >
+              <div className={styles.panelContent}>
+                <h2 id={`${block.id}-heading`} className={styles.panelTitle}>
+                  <span className={styles.titleLine}>{block.title[0]}</span>
+                  <span className={styles.titleLine}>{block.title[1]}</span>
+                </h2>
+                <p className={styles.panelBody}>{block.body}</p>
+                <CtaRow ctas={block.ctas} align="start" />
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   )
