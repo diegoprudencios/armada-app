@@ -5,7 +5,7 @@ import usdcLogoUrl from '@/assets/usdc-logo.svg'
 const SPHERE_RADIUS = 2.4
 const DEPTH_SPHERE_RADIUS = 2.38
 const MERIDIAN_COUNT = 7
-const MERIDIAN_OPACITY = 0.4
+const MERIDIAN_OPACITY = 1
 const SPHERE_SPIN = 0.0048
 
 const CLUSTER_COUNT = 12
@@ -15,15 +15,16 @@ const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
 const BLUR_PX = 8.4
 
 const COIN_COUNT = 3
-const COIN_ORBIT = 3.15
+const COIN_ORBIT = 2.9
 const COIN_BASE_SPEED = 0.009
 const COIN_SPEED_MULT = [1, 0.85, 1] as const
 /** Fixed heights: top / center / bottom (no vertical drift). */
 const COIN_HEIGHTS = [1.72, 0.42, -1.25] as const
 /** Per-coin scale: bottom coin reads larger. */
-const COIN_SCALES = [0.72, 0.72, 0.98] as const
+const COIN_SCALES = [0.68, 0.68, 0.9] as const
 
-const CAMERA_Z = 9
+/* Pull back enough that orbiting coins stay inside the canvas (no edge clip). */
+const CAMERA_Z = 9.4
 const CAMERA_FOV = 45
 
 type Rgb = { r: number; g: number; b: number }
@@ -191,7 +192,7 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const rand = mulberry32(42)
 
-    const borderRgb = readCssColor('--semantic-color-border-default')
+    const borderRgb = readCssColor('--semantic-color-brand-ink')
     const infoRgb = readCssColor('--semantic-color-status-info')
     const lavenderRgb = readCssColor('--semantic-color-brand-lavender')
     const actionRgb = readCssColor('--semantic-color-brand-action')
