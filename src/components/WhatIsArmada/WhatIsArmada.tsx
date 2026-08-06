@@ -1,7 +1,12 @@
+import { lazy, Suspense } from 'react'
 import { Button } from '@/components/Button'
 import type { ButtonVariant } from '@/components/Button'
 import { FleetFogCompare } from './FleetFogCompare'
 import styles from './WhatIsArmada.module.css'
+
+const PrivacySphere = lazy(() =>
+  import('@/components/PrivacySphere').then((module) => ({ default: module.PrivacySphere })),
+)
 
 type Cta = {
   label: string
@@ -128,23 +133,33 @@ export function WhatIsArmada() {
 
       <div className={styles.features}>
         <div className={styles.stack}>
-          {FEATURES.map((block) => (
-            <article
-              key={block.id}
-              id={block.id}
-              className={styles.panel}
-              aria-labelledby={`${block.id}-heading`}
-            >
-              <div className={styles.panelContent}>
-                <h2 id={`${block.id}-heading`} className={styles.panelTitle}>
-                  <span className={styles.titleLine}>{block.title[0]}</span>
-                  <span className={styles.titleLine}>{block.title[1]}</span>
-                </h2>
-                <p className={styles.panelBody}>{block.body}</p>
-                <CtaRow ctas={block.ctas} align="start" />
-              </div>
-            </article>
-          ))}
+          {FEATURES.map((block) => {
+            const isCapital = block.id === 'capital-in-motion'
+            return (
+              <article
+                key={block.id}
+                id={block.id}
+                className={isCapital ? `${styles.panel} ${styles.panelSplit}` : styles.panel}
+                aria-labelledby={`${block.id}-heading`}
+              >
+                <div className={styles.panelContent}>
+                  <h2 id={`${block.id}-heading`} className={styles.panelTitle}>
+                    <span className={styles.titleLine}>{block.title[0]}</span>
+                    <span className={styles.titleLine}>{block.title[1]}</span>
+                  </h2>
+                  <p className={styles.panelBody}>{block.body}</p>
+                  <CtaRow ctas={block.ctas} align="start" />
+                </div>
+                {isCapital ? (
+                  <div className={styles.panelDiagram}>
+                    <Suspense fallback={null}>
+                      <PrivacySphere />
+                    </Suspense>
+                  </div>
+                ) : null}
+              </article>
+            )
+          })}
         </div>
       </div>
     </section>

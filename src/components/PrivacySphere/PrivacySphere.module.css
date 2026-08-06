@@ -1,0 +1,118 @@
+/*
+  Tokens used (verified in src/styles/tokens.css):
+  - Text: --semantic-color-text-primary
+  - Border: --semantic-color-border-default
+  - Brand lavender: --semantic-color-brand-lavender (used in three.js blue ramp)
+  - Brand action: --semantic-color-brand-action (used in three.js blue ramp)
+  - Blue source: --semantic-color-status-info
+  No --pad-sm / --pad-md — padding uses --primitives-spacing-*.
+*/
+
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.labelBox {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: var(--primitives-spacing-2) var(--primitives-spacing-3);
+  border: 1px solid var(--semantic-color-border-default);
+  border-radius: calc(var(--primitives-borderRadius-lg) * 1px);
+  font-family: var(--semantic-typography-ui-label-sm-font-family), sans-serif;
+  font-size: var(--semantic-typography-ui-label-sm-font-size);
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: var(--semantic-typography-ui-label-sm-line-height);
+  letter-spacing: var(--primitives-letterSpacing-wide);
+  text-transform: uppercase;
+  color: var(--semantic-color-text-primary);
+  white-space: nowrap;
+  background: transparent;
+}
+
+/* 20px between label boxes and sphere */
+.connector {
+  flex: 0 0 var(--primitives-spacing-5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--primitives-spacing-5);
+  overflow: visible;
+}
+
+.arrow {
+  flex-shrink: 0;
+  width: 100%;
+  height: var(--primitives-spacing-3);
+  overflow: visible;
+}
+
+.arrowStroke {
+  fill: none;
+  stroke: var(--semantic-color-border-default);
+  stroke-width: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/*
+  Fixed canvas size — avoids flex stretch bug from aspect-ratio in a row.
+  Desktop 320×280:
+  320 = spacing-20 * 4
+  280 = spacing-16 * 4 + spacing-6
+  Negative inline margin pulls label boxes over empty canvas padding
+  so they sit ~20px from the sphere silhouette (not the canvas edge).
+*/
+.canvasHost {
+  flex: 0 0 auto;
+  position: relative;
+  overflow: hidden;
+  width: calc(var(--primitives-spacing-20) * 4);
+  height: calc(var(--primitives-spacing-16) * 4 + var(--primitives-spacing-6));
+  margin-inline: calc(var(--primitives-spacing-16) * -1);
+}
+
+/*
+  Mobile 220×200 (≤767 via useMobileLayout class swap):
+  220 = spacing-20 * 2 + spacing-10 + spacing-5
+  200 = spacing-20 * 2 + spacing-10
+*/
+.canvasHostMobile {
+  flex: 0 0 auto;
+  position: relative;
+  overflow: hidden;
+  width: calc(
+    var(--primitives-spacing-20) * 2 + var(--primitives-spacing-10) + var(--primitives-spacing-5)
+  );
+  height: calc(var(--primitives-spacing-20) * 2 + var(--primitives-spacing-10));
+  margin-inline: calc(var(--primitives-spacing-10) * -1);
+}
+
+.canvasHost canvas,
+.canvasHostMobile canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 767px) {
+  .root {
+    flex-wrap: wrap;
+    gap: var(--primitives-spacing-2);
+  }
+
+  .labelBox {
+    padding: var(--primitives-spacing-1) var(--primitives-spacing-2);
+  }
+
+  .connector {
+    flex-basis: var(--primitives-spacing-5);
+    width: var(--primitives-spacing-5);
+  }
+}

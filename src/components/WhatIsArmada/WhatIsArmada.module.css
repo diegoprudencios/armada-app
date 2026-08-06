@@ -157,6 +157,21 @@
   scroll-margin-top: 0;
 }
 
+.panelSplit {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--primitives-spacing-10);
+}
+
+.panelDiagram {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .panelContent {
   display: flex;
   flex-direction: column;
@@ -236,6 +251,15 @@
     height: auto;
     min-height: 0;
     padding: var(--primitives-spacing-12) var(--primitives-spacing-8);
+  }
+
+  .panelSplit {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .panelDiagram {
+    width: 100%;
   }
 
   .introTitle {
