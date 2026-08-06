@@ -1,4 +1,10 @@
 import { useEffect, useRef } from 'react'
+import {
+  CodeBracketIcon,
+  ServerStackIcon,
+  ShieldCheckIcon,
+} from '@heroicons/react/24/outline'
+import type { ComponentType, SVGProps } from 'react'
 import fleetFog from '@/assets/fleet-fog.webp'
 import fleetNoFog from '@/assets/fleet-no-fog.webp'
 import styles from './FleetFogCompare.module.css'
@@ -7,6 +13,20 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
+type Topic = {
+  id: string
+  label: string
+  Icon: ComponentType<SVGProps<SVGSVGElement>>
+}
+
+const TOPICS: Topic[] = [
+  { id: 'sdk', label: 'Armada SDK', Icon: CodeBracketIcon },
+  { id: 'api', label: 'Armada API', Icon: ServerStackIcon },
+  { id: 'compliance', label: 'Compliance', Icon: ShieldCheckIcon },
+]
+
+const ICON_PX = 32
+
 export interface FleetFogCompareProps {
   className?: string
 }
@@ -14,6 +34,7 @@ export interface FleetFogCompareProps {
 /**
  * Scroll-scrubbed fog reveal: fog underneath, clear on top with a mask
  * that expands left→right on scroll, plus a 1px split marker.
+ * Topic markers sit on the fog layer and reveal as clear peels away.
  */
 export function FleetFogCompare({ className }: FleetFogCompareProps) {
   const rootRef = useRef<HTMLElement>(null)
@@ -98,7 +119,7 @@ export function FleetFogCompare({ className }: FleetFogCompareProps) {
     <figure
       ref={rootRef}
       className={rootClassName}
-      aria-label="Fleet scene clearing as you scroll"
+      aria-label="Fleet scene clearing as you scroll, revealing Armada SDK, API, and Compliance"
     >
       <img
         className={styles.image}
@@ -108,6 +129,17 @@ export function FleetFogCompare({ className }: FleetFogCompareProps) {
         height={592}
         decoding="async"
       />
+
+      <ul className={styles.topics} aria-label="Armada capabilities">
+        {TOPICS.map(({ id, label, Icon }) => (
+          <li key={id} className={styles.topic}>
+            <span className={styles.circle}>
+              <Icon width={ICON_PX} height={ICON_PX} className={styles.icon} aria-hidden />
+            </span>
+            <span className={styles.label}>{label}</span>
+          </li>
+        ))}
+      </ul>
 
       <div className={styles.clearLayer} aria-hidden>
         <img

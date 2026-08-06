@@ -1,6 +1,10 @@
 .root {
   /* 0 = full fog; 1 = fully cleared — driven by scroll in FleetFogCompare.tsx */
   --fog-progress: 0;
+  /* 90px = 64 + 24 + 2 */
+  --topic-circle-size: calc(
+    var(--primitives-spacing-16) + var(--primitives-spacing-6) + var(--primitives-spacing-1) / 2
+  );
 
   position: relative;
   margin: 0;
@@ -20,10 +24,73 @@
   object-position: center;
 }
 
+/*
+  Topic markers sit on the fog photo (under clear). As the clear layer clips
+  away left→right, the glass circles reveal with the fog.
+*/
+.topics {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitives-spacing-20);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  pointer-events: none;
+}
+
+.topic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--primitives-spacing-3);
+  min-width: var(--topic-circle-size);
+}
+
+.circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--topic-circle-size);
+  height: var(--topic-circle-size);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+  isolation: isolate;
+  overflow: hidden;
+  /* Same glass as hero USDC container — Figma: #000 @ 30%, blur 25. */
+  background: color-mix(in srgb, #000000 30%, transparent);
+  backdrop-filter: blur(calc(var(--primitives-spacing-6) + 1px));
+  -webkit-backdrop-filter: blur(calc(var(--primitives-spacing-6) + 1px));
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--semantic-component-tag-label);
+  stroke-width: 1.5;
+}
+
+.label {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  /* 12px — same midpoint as hero glass copy */
+  font-size: calc(
+    ((var(--primitives-fontSize-sm) + var(--primitives-fontSize-base)) / 2) * 1px
+  );
+  font-weight: var(--primitives-fontWeight-medium);
+  line-height: 1.3;
+  letter-spacing: var(--primitives-letterSpacing-normal);
+  text-align: center;
+  white-space: nowrap;
+  color: var(--semantic-component-tag-label);
+}
+
 /* Clear on top; fog on the left, clear on the right; split moves L→R on scroll down */
 .clearLayer {
   position: absolute;
   inset: 0;
+  z-index: 2;
   clip-path: inset(0 0 0 calc(var(--fog-progress) * 100%));
   pointer-events: none;
 }
@@ -33,7 +100,7 @@
   top: 0;
   bottom: 0;
   left: calc(var(--fog-progress) * 100%);
-  z-index: 2;
+  z-index: 3;
   width: 0;
   transform: translateX(-50%);
   pointer-events: none;
@@ -66,11 +133,38 @@
   .root {
     height: calc(var(--primitives-spacing-20) * 5);
   }
+
+  .topics {
+    gap: var(--primitives-spacing-12);
+    padding: 0 var(--primitives-spacing-6);
+  }
 }
 
 @media (max-width: 767px) {
   .root {
     height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-10));
     border-radius: var(--primitives-spacing-4);
+  }
+
+  .topics {
+    gap: var(--primitives-spacing-3);
+    padding: 0 var(--primitives-spacing-4);
+    justify-content: space-evenly;
+  }
+
+  .topic {
+    gap: var(--primitives-spacing-2);
+    min-width: 0;
+  }
+
+  .circle {
+    /* 64px on small screens so three fit */
+    width: var(--primitives-spacing-16);
+    height: var(--primitives-spacing-16);
+  }
+
+  .icon {
+    width: var(--primitives-spacing-5);
+    height: var(--primitives-spacing-5);
   }
 }
