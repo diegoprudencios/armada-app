@@ -435,8 +435,8 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
       clusterGroup.rotation.y += CLUSTER_SPIN * spinMul * frameScale
 
       for (const badge of orbitSprites) {
-        /* Negative so motion runs bottom-left → front → top-right (ref arrow). */
-        badge.angle -= ORBIT_BASE_SPEED * spinMul * frameScale
+        /* Constant orbit speed — scroll boost only affects sphere / cluster spin. */
+        badge.angle -= ORBIT_BASE_SPEED * frameScale
         badge.sprite.position.copy(diagonalOrbitPosition(badge.angle, orbitPos))
       }
 
