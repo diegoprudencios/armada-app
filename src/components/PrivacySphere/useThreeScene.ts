@@ -20,7 +20,8 @@ const BLUR_PX = 8.4
 /** Scroll velocity (px/ms) adds temporary spin; decays each frame back to idle. */
 const SCROLL_VELOCITY_GAIN = 0.45
 const SCROLL_SPIN_MAX_BOOST = 4
-const SCROLL_SPIN_DECAY = 0.92
+/** Per-frame decay at 60fps; applied with Math.pow(..., dt*60). */
+const SCROLL_SPIN_DECAY_PER_FRAME_60 = 0.92
 
 /** Two eye badges on one shared diagonal ring (opposite sides). */
 const ORBIT_COUNT = 2
@@ -361,6 +362,7 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     let scrollBoost = 0
     let lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0
     let lastScrollTs = typeof performance !== 'undefined' ? performance.now() : 0
+    let lastFrameTs = typeof performance !== 'undefined' ? performance.now() : 0
 
     const onScroll = () => {
       if (disposed || reducedMotion.matches) return
@@ -417,18 +419,24 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
       renderer.render(scene, camera)
     }
 
-    const tick = () => {
+    const tick = (now: number) => {
       if (disposed) return
-      scrollBoost *= SCROLL_SPIN_DECAY
+
+      const dtSec = Math.min(Math.max((now - lastFrameTs) / 1000, 0), 0.064)
+      lastFrameTs = now
+
+      scrollBoost *= Math.pow(SCROLL_SPIN_DECAY_PER_FRAME_60, dtSec * 60)
       if (scrollBoost < 0.02) scrollBoost = 0
       const spinMul = 1 + scrollBoost
+      /* Per-frame constants were tuned at ~60fps — multiply by 60 for rad/s. */
+      const frameScale = dtSec * 60
 
-      sphereGroup.rotation.y += SPHERE_SPIN * spinMul
-      clusterGroup.rotation.y += CLUSTER_SPIN * spinMul
+      sphereGroup.rotation.y += SPHERE_SPIN * spinMul * frameScale
+      clusterGroup.rotation.y += CLUSTER_SPIN * spinMul * frameScale
 
       for (const badge of orbitSprites) {
         /* Negative so motion runs bottom-left → front → top-right (ref arrow). */
-        badge.angle -= ORBIT_BASE_SPEED * spinMul
+        badge.angle -= ORBIT_BASE_SPEED * spinMul * frameScale
         badge.sprite.position.copy(diagonalOrbitPosition(badge.angle, orbitPos))
       }
 

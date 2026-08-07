@@ -2,27 +2,53 @@
   Tokens used (verified in src/styles/tokens.css):
   - Thumb off: --semantic-color-brand-ink
   - Thumb on: lavender → amber gradient
-  EXCEPTION — toggle 345×170, indent 150px, gap 28px, icon 72px (Figma); no matching tokens.
+  EXCEPTION — design sizes from Figma (345×170, indent 150, gap 28, icon 72);
+    --s is set by ResizeObserver to fit the diagram column.
+    Dial --compliance-anim-scale (default 1) to shrink/grow within that fit.
   EXCEPTION — track/thumb stroke #a2a2a2 1px (matches PrivacySphere diagram stroke).
 */
 
 .viewport {
-  --toggle-w: 345px;
-  --toggle-h: 170px;
-  --stack-indent: 150px;
-  --toggle-gap: 28px; /* EXCEPTION — Figma stack gap */
-  --thumb-size: calc(var(--primitives-spacing-20) + var(--primitives-spacing-12)); /* 128px */
-  --icon-size: 72px; /* EXCEPTION — Figma icon size */
-  /* Distance from center to fully clear the circular clip. */
-  --icon-travel: calc((var(--thumb-size) + var(--icon-size)) / 2);
+  /* Design units (px at scale 1). */
+  --design-track-w: 345;
+  --design-track-h: 170;
+  --design-indent: 150;
+  --design-gap: 28;
+  --design-thumb: 128;
+  --design-icon: 72;
+  /* EXCEPTION — compliance doc 40×50 + badge 20Ø, overhang 6px right/bottom. */
+  --design-compliance-w: 46;
+  --design-compliance-h: 56;
+  /* Optical nudge of the doc+badge inside the thumb. */
+  --design-compliance-nudge-x: 4;
+  --design-thumb-inset: 20;
+  --design-total-w: 495; /* track + indent */
+
+  /* Manual dial (JS multiplies this by the fit factor into --s). */
+  --compliance-anim-scale: 1;
+  /* Fallback until ResizeObserver runs. */
+  --s: 1;
+
+  --toggle-w: calc(var(--design-track-w) * var(--s) * 1px);
+  --toggle-h: calc(var(--design-track-h) * var(--s) * 1px);
+  --stack-indent: calc(var(--design-indent) * var(--s) * 1px);
+  --toggle-gap: calc(var(--design-gap) * var(--s) * 1px);
+  --thumb-size: calc(var(--design-thumb) * var(--s) * 1px);
+  --icon-size: calc(var(--design-icon) * var(--s) * 1px);
+  --compliance-icon-w: calc(var(--design-compliance-w) * var(--s) * 1px);
+  --compliance-icon-h: calc(var(--design-compliance-h) * var(--s) * 1px);
+  --compliance-nudge-x: calc(var(--design-compliance-nudge-x) * var(--s) * 1px);
+  --thumb-inset: calc(var(--design-thumb-inset) * var(--s) * 1px);
+  --icon-travel: calc((var(--thumb-size) + max(var(--icon-size), var(--compliance-icon-h))) / 2);
   /* EXCEPTION — same as PrivacySphere --privacy-sphere-stroke. */
   --toggle-stroke: #a2a2a2;
 
   position: relative;
   box-sizing: border-box;
-  width: calc(var(--toggle-w) + var(--stack-indent));
+  width: calc(var(--design-total-w) * var(--s) * 1px);
+  max-width: 100%;
   height: 100%;
-  min-height: calc(var(--primitives-spacing-20) * 6);
+  min-height: calc(var(--primitives-spacing-20) * 4);
   overflow: hidden;
   pointer-events: none;
 }
@@ -53,7 +79,7 @@
 .thumb {
   position: absolute;
   top: 50%;
-  left: var(--primitives-spacing-5);
+  left: var(--thumb-inset);
   box-sizing: border-box;
   width: var(--thumb-size);
   height: var(--thumb-size);
@@ -69,7 +95,7 @@
 }
 
 .on .thumb {
-  left: calc(100% - var(--thumb-size) - var(--primitives-spacing-5));
+  left: calc(100% - var(--thumb-size) - var(--thumb-inset));
   background-image: linear-gradient(
     135deg,
     var(--semantic-color-brand-lavender) 0%,
@@ -97,28 +123,39 @@
   transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Keep a 1px screen stroke at any icon size (matches toggle / connectors). */
-.icon :is(path, circle, rect, line, polyline, polygon) {
+/* Keep a 1px screen stroke on outline icons (matches toggle / connectors). */
+.iconOutline :is(path, circle, rect, line, polyline, polygon) {
   stroke-width: 1px;
   vector-effect: non-scaling-stroke;
 }
 
-/* Eye: middle → slides up and out. Shield: below → slides up to middle. */
-.iconEye {
+.iconCompliance :global(.docStroke),
+.iconCompliance :global(.checkStroke) {
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Private (slash eye): middle → slides up and out. Compliance (doc+check): below → middle. */
+.iconPrivate {
   transform: translateY(0);
 }
 
-.iconShield {
+.iconCompliance {
+  width: var(--compliance-icon-w);
+  height: var(--compliance-icon-h);
+  margin-top: calc(var(--compliance-icon-h) / -2);
+  margin-left: calc(var(--compliance-icon-w) / -2);
   color: var(--semantic-color-brand-ink);
-  transform: translateY(var(--icon-travel));
+  /* 4px right of dead-center inside the thumb (scaled with --s). */
+  transform: translate(var(--compliance-nudge-x), var(--icon-travel));
 }
 
-.on .iconEye {
+.on .iconPrivate {
   transform: translateY(calc(var(--icon-travel) * -1));
 }
 
-.on .iconShield {
-  transform: translateY(0);
+.on .iconCompliance {
+  transform: translate(var(--compliance-nudge-x), 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -136,24 +173,7 @@
 
 @media (max-width: 1199px) {
   .viewport {
-    --toggle-w: 280px;
-    --toggle-h: 140px;
-    --stack-indent: 100px;
-    --thumb-size: calc(var(--primitives-spacing-20) + var(--primitives-spacing-6));
-    --icon-size: var(--primitives-spacing-16);
-    width: 100%;
-    max-width: calc(var(--toggle-w) + var(--stack-indent));
     min-height: calc(var(--primitives-spacing-20) * 4);
     margin-inline: auto;
-  }
-}
-
-@media (max-width: 767px) {
-  .viewport {
-    --toggle-w: 240px;
-    --toggle-h: 120px;
-    --stack-indent: 64px;
-    --thumb-size: calc(var(--primitives-spacing-20));
-    --icon-size: var(--primitives-spacing-12);
   }
 }

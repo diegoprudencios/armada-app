@@ -16,13 +16,20 @@ type ConnectorPaths = {
 
 type LabelLayout = {
   inLeft: number
+  inTop: number
   outLeft: number
+  outTop: number
 }
 
 /** Elbow fillet — matches Figma rounded connector (~spacing-5). */
 const CORNER_R = 20
 /** Horizontal run into/out of the sphere rim (~50px). Boxes move to keep the drop centered. */
 const HORIZONTAL_RUN = 48 // --primitives-spacing-12
+/** EXCEPTION — Figma label pill size. */
+const LABEL_WIDTH = 180
+const LABEL_HEIGHT = 56
+/** Gap from sphere top edge — --primitives-spacing-8. */
+const LABEL_EDGE_GAP = 32
 
 const TRAVEL_DURATION_MS = 7200
 const TRAVEL_PAUSE_MS = 2600
@@ -80,7 +87,7 @@ function pathBoxToSphereLeft(
 }
 
 /**
- * Sphere (right) → box: horizontal from rim, rounded elbow, vertical into box center.
+ * Sphere (right) → box: horizontal from rim, rounded elbow, vertical down into box.
  */
 function pathSphereRightToBox(
   sphereRight: number,
@@ -102,15 +109,11 @@ function pathSphereRightToBox(
 
 function measureLayout(
   rootEl: HTMLElement,
-  labelInEl: HTMLElement,
-  labelOutEl: HTMLElement,
   canvasEl: HTMLElement,
 ): { connectors: ConnectorPaths; labels: LabelLayout } | null {
   const root = rootEl.getBoundingClientRect()
   if (root.width < 1 || root.height < 1) return null
 
-  const labelIn = labelInEl.getBoundingClientRect()
-  const labelOut = labelOutEl.getBoundingClientRect()
   const canvas = canvasEl.getBoundingClientRect()
 
   const sphereCx = canvas.left + canvas.width / 2
@@ -121,26 +124,27 @@ function measureLayout(
   const sphereRight = localPoint(root, sphereCx + sphereR, sphereCy)
   const midY = sphereLeft.y
   const cx = (sphereLeft.x + sphereRight.x) / 2
+  const sphereTop = midY - sphereR
+  const sphereBottom = midY + sphereR
 
-  /* Place box centers so the horizontal run into the rim is HORIZONTAL_RUN. */
   const labels: LabelLayout = {
-    inLeft: sphereLeft.x - HORIZONTAL_RUN - labelIn.width / 2,
-    outLeft: sphereRight.x + HORIZONTAL_RUN - labelOut.width / 2,
+    inLeft: sphereLeft.x - HORIZONTAL_RUN - LABEL_WIDTH / 2,
+    inTop: sphereTop + LABEL_EDGE_GAP,
+    outLeft: sphereRight.x + HORIZONTAL_RUN - LABEL_WIDTH / 2,
+    outTop: sphereBottom - LABEL_EDGE_GAP - LABEL_HEIGHT,
   }
 
-  const inX = labels.inLeft + labelIn.width / 2
-  const outX = labels.outLeft + labelOut.width / 2
-  const labelInTop = localPoint(root, 0, labelIn.top).y
-  const labelInBottom = localPoint(root, 0, labelIn.bottom).y
-  const labelOutTop = localPoint(root, 0, labelOut.top).y
-  const labelOutBottom = localPoint(root, 0, labelOut.bottom).y
+  const inX = labels.inLeft + LABEL_WIDTH / 2
+  const outX = labels.outLeft + LABEL_WIDTH / 2
+  const labelInBottom = labels.inTop + LABEL_HEIGHT
+  const labelOutTop = labels.outTop
 
   /* Connectors meet the pill edges; traveler starts/ends at pill centers so the
      USDC is fully covered by the box (no half-peek at handoff). */
   const inAttach = { x: inX, y: labelInBottom }
   const outAttach = { x: outX, y: labelOutTop }
-  const inTravelStart = { x: inX, y: (labelInTop + labelInBottom) / 2 }
-  const outTravelEnd = { x: outX, y: (labelOutTop + labelOutBottom) / 2 }
+  const inTravelStart = { x: inX, y: labels.inTop + LABEL_HEIGHT / 2 }
+  const outTravelEnd = { x: outX, y: labels.outTop + LABEL_HEIGHT / 2 }
 
   const inLine = pathBoxToSphereLeft(inAttach, midY, sphereLeft.x, CORNER_R)
   const outLine = pathSphereRightToBox(sphereRight.x, midY, outAttach, CORNER_R)
@@ -187,12 +191,10 @@ export function PrivacySphere() {
   useEffect(() => {
     const rootEl = rootRef.current
     const canvasEl = canvasHostRef.current
-    const labelInEl = labelInRef.current
-    const labelOutEl = labelOutRef.current
-    if (!rootEl || !canvasEl || !labelInEl || !labelOutEl) return
+    if (!rootEl || !canvasEl) return
 
     const update = () => {
-      const next = measureLayout(rootEl, labelInEl, labelOutEl, canvasEl)
+      const next = measureLayout(rootEl, canvasEl)
       if (!next) return
       setLabelLayout(next.labels)
       setConnectors(next.connectors)
@@ -201,8 +203,7 @@ export function PrivacySphere() {
     update()
     const observer = new ResizeObserver(update)
     observer.observe(rootEl)
-    observer.observe(labelInEl)
-    observer.observe(labelOutEl)
+    observer.observe(canvasEl)
     if (typeof document !== 'undefined' && 'fonts' in document) {
       void document.fonts.ready.then(update)
     }
@@ -301,14 +302,22 @@ export function PrivacySphere() {
       <div
         ref={labelInRef}
         className={`${styles.labelBox} ${styles.labelIn}`}
-        style={labelLayout ? { left: labelLayout.inLeft } : undefined}
+        style={
+          labelLayout
+            ? { left: labelLayout.inLeft, top: labelLayout.inTop }
+            : undefined
+        }
       >
         Your wallet
       </div>
       <div
         ref={labelOutRef}
         className={`${styles.labelBox} ${styles.labelOut}`}
-        style={labelLayout ? { left: labelLayout.outLeft, right: 'auto' } : undefined}
+        style={
+          labelLayout
+            ? { left: labelLayout.outLeft, top: labelLayout.outTop }
+            : undefined
+        }
       >
         Any address
       </div>

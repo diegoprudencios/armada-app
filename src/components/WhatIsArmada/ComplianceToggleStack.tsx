@@ -1,19 +1,23 @@
 import { useEffect, useRef } from 'react'
-import { EyeIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
+import { EyeSlashIcon } from '@heroicons/react/24/outline'
+import { ComplianceDocCheckIcon } from './ComplianceDocCheckIcon'
 import styles from './ComplianceToggleStack.module.css'
 
-/** Figma compliance toggle — no exact spacing tokens for these sizes. */
+/** Figma compliance toggle — design sizes at scale 1 (JS fits to the diagram column). */
 const TOGGLE_WIDTH_PX = 345
 const TOGGLE_HEIGHT_PX = 170
 const STACK_INDENT_PX = 150
 const TOGGLE_GAP_PX = 28
 const TOGGLE_COUNT = 6
+const DESIGN_TOTAL_W = TOGGLE_WIDTH_PX + STACK_INDENT_PX
 
-const BASE_SPEED_PX = 1.35
+/** ~1.35px/frame at 60fps — frame-rate independent. */
+const BASE_SPEED_PX_PER_SEC = 1.35 * 60
 /** Maps scroll velocity (px/ms) into boost added per scroll event. */
 const SCROLL_VELOCITY_GAIN = 0.45
 const SCROLL_MAX_BOOST = 4
-const SCROLL_DECAY = 0.92
+/** Per-frame decay at 60fps; applied with Math.pow(..., dt*60). */
+const SCROLL_DECAY_PER_FRAME_60 = 0.92
 
 type ToggleItem = {
   id: number
@@ -30,7 +34,8 @@ function buildItems(): ToggleItem[] {
 /**
  * Infinite stack of compliance toggles rising bottom→top.
  * Each toggle flips on (gradient + shield) as it crosses the viewport midline.
- * Scroll boosts travel speed.
+ * Scroll boosts travel speed. Motion is delta-timed (same speed on 60/120Hz).
+ * Size fits the diagram column via ResizeObserver; dial --compliance-anim-scale in CSS.
  */
 export function ComplianceToggleStack() {
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -42,6 +47,7 @@ export function ComplianceToggleStack() {
     const rail = railRef.current
     if (!viewport || !rail) return
 
+    const host = viewport.parentElement
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const fallbackStride = TOGGLE_HEIGHT_PX + TOGGLE_GAP_PX
 
@@ -51,6 +57,7 @@ export function ComplianceToggleStack() {
     let scrollBoost = 0
     let lastScrollY = window.scrollY
     let lastScrollTs = performance.now()
+    let lastFrameTs = performance.now()
 
     const toggles = toggleRefs.current.filter(Boolean) as HTMLDivElement[]
 
@@ -62,6 +69,20 @@ export function ComplianceToggleStack() {
     }
 
     let loopHeight = measureLoopHeight()
+
+    const applyFitScale = () => {
+      if (!host) return
+      const available = host.clientWidth
+      if (available <= 0) return
+      const fit = Math.min(1, available / DESIGN_TOTAL_W)
+      const manual =
+        Number.parseFloat(
+          getComputedStyle(viewport).getPropertyValue('--compliance-anim-scale').trim(),
+        ) || 1
+      viewport.style.setProperty('--s', String(fit * manual))
+      loopHeight = measureLoopHeight()
+      if (loopHeight > 0) offset = offset % loopHeight
+    }
 
     const updateActiveStates = (instant: boolean) => {
       const midY = viewport.getBoundingClientRect().top + viewport.clientHeight / 2
@@ -93,7 +114,6 @@ export function ComplianceToggleStack() {
       lastScrollY = y
       lastScrollTs = now
 
-      /* Boost scales with scroll speed: slow → small kick, fast → large. */
       const velocityPxPerMs = dy / dt
       scrollBoost = Math.min(
         SCROLL_MAX_BOOST,
@@ -101,21 +121,23 @@ export function ComplianceToggleStack() {
       )
     }
 
-    const onResize = () => {
-      loopHeight = measureLoopHeight()
-      if (loopHeight > 0) offset = offset % loopHeight
-    }
-
-    const tick = () => {
+    const tick = (now: number) => {
       if (disposed) return
 
+      const dtSec = Math.min(Math.max((now - lastFrameTs) / 1000, 0), 0.064)
+      lastFrameTs = now
       let wrapped = false
 
-      if (!reducedMotion.matches) {
-        scrollBoost *= SCROLL_DECAY
+      if (!reducedMotion.matches && dtSec > 0) {
+        scrollBoost *= Math.pow(SCROLL_DECAY_PER_FRAME_60, dtSec * 60)
         if (scrollBoost < 0.02) scrollBoost = 0
-        const speed = BASE_SPEED_PX * (1 + scrollBoost)
-        offset += speed
+
+        const layoutScale =
+          toggles[0] && toggles[0].offsetHeight > 0
+            ? toggles[0].offsetHeight / TOGGLE_HEIGHT_PX
+            : 1
+        const speed = BASE_SPEED_PX_PER_SEC * layoutScale * (1 + scrollBoost)
+        offset += speed * dtSec
         if (loopHeight > 0 && offset >= loopHeight) {
           offset -= loopHeight
           wrapped = true
@@ -127,15 +149,26 @@ export function ComplianceToggleStack() {
       frameId = window.requestAnimationFrame(tick)
     }
 
+    applyFitScale()
+    const resizeObserver =
+      host && typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(() => {
+            applyFitScale()
+            updateActiveStates(true)
+          })
+        : null
+    if (host && resizeObserver) {
+      resizeObserver.observe(host)
+    }
+
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onResize)
     updateActiveStates(true)
     frameId = window.requestAnimationFrame(tick)
 
     return () => {
       disposed = true
+      resizeObserver?.disconnect()
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onResize)
       window.cancelAnimationFrame(frameId)
     }
   }, [])
@@ -165,8 +198,13 @@ export function ComplianceToggleStack() {
           >
             <div className={styles.thumb}>
               <span className={styles.iconClip}>
-                <EyeIcon className={`${styles.icon} ${styles.iconEye}`} aria-hidden />
-                <ShieldCheckIcon className={`${styles.icon} ${styles.iconShield}`} aria-hidden />
+                <EyeSlashIcon
+                  className={`${styles.icon} ${styles.iconOutline} ${styles.iconPrivate}`}
+                  aria-hidden
+                />
+                <ComplianceDocCheckIcon
+                  className={`${styles.icon} ${styles.iconCompliance}`}
+                />
               </span>
             </div>
           </div>

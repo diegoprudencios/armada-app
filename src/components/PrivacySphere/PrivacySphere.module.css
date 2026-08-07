@@ -1,8 +1,7 @@
-/*
-  Tokens used (verified in src/styles/tokens.css):
+  /* Tokens used (verified in src/styles/tokens.css):
   - Text: --semantic-color-brand-ink
   - Label fill: lavender → amber gradient (--semantic-color-brand-lavender / -amber)
-  - Label height: --primitives-spacing-10 (40px)
+  EXCEPTION — label pill 180×56 (Figma); no matching tokens.
   EXCEPTION — diagram stroke #a2a2a2 (Figma); no matching token.
   EXCEPTION — traveler blur 7px (ref soft in-pool half); no blur token.
   Stack: connectors → blur traveler → sharp traveler → canvas (eyes) → labels
@@ -29,8 +28,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: var(--primitives-spacing-10); /* 40px */
-  padding: 0 var(--primitives-spacing-4);
+  /* EXCEPTION — Figma label pill 180×56; no matching tokens. */
+  width: 180px;
+  height: 56px;
+  padding: 0;
   border: none;
   border-radius: calc(var(--primitives-borderRadius-full) * 1px);
   font-family: var(--semantic-typography-ui-label-sm-font-family), sans-serif;
@@ -47,17 +48,15 @@
     var(--semantic-color-brand-amber)
   );
   pointer-events: none;
+  /* left/top set in JS from sphere silhouette. */
 }
 
-.labelIn {
-  top: var(--primitives-spacing-1);
-  left: var(--primitives-spacing-1);
-}
-
+.labelIn,
 .labelOut {
-  bottom: var(--primitives-spacing-1);
-  left: auto;
-  right: var(--primitives-spacing-1);
+  top: 0;
+  left: 0;
+  right: auto;
+  bottom: auto;
 }
 
 .connectorOverlay {
@@ -89,8 +88,6 @@
   /* Above the traveler USDC so orbiting eye badges always paint over it. */
   z-index: 3;
   overflow: visible;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
 }
 
@@ -145,10 +142,6 @@
   .root {
     width: calc(var(--primitives-spacing-20) * 4);
     height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-5));
-  }
-
-  .labelBox {
-    padding: 0 var(--primitives-spacing-3);
   }
 
   .traveler {

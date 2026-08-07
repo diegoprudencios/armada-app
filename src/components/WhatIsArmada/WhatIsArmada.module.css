@@ -165,7 +165,7 @@
 }
 
 .panelDiagram {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
   display: flex;
   align-items: center;
@@ -176,9 +176,11 @@
   align-self: stretch;
   align-items: stretch;
   justify-content: flex-end;
+  overflow: hidden;
 }
 
 .panelContent {
+  flex: 0 1 auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -231,6 +233,15 @@
   .panel {
     height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
     min-height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
+    padding: 0 calc(var(--primitives-spacing-16) + var(--primitives-spacing-4));
+  }
+
+  .panelContent {
+    max-width: calc(var(--primitives-spacing-20) * 5);
+  }
+
+  .panelSplit {
+    gap: var(--primitives-spacing-8);
   }
 }
 
