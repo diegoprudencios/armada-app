@@ -17,13 +17,20 @@ const CLUSTER_SPIN = 0.0064
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
 const BLUR_PX = 8.4
 
-/** Top + bottom privacy-eye badges only (no mid orbit). */
+/** Scroll adds temporary spin; decays each frame back to idle. */
+const SCROLL_SPIN_GAIN = 0.018
+const SCROLL_SPIN_MAX_BOOST = 14
+const SCROLL_SPIN_DECAY = 0.94
+
+/** Two eye badges on one shared diagonal ring (opposite sides). */
 const ORBIT_COUNT = 2
 /** Outside the wireframe so badges read as orbiting clear of the sphere. */
 const ORBIT_RADIUS = 2.9
 const ORBIT_BASE_SPEED = 0.009
-const ORBIT_SPEED_MULT = [1, 1] as const
-const ORBIT_HEIGHTS = [1.2, -1.15] as const
+/** Tilt of the orbit plane around Z — ~45° reads bottom-left ↔ top-right (ref). */
+const ORBIT_TILT = Math.PI / 4
+const ORBIT_TILT_COS = Math.cos(ORBIT_TILT)
+const ORBIT_TILT_SIN = Math.sin(ORBIT_TILT)
 /** Max on-screen size when a badge is at the front of the orbit (--primitives-spacing-16). */
 const ORBIT_FRONT_PX = 64
 
@@ -37,6 +44,13 @@ function orbitWorldScale(canvasHeight: number): number {
   const distToFront = CAMERA_Z - ORBIT_RADIUS
   const visibleHeight = 2 * Math.tan(fovRad / 2) * distToFront
   return (ORBIT_FRONT_PX / Math.max(1, canvasHeight)) * visibleHeight
+}
+
+/** Point on the diagonal orbit: circle in XZ, then rotate around Z by ORBIT_TILT. */
+function diagonalOrbitPosition(angle: number, target: THREE.Vector3) {
+  const along = Math.cos(angle) * ORBIT_RADIUS
+  const depth = Math.sin(angle) * ORBIT_RADIUS
+  return target.set(along * ORBIT_TILT_COS, along * ORBIT_TILT_SIN, depth)
 }
 
 type Rgb = { r: number; g: number; b: number }
@@ -336,15 +350,27 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     const orbitSprites: {
       sprite: THREE.Sprite
       angle: number
-      speedMult: number
-      height: number
       material: THREE.SpriteMaterial
     }[] = []
+    const orbitPos = new THREE.Vector3()
 
     let eyeTexture: THREE.Texture | null = null
     let disposed = false
     let frameId = 0
     const worldPos = new THREE.Vector3()
+    let scrollBoost = 0
+    let lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0
+
+    const onScroll = () => {
+      if (disposed || reducedMotion.matches) return
+      const y = window.scrollY
+      const dy = Math.abs(y - lastScrollY)
+      lastScrollY = y
+      /* Floor so trackpads / small ticks still punch the spin. */
+      const kick = Math.max(dy, 12)
+      scrollBoost = Math.min(SCROLL_SPIN_MAX_BOOST, scrollBoost + kick * SCROLL_SPIN_GAIN)
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
 
     const applyOrbitScale = () => {
       const scale = orbitWorldScale(container.clientHeight)
@@ -385,16 +411,17 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
 
     const tick = () => {
       if (disposed) return
-      sphereGroup.rotation.y += SPHERE_SPIN
-      clusterGroup.rotation.y += CLUSTER_SPIN
+      scrollBoost *= SCROLL_SPIN_DECAY
+      if (scrollBoost < 0.02) scrollBoost = 0
+      const spinMul = 1 + scrollBoost
+
+      sphereGroup.rotation.y += SPHERE_SPIN * spinMul
+      clusterGroup.rotation.y += CLUSTER_SPIN * spinMul
 
       for (const badge of orbitSprites) {
-        badge.angle += ORBIT_BASE_SPEED * badge.speedMult
-        badge.sprite.position.set(
-          Math.cos(badge.angle) * ORBIT_RADIUS,
-          badge.height,
-          Math.sin(badge.angle) * ORBIT_RADIUS,
-        )
+        /* Negative so motion runs bottom-left → front → top-right (ref arrow). */
+        badge.angle -= ORBIT_BASE_SPEED * spinMul
+        badge.sprite.position.copy(diagonalOrbitPosition(badge.angle, orbitPos))
       }
 
       renderFrame()
@@ -417,14 +444,11 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
         })
         const sprite = new THREE.Sprite(material)
         const angle = (i / ORBIT_COUNT) * Math.PI * 2
-        const height = ORBIT_HEIGHTS[i]
-        sprite.position.set(Math.cos(angle) * ORBIT_RADIUS, height, Math.sin(angle) * ORBIT_RADIUS)
+        sprite.position.copy(diagonalOrbitPosition(angle, orbitPos))
         orbitGroup.add(sprite)
         orbitSprites.push({
           sprite,
           angle,
-          speedMult: ORBIT_SPEED_MULT[i],
-          height,
           material,
         })
       }
@@ -452,6 +476,7 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
 
     return () => {
       disposed = true
+      window.removeEventListener('scroll', onScroll)
       reducedMotion.removeEventListener('change', onMotionChange)
       window.cancelAnimationFrame(frameId)
       observer.disconnect()
