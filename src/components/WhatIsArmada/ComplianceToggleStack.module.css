@@ -63,9 +63,9 @@
   transform: translateY(-50%);
   overflow: hidden;
   transition:
-    left 420ms cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 420ms ease,
-    background-image 420ms ease;
+    left 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-image 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .on .thumb {
@@ -94,7 +94,7 @@
   margin-top: calc(var(--icon-size) / -2);
   margin-left: calc(var(--icon-size) / -2);
   color: #ffffff;
-  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* Keep a 1px screen stroke at any icon size (matches toggle / connectors). */

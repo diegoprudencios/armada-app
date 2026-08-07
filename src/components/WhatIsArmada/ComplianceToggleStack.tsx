@@ -29,8 +29,8 @@ function buildItems(): ToggleItem[] {
 
 /**
  * Infinite stack of compliance toggles rising bottom→top.
- * Crossing the viewport midline flips each toggle on (gradient + shield).
- * Scroll boosts travel speed (same idea as PrivacySphere spin).
+ * Each toggle flips on (gradient + shield) as it crosses the viewport midline.
+ * Scroll boosts travel speed.
  */
 export function ComplianceToggleStack() {
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -63,11 +63,6 @@ export function ComplianceToggleStack() {
 
     let loopHeight = measureLoopHeight()
 
-    const setActiveInstant = (el: HTMLDivElement, on: boolean) => {
-      el.classList.toggle(styles.on, on)
-      el.setAttribute('aria-checked', on ? 'true' : 'false')
-    }
-
     const updateActiveStates = (instant: boolean) => {
       const midY = viewport.getBoundingClientRect().top + viewport.clientHeight / 2
 
@@ -78,11 +73,12 @@ export function ComplianceToggleStack() {
       for (const el of toggles) {
         const rect = el.getBoundingClientRect()
         const centerY = rect.top + rect.height / 2
-        setActiveInstant(el, centerY <= midY)
+        const on = centerY <= midY
+        el.classList.toggle(styles.on, on)
+        el.setAttribute('aria-checked', on ? 'true' : 'false')
       }
 
       if (instant) {
-        /* Flush styles so the snap applies before transitions turn back on. */
         void rail.offsetHeight
         rail.classList.remove(styles.noTransition)
       }
