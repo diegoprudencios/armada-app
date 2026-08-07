@@ -1,25 +1,38 @@
 /*
   Tokens used (verified in src/styles/tokens.css):
-  - Ink: --semantic-color-brand-ink (solid diagram strokes on cream panel)
-  Hairline look was from border-default @ 10% opacity, not from sub-1px width.
+  - Text: --semantic-color-brand-ink
+  - Label fill: lavender → amber gradient (--semantic-color-brand-lavender / -amber)
+  - Label height: --primitives-spacing-10 (40px)
+  EXCEPTION — diagram stroke #a2a2a2 (Figma); no matching token.
+  EXCEPTION — traveler blur 7px (ref soft in-pool half); no blur token.
+  Stack: connectors → blur traveler → sharp traveler → canvas (eyes) → labels
+  (eyes above the little USDC; labels on top so the USDC tucks fully under the pills).
 */
 
 .root {
+  /* EXCEPTION — Figma diagram stroke. */
+  --privacy-sphere-stroke: #a2a2a2;
   position: relative;
   box-sizing: border-box;
-  /* Desktop 400×360 */
-  width: calc(var(--primitives-spacing-20) * 5);
+  /* Desktop 480×360 — wider stage so orbit badges clear the sphere sides. */
+  width: calc(var(--primitives-spacing-20) * 6);
   height: calc(var(--primitives-spacing-20) * 4 + var(--primitives-spacing-10));
   flex-shrink: 0;
+  overflow: visible;
 }
 
 .labelBox {
   position: absolute;
-  z-index: 2;
+  /* Above the traveler USDC so the pill covers it at the endpoint. */
+  z-index: 4;
   box-sizing: border-box;
-  padding: var(--primitives-spacing-2) var(--primitives-spacing-3);
-  border: 1px solid var(--semantic-color-brand-ink);
-  border-radius: calc(var(--primitives-borderRadius-lg) * 1px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--primitives-spacing-10); /* 40px */
+  padding: 0 var(--primitives-spacing-4);
+  border: none;
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
   font-family: var(--semantic-typography-ui-label-sm-font-family), sans-serif;
   font-size: var(--semantic-typography-ui-label-sm-font-size);
   font-weight: var(--primitives-fontWeight-medium);
@@ -28,7 +41,11 @@
   text-transform: uppercase;
   color: var(--semantic-color-brand-ink);
   white-space: nowrap;
-  background: transparent;
+  background: linear-gradient(
+    to right,
+    var(--semantic-color-brand-lavender),
+    var(--semantic-color-brand-amber)
+  );
   pointer-events: none;
 }
 
@@ -38,33 +55,43 @@
 }
 
 .labelOut {
-  right: var(--primitives-spacing-1);
   bottom: var(--primitives-spacing-1);
+  left: auto;
+  right: var(--primitives-spacing-1);
 }
 
-.arrowOverlay {
+.connectorOverlay {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 0;
   overflow: visible;
   pointer-events: none;
 }
 
-.arrowStroke {
+.connectorStroke {
   fill: none;
-  stroke: var(--semantic-color-brand-ink);
+  stroke: var(--privacy-sphere-stroke);
   stroke-width: 1;
   stroke-linecap: round;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
 }
 
+.travelPath {
+  fill: none;
+  stroke: none;
+  pointer-events: none;
+}
+
 .canvasHost {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  /* Above the traveler USDC so orbiting eye badges always paint over it. */
+  z-index: 3;
+  overflow: visible;
   width: 100%;
   height: 100%;
+  pointer-events: none;
 }
 
 .canvasHost canvas {
@@ -73,14 +100,59 @@
   height: 100%;
 }
 
+.travelerLayerBlur,
+.travelerLayerSharp {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  /* Mask set in JS to the sphere silhouette (inside vs outside). */
+}
+
+.travelerLayerBlur {
+  z-index: 1;
+}
+
+.travelerLayerSharp {
+  z-index: 2;
+}
+
+.traveler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.travelerBlur {
+  /* EXCEPTION — match reference soft in-pool half. */
+  filter: blur(7px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .traveler {
+    display: none;
+  }
+}
+
 @media (max-width: 767px) {
-  /* 280×260 */
+  /* 320×260 — wider than before so side orbits still clear. */
   .root {
-    width: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-10));
+    width: calc(var(--primitives-spacing-20) * 4);
     height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-5));
   }
 
   .labelBox {
-    padding: var(--primitives-spacing-1) var(--primitives-spacing-2);
+    padding: 0 var(--primitives-spacing-3);
+  }
+
+  .traveler {
+    width: var(--primitives-spacing-4);
+    height: var(--primitives-spacing-4);
   }
 }

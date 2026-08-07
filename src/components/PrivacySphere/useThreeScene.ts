@@ -1,11 +1,14 @@
 import { useEffect, type RefObject } from 'react'
 import * as THREE from 'three'
-import usdcLogoUrl from '@/assets/usdc-logo.svg'
+/** Ink disk + Heroicons 24/outline EyeIcon (see asset comment). */
+import eyeBadgeUrl from '@/assets/privacy-eye-badge.svg'
 
 const SPHERE_RADIUS = 2.4
 const DEPTH_SPHERE_RADIUS = 2.38
 const MERIDIAN_COUNT = 7
 const MERIDIAN_OPACITY = 1
+/** Skip this many radians at each pole so meridians don't hook into the wrap-around. */
+const MERIDIAN_POLE_CUT = 0.38
 const SPHERE_SPIN = 0.0048
 
 const CLUSTER_COUNT = 12
@@ -14,31 +17,41 @@ const CLUSTER_SPIN = 0.0064
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
 const BLUR_PX = 8.4
 
-const COIN_COUNT = 3
-const COIN_ORBIT = 2.9
-const COIN_BASE_SPEED = 0.009
-const COIN_SPEED_MULT = [1, 0.85, 1] as const
-/** Fixed heights: top / center / bottom (no vertical drift). */
-const COIN_HEIGHTS = [1.72, 0.42, -1.25] as const
-/** Per-coin scale: bottom coin reads larger. */
-const COIN_SCALES = [0.68, 0.68, 0.9] as const
+/** Top + bottom privacy-eye badges only (no mid orbit). */
+const ORBIT_COUNT = 2
+/** Outside the wireframe so badges read as orbiting clear of the sphere. */
+const ORBIT_RADIUS = 2.9
+const ORBIT_BASE_SPEED = 0.009
+const ORBIT_SPEED_MULT = [1, 1] as const
+const ORBIT_HEIGHTS = [1.2, -1.15] as const
+/** Max on-screen size when a badge is at the front of the orbit (--primitives-spacing-16). */
+const ORBIT_FRONT_PX = 64
 
-/* Pull back enough that orbiting coins stay inside the canvas (no edge clip). */
-const CAMERA_Z = 9.4
+/* Camera distance tuned for the wider stage (badges at ORBIT_RADIUS clear the edges). */
+const CAMERA_Z = 8.0
 const CAMERA_FOV = 45
+
+/** World-unit sprite scale so a front-orbit badge reads as `ORBIT_FRONT_PX` tall. */
+function orbitWorldScale(canvasHeight: number): number {
+  const fovRad = (CAMERA_FOV * Math.PI) / 180
+  const distToFront = CAMERA_Z - ORBIT_RADIUS
+  const visibleHeight = 2 * Math.tan(fovRad / 2) * distToFront
+  return (ORBIT_FRONT_PX / Math.max(1, canvasHeight)) * visibleHeight
+}
 
 type Rgb = { r: number; g: number; b: number }
 
-function readCssColor(varName: string): Rgb {
+function readCssColor(varName: string, scope?: HTMLElement): Rgb {
   const probe = document.createElement('div')
   probe.style.color = `var(${varName})`
   probe.style.position = 'absolute'
   probe.style.visibility = 'hidden'
-  document.body.appendChild(probe)
+  const host = scope ?? document.body
+  host.appendChild(probe)
   const raw = getComputedStyle(probe).color
-  document.body.removeChild(probe)
+  host.removeChild(probe)
   const match = raw.match(/[\d.]+/g)
-  if (!match || match.length < 3) return { r: 46, g: 35, b: 35 }
+  if (!match || match.length < 3) return { r: 162, g: 162, b: 162 }
   return {
     r: Number(match[0]),
     g: Number(match[1]),
@@ -83,37 +96,25 @@ function createBlurDotTexture(color: Rgb): THREE.CanvasTexture {
   return texture
 }
 
-function createPlaceholderCoinTexture(brand: Rgb): THREE.CanvasTexture {
-  // TODO: replace if usdc-logo.svg fails to load — branded circle fallback.
-  const size = 128
+/** Fallback if the Heroicons-based SVG fails to load. */
+function createEyeBadgeFallback(ink: Rgb): THREE.CanvasTexture {
+  const size = 256
   const canvas = document.createElement('canvas')
   canvas.width = size
   canvas.height = size
   const ctx = canvas.getContext('2d')
   if (!ctx) return new THREE.CanvasTexture(canvas)
-
   ctx.clearRect(0, 0, size, size)
-  ctx.fillStyle = `rgb(${brand.r},${brand.g},${brand.b})`
+  ctx.fillStyle = `rgb(${ink.r},${ink.g},${ink.b})`
   ctx.beginPath()
   ctx.arc(size / 2, size / 2, size * 0.46, 0, Math.PI * 2)
   ctx.fill()
-  ctx.strokeStyle = 'rgba(255,255,255,0.85)'
-  ctx.lineWidth = 6
-  ctx.beginPath()
-  ctx.arc(size / 2, size / 2, size * 0.32, 0, Math.PI * 2)
-  ctx.stroke()
-  ctx.fillStyle = '#ffffff'
-  ctx.font = `bold ${Math.round(size * 0.42)}px system-ui, sans-serif`
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  ctx.fillText('$', size / 2, size / 2 + 2)
-
   const texture = new THREE.CanvasTexture(canvas)
   texture.needsUpdate = true
   return texture
 }
 
-function loadUsdcTexture(fallbackBrand: Rgb): Promise<THREE.Texture> {
+function loadEyeBadgeTexture(ink: Rgb): Promise<THREE.Texture> {
   return new Promise((resolve) => {
     const image = new Image()
     image.decoding = 'async'
@@ -124,7 +125,7 @@ function loadUsdcTexture(fallbackBrand: Rgb): Promise<THREE.Texture> {
       canvas.height = size
       const ctx = canvas.getContext('2d')
       if (!ctx) {
-        resolve(createPlaceholderCoinTexture(fallbackBrand))
+        resolve(createEyeBadgeFallback(ink))
         return
       }
       ctx.clearRect(0, 0, size, size)
@@ -134,9 +135,9 @@ function loadUsdcTexture(fallbackBrand: Rgb): Promise<THREE.Texture> {
       resolve(texture)
     }
     image.onerror = () => {
-      resolve(createPlaceholderCoinTexture(fallbackBrand))
+      resolve(createEyeBadgeFallback(ink))
     }
-    image.src = usdcLogoUrl
+    image.src = eyeBadgeUrl
   })
 }
 
@@ -158,17 +159,56 @@ function fibonacciPoints(count: number, radius: number, rand: () => number): THR
   return points
 }
 
-function createMeridianGeometry(radius: number, longitude: number, segments = 96): THREE.BufferGeometry {
+function meridianPoint(radius: number, longitude: number, phi: number, target: THREE.Vector3) {
+  return target.set(
+    radius * Math.sin(phi) * Math.cos(longitude),
+    radius * Math.cos(phi),
+    radius * Math.sin(phi) * Math.sin(longitude),
+  )
+}
+
+/** Open arc along a meridian — does not include the poles. */
+function createMeridianArcGeometry(
+  radius: number,
+  longitude: number,
+  phiStart: number,
+  phiEnd: number,
+  segments = 64,
+): THREE.BufferGeometry {
   const positions = new Float32Array((segments + 1) * 3)
+  const point = new THREE.Vector3()
   for (let i = 0; i <= segments; i += 1) {
-    const phi = (i / segments) * Math.PI * 2
-    const x = radius * Math.sin(phi) * Math.cos(longitude)
-    const y = radius * Math.cos(phi)
-    const z = radius * Math.sin(phi) * Math.sin(longitude)
+    const phi = phiStart + ((phiEnd - phiStart) * i) / segments
+    meridianPoint(radius, longitude, phi, point)
     const idx = i * 3
-    positions[idx] = x
-    positions[idx + 1] = y
-    positions[idx + 2] = z
+    positions[idx] = point.x
+    positions[idx + 1] = point.y
+    positions[idx + 2] = point.z
+  }
+  const geometry = new THREE.BufferGeometry()
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  return geometry
+}
+
+/**
+ * True perspective silhouette of a sphere at the origin, camera on +Z.
+ * A unit circle in the equatorial plane looks oversized under perspective.
+ */
+function createOutlineCircleGeometry(
+  sphereRadius: number,
+  cameraZ: number,
+  segments = 128,
+): THREE.BufferGeometry {
+  const silhouetteZ = (sphereRadius * sphereRadius) / cameraZ
+  const silhouetteRadius =
+    sphereRadius * Math.sqrt(1 - (sphereRadius * sphereRadius) / (cameraZ * cameraZ))
+  const positions = new Float32Array(segments * 3)
+  for (let i = 0; i < segments; i += 1) {
+    const theta = (i / segments) * Math.PI * 2
+    const idx = i * 3
+    positions[idx] = Math.cos(theta) * silhouetteRadius
+    positions[idx + 1] = Math.sin(theta) * silhouetteRadius
+    positions[idx + 2] = silhouetteZ
   }
   const geometry = new THREE.BufferGeometry()
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
@@ -192,7 +232,8 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const rand = mulberry32(42)
 
-    const borderRgb = readCssColor('--semantic-color-brand-ink')
+    const borderRgb = readCssColor('--privacy-sphere-stroke', container)
+    const inkRgb = readCssColor('--semantic-color-brand-ink')
     const infoRgb = readCssColor('--semantic-color-status-info')
     const lavenderRgb = readCssColor('--semantic-color-brand-lavender')
     const actionRgb = readCssColor('--semantic-color-brand-action')
@@ -223,11 +264,19 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
       opacity: MERIDIAN_OPACITY,
     })
     const meridianGeometries: THREE.BufferGeometry[] = []
+    const cut = MERIDIAN_POLE_CUT
     for (let i = 0; i < MERIDIAN_COUNT; i += 1) {
       const lon = (i * Math.PI) / MERIDIAN_COUNT
-      const geometry = createMeridianGeometry(SPHERE_RADIUS, lon)
-      meridianGeometries.push(geometry)
-      sphereGroup.add(new THREE.Line(geometry, meridianMaterial))
+      /* Two open arcs per great circle — gaps at both poles remove the wrap hook. */
+      const arcs: Array<[number, number]> = [
+        [cut, Math.PI - cut],
+        [Math.PI + cut, Math.PI * 2 - cut],
+      ]
+      for (const [phiStart, phiEnd] of arcs) {
+        const geometry = createMeridianArcGeometry(SPHERE_RADIUS, lon, phiStart, phiEnd)
+        meridianGeometries.push(geometry)
+        sphereGroup.add(new THREE.Line(geometry, meridianMaterial))
+      }
     }
 
     const depthSphere = new THREE.Mesh(
@@ -235,6 +284,17 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
       new THREE.MeshBasicMaterial({ colorWrite: false }),
     )
     sphereGroup.add(depthSphere)
+
+    /* Fixed silhouette — depthTest off so the depth shell cannot hide it. */
+    const outlineMaterial = new THREE.LineBasicMaterial({
+      color: rgbToHex(borderRgb),
+      depthTest: false,
+      depthWrite: false,
+    })
+    const outlineGeometry = createOutlineCircleGeometry(SPHERE_RADIUS, CAMERA_Z)
+    const outlineCircle = new THREE.LineLoop(outlineGeometry, outlineMaterial)
+    outlineCircle.renderOrder = 2
+    scene.add(outlineCircle)
 
     const clusterGroup = new THREE.Group()
     scene.add(clusterGroup)
@@ -270,22 +330,28 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
       clusterSprites.push({ sprite, baseScale, material, texture })
     })
 
-    const coinGroup = new THREE.Group()
-    scene.add(coinGroup)
+    const orbitGroup = new THREE.Group()
+    scene.add(orbitGroup)
 
-    const coinSprites: {
+    const orbitSprites: {
       sprite: THREE.Sprite
       angle: number
       speedMult: number
       height: number
-      scale: number
       material: THREE.SpriteMaterial
     }[] = []
 
-    let coinTexture: THREE.Texture | null = null
+    let eyeTexture: THREE.Texture | null = null
     let disposed = false
     let frameId = 0
     const worldPos = new THREE.Vector3()
+
+    const applyOrbitScale = () => {
+      const scale = orbitWorldScale(container.clientHeight)
+      for (const badge of orbitSprites) {
+        badge.sprite.scale.setScalar(scale)
+      }
+    }
 
     const resize = () => {
       const width = container.clientWidth
@@ -294,6 +360,7 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
       camera.aspect = width / height
       camera.updateProjectionMatrix()
       renderer.setSize(width, height, false)
+      applyOrbitScale()
     }
 
     const observer = new ResizeObserver(() => resize())
@@ -321,12 +388,12 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
       sphereGroup.rotation.y += SPHERE_SPIN
       clusterGroup.rotation.y += CLUSTER_SPIN
 
-      for (const coin of coinSprites) {
-        coin.angle += COIN_BASE_SPEED * coin.speedMult
-        coin.sprite.position.set(
-          Math.cos(coin.angle) * COIN_ORBIT,
-          coin.height,
-          Math.sin(coin.angle) * COIN_ORBIT,
+      for (const badge of orbitSprites) {
+        badge.angle += ORBIT_BASE_SPEED * badge.speedMult
+        badge.sprite.position.set(
+          Math.cos(badge.angle) * ORBIT_RADIUS,
+          badge.height,
+          Math.sin(badge.angle) * ORBIT_RADIUS,
         )
       }
 
@@ -335,35 +402,33 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     }
 
     const start = async () => {
-      coinTexture = await loadUsdcTexture(infoRgb)
+      eyeTexture = await loadEyeBadgeTexture(inkRgb)
       if (disposed) {
-        coinTexture.dispose()
+        eyeTexture.dispose()
         return
       }
 
-      for (let i = 0; i < COIN_COUNT; i += 1) {
+      for (let i = 0; i < ORBIT_COUNT; i += 1) {
         const material = new THREE.SpriteMaterial({
-          map: coinTexture,
+          map: eyeTexture,
           transparent: true,
           depthTest: true,
           depthWrite: false,
         })
         const sprite = new THREE.Sprite(material)
-        const scale = COIN_SCALES[i]
-        sprite.scale.setScalar(scale)
-        const angle = (i / COIN_COUNT) * Math.PI * 2
-        const height = COIN_HEIGHTS[i]
-        sprite.position.set(Math.cos(angle) * COIN_ORBIT, height, Math.sin(angle) * COIN_ORBIT)
-        coinGroup.add(sprite)
-        coinSprites.push({
+        const angle = (i / ORBIT_COUNT) * Math.PI * 2
+        const height = ORBIT_HEIGHTS[i]
+        sprite.position.set(Math.cos(angle) * ORBIT_RADIUS, height, Math.sin(angle) * ORBIT_RADIUS)
+        orbitGroup.add(sprite)
+        orbitSprites.push({
           sprite,
           angle,
-          speedMult: COIN_SPEED_MULT[i],
+          speedMult: ORBIT_SPEED_MULT[i],
           height,
-          scale,
           material,
         })
       }
+      applyOrbitScale()
 
       if (reducedMotion.matches) {
         renderFrame()
@@ -393,6 +458,8 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
 
       meridianGeometries.forEach((geometry) => geometry.dispose())
       meridianMaterial.dispose()
+      outlineGeometry.dispose()
+      outlineMaterial.dispose()
       depthSphere.geometry.dispose()
       ;(depthSphere.material as THREE.Material).dispose()
 
@@ -400,8 +467,8 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
         material.dispose()
         texture.dispose()
       })
-      coinSprites.forEach(({ material }) => material.dispose())
-      coinTexture?.dispose()
+      orbitSprites.forEach(({ material }) => material.dispose())
+      eyeTexture?.dispose()
 
       renderer.dispose()
       if (renderer.domElement.parentElement === container) {

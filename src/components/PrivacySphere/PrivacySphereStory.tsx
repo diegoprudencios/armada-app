@@ -8,10 +8,13 @@ type ConnectorPaths = {
   height: number
   inLine: string
   outLine: string
-  /** Full wallet → through sphere → address path for the traveler. */
+  /** Full wallet → through sphere → address path. */
   travelPath: string
   sphereLeft: number
   sphereRight: number
+  sphereCx: number
+  sphereCy: number
+  sphereR: number
 }
 
 type LabelLayout = {
@@ -21,21 +24,19 @@ type LabelLayout = {
 
 /** Elbow fillet — matches Figma rounded connector (~spacing-5). */
 const CORNER_R = 20
-/** Horizontal run into/out of the sphere rim (~50px). Boxes move to keep the drop centered. */
+/** Horizontal run into/out of the sphere rim (~50px). */
 const HORIZONTAL_RUN = 48 // --primitives-spacing-12
 
 const TRAVEL_DURATION_MS = 7200
-const TRAVEL_PAUSE_MS = 2600
+const TRAVEL_PAUSE_MS = 2400
 
 /**
  * Must stay in sync with useThreeScene camera framing.
- * Used to place connector endpoints on the true perspective silhouette.
  */
 const SPHERE_RADIUS = 2.4
 const CAMERA_Z = 8.0
 const CAMERA_FOV_DEG = 45
 
-/** Screen-space radius (px) of the sphere silhouette for the current canvas size. */
 function silhouettePixelRadius(canvasHeight: number): number {
   const fovRad = (CAMERA_FOV_DEG * Math.PI) / 180
   const silZ = (SPHERE_RADIUS * SPHERE_RADIUS) / CAMERA_Z
@@ -58,9 +59,6 @@ function clampCorner(
   return Math.max(0, Math.min(requested, Math.abs(verticalRun) - 1, Math.abs(horizontalRun) - 1))
 }
 
-/**
- * Box → sphere (left): vertical from box center, rounded elbow, horizontal to rim.
- */
 function pathBoxToSphereLeft(
   start: { x: number; y: number },
   midY: number,
@@ -79,9 +77,6 @@ function pathBoxToSphereLeft(
   ].join(' ')
 }
 
-/**
- * Sphere (right) → box: horizontal from rim, rounded elbow, vertical into box center.
- */
 function pathSphereRightToBox(
   sphereRight: number,
   midY: number,
@@ -113,16 +108,15 @@ function measureLayout(
   const labelOut = labelOutEl.getBoundingClientRect()
   const canvas = canvasEl.getBoundingClientRect()
 
-  const sphereCx = canvas.left + canvas.width / 2
-  const sphereCy = canvas.top + canvas.height / 2
-  /* True silhouette rim; −0.5px so the 1px stroke sits outside the wire, not over it. */
+  const sphereCxScreen = canvas.left + canvas.width / 2
+  const sphereCyScreen = canvas.top + canvas.height / 2
   const sphereR = silhouettePixelRadius(canvas.height) - 0.5
-  const sphereLeft = localPoint(root, sphereCx - sphereR, sphereCy)
-  const sphereRight = localPoint(root, sphereCx + sphereR, sphereCy)
+  const sphereLeft = localPoint(root, sphereCxScreen - sphereR, sphereCyScreen)
+  const sphereRight = localPoint(root, sphereCxScreen + sphereR, sphereCyScreen)
   const midY = sphereLeft.y
-  const cx = (sphereLeft.x + sphereRight.x) / 2
+  const sphereCx = (sphereLeft.x + sphereRight.x) / 2
+  const sphereCy = midY
 
-  /* Place box centers so the horizontal run into the rim is HORIZONTAL_RUN. */
   const labels: LabelLayout = {
     inLeft: sphereLeft.x - HORIZONTAL_RUN - labelIn.width / 2,
     outLeft: sphereRight.x + HORIZONTAL_RUN - labelOut.width / 2,
@@ -146,8 +140,8 @@ function measureLayout(
   const outLine = pathSphereRightToBox(sphereRight.x, midY, outAttach, CORNER_R)
   const travelIn = pathBoxToSphereLeft(inTravelStart, midY, sphereLeft.x, CORNER_R)
   const travelOut = pathSphereRightToBox(sphereRight.x, midY, outTravelEnd, CORNER_R)
-  /* Through the pool: slight dip so the coin reads as entering the volume. */
-  const through = `L ${cx} ${midY + Math.min(28, sphereR * 0.22)} L ${sphereRight.x} ${midY}`
+  /* Straight through the pool (slight dip so it reads inside the volume). */
+  const through = `L ${sphereCx} ${midY + Math.min(28, sphereR * 0.22)} L ${sphereRight.x} ${midY}`
   const outContinuation = travelOut.replace(/^M\s+[-\d.]+\s+[-\d.]+\s*/, '')
 
   return {
@@ -160,25 +154,37 @@ function measureLayout(
       travelPath: `${travelIn} ${through} ${outContinuation}`,
       sphereLeft: sphereLeft.x,
       sphereRight: sphereRight.x,
+      sphereCx,
+      sphereCy,
+      sphereR,
     },
   }
 }
 
+function sphereMasks(cx: number, cy: number, r: number) {
+  /* Hard cut at the silhouette so sharp/blur meet exactly on the rim (ref). */
+  const inside = `radial-gradient(circle ${r}px at ${cx}px ${cy}px, #000 ${r - 0.5}px, transparent ${r}px)`
+  const outside = `radial-gradient(circle ${r}px at ${cx}px ${cy}px, transparent ${r - 0.5}px, #000 ${r}px)`
+  return { inside, outside }
+}
+
 /**
- * Wallet → shielded pool → any address diagram with a rotating three.js
- * wireframe sphere, blurred asset cluster, and orbiting privacy-eye badges.
- *
- * A small USDC periodically rides the connectors, dips through the sphere,
- * and exits toward any address. Labels sit under the WebGL canvas so orbiting
- * privacy-eye badges paint over the boxes.
+ * Story variant: one USDC rides wallet → through the pool → any address.
+ * Two synced layers share the same position:
+ * - sharp, masked to the outside of the silhouette
+ * - blurred, masked to the inside
+ * so the rim bisects the mark exactly as in the reference.
  */
-export function PrivacySphere() {
+export function PrivacySphereStory() {
   const rootRef = useRef<HTMLDivElement>(null)
   const canvasHostRef = useRef<HTMLDivElement>(null)
   const labelInRef = useRef<HTMLDivElement>(null)
   const labelOutRef = useRef<HTMLDivElement>(null)
   const travelPathRef = useRef<SVGPathElement>(null)
-  const travelerRef = useRef<HTMLImageElement>(null)
+  const sharpRef = useRef<HTMLImageElement>(null)
+  const blurRef = useRef<HTMLImageElement>(null)
+  const sharpLayerRef = useRef<HTMLDivElement>(null)
+  const blurLayerRef = useRef<HTMLDivElement>(null)
   const [connectors, setConnectors] = useState<ConnectorPaths | null>(null)
   const [labelLayout, setLabelLayout] = useState<LabelLayout | null>(null)
 
@@ -196,6 +202,22 @@ export function PrivacySphere() {
       if (!next) return
       setLabelLayout(next.labels)
       setConnectors(next.connectors)
+
+      const { inside, outside } = sphereMasks(
+        next.connectors.sphereCx,
+        next.connectors.sphereCy,
+        next.connectors.sphereR,
+      )
+      const blurLayer = blurLayerRef.current
+      const sharpLayer = sharpLayerRef.current
+      if (blurLayer) {
+        blurLayer.style.webkitMaskImage = inside
+        blurLayer.style.maskImage = inside
+      }
+      if (sharpLayer) {
+        sharpLayer.style.webkitMaskImage = outside
+        sharpLayer.style.maskImage = outside
+      }
     }
 
     update()
@@ -210,16 +232,17 @@ export function PrivacySphere() {
     return () => observer.disconnect()
   }, [])
 
-  /* Periodic traveler along wallet → sphere → address. */
   useEffect(() => {
     if (!connectors) return
     const pathEl = travelPathRef.current
-    const travelerEl = travelerRef.current
-    if (!pathEl || !travelerEl) return
+    const sharpEl = sharpRef.current
+    const blurEl = blurRef.current
+    if (!pathEl || !sharpEl || !blurEl) return
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     if (reducedMotion.matches) {
-      travelerEl.style.opacity = '0'
+      sharpEl.style.opacity = '0'
+      blurEl.style.opacity = '0'
       return
     }
 
@@ -227,17 +250,22 @@ export function PrivacySphere() {
     let timeoutId = 0
     let startTime = 0
     let running = true
-
     const totalLength = pathEl.getTotalLength()
     if (totalLength < 1) return
 
+    const hide = () => {
+      sharpEl.style.opacity = '0'
+      blurEl.style.opacity = '0'
+    }
+
     const place = (t: number) => {
       const point = pathEl.getPointAtLength(t * totalLength)
-      const inside =
-        point.x > connectors.sphereLeft && point.x < connectors.sphereRight
-      const scale = inside ? 0.72 : 1
-      travelerEl.style.opacity = inside ? '0.85' : '1'
-      travelerEl.style.transform = `translate(${point.x}px, ${point.y}px) translate(-50%, -50%) scale(${scale})`
+      const transform = `translate(${point.x}px, ${point.y}px) translate(-50%, -50%)`
+      sharpEl.style.opacity = '1'
+      blurEl.style.opacity = '1'
+      sharpEl.style.transform = transform
+      /* Slightly larger so the soft edge fills the clipped half like the ref. */
+      blurEl.style.transform = `${transform} scale(1.2)`
     }
 
     const tick = (now: number) => {
@@ -249,20 +277,18 @@ export function PrivacySphere() {
         frameId = window.requestAnimationFrame(tick)
         return
       }
-      travelerEl.style.opacity = '0'
+      hide()
       timeoutId = window.setTimeout(startTrip, TRAVEL_PAUSE_MS)
     }
 
     const startTrip = () => {
       if (!running) return
       startTime = performance.now()
-      travelerEl.style.opacity = '1'
       frameId = window.requestAnimationFrame(tick)
     }
 
-    place(0)
-    travelerEl.style.opacity = '0'
-    timeoutId = window.setTimeout(startTrip, 900)
+    hide()
+    timeoutId = window.setTimeout(startTrip, 700)
 
     return () => {
       running = false
@@ -276,7 +302,7 @@ export function PrivacySphere() {
       ref={rootRef}
       className={styles.root}
       role="img"
-      aria-label="Diagram: your wallet connects through Armada's private pool to any address, with USDC moving around a shielded sphere"
+      aria-label="Diagram: a USDC token moves from your wallet through Armada's private pool to any address; inside the pool it appears blurred"
     >
       {connectors ? (
         <svg
@@ -290,11 +316,7 @@ export function PrivacySphere() {
         >
           <path d={connectors.inLine} className={styles.connectorStroke} />
           <path d={connectors.outLine} className={styles.connectorStroke} />
-          <path
-            ref={travelPathRef}
-            d={connectors.travelPath}
-            className={styles.travelPath}
-          />
+          <path ref={travelPathRef} d={connectors.travelPath} className={styles.travelPath} />
         </svg>
       ) : null}
 
@@ -313,16 +335,29 @@ export function PrivacySphere() {
         Any address
       </div>
 
+      {/* Blur under the canvas so meridian lines sit over the in-pool half (ref). */}
+      <div ref={blurLayerRef} className={styles.travelerLayerBlur} aria-hidden>
+        <img
+          ref={blurRef}
+          className={`${styles.traveler} ${styles.travelerBlur}`}
+          src={usdcLogoUrl}
+          alt=""
+          draggable={false}
+        />
+      </div>
+
       <div ref={canvasHostRef} className={styles.canvasHost} />
 
-      <img
-        ref={travelerRef}
-        className={styles.traveler}
-        src={usdcLogoUrl}
-        alt=""
-        aria-hidden
-        draggable={false}
-      />
+      {/* Sharp above the canvas; masked out inside the silhouette. */}
+      <div ref={sharpLayerRef} className={styles.travelerLayerSharp} aria-hidden>
+        <img
+          ref={sharpRef}
+          className={styles.traveler}
+          src={usdcLogoUrl}
+          alt=""
+          draggable={false}
+        />
+      </div>
     </div>
   )
 }

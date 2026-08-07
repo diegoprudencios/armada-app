@@ -4,9 +4,23 @@ import type { ButtonVariant } from '@/components/Button'
 import { FleetFogCompare } from './FleetFogCompare'
 import styles from './WhatIsArmada.module.css'
 
-const PrivacySphere = lazy(() =>
+/**
+ * Sphere diagram variant on the capital-in-motion panel:
+ * - 'default' — continuous USDC traveler (PrivacySphere)
+ * - 'story' — dual-layer rim sync: sharp outside / blurred inside (PrivacySphereStory)
+ *
+ * Flip this flag, then hard-refresh — React.lazy + HMR can keep the old chunk mounted.
+ */
+const PRIVACY_SPHERE_VARIANT: 'default' | 'story' = 'story'
+
+const PrivacySphereDefault = lazy(() =>
   import('@/components/PrivacySphere').then((module) => ({ default: module.PrivacySphere })),
 )
+const PrivacySphereStoryLazy = lazy(() =>
+  import('@/components/PrivacySphere').then((module) => ({ default: module.PrivacySphereStory })),
+)
+const PrivacySphereViz =
+  PRIVACY_SPHERE_VARIANT === 'story' ? PrivacySphereStoryLazy : PrivacySphereDefault
 
 type Cta = {
   label: string
@@ -152,8 +166,8 @@ export function WhatIsArmada() {
                 </div>
                 {isCapital ? (
                   <div className={styles.panelDiagram}>
-                    <Suspense fallback={null}>
-                      <PrivacySphere />
+                    <Suspense key={PRIVACY_SPHERE_VARIANT} fallback={null}>
+                      <PrivacySphereViz />
                     </Suspense>
                   </div>
                 ) : null}
