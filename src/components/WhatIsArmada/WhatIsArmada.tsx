@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Button } from '@/components/Button'
 import type { ButtonVariant } from '@/components/Button'
 import { FleetFogCompare } from './FleetFogCompare'
+import { ComplianceToggleStack } from './ComplianceToggleStack'
 import styles from './WhatIsArmada.module.css'
 
 /**
@@ -149,11 +150,13 @@ export function WhatIsArmada() {
         <div className={styles.stack}>
           {FEATURES.map((block) => {
             const isCapital = block.id === 'capital-in-motion'
+            const isCompliance = block.id === 'compliance'
+            const isSplit = isCapital || isCompliance
             return (
               <article
                 key={block.id}
                 id={block.id}
-                className={isCapital ? `${styles.panel} ${styles.panelSplit}` : styles.panel}
+                className={isSplit ? `${styles.panel} ${styles.panelSplit}` : styles.panel}
                 aria-labelledby={`${block.id}-heading`}
               >
                 <div className={styles.panelContent}>
@@ -169,6 +172,11 @@ export function WhatIsArmada() {
                     <Suspense key={PRIVACY_SPHERE_VARIANT} fallback={null}>
                       <PrivacySphereViz />
                     </Suspense>
+                  </div>
+                ) : null}
+                {isCompliance ? (
+                  <div className={`${styles.panelDiagram} ${styles.panelDiagramFill}`}>
+                    <ComplianceToggleStack />
                   </div>
                 ) : null}
               </article>

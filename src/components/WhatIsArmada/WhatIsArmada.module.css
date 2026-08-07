@@ -172,6 +172,12 @@
   justify-content: center;
 }
 
+.panelDiagramFill {
+  align-self: stretch;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+
 .panelContent {
   display: flex;
   flex-direction: column;

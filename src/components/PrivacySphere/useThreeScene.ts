@@ -17,10 +17,10 @@ const CLUSTER_SPIN = 0.0064
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
 const BLUR_PX = 8.4
 
-/** Scroll adds temporary spin; decays each frame back to idle. */
-const SCROLL_SPIN_GAIN = 0.018
-const SCROLL_SPIN_MAX_BOOST = 14
-const SCROLL_SPIN_DECAY = 0.94
+/** Scroll velocity (px/ms) adds temporary spin; decays each frame back to idle. */
+const SCROLL_VELOCITY_GAIN = 0.45
+const SCROLL_SPIN_MAX_BOOST = 4
+const SCROLL_SPIN_DECAY = 0.92
 
 /** Two eye badges on one shared diagonal ring (opposite sides). */
 const ORBIT_COUNT = 2
@@ -360,15 +360,23 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     const worldPos = new THREE.Vector3()
     let scrollBoost = 0
     let lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0
+    let lastScrollTs = typeof performance !== 'undefined' ? performance.now() : 0
 
     const onScroll = () => {
       if (disposed || reducedMotion.matches) return
+      const now = performance.now()
       const y = window.scrollY
       const dy = Math.abs(y - lastScrollY)
+      const dt = Math.max(now - lastScrollTs, 1)
       lastScrollY = y
-      /* Floor so trackpads / small ticks still punch the spin. */
-      const kick = Math.max(dy, 12)
-      scrollBoost = Math.min(SCROLL_SPIN_MAX_BOOST, scrollBoost + kick * SCROLL_SPIN_GAIN)
+      lastScrollTs = now
+
+      /* Boost scales with scroll speed: slow → small kick, fast → large. */
+      const velocityPxPerMs = dy / dt
+      scrollBoost = Math.min(
+        SCROLL_SPIN_MAX_BOOST,
+        scrollBoost + velocityPxPerMs * SCROLL_VELOCITY_GAIN,
+      )
     }
     window.addEventListener('scroll', onScroll, { passive: true })
 
