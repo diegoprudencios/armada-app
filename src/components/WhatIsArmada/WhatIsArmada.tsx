@@ -33,7 +33,7 @@ type Cta = {
 
 type Block = {
   id: string
-  title: [string, string]
+  title: readonly [string] | readonly [string, string]
   body: string
   ctas: Cta[]
 }
@@ -69,7 +69,7 @@ const FEATURES: Block[] = [
   {
     id: 'compliance',
     title: ['Compliance without', 'intermediaries'],
-    body: "Support policy controls, selective disclosure, transaction records, and reporting workflows through Armada's compliance tooling.",
+    body: 'Give authorized parties access to the records they need without making financial activity visible to the entire market.',
     ctas: [
       {
         label: 'Integrate and test',
@@ -81,7 +81,7 @@ const FEATURES: Block[] = [
   },
   {
     id: 'beyond-capture',
-    title: ['Built beyond', 'capture'],
+    title: ['Beyond capture'] as const,
     body: "Like Ethereum, Armada's shielded pool is neutral infrastructure: no company or governing entity can take control of it.",
     ctas: [
       {
@@ -169,8 +169,11 @@ export function WhatIsArmada() {
               >
                 <div className={styles.panelContent}>
                   <h2 id={`${block.id}-heading`} className={styles.panelTitle}>
-                    <span className={styles.titleLine}>{block.title[0]}</span>
-                    <span className={styles.titleLine}>{block.title[1]}</span>
+                    {block.title.map((line) => (
+                      <span key={line} className={styles.titleLine}>
+                        {line}
+                      </span>
+                    ))}
                   </h2>
                   <p className={styles.panelBody}>{block.body}</p>
                   <CtaRow ctas={block.ctas} align="start" />

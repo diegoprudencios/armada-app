@@ -10,8 +10,9 @@ const SHOW_LEGACY_HERO = true
 const HEADING_LINES = ['Pluggable privacy', 'infrastructure for stablecoins'] as const
 
 const FEATURE_LINES = [
-  'Armada protects USDC balances for on-chain',
-  'asset managers and private capital platforms.',
+  'Stablecoins are exposed by default.',
+  'Armada protects USDC balances for',
+  'organizational money on-chain.',
 ] as const
 
 function FeatureCard() {

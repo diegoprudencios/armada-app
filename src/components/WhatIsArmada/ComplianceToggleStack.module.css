@@ -16,11 +16,6 @@
   --design-gap: 28;
   --design-thumb: 128;
   --design-icon: 72;
-  /* EXCEPTION — compliance doc 40×50 + badge 20Ø, overhang 6px right/bottom. */
-  --design-compliance-w: 46;
-  --design-compliance-h: 56;
-  /* Optical nudge of the doc+badge inside the thumb. */
-  --design-compliance-nudge-x: 4;
   --design-thumb-inset: 20;
   --design-total-w: 495; /* track + indent */
 
@@ -35,11 +30,8 @@
   --toggle-gap: calc(var(--design-gap) * var(--s) * 1px);
   --thumb-size: calc(var(--design-thumb) * var(--s) * 1px);
   --icon-size: calc(var(--design-icon) * var(--s) * 1px);
-  --compliance-icon-w: calc(var(--design-compliance-w) * var(--s) * 1px);
-  --compliance-icon-h: calc(var(--design-compliance-h) * var(--s) * 1px);
-  --compliance-nudge-x: calc(var(--design-compliance-nudge-x) * var(--s) * 1px);
   --thumb-inset: calc(var(--design-thumb-inset) * var(--s) * 1px);
-  --icon-travel: calc((var(--thumb-size) + max(var(--icon-size), var(--compliance-icon-h))) / 2);
+  --icon-travel: calc((var(--thumb-size) + var(--icon-size)) / 2);
   /* Prefer parent --diagram-stroke (split panels); fallback for standalone. */
   --toggle-stroke: var(--diagram-stroke, #5a4a62);
 
@@ -148,33 +140,21 @@
   vector-effect: non-scaling-stroke;
 }
 
-.iconCompliance :global(.docStroke),
-.iconCompliance :global(.checkStroke) {
-  stroke-width: 1px;
-  vector-effect: non-scaling-stroke;
-}
-
-/* Private (slash eye): middle → slides up and out. Compliance (doc+check): below → middle. */
+/* Closed lock (private): middle → slides up and out. Open lock: below → middle. */
 .iconPrivate {
   transform: translateY(0);
 }
 
-.iconCompliance {
-  width: var(--compliance-icon-w);
-  height: var(--compliance-icon-h);
-  margin-top: calc(var(--compliance-icon-h) / -2);
-  margin-left: calc(var(--compliance-icon-w) / -2);
-  color: var(--semantic-color-brand-ink);
-  /* 4px right of dead-center inside the thumb (scaled with --s). */
-  transform: translate(var(--compliance-nudge-x), var(--icon-travel));
+.iconOpen {
+  transform: translateY(var(--icon-travel));
 }
 
 .on .iconPrivate {
   transform: translateY(calc(var(--icon-travel) * -1));
 }
 
-.on .iconCompliance {
-  transform: translate(var(--compliance-nudge-x), 0);
+.on .iconOpen {
+  transform: translateY(0);
 }
 
 @media (prefers-reduced-motion: reduce) {

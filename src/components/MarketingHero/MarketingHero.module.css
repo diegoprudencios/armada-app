@@ -139,7 +139,7 @@
   color: var(--semantic-component-tag-label);
 }
 
-/* Forced break after “on-chain” — matches Figma */
+/* Forced line breaks — keep each span on its own row. */
 .featureLine {
   display: block;
 }

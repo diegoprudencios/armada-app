@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { EyeSlashIcon } from '@heroicons/react/24/outline'
-import { ComplianceDocCheckIcon } from './ComplianceDocCheckIcon'
+import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/24/outline'
 import styles from './ComplianceToggleStack.module.css'
 
 /** Figma compliance toggle — design sizes at scale 1 (JS fits to the diagram column). */
@@ -206,12 +205,13 @@ export function ComplianceToggleStack() {
           >
             <div className={styles.thumb}>
               <span className={styles.iconClip}>
-                <EyeSlashIcon
+                <LockClosedIcon
                   className={`${styles.icon} ${styles.iconOutline} ${styles.iconPrivate}`}
                   aria-hidden
                 />
-                <ComplianceDocCheckIcon
-                  className={`${styles.icon} ${styles.iconCompliance}`}
+                <LockOpenIcon
+                  className={`${styles.icon} ${styles.iconOutline} ${styles.iconOpen}`}
+                  aria-hidden
                 />
               </span>
             </div>

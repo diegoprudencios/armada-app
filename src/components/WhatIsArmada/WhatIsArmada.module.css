@@ -152,13 +152,18 @@
   width: 100%;
   height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
   min-height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
-  padding: 0 var(--panel-pad-x);
+  padding: 0;
   border-radius: var(--primitives-spacing-5);
   background: var(--section-panel-bg);
   scroll-margin-top: 0;
 }
 
-/* 50/50 split: cream copy | brand-deep diagram. */
+/* Full-bleed cream panels (no diagram half). */
+.panel:not(.panelSplit) {
+  padding: 0 var(--panel-pad-x);
+}
+
+/* 50/50 split: cream copy | brand-deep diagram — edge to edge, sharp clip. */
 .panelSplit {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -198,8 +203,10 @@
   align-self: stretch;
   box-sizing: border-box;
   width: 100%;
+  height: 100%;
   min-height: 0;
-  padding: var(--primitives-spacing-8);
+  padding: 0;
+  overflow: hidden;
   background: var(--semantic-color-brand-deep);
   /* Pass stroke/fill into diagram children. */
   --privacy-sphere-stroke: var(--diagram-stroke);
@@ -211,12 +218,6 @@
 .panelDiagramFill {
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-}
-
-.panelSplit .panelDiagramFill {
-  /* Full-bleed stack — soft fade is handled inside the viewport. */
-  padding: 0;
 }
 
 .panelCrop {
@@ -225,12 +226,6 @@
 
 .panelDiagramCrop {
   position: relative;
-  overflow: hidden;
-}
-
-.panelSplit .panelDiagramCrop {
-  /* Edge-to-edge lattice in the deep half. */
-  padding: 0;
 }
 
 .panelContent {
@@ -288,6 +283,9 @@
     height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
     min-height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
     --panel-pad-x: calc(var(--primitives-spacing-16) + var(--primitives-spacing-4));
+  }
+
+  .panel:not(.panelSplit) {
     padding: 0 var(--panel-pad-x);
   }
 
@@ -296,15 +294,13 @@
   }
 
   .panelSplit {
+    padding: 0;
     gap: 0;
   }
 
   .panelSplit .panelContent {
+    max-width: none;
     padding-inline: var(--panel-pad-x);
-  }
-
-  .panelDiagramCrop {
-    margin-right: 0;
   }
 }
 
@@ -331,6 +327,9 @@
     height: auto;
     min-height: 0;
     --panel-pad-x: var(--primitives-spacing-8);
+  }
+
+  .panel:not(.panelSplit) {
     padding: var(--primitives-spacing-12) var(--panel-pad-x);
   }
 
@@ -338,6 +337,7 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    padding: 0;
   }
 
   .panelSplit .panelContent {
@@ -354,7 +354,6 @@
   }
 
   .panelDiagramCrop {
-    margin-right: 0;
     width: 100%;
     min-height: calc(var(--primitives-spacing-20) * 4);
   }
@@ -398,8 +397,15 @@
 
   .panel {
     --panel-pad-x: var(--primitives-spacing-5);
-    padding: var(--primitives-spacing-10) var(--panel-pad-x);
     border-radius: var(--primitives-spacing-4);
+  }
+
+  .panel:not(.panelSplit) {
+    padding: var(--primitives-spacing-10) var(--panel-pad-x);
+  }
+
+  .panelSplit {
+    padding: 0;
   }
 
   .panelContent {
