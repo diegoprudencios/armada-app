@@ -2,15 +2,15 @@
   - Text: --semantic-color-brand-ink
   - Label fill: lavender → amber gradient (--semantic-color-brand-lavender / -amber)
   EXCEPTION — label pill 180×56 (Figma); no matching tokens.
-  EXCEPTION — diagram stroke #a2a2a2 (Figma); no matching token.
+  EXCEPTION — diagram stroke #5A4A62 on brand-deep panels; no matching token.
   EXCEPTION — traveler blur 7px (ref soft in-pool half); no blur token.
   Stack: connectors → blur traveler → sharp traveler → canvas (eyes) → labels
   (eyes above the little USDC; labels on top so the USDC tucks fully under the pills).
 */
 
 .root {
-  /* EXCEPTION — Figma diagram stroke. */
-  --privacy-sphere-stroke: #a2a2a2;
+  /* Prefer parent --diagram-stroke (split panels); fallback for standalone. */
+  --privacy-sphere-stroke: var(--diagram-stroke, #5a4a62);
   position: relative;
   box-sizing: border-box;
   /* Desktop 480×360 — wider stage so orbit badges clear the sphere sides. */

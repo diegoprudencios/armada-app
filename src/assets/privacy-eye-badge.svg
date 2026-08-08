@@ -1,13 +1,13 @@
 <!--
-  Privacy-eye orbit badge: ink disk + Heroicons 24/outline EyeIcon paths.
+  Privacy-eye orbit badge: lavender disk + Heroicons 24/outline EyeIcon paths.
   Source: @heroicons/react/24/outline EyeIcon
   Stroke tuned so on-canvas weight ≈ connector 1px (scale 0.58 × 64px badge).
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-  <circle cx="12" cy="12" r="12" fill="#151416" />
+  <circle cx="12" cy="12" r="12" fill="#c491e5" />
   <g
     fill="none"
-    stroke="#ffffff"
+    stroke="#151416"
     stroke-width="0.65"
     stroke-linecap="round"
     stroke-linejoin="round"

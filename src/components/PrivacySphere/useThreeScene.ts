@@ -248,7 +248,6 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     const rand = mulberry32(42)
 
     const borderRgb = readCssColor('--privacy-sphere-stroke', container)
-    const inkRgb = readCssColor('--semantic-color-brand-ink')
     const infoRgb = readCssColor('--semantic-color-status-info')
     const lavenderRgb = readCssColor('--semantic-color-brand-lavender')
     const actionRgb = readCssColor('--semantic-color-brand-action')
@@ -445,7 +444,7 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     }
 
     const start = async () => {
-      eyeTexture = await loadEyeBadgeTexture(inkRgb)
+      eyeTexture = await loadEyeBadgeTexture(lavenderRgb)
       if (disposed) {
         eyeTexture.dispose()
         return

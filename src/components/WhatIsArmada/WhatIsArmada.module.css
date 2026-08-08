@@ -143,6 +143,7 @@
 }
 
 .panel {
+  --panel-pad-x: calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -151,17 +152,36 @@
   width: 100%;
   height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
   min-height: calc(var(--primitives-spacing-20) * 8 + var(--primitives-spacing-6) + var(--primitives-spacing-3) / 2);
-  padding: 0 calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
+  padding: 0 var(--panel-pad-x);
   border-radius: var(--primitives-spacing-5);
   background: var(--section-panel-bg);
   scroll-margin-top: 0;
 }
 
+/* 50/50 split: cream copy | brand-deep diagram. */
 .panelSplit {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--primitives-spacing-10);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  /* EXCEPTION — diagram stroke on deep half (no matching token). */
+  --diagram-stroke: #5a4a62;
+}
+
+.panelSplit .panelContent {
+  box-sizing: border-box;
+  justify-content: center;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  padding:
+    var(--primitives-spacing-12)
+    var(--panel-pad-x)
+    var(--primitives-spacing-12)
+    var(--panel-pad-x);
+  background: var(--section-panel-bg);
 }
 
 .panelDiagram {
@@ -172,11 +192,45 @@
   justify-content: center;
 }
 
-.panelDiagramFill {
+.panelSplit .panelDiagram {
+  flex: none;
+  position: relative;
   align-self: stretch;
-  align-items: stretch;
-  justify-content: flex-end;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  padding: var(--primitives-spacing-8);
+  background: var(--semantic-color-brand-deep);
+  /* Pass stroke/fill into diagram children. */
+  --privacy-sphere-stroke: var(--diagram-stroke);
+  --toggle-stroke: var(--diagram-stroke);
+  --cube-stroke: var(--diagram-stroke);
+  --cube-face-fill: var(--semantic-color-brand-deep);
+}
+
+.panelDiagramFill {
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
+}
+
+.panelSplit .panelDiagramFill {
+  /* Full-bleed stack — soft fade is handled inside the viewport. */
+  padding: 0;
+}
+
+.panelCrop {
+  overflow: hidden;
+}
+
+.panelDiagramCrop {
+  position: relative;
+  overflow: hidden;
+}
+
+.panelSplit .panelDiagramCrop {
+  /* Edge-to-edge lattice in the deep half. */
+  padding: 0;
 }
 
 .panelContent {
@@ -233,7 +287,8 @@
   .panel {
     height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
     min-height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
-    padding: 0 calc(var(--primitives-spacing-16) + var(--primitives-spacing-4));
+    --panel-pad-x: calc(var(--primitives-spacing-16) + var(--primitives-spacing-4));
+    padding: 0 var(--panel-pad-x);
   }
 
   .panelContent {
@@ -241,7 +296,15 @@
   }
 
   .panelSplit {
-    gap: var(--primitives-spacing-8);
+    gap: 0;
+  }
+
+  .panelSplit .panelContent {
+    padding-inline: var(--panel-pad-x);
+  }
+
+  .panelDiagramCrop {
+    margin-right: 0;
   }
 }
 
@@ -267,16 +330,33 @@
   .panel {
     height: auto;
     min-height: 0;
-    padding: var(--primitives-spacing-12) var(--primitives-spacing-8);
+    --panel-pad-x: var(--primitives-spacing-8);
+    padding: var(--primitives-spacing-12) var(--panel-pad-x);
   }
 
   .panelSplit {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
   }
 
+  .panelSplit .panelContent {
+    height: auto;
+    padding: var(--primitives-spacing-12) var(--panel-pad-x);
+  }
+
+  .panelSplit .panelDiagram {
+    min-height: calc(var(--primitives-spacing-20) * 4);
+  }
+
   .panelDiagram {
     width: 100%;
+  }
+
+  .panelDiagramCrop {
+    margin-right: 0;
+    width: 100%;
+    min-height: calc(var(--primitives-spacing-20) * 4);
   }
 
   .introTitle {
@@ -317,7 +397,8 @@
   }
 
   .panel {
-    padding: var(--primitives-spacing-10) var(--primitives-spacing-5);
+    --panel-pad-x: var(--primitives-spacing-5);
+    padding: var(--primitives-spacing-10) var(--panel-pad-x);
     border-radius: var(--primitives-spacing-4);
   }
 

@@ -1,11 +1,11 @@
 /*
   Tokens used (verified in src/styles/tokens.css):
-  - Thumb off: --semantic-color-brand-ink
+  - Thumb off: --semantic-color-brand-lavender
   - Thumb on: lavender → amber gradient
   EXCEPTION — design sizes from Figma (345×170, indent 150, gap 28, icon 72);
     --s is set by ResizeObserver to fit the diagram column.
     Dial --compliance-anim-scale (default 1) to shrink/grow within that fit.
-  EXCEPTION — track/thumb stroke #a2a2a2 1px (matches PrivacySphere diagram stroke).
+  EXCEPTION — track/thumb stroke #5A4A62 on brand-deep panels; no matching token.
 */
 
 .viewport {
@@ -40,13 +40,15 @@
   --compliance-nudge-x: calc(var(--design-compliance-nudge-x) * var(--s) * 1px);
   --thumb-inset: calc(var(--design-thumb-inset) * var(--s) * 1px);
   --icon-travel: calc((var(--thumb-size) + max(var(--icon-size), var(--compliance-icon-h))) / 2);
-  /* EXCEPTION — same as PrivacySphere --privacy-sphere-stroke. */
-  --toggle-stroke: #a2a2a2;
+  /* Prefer parent --diagram-stroke (split panels); fallback for standalone. */
+  --toggle-stroke: var(--diagram-stroke, #5a4a62);
 
-  position: relative;
+  position: absolute;
+  inset: 0;
   box-sizing: border-box;
-  width: calc(var(--design-total-w) * var(--s) * 1px);
-  max-width: 100%;
+  display: flex;
+  justify-content: center;
+  width: 100%;
   height: 100%;
   min-height: calc(var(--primitives-spacing-20) * 4);
   overflow: hidden;
@@ -57,6 +59,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  width: calc(var(--design-total-w) * var(--s) * 1px);
+  max-width: 100%;
   gap: var(--toggle-gap);
   will-change: transform;
 }
@@ -88,7 +92,7 @@
   height: var(--thumb-size);
   border: 1px solid var(--toggle-stroke);
   border-radius: calc(var(--primitives-borderRadius-full) * 1px);
-  background: var(--semantic-color-brand-ink);
+  background: var(--semantic-color-brand-lavender);
   transform: translateY(-50%);
   overflow: hidden;
   transition: left var(--toggle-duration) var(--toggle-ease);
@@ -134,7 +138,7 @@
   height: var(--icon-size);
   margin-top: calc(var(--icon-size) / -2);
   margin-left: calc(var(--icon-size) / -2);
-  color: #ffffff;
+  color: var(--semantic-color-brand-ink);
   transition: transform 600ms cubic-bezier(1, 0.01, 0.47, 1);
 }
 
@@ -190,7 +194,8 @@
 
 @media (max-width: 1199px) {
   .viewport {
-    min-height: calc(var(--primitives-spacing-20) * 4);
-    margin-inline: auto;
+    position: relative;
+    inset: auto;
+    min-height: calc(var(--primitives-spacing-20) * 5);
   }
 }

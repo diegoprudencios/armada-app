@@ -72,9 +72,17 @@ export function ComplianceToggleStack() {
 
     const applyFitScale = () => {
       if (!host) return
-      const available = host.clientWidth
-      if (available <= 0) return
-      const fit = Math.min(1, available / DESIGN_TOTAL_W)
+      const availableW = host.clientWidth
+      const availableH = host.clientHeight
+      if (availableW <= 0 || availableH <= 0) return
+
+      const fitW = availableW / DESIGN_TOTAL_W
+      /* Keep ~2.5 strides in view so top/bottom fades land in gaps, not mid-pill. */
+      const visibleStrides = 2.5
+      const stride = TOGGLE_HEIGHT_PX + TOGGLE_GAP_PX
+      const fitH = availableH / (stride * visibleStrides)
+      const fit = Math.min(1, fitW, fitH)
+
       const manual =
         Number.parseFloat(
           getComputedStyle(viewport).getPropertyValue('--compliance-anim-scale').trim(),

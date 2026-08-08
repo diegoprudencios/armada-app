@@ -1,0 +1,97 @@
+/*
+  Tokens used (verified in src/styles/tokens.css):
+  - Face fill: --cube-face-fill (brand-deep on split panels)
+  - Armada top: --semantic-color-brand-lavender → --semantic-color-brand-amber
+  EXCEPTION — cube stroke #5A4A62 on brand-deep panels; no matching token.
+  EXCEPTION — cube geometry / gap / float from marketing ref.
+*/
+
+.root {
+  /* Prefer parent diagram tokens on split panels. */
+  --cube-stroke: var(--diagram-stroke, #5a4a62);
+  --cube-face-fill: var(--semantic-color-brand-deep);
+  --float-amp: var(--primitives-spacing-8); /* 32px */
+  --float-duration: 3.6s;
+
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.outlineCube path,
+.armadaCube .faceFill,
+.armadaCube .faceTop {
+  stroke: var(--cube-stroke);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.faceFill {
+  fill: var(--cube-face-fill);
+}
+
+.faceTop {
+  fill: url(#armadaCubeTop);
+}
+
+.mark {
+  pointer-events: none;
+  fill: var(--semantic-color-brand-ink);
+}
+
+.float {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cubeFloat var(--float-duration) ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes cubeFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--float-amp) * -1));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float {
+    animation: none;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1535px) {
+  .root {
+    --float-amp: var(--primitives-spacing-6); /* 24px */
+  }
+}
+
+@media (max-width: 1199px) {
+  .root {
+    position: relative;
+    inset: auto;
+    min-height: calc(var(--primitives-spacing-20) * 5);
+    --float-amp: var(--primitives-spacing-5); /* 20px */
+  }
+}
+
+@media (max-width: 767px) {
+  .root {
+    min-height: calc(var(--primitives-spacing-20) * 4);
+    --float-amp: var(--primitives-spacing-4); /* 16px */
+  }
+}
