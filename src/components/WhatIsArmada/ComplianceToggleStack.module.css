@@ -77,6 +77,9 @@
 }
 
 .thumb {
+  --toggle-ease: cubic-bezier(1, 0.01, 0.47, 1);
+  --toggle-duration: 600ms;
+
   position: absolute;
   top: 50%;
   left: var(--thumb-inset);
@@ -88,25 +91,37 @@
   background: var(--semantic-color-brand-ink);
   transform: translateY(-50%);
   overflow: hidden;
-  transition:
-    left 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    background-color 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    background-image 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: left var(--toggle-duration) var(--toggle-ease);
 }
 
-.on .thumb {
-  left: calc(100% - var(--thumb-size) - var(--thumb-inset));
+/* Gradient fades in with the same curve as the thumb travel (background-image can't ease). */
+.thumb::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   background-image: linear-gradient(
     135deg,
     var(--semantic-color-brand-lavender) 0%,
     var(--semantic-color-brand-amber) 100%
   );
-  background-color: transparent;
+  opacity: 0;
+  transition: opacity var(--toggle-duration) var(--toggle-ease);
+  pointer-events: none;
+}
+
+.on .thumb {
+  left: calc(100% - var(--thumb-size) - var(--thumb-inset));
+}
+
+.on .thumb::before {
+  opacity: 1;
 }
 
 .iconClip {
   position: absolute;
   inset: 0;
+  z-index: 1;
   overflow: hidden;
   border-radius: inherit;
 }
@@ -120,7 +135,7 @@
   margin-top: calc(var(--icon-size) / -2);
   margin-left: calc(var(--icon-size) / -2);
   color: #ffffff;
-  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 600ms cubic-bezier(1, 0.01, 0.47, 1);
 }
 
 /* Keep a 1px screen stroke on outline icons (matches toggle / connectors). */
@@ -160,6 +175,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .thumb,
+  .thumb::before,
   .icon {
     transition: none;
   }
@@ -167,6 +183,7 @@
 
 /* Used for one frame when the infinite rail wraps so thumbs/icons snap instead of tweening. */
 .noTransition .thumb,
+.noTransition .thumb::before,
 .noTransition .icon {
   transition: none !important;
 }
