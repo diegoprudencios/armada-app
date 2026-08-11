@@ -172,15 +172,7 @@
 }
 
 @media (max-width: 1199px) {
-  /* Vertical layout: match other section animations — square frame. */
-  .root,
-  .rootFill {
-    height: auto;
-    min-height: 0;
-    aspect-ratio: 1 / 1;
-  }
-
-  /* Banner stays a wide strip (not square) on compact screens. */
+  /* Banner stays a wide strip on tablet (horizontal sections). */
   .rootBanner {
     height: 50vh;
     max-height: 50vh;
@@ -195,6 +187,14 @@
 }
 
 @media (max-width: 767px) {
+  /* Vertical layout: match other section animations — square frame. */
+  .root,
+  .rootFill {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+  }
+
   .root:not(.rootBanner):not(.rootFill) {
     border-radius: var(--primitives-spacing-4);
   }

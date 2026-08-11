@@ -61,16 +61,10 @@
   fill: var(--semantic-color-brand-ink);
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 767px) {
   .root {
     position: relative;
     inset: auto;
-    min-height: calc(var(--primitives-spacing-20) * 5);
-  }
-}
-
-@media (max-width: 767px) {
-  .root {
     min-height: calc(var(--primitives-spacing-20) * 4);
   }
 }

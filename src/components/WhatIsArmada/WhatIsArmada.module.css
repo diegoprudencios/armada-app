@@ -775,13 +775,12 @@
 }
 
 /*
-  Tablet / compact: stack split panels vertically.
-  Animation square on top (visual order); copy hugs content below.
-  Paddings intentionally looser than mobile.
+  Tablet: keep desktop horizontal splits; tighten padding vs large desktop.
+  Vertical stacking is mobile-only (≤767).
 */
 @media (max-width: 1199px) {
   .section {
-    gap: var(--primitives-spacing-12);
+    gap: var(--primitives-spacing-16);
     padding-top: var(--primitives-spacing-16);
   }
 
@@ -793,17 +792,78 @@
   }
 
   .intro {
-    gap: 0;
-    padding: 0 0 var(--section-features-pad-y);
     --section-features-pad-x: var(--primitives-spacing-10);
     --section-features-pad-y: var(--primitives-spacing-16);
   }
 
   .introText {
+    padding: var(--primitives-spacing-16) var(--primitives-spacing-10);
+  }
+
+  .fogWrap {
+    padding: 0 var(--section-features-pad-x);
+  }
+
+  .introSplit {
+    --intro-pad-x: var(--primitives-spacing-10);
+  }
+
+  .features {
+    padding: var(--section-features-pad-y) var(--section-features-pad-x);
+    --section-features-pad-x: var(--primitives-spacing-10);
+    --section-features-pad-y: var(--primitives-spacing-16);
+  }
+
+  .stack {
+    gap: var(--primitives-spacing-12);
+  }
+
+  .panel {
+    --panel-pad-x: var(--primitives-spacing-10);
+    /* Match mid-desktop panel height so 50/50 splits fit tablet. */
+    height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
+    min-height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
+  }
+
+  .panel:not(.panelSplit) {
+    padding: 0 var(--panel-pad-x);
+  }
+
+  .featuresGrid {
+    --features-pad-y: var(--primitives-spacing-16);
+    --features-pad-x: var(--primitives-spacing-10);
+  }
+
+  .panelContent {
     max-width: none;
-    padding:
-      var(--primitives-spacing-16)
-      var(--primitives-spacing-10);
+  }
+}
+
+/* Mobile: stack split panels; animation square on top; tighter padding. */
+@media (max-width: 767px) {
+  .section {
+    gap: var(--primitives-spacing-8);
+    padding-top: var(--primitives-spacing-8);
+  }
+
+  .sectionSplit,
+  .sectionLoop,
+  .sectionIntroStack {
+    padding-top: 0;
+    gap: 0;
+  }
+
+  .intro {
+    gap: var(--primitives-spacing-10);
+    padding: 0 0 var(--section-features-pad-y);
+    --section-features-pad-x: var(--primitives-spacing-8);
+    --section-features-pad-y: var(--primitives-spacing-20);
+  }
+
+  .introText {
+    min-height: 0;
+    max-width: none;
+    padding: var(--primitives-spacing-16) var(--primitives-spacing-8) 0;
   }
 
   .fogWrap {
@@ -826,7 +886,7 @@
   }
 
   .introSplit {
-    --intro-pad-x: var(--primitives-spacing-10);
+    --intro-pad-x: var(--primitives-spacing-8);
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -852,28 +912,36 @@
     /* Hug title + body + CTA — no forced min-height. */
     flex: 0 0 auto;
     justify-content: flex-start;
-    padding: var(--primitives-spacing-12) var(--intro-pad-x);
+    padding: var(--primitives-spacing-8) var(--intro-pad-x);
   }
 
   .features {
+    /* Side inset matches panel content bottom padding (spacing-8). */
     padding: var(--section-features-pad-y) var(--section-features-pad-x);
-    --section-features-pad-x: var(--primitives-spacing-10);
-    --section-features-pad-y: var(--primitives-spacing-16);
+    --section-features-pad-x: var(--primitives-spacing-8);
+    --section-features-pad-y: var(--primitives-spacing-20);
+  }
+
+  .featuresGrid {
+    --features-pad-y: var(--primitives-spacing-20);
+    --features-pad-x: var(--primitives-spacing-8);
+    padding: var(--features-pad-y) var(--features-pad-x);
   }
 
   .stack {
-    gap: var(--primitives-spacing-12);
+    gap: var(--primitives-spacing-8);
   }
 
   .panel {
     height: auto;
     min-height: 0;
-    /* Match side inset to top/bottom (spacing-12). */
-    --panel-pad-x: var(--primitives-spacing-12);
+    /* Match side inset to top/bottom (spacing-8). */
+    --panel-pad-x: var(--primitives-spacing-8);
+    border-radius: var(--primitives-spacing-4);
   }
 
   .panel:not(.panelSplit) {
-    padding: var(--primitives-spacing-12) var(--panel-pad-x);
+    padding: var(--primitives-spacing-8) var(--panel-pad-x);
   }
 
   .panelSplit {
@@ -888,13 +956,9 @@
     display: none;
   }
 
-  .featuresGrid {
-    --features-pad-y: var(--primitives-spacing-16);
-    --features-pad-x: var(--primitives-spacing-10);
-  }
-
   .stackBento {
     grid-template-columns: 1fr;
+    gap: var(--primitives-spacing-8);
   }
 
   .bentoPrivacy,
@@ -914,7 +978,11 @@
   .bentoPrivacyMedia {
     order: -1;
     min-height: 0;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 4 / 3;
+  }
+
+  .bentoBeyond {
+    grid-template-rows: minmax(calc(var(--primitives-spacing-20) * 2 + var(--primitives-spacing-10)), auto) auto;
   }
 
   .bentoCompliance,
@@ -939,7 +1007,7 @@
     flex: 0 0 auto;
     height: auto;
     max-width: none;
-    padding: var(--primitives-spacing-12) var(--panel-pad-x);
+    padding: var(--primitives-spacing-8) var(--panel-pad-x);
   }
 
   .panelSplit .panelDiagram {
@@ -963,120 +1031,13 @@
   .panelContent {
     max-width: none;
   }
-}
-
-/* Mobile: same stack/square rules, tighter padding. */
-@media (max-width: 767px) {
-  .section {
-    gap: var(--primitives-spacing-8);
-    padding-top: var(--primitives-spacing-8);
-  }
-
-  .sectionSplit,
-  .sectionLoop,
-  .sectionIntroStack {
-    padding-top: 0;
-    gap: 0;
-  }
-
-  .intro {
-    gap: var(--primitives-spacing-10);
-    padding: 0 0 var(--section-features-pad-y);
-    --section-features-pad-x: var(--primitives-spacing-8);
-    --section-features-pad-y: var(--primitives-spacing-20);
-  }
-
-  .introText {
-    min-height: 0;
-    padding: var(--primitives-spacing-16) var(--primitives-spacing-8) 0;
-  }
-
-  .fogWrap {
-    padding: 0 var(--section-features-pad-x);
-  }
-
-  .features {
-    /* Side inset matches panel content bottom padding (spacing-8). */
-    padding: var(--section-features-pad-y) var(--section-features-pad-x);
-    --section-features-pad-x: var(--primitives-spacing-8);
-    --section-features-pad-y: var(--primitives-spacing-20);
-  }
-
-  .featuresGrid {
-    --features-pad-y: var(--primitives-spacing-20);
-    --features-pad-x: var(--primitives-spacing-8);
-    padding: var(--features-pad-y) var(--features-pad-x);
-  }
-
-  .stackBento {
-    grid-template-columns: 1fr;
-    gap: var(--primitives-spacing-8);
-  }
-
-  .bentoPrivacy,
-  .bentoCapital,
-  .bentoCompliance,
-  .bentoBeyond,
-  .bentoFoundations {
-    grid-column: 1 / -1;
-  }
-
-  .bentoPrivacy {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 0;
-  }
-
-  .bentoPrivacyMedia {
-    order: -1;
-    aspect-ratio: 4 / 3;
-  }
-
-  .bentoBeyond {
-    grid-template-rows: minmax(calc(var(--primitives-spacing-20) * 2 + var(--primitives-spacing-10)), auto) auto;
-  }
-
-  .panelBento {
-    height: auto;
-    min-height: 0;
-  }
-
-  .panelBento:not(.panelSplit) {
-    padding: 0;
-  }
 
   .featuresBento {
     padding: var(--primitives-spacing-10) var(--primitives-spacing-8);
   }
 
-  .stack {
-    gap: var(--primitives-spacing-8);
-  }
-
-  .introSplit {
-    --intro-pad-x: var(--primitives-spacing-8);
-  }
-
-  .introSplitContent {
-    padding: var(--primitives-spacing-8) var(--intro-pad-x);
-  }
-
   .titleLine {
     white-space: normal;
-  }
-
-  .panel {
-    /* Match side inset to top/bottom (spacing-8). */
-    --panel-pad-x: var(--primitives-spacing-8);
-    border-radius: var(--primitives-spacing-4);
-  }
-
-  .panel:not(.panelSplit) {
-    padding: var(--primitives-spacing-8) var(--panel-pad-x);
-  }
-
-  .panelSplit .panelContent {
-    padding: var(--primitives-spacing-8) var(--panel-pad-x);
   }
 
   .ctaRowCenter,

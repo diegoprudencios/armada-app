@@ -299,45 +299,34 @@
   }
 }
 
+/*
+  Tablet: mobile-style stack (copy on top, glass below) but keep desktop
+  glass width and center it. Mobile (≤767) stretches the glass full-width.
+*/
 @media (max-width: 1199px) {
   .content {
     /* Tablet: looser side padding than mobile. */
-    padding: calc(var(--primitives-spacing-20) * 2) var(--primitives-spacing-10)
-      var(--primitives-spacing-12);
+    padding: calc(var(--primitives-spacing-16) + var(--primitives-spacing-4))
+      var(--primitives-spacing-10) var(--primitives-spacing-10);
   }
 
   .contentLegacy {
-    padding: var(--primitives-spacing-12) var(--primitives-spacing-10);
+    justify-content: stretch;
+    /* Clear header; sides looser than mobile. */
+    padding:
+      calc(var(--primitives-spacing-16) + var(--primitives-spacing-4))
+      var(--primitives-spacing-10)
+      var(--primitives-spacing-10);
   }
 
   .headingLine {
     white-space: normal;
   }
 
-  .content .feature {
-    right: var(--primitives-spacing-10);
-    bottom: var(--primitives-spacing-12);
-    max-width: calc(100% - var(--primitives-spacing-10) * 2);
-  }
-}
-
-@media (max-width: 767px) {
-  .content {
-    padding: calc(var(--primitives-spacing-16) + var(--primitives-spacing-4))
-      var(--primitives-spacing-8) var(--primitives-spacing-6);
-  }
-
-  .contentLegacy {
-    justify-content: stretch;
-    /* Clear header; sides + bottom match page inset (spacing-8). */
-    padding:
-      calc(var(--primitives-spacing-16) + var(--primitives-spacing-8))
-      var(--primitives-spacing-8)
-      var(--primitives-spacing-8);
-  }
-
   .intro {
     max-width: none;
+    /* Active layout title: same extra 40px nudge. */
+    margin-top: var(--primitives-spacing-10);
   }
 
   .introLegacy {
@@ -345,7 +334,8 @@
     align-self: center;
     max-width: none;
     text-align: center;
-    margin-top: var(--primitives-spacing-6);
+    /* Previous 24px + ~40px lower. */
+    margin-top: calc(var(--primitives-spacing-6) + var(--primitives-spacing-10));
   }
 
   .headingLegacy {
@@ -366,18 +356,10 @@
     position: relative;
     right: auto;
     bottom: auto;
-    align-self: stretch;
-    width: 100%;
-    max-width: none;
+    align-self: center;
+    width: fit-content;
+    max-width: 100%;
     margin-top: 0;
-    --glass-copy-width: auto;
-  }
-
-  .featureCopy {
-    flex: 1 1 auto;
-    width: auto;
-    min-width: 0;
-    max-width: none;
   }
 
   /* Stacked layout: drift vertically apart instead of left/right. */
@@ -395,6 +377,44 @@
       calc(var(--hero-exit) * var(--primitives-spacing-20) * 1.75),
       0
     );
+  }
+}
+
+@media (max-width: 767px) {
+  .content {
+    padding: calc(var(--primitives-spacing-16) + var(--primitives-spacing-4))
+      var(--primitives-spacing-8) var(--primitives-spacing-6);
+  }
+
+  .contentLegacy {
+    /* Clear header; sides + bottom match page inset (spacing-8). */
+    padding:
+      calc(var(--primitives-spacing-16) + var(--primitives-spacing-8))
+      var(--primitives-spacing-8)
+      var(--primitives-spacing-8);
+  }
+
+  .intro {
+    margin-top: 0;
+  }
+
+  .introLegacy {
+    margin-top: var(--primitives-spacing-6);
+  }
+
+  .content .feature,
+  .bottomLegacy .feature {
+    align-self: stretch;
+    width: 100%;
+    max-width: none;
+    --glass-copy-width: auto;
+  }
+
+  .featureCopy {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: none;
   }
 }
 

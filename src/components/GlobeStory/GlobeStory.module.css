@@ -187,6 +187,17 @@
 }
 
 @media (max-width: 1199px) {
+  /* Tablet: keep 50/50 horizontal; tighten inset vs desktop. */
+  .pin {
+    --globe-story-pad: var(--primitives-spacing-10);
+  }
+
+  .copyColumn {
+    --copy-pad-x: var(--primitives-spacing-10);
+  }
+}
+
+@media (max-width: 767px) {
   .pin {
     height: auto;
     padding: var(--primitives-spacing-8);
@@ -204,7 +215,7 @@
   }
 
   .copyColumn {
-    --copy-pad-x: var(--primitives-spacing-10);
+    --copy-pad-x: var(--primitives-spacing-8);
     height: auto;
     overflow: visible;
   }

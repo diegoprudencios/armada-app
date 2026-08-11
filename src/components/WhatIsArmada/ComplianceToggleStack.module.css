@@ -173,7 +173,7 @@
   transition: none !important;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 767px) {
   .viewport {
     position: relative;
     inset: auto;
