@@ -53,7 +53,7 @@
   background: var(--primitives-color-amber-100);
 }
 
-/* —— Intro: sticky 100svh centered copy; fog rises above it (desktop) —— */
+/* —— Intro: desktop handoff uses sticky copy; default is normal flow —— */
 
 .intro {
   display: flex;
@@ -90,20 +90,16 @@
   }
 }
 
-/* Centers the handoff copy in the first viewport (mobile push). Desktop: passthrough. */
+/* Centers the handoff copy in the first viewport. Desktop: passthrough. */
 .introLead {
   display: contents;
 }
 
 .introText {
-  position: sticky;
-  top: 0;
-  z-index: 1;
   align-self: stretch;
   box-sizing: border-box;
   width: 100%;
   max-width: none;
-  min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -113,8 +109,11 @@
   background: var(--primitives-color-amber-100);
 }
 
-/* Match hero sticky (lvh) so under-hero overlap stays flush when chrome toggles. */
+/* Desktop sticky handoff only. */
 .introUnderHero .introText {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   min-height: 100lvh;
 }
 
@@ -157,7 +156,7 @@
   padding: 0 var(--section-features-pad-x);
 }
 
-/* Desktop + mobile cover height for sticky privacy handoff. */
+/* Desktop cover height for sticky privacy handoff. */
 .fogWrapCover {
   --fog-cover-height: 70vh;
 }
@@ -168,43 +167,15 @@
   margin-inline: auto;
 }
 
-/*
-  Mobile handoff: hug-height sticky copy; fog stays below and pushes copy up
-  when within --fog-push-gap (80px / spacing-20). Desktop keeps cover-over.
-*/
+/* Mobile: normal section padding (handoff is desktop-only via JS). */
 @media (max-width: 767px) {
-  .introUnderHero .introLead {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    box-sizing: border-box;
-    width: 100%;
-    min-height: 100svh;
-    min-height: 100lvh;
-    padding: var(--primitives-spacing-20) var(--primitives-spacing-8);
+  .intro {
+    gap: var(--primitives-spacing-10);
   }
 
-  .introUnderHero .introText {
-    top: var(--primitives-spacing-8);
+  .introText {
     min-height: 0;
-    height: auto;
-    justify-content: flex-start;
-    padding: 0;
-    background: transparent;
-  }
-
-  .introCopyPush {
-    --fog-push-gap: var(--primitives-spacing-20);
-    will-change: transform, opacity;
-  }
-
-  .introUnderHero .introHold {
-    height: var(--primitives-spacing-20);
-  }
-
-  .introUnderHero .fogWrapCover {
-    z-index: 0;
+    padding: var(--primitives-spacing-16) var(--primitives-spacing-8) 0;
   }
 }
 
@@ -830,7 +801,6 @@
 
   .introText {
     max-width: none;
-    min-height: 100svh;
     padding:
       var(--primitives-spacing-16)
       var(--primitives-spacing-10);
@@ -1010,18 +980,15 @@
   }
 
   .intro {
-    gap: 0;
+    gap: var(--primitives-spacing-10);
     padding: 0 0 var(--section-features-pad-y);
     --section-features-pad-x: var(--primitives-spacing-8);
     --section-features-pad-y: var(--primitives-spacing-20);
   }
 
   .introText {
-    min-height: 100svh;
-    /* 80px top/bottom on mobile */
-    padding:
-      var(--primitives-spacing-20)
-      var(--primitives-spacing-8);
+    min-height: 0;
+    padding: var(--primitives-spacing-16) var(--primitives-spacing-8) 0;
   }
 
   .fogWrap {

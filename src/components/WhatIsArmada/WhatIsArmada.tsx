@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, type CSSProperties } from 'react'
+import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react'
 import { Button } from '@/components/Button'
 import type { ButtonVariant } from '@/components/Button'
 import { RevealStack } from '@/components/ScrollReveal'
@@ -145,86 +145,31 @@ function CtaRow({ ctas, align }: { ctas: Cta[]; align: 'center' | 'start' }) {
   )
 }
 
-function IntroCentered({ underHero = false }: { underHero?: boolean }) {
-  const copyRef = useRef<HTMLDivElement>(null)
-  const fogRef = useRef<HTMLDivElement>(null)
+/** Sticky under-hero handoff is desktop-only; mobile is a normal scroll section. */
+function useDesktopHandoff(enabled: boolean) {
+  const [active, setActive] = useState(() =>
+    enabled && typeof window !== 'undefined'
+      ? window.matchMedia('(min-width: 768px)').matches
+      : false,
+  )
 
-  // Mobile only: fog stays below the copy and pushes it up when within 80px.
   useEffect(() => {
-    if (!underHero) return
-
-    const copy = copyRef.current
-    const fog = fogRef.current
-    if (!copy || !fog) return
-
-    const mobileMq = window.matchMedia('(max-width: 767px)')
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-    let frame = 0
-    let listening = false
-
-    const clearPush = () => {
-      copy.style.removeProperty('transform')
+    if (!enabled) {
+      setActive(false)
+      return
     }
+    const mq = window.matchMedia('(min-width: 768px)')
+    const sync = () => setActive(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [enabled])
 
-    const scrub = () => {
-      frame = 0
+  return active
+}
 
-      if (!mobileMq.matches || reducedMotion.matches) {
-        clearPush()
-        return
-      }
-
-      const gapToken = getComputedStyle(copy).getPropertyValue('--fog-push-gap').trim()
-      const gapPx = Number.parseFloat(gapToken) || 80
-      const gap = fog.getBoundingClientRect().top - copy.getBoundingClientRect().bottom
-
-      if (gap < gapPx) {
-        copy.style.transform = `translate3d(0, ${-(gapPx - gap)}px, 0)`
-      } else {
-        clearPush()
-      }
-    }
-
-    const requestScrub = () => {
-      if (frame) return
-      frame = requestAnimationFrame(scrub)
-    }
-
-    const startListening = () => {
-      if (listening) return
-      listening = true
-      window.addEventListener('scroll', requestScrub, { passive: true })
-      window.addEventListener('resize', requestScrub)
-      requestScrub()
-    }
-
-    const stopListening = () => {
-      if (!listening) return
-      listening = false
-      window.removeEventListener('scroll', requestScrub)
-      window.removeEventListener('resize', requestScrub)
-    }
-
-    const onModeChange = () => {
-      if (mobileMq.matches && !reducedMotion.matches) startListening()
-      else {
-        stopListening()
-        clearPush()
-      }
-    }
-
-    onModeChange()
-    mobileMq.addEventListener('change', onModeChange)
-    reducedMotion.addEventListener('change', onModeChange)
-
-    return () => {
-      stopListening()
-      mobileMq.removeEventListener('change', onModeChange)
-      reducedMotion.removeEventListener('change', onModeChange)
-      if (frame) cancelAnimationFrame(frame)
-      clearPush()
-    }
-  }, [underHero])
+function IntroCentered({ underHero = false }: { underHero?: boolean }) {
+  const pinHandoff = useDesktopHandoff(underHero)
 
   const copyBlock = (
     <>
@@ -239,12 +184,12 @@ function IntroCentered({ underHero = false }: { underHero?: boolean }) {
 
   return (
     <div
-      className={[styles.intro, underHero ? styles.introUnderHero : '']
+      className={[styles.intro, pinHandoff ? styles.introUnderHero : '']
         .filter(Boolean)
         .join(' ')}
       id="what-is-armada"
       style={
-        underHero
+        pinHandoff
           ? ({
               ['--intro-under-hero-margin' as string]: INTRO_UNDER_HERO_MARGIN,
               ['--intro-hold-svh' as string]: `${INTRO_HOLD_BEFORE_FOG_SVH}svh`,
@@ -252,11 +197,10 @@ function IntroCentered({ underHero = false }: { underHero?: boolean }) {
           : undefined
       }
     >
-      {underHero ? (
+      {pinHandoff ? (
         <div className={styles.introLead}>
           <div
-            ref={copyRef}
-            className={`armada-site-stack ${styles.introText} ${styles.introTextHandoff} ${styles.introCopyPush}`}
+            className={`armada-site-stack ${styles.introText} ${styles.introTextHandoff}`}
           >
             {copyBlock}
           </div>
@@ -267,17 +211,16 @@ function IntroCentered({ underHero = false }: { underHero?: boolean }) {
         </RevealStack>
       )}
 
-      {underHero ? <div className={styles.introHold} aria-hidden /> : null}
+      {pinHandoff ? <div className={styles.introHold} aria-hidden /> : null}
 
       <div
-        ref={fogRef}
-        className={[styles.fogWrap, underHero ? styles.fogWrapCover : '']
+        className={[styles.fogWrap, pinHandoff ? styles.fogWrapCover : '']
           .filter(Boolean)
           .join(' ')}
       >
         <FleetFogCompare
           className={styles.fog}
-          layout={underHero ? 'cover' : 'card'}
+          layout={pinHandoff ? 'cover' : 'card'}
         />
       </div>
     </div>

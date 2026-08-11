@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import heroBackground from '@/assets/hero-fleet-centered.webp'
 import heroBackgroundLegacy from '@/assets/new-fleet.webp'
 import { Button } from '@/components/Button'
@@ -10,6 +10,29 @@ import {
 } from '@/constants/homepageHandoff'
 import { HeroUsdcSpinner } from './HeroUsdcSpinner'
 import styles from './MarketingHero.module.css'
+
+/** Desktop-only sticky handoff; mobile is a normal hero → section scroll. */
+function useDesktopHandoff(enabled: boolean) {
+  const [active, setActive] = useState(() =>
+    enabled && typeof window !== 'undefined'
+      ? window.matchMedia('(min-width: 768px)').matches
+      : false,
+  )
+
+  useEffect(() => {
+    if (!enabled) {
+      setActive(false)
+      return
+    }
+    const mq = window.matchMedia('(min-width: 768px)')
+    const sync = () => setActive(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [enabled])
+
+  return active
+}
 
 /** Flip to true to restore the previous bottom-aligned hero layout. */
 const SHOW_LEGACY_HERO = true
@@ -56,7 +79,7 @@ function IntegrateCta({ className }: { className?: string }) {
 export interface MarketingHeroProps {
   /**
    * Sticky scroll-exit: intro + USDC drift apart, hero image dissolves
-   * into the section below. Intended for `/homepage` only.
+   * into the section below. Desktop `/homepage` only — mobile is a normal hero.
    */
   scrollExit?: boolean
 }
@@ -64,18 +87,19 @@ export interface MarketingHeroProps {
 export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
   const pinRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
+  const pinHandoff = useDesktopHandoff(scrollExit)
 
   const backgroundUrl = SHOW_LEGACY_HERO ? heroBackgroundLegacy : heroBackground
   const backgroundClass = [
     styles.background,
     SHOW_LEGACY_HERO && styles.backgroundBottom,
-    scrollExit && styles.backgroundExit,
+    pinHandoff && styles.backgroundExit,
   ]
     .filter(Boolean)
     .join(' ')
 
   useEffect(() => {
-    if (!scrollExit) return
+    if (!pinHandoff) return
 
     const pin = pinRef.current
     const stage = stageRef.current
@@ -164,13 +188,13 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
       if (frame) cancelAnimationFrame(frame)
       clearHandoffVars()
     }
-  }, [scrollExit])
+  }, [pinHandoff])
 
   const heroInner = SHOW_LEGACY_HERO ? (
     <div className={styles.contentLegacy}>
       <div className={styles.bottomLegacy}>
         <RevealStack
-          className={`armada-site-stack ${styles.introLegacy} ${scrollExit ? styles.introExit : ''}`}
+          className={`armada-site-stack ${styles.introLegacy} ${pinHandoff ? styles.introExit : ''}`}
         >
           <h1
             id="marketing-hero-heading"
@@ -186,7 +210,7 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
         </RevealStack>
         <RevealStack
           immediate
-          className={scrollExit ? styles.featureExit : undefined}
+          className={pinHandoff ? styles.featureExit : undefined}
         >
           <FeatureCard />
         </RevealStack>
@@ -195,7 +219,7 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
   ) : (
     <div className={styles.content}>
       <RevealStack
-        className={`armada-site-stack ${styles.intro} ${scrollExit ? styles.introExit : ''}`}
+        className={`armada-site-stack ${styles.intro} ${pinHandoff ? styles.introExit : ''}`}
       >
         <h1 id="marketing-hero-heading" className={`armada-text-title ${styles.heading}`}>
           {HEADING_LINES.map((line) => (
@@ -209,14 +233,14 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
 
       <RevealStack
         immediate
-        className={scrollExit ? styles.featureExit : undefined}
+        className={pinHandoff ? styles.featureExit : undefined}
       >
         <FeatureCard />
       </RevealStack>
     </div>
   )
 
-  if (!scrollExit) {
+  if (!pinHandoff) {
     return (
       <section className={styles.hero} aria-labelledby="marketing-hero-heading">
         <div
