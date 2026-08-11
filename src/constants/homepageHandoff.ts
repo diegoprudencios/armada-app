@@ -20,9 +20,6 @@ export const HERO_PIN_HEIGHT = `calc(100lvh + ${HERO_EXIT_SCRUB_SVH}svh)`
 /** Pull privacy intro under the full pin. */
 export const INTRO_UNDER_HERO_MARGIN = `calc(-100lvh - ${HERO_EXIT_SCRUB_SVH}svh)`
 
-/** Hold after copy before fog enters (inside intro). */
-export const INTRO_HOLD_BEFORE_FOG_SVH = 40
-
 /**
  * Pin progress 0→1 (after smoothstep):
  * 1) Amber / hero out
@@ -35,6 +32,14 @@ export const HANDOFF = {
   copyStart: 0.48,
   copyEnd: 0.72,
 } as const
+
+/**
+ * Spacer above the fog (svh). Sticky copy stays alone until this clears —
+ * must be past copyEnd × pin scrub (~79svh) so fog only rises once privacy
+ * text is fully opaque, plus a short beat.
+ */
+export const INTRO_HOLD_BEFORE_FOG_SVH =
+  Math.ceil(HANDOFF.copyEnd * HERO_EXIT_SCRUB_SVH) + 24
 
 export function remap01(value: number, start: number, end: number) {
   if (end <= start) return value >= end ? 1 : 0
