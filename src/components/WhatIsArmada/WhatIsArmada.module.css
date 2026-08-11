@@ -213,9 +213,9 @@
     var(--primitives-spacing-20);
   background: linear-gradient(
     180deg,
-    var(--semantic-color-brand-lavender) 0%,
-    var(--semantic-color-brand-gradient-rose) 52%,
-    var(--semantic-color-brand-amber) 100%
+    color-mix(in srgb, var(--semantic-color-brand-lavender) 40%, transparent) 0%,
+    color-mix(in srgb, var(--semantic-color-brand-gradient-rose) 40%, transparent) 52%,
+    color-mix(in srgb, var(--semantic-color-brand-amber) 40%, transparent) 100%
   );
 }
 
@@ -549,14 +549,17 @@
   }
 
   .introText {
+    /* 80px top/bottom on mobile */
     padding:
-      var(--primitives-spacing-10)
+      var(--primitives-spacing-20)
       var(--primitives-spacing-8);
   }
 
   .features {
     /* Side inset matches panel content bottom padding (spacing-8). */
-    padding: var(--primitives-spacing-10) var(--primitives-spacing-8);
+    padding:
+      var(--primitives-spacing-20)
+      var(--primitives-spacing-8);
   }
 
   .stack {
