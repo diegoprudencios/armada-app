@@ -3,13 +3,20 @@ import styles from './ScrollReveal.module.css'
 
 export type RevealMotion = 'slide' | 'fade'
 
+type RevealOptions = {
+  motion?: RevealMotion
+  /** Reveal on mount — no IntersectionObserver wait (e.g. hero USDC on mobile). */
+  immediate?: boolean
+}
+
 /**
  * Scroll-triggered cascade for a text block’s direct children
  * (title → body → CTA).
  */
-export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
-  motion: RevealMotion = 'slide',
-) {
+export function useScrollReveal<T extends HTMLElement = HTMLDivElement>({
+  motion = 'slide',
+  immediate = false,
+}: RevealOptions = {}) {
   const ref = useRef<T>(null)
 
   useEffect(() => {
@@ -22,8 +29,10 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
       root.classList.add(styles.isVisible)
     }
 
-    if (reducedMotion.matches) {
-      reveal()
+    if (reducedMotion.matches || immediate) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(reveal)
+      })
       return
     }
 
@@ -63,7 +72,7 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
       io.disconnect()
       reducedMotion.removeEventListener('change', onMotionChange)
     }
-  }, [motion])
+  }, [motion, immediate])
 
   return {
     ref,
@@ -75,6 +84,8 @@ type RevealStackProps = HTMLAttributes<HTMLDivElement> & {
   children: ReactNode
   /** `slide` = translate up (default); `fade` = opacity only, earlier trigger. */
   motion?: RevealMotion
+  /** Skip scroll wait — reveal as soon as mounted. */
+  immediate?: boolean
 }
 
 /** Stack root that cascades direct children on scroll entry. */
@@ -82,9 +93,10 @@ export function RevealStack({
   children,
   className,
   motion = 'slide',
+  immediate = false,
   ...rest
 }: RevealStackProps) {
-  const reveal = useScrollReveal(motion)
+  const reveal = useScrollReveal({ motion, immediate })
   return (
     <div
       {...rest}

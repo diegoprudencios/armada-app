@@ -1,4 +1,4 @@
-import { lazy, Suspense, type CSSProperties } from 'react'
+import { lazy, Suspense, useEffect, useRef, type CSSProperties } from 'react'
 import { Button } from '@/components/Button'
 import type { ButtonVariant } from '@/components/Button'
 import { RevealStack } from '@/components/ScrollReveal'
@@ -146,6 +146,97 @@ function CtaRow({ ctas, align }: { ctas: Cta[]; align: 'center' | 'start' }) {
 }
 
 function IntroCentered({ underHero = false }: { underHero?: boolean }) {
+  const copyRef = useRef<HTMLDivElement>(null)
+  const fogRef = useRef<HTMLDivElement>(null)
+
+  // Mobile only: fog stays below the copy and pushes it up when within 80px.
+  useEffect(() => {
+    if (!underHero) return
+
+    const copy = copyRef.current
+    const fog = fogRef.current
+    if (!copy || !fog) return
+
+    const mobileMq = window.matchMedia('(max-width: 767px)')
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let frame = 0
+    let listening = false
+
+    const clearPush = () => {
+      copy.style.removeProperty('transform')
+    }
+
+    const scrub = () => {
+      frame = 0
+
+      if (!mobileMq.matches || reducedMotion.matches) {
+        clearPush()
+        return
+      }
+
+      const gapToken = getComputedStyle(copy).getPropertyValue('--fog-push-gap').trim()
+      const gapPx = Number.parseFloat(gapToken) || 80
+      const gap = fog.getBoundingClientRect().top - copy.getBoundingClientRect().bottom
+
+      if (gap < gapPx) {
+        copy.style.transform = `translate3d(0, ${-(gapPx - gap)}px, 0)`
+      } else {
+        clearPush()
+      }
+    }
+
+    const requestScrub = () => {
+      if (frame) return
+      frame = requestAnimationFrame(scrub)
+    }
+
+    const startListening = () => {
+      if (listening) return
+      listening = true
+      window.addEventListener('scroll', requestScrub, { passive: true })
+      window.addEventListener('resize', requestScrub)
+      requestScrub()
+    }
+
+    const stopListening = () => {
+      if (!listening) return
+      listening = false
+      window.removeEventListener('scroll', requestScrub)
+      window.removeEventListener('resize', requestScrub)
+    }
+
+    const onModeChange = () => {
+      if (mobileMq.matches && !reducedMotion.matches) startListening()
+      else {
+        stopListening()
+        clearPush()
+      }
+    }
+
+    onModeChange()
+    mobileMq.addEventListener('change', onModeChange)
+    reducedMotion.addEventListener('change', onModeChange)
+
+    return () => {
+      stopListening()
+      mobileMq.removeEventListener('change', onModeChange)
+      reducedMotion.removeEventListener('change', onModeChange)
+      if (frame) cancelAnimationFrame(frame)
+      clearPush()
+    }
+  }, [underHero])
+
+  const copyBlock = (
+    <>
+      <h2 id="integrators-heading" className={`armada-text-title ${styles.introTitle}`}>
+        <span className={styles.titleLine}>{INTRO.title[0]}</span>
+        <span className={styles.titleLine}>{INTRO.title[1]}</span>
+      </h2>
+      <p className={`armada-text-body ${styles.introBody}`}>{INTRO.body}</p>
+      <CtaRow ctas={INTRO.ctas} align="center" />
+    </>
+  )
+
   return (
     <div
       className={[styles.intro, underHero ? styles.introUnderHero : '']
@@ -162,28 +253,28 @@ function IntroCentered({ underHero = false }: { underHero?: boolean }) {
       }
     >
       {underHero ? (
-        <div className={`armada-site-stack ${styles.introText} ${styles.introTextHandoff}`}>
-          <h2 id="integrators-heading" className={`armada-text-title ${styles.introTitle}`}>
-            <span className={styles.titleLine}>{INTRO.title[0]}</span>
-            <span className={styles.titleLine}>{INTRO.title[1]}</span>
-          </h2>
-          <p className={`armada-text-body ${styles.introBody}`}>{INTRO.body}</p>
-          <CtaRow ctas={INTRO.ctas} align="center" />
+        <div className={styles.introLead}>
+          <div
+            ref={copyRef}
+            className={`armada-site-stack ${styles.introText} ${styles.introTextHandoff} ${styles.introCopyPush}`}
+          >
+            {copyBlock}
+          </div>
         </div>
       ) : (
         <RevealStack motion="fade" className={`armada-site-stack ${styles.introText}`}>
-          <h2 id="integrators-heading" className={`armada-text-title ${styles.introTitle}`}>
-            <span className={styles.titleLine}>{INTRO.title[0]}</span>
-            <span className={styles.titleLine}>{INTRO.title[1]}</span>
-          </h2>
-          <p className={`armada-text-body ${styles.introBody}`}>{INTRO.body}</p>
-          <CtaRow ctas={INTRO.ctas} align="center" />
+          {copyBlock}
         </RevealStack>
       )}
 
       {underHero ? <div className={styles.introHold} aria-hidden /> : null}
 
-      <div className={styles.fogWrap}>
+      <div
+        ref={fogRef}
+        className={[styles.fogWrap, underHero ? styles.fogWrapCover : '']
+          .filter(Boolean)
+          .join(' ')}
+      >
         <FleetFogCompare
           className={styles.fog}
           layout={underHero ? 'cover' : 'card'}

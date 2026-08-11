@@ -53,7 +53,7 @@
   background: var(--primitives-color-amber-100);
 }
 
-/* —— Intro: sticky 100svh centered copy; fog rises above it —— */
+/* —— Intro: sticky 100svh centered copy; fog rises above it (desktop) —— */
 
 .intro {
   display: flex;
@@ -71,7 +71,7 @@
 
 /* Sit under the full hero pin so copy is centered as the stage fades to amber. */
 .introUnderHero {
-  margin-top: var(--intro-under-hero-margin, calc(-100svh - 110svh));
+  margin-top: var(--intro-under-hero-margin, calc(-100lvh - 110svh));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -90,6 +90,11 @@
   }
 }
 
+/* Centers the handoff copy in the first viewport (mobile push). Desktop: passthrough. */
+.introLead {
+  display: contents;
+}
+
 .introText {
   position: sticky;
   top: 0;
@@ -106,6 +111,11 @@
   padding: var(--primitives-spacing-20);
   text-align: center;
   background: var(--primitives-color-amber-100);
+}
+
+/* Match hero sticky (lvh) so under-hero overlap stays flush when chrome toggles. */
+.introUnderHero .introText {
+  min-height: 100lvh;
 }
 
 /* Scroll-scrubbed by MarketingHero (--privacy-copy). Amber first, then this fades in. */
@@ -147,10 +157,55 @@
   padding: 0 var(--section-features-pad-x);
 }
 
+/* Desktop + mobile cover height for sticky privacy handoff. */
+.fogWrapCover {
+  --fog-cover-height: 70vh;
+}
+
 .fog {
   width: 100%;
   max-width: var(--section-stack-max);
   margin-inline: auto;
+}
+
+/*
+  Mobile handoff: hug-height sticky copy; fog stays below and pushes copy up
+  when within --fog-push-gap (80px / spacing-20). Desktop keeps cover-over.
+*/
+@media (max-width: 767px) {
+  .introUnderHero .introLead {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100svh;
+    min-height: 100lvh;
+    padding: var(--primitives-spacing-20) var(--primitives-spacing-8);
+  }
+
+  .introUnderHero .introText {
+    top: var(--primitives-spacing-8);
+    min-height: 0;
+    height: auto;
+    justify-content: flex-start;
+    padding: 0;
+    background: transparent;
+  }
+
+  .introCopyPush {
+    --fog-push-gap: var(--primitives-spacing-20);
+    will-change: transform, opacity;
+  }
+
+  .introUnderHero .introHold {
+    height: var(--primitives-spacing-20);
+  }
+
+  .introUnderHero .fogWrapCover {
+    z-index: 0;
+  }
 }
 
 .introBody {

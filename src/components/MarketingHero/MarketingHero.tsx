@@ -184,7 +184,10 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
           </h1>
           <IntegrateCta className={styles.cta} />
         </RevealStack>
-        <RevealStack className={scrollExit ? styles.featureExit : undefined}>
+        <RevealStack
+          immediate
+          className={scrollExit ? styles.featureExit : undefined}
+        >
           <FeatureCard />
         </RevealStack>
       </div>
@@ -204,7 +207,10 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
         <IntegrateCta className={styles.cta} />
       </RevealStack>
 
-      <RevealStack className={scrollExit ? styles.featureExit : undefined}>
+      <RevealStack
+        immediate
+        className={scrollExit ? styles.featureExit : undefined}
+      >
         <FeatureCard />
       </RevealStack>
     </div>
