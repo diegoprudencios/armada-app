@@ -18,6 +18,7 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, 'index.html'),
         homepage: resolve(__dirname, 'homepage.html'),
+        homepage2: resolve(__dirname, 'homepage2.html'),
         showcase: resolve(__dirname, 'showcase.html'),
         deposit: resolve(__dirname, 'deposit.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),

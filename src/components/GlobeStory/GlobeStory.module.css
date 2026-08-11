@@ -1,0 +1,232 @@
+/*
+  Gem-gradient band with inset sticky split: cream copy | brand-deep globe.
+*/
+
+.pin {
+  /* 100px = spacing-20 + spacing-5 */
+  --globe-story-pad: calc(var(--primitives-spacing-20) + var(--primitives-spacing-5));
+
+  position: relative;
+  /* Blur phase, then copy scroll — two chapters. */
+  height: 240svh;
+  box-sizing: border-box;
+  padding: var(--globe-story-pad);
+  background: linear-gradient(
+    180deg,
+    var(--semantic-color-brand-lavender) 0%,
+    var(--semantic-color-brand-gradient-rose) 52%,
+    var(--semantic-color-brand-amber) 100%
+  );
+}
+
+.sticky {
+  position: sticky;
+  top: var(--globe-story-pad);
+  height: calc(100svh - var(--globe-story-pad) * 2);
+  overflow: hidden;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+}
+
+.copyColumn {
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  overflow: hidden;
+  /* Match WhatIsArmada split / panel horizontal inset. */
+  --copy-pad-x: calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
+  /* EXCEPTION — Figma panel fill #f9f3ef (same as WhatIsArmada). */
+  background: #f9f3ef;
+  color: #000000;
+}
+
+.copyTrack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 200%;
+  will-change: transform;
+}
+
+.chapter {
+  box-sizing: border-box;
+  flex: 1 0 50%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding:
+    var(--primitives-spacing-16)
+    var(--primitives-spacing-16)
+    var(--primitives-spacing-16)
+    var(--copy-pad-x);
+  pointer-events: none;
+}
+
+.chapter[data-active='true'] {
+  pointer-events: auto;
+}
+
+.chapterInner {
+  align-items: flex-start;
+  width: 100%;
+  max-width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-10));
+}
+
+.chapterTitle {
+  margin: 0;
+  color: #000000;
+  text-align: left;
+  text-wrap: pretty;
+}
+
+.chapterBody {
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  color: rgba(0, 0, 0, 0.7);
+  text-wrap: pretty;
+}
+
+.stageColumn {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background: var(--semantic-color-brand-deep);
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.canvasHost {
+  position: absolute;
+  inset: 0;
+}
+
+.canvasHost :global(canvas) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pipeStage {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 420ms ease;
+}
+
+.pipeStage[data-active='true'] {
+  opacity: 1;
+}
+
+.pipeSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.pipeGuide {
+  fill: none;
+  stroke: none;
+}
+
+.pipeLine {
+  fill: none;
+  stroke: var(--diagram-stroke, #5a4a62);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.traveler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--primitives-spacing-8);
+  height: var(--primitives-spacing-8);
+  opacity: 0;
+  will-change: transform, filter;
+}
+
+.travelerToken {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copyTrack {
+    will-change: auto;
+  }
+
+  .pipeStage {
+    transition: none;
+  }
+
+  .traveler {
+    display: none;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1535px) {
+  .copyColumn {
+    --copy-pad-x: calc(var(--primitives-spacing-16) + var(--primitives-spacing-4));
+  }
+}
+
+@media (max-width: 1199px) {
+  .pin {
+    height: auto;
+    padding: var(--primitives-spacing-8);
+  }
+
+  .sticky {
+    position: relative;
+    top: auto;
+    height: auto;
+    overflow: visible;
+  }
+
+  .split {
+    grid-template-columns: 1fr;
+  }
+
+  .copyColumn {
+    --copy-pad-x: var(--primitives-spacing-10);
+    height: auto;
+    overflow: visible;
+  }
+
+  .copyTrack {
+    height: auto;
+    transform: none !important;
+  }
+
+  .chapter {
+    flex: none;
+    padding: var(--primitives-spacing-12) var(--copy-pad-x);
+    pointer-events: auto;
+  }
+
+  .chapter + .chapter {
+    border-top: 1px solid color-mix(in srgb, #000000 8%, transparent);
+  }
+
+  .stageColumn {
+    order: -1;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+  }
+}

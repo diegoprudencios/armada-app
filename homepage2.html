@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function () {
+        document.documentElement.setAttribute('data-theme', 'light');
+        try {
+          localStorage.setItem('armada-theme', 'light');
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#291433" />
+    <meta
+      name="description"
+      content="Armada — pluggable privacy infrastructure for stablecoins. Homepage scrollytelling prototype."
+    />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Charis+SIL:wght@400;700&family=Geist:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Armada — Globe story prototype</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main-homepage2.tsx"></script>
+  </body>
+</html>

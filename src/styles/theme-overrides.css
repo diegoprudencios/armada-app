@@ -1,4 +1,16 @@
-/* App-specific theme tweaks — must load after tokens.css (synced tokens reset some values). */
+/* App-specific theme tweaks — load after tokens.css and typography.css
+   so overrides win the cascade (typography.css redefines composite vars on :root). */
+
+/*
+  EXCEPTION — marketing gem gradient (logo + footer Figma stops).
+  Overrides synced brand-lavender / brand-amber so animations match the footer.
+*/
+[data-theme='light'],
+[data-theme='dark'] {
+  --semantic-color-brand-lavender: #ca8aea;
+  --semantic-color-brand-amber: #f8d197;
+  --semantic-color-brand-gradient-rose: #f39db0;
+}
 
 [data-theme='light'] {
   --semantic-color-surface-main: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
@@ -7,4 +19,18 @@
 
 [data-theme='dark'] {
   --semantic-color-surface-main: var(--semantic-color-surface-default);
+}
+
+/*
+  Marketing mobile type — stay on the scale:
+  title → fontSize-3xl (32px), body → fontSize-base (13px).
+  Desktop keeps site/title fluid clamp and site/body (17px).
+*/
+@media (max-width: 767px) {
+  :root,
+  [data-theme='light'],
+  [data-theme='dark'] {
+    --semantic-typography-title-font-size: calc(var(--primitives-fontSize-3xl) * 1px);
+    --semantic-typography-body-font-size: calc(var(--primitives-fontSize-base) * 1px);
+  }
 }

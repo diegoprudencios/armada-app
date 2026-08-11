@@ -1,7 +1,7 @@
 /*
   Tokens used (verified in src/styles/tokens.css):
-  - Thumb off: --semantic-color-brand-lavender
-  - Thumb on: lavender → amber gradient
+  - Thumb off: --semantic-color-brand-lavender (footer gem)
+  - Thumb on: footer gem gradient (lavender → rose → amber)
   EXCEPTION — design sizes from Figma (345×170, indent 150, gap 28, icon 72);
     --s is set by ResizeObserver to fit the diagram column.
     Dial --compliance-anim-scale (default 1) to shrink/grow within that fit.
@@ -99,6 +99,7 @@
   background-image: linear-gradient(
     135deg,
     var(--semantic-color-brand-lavender) 0%,
+    var(--semantic-color-brand-gradient-rose) 52%,
     var(--semantic-color-brand-amber) 100%
   );
   opacity: 0;

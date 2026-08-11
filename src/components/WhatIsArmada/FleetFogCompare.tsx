@@ -29,6 +29,8 @@ const ICON_PX = 32
 
 export interface FleetFogCompareProps {
   className?: string
+  /** 'card' = fixed-height rounded figure; 'fill' = stretch to parent; 'banner' = full-width ≤50vh. */
+  layout?: 'card' | 'fill' | 'banner'
 }
 
 /**
@@ -36,7 +38,7 @@ export interface FleetFogCompareProps {
  * that expands left→right on scroll, plus a 1px split marker.
  * Topic markers sit on the fog layer and reveal as clear peels away.
  */
-export function FleetFogCompare({ className }: FleetFogCompareProps) {
+export function FleetFogCompare({ className, layout = 'card' }: FleetFogCompareProps) {
   const rootRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -113,7 +115,14 @@ export function FleetFogCompare({ className }: FleetFogCompareProps) {
     }
   }, [])
 
-  const rootClassName = [styles.root, className].filter(Boolean).join(' ')
+  const rootClassName = [
+    styles.root,
+    layout === 'fill' ? styles.rootFill : '',
+    layout === 'banner' ? styles.rootBanner : '',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
     <figure
@@ -136,7 +145,7 @@ export function FleetFogCompare({ className }: FleetFogCompareProps) {
             <span className={styles.circle}>
               <Icon width={ICON_PX} height={ICON_PX} className={styles.icon} aria-hidden />
             </span>
-            <span className={styles.label}>{label}</span>
+            <span className={`armada-text-detail ${styles.label}`}>{label}</span>
           </li>
         ))}
       </ul>

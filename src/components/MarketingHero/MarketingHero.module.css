@@ -56,20 +56,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--primitives-spacing-6);
   max-width: calc(var(--primitives-spacing-20) * 12);
   text-align: center;
 }
 
 .heading {
   margin: 0;
-  /* Quoted family name — multi-word fonts fail without quotes when tokenized. */
-  font-family: 'Charis SIL', var(--primitives-fontFamily-display), serif;
-  /* Default / large: 72px = 64 + 8 */
-  font-size: calc(var(--primitives-fontSize-6xl) * 1px + var(--primitives-spacing-2));
-  font-weight: var(--semantic-typography-display-hero-lg-font-weight);
-  line-height: var(--semantic-typography-display-hero-lg-line-height);
-  letter-spacing: var(--semantic-typography-display-hero-lg-letter-spacing);
   text-align: center;
   /* EXCEPTION — white headline on fleet photo (homepage is light theme). */
   color: var(--semantic-component-tag-label);
@@ -100,7 +92,8 @@
   box-sizing: border-box;
   width: fit-content;
   max-width: 100%;
-  padding: var(--primitives-spacing-4);
+  padding: var(--primitives-spacing-4) var(--primitives-spacing-5)
+    var(--primitives-spacing-5) var(--primitives-spacing-4);
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
   isolation: isolate;
   overflow: hidden;
@@ -126,22 +119,10 @@
   flex: 0 0 var(--glass-copy-width);
   width: var(--glass-copy-width);
   max-width: var(--glass-copy-width);
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  /* Figma body on glass — 12px (sm/base midpoint) */
-  font-size: calc(
-    ((var(--primitives-fontSize-sm) + var(--primitives-fontSize-base)) / 2) * 1px
-  );
-  font-weight: var(--primitives-fontWeight-medium);
-  line-height: 1.5;
-  letter-spacing: 0.03em;
   text-align: left;
+  text-wrap: pretty;
   /* EXCEPTION — white body on fleet photo. */
   color: var(--semantic-component-tag-label);
-}
-
-/* Forced line breaks — keep each span on its own row. */
-.featureLine {
-  display: block;
 }
 
 /* —— Legacy bottom-aligned layout (hidden; restore by swapping visibility) —— */
@@ -174,18 +155,12 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: var(--primitives-spacing-6);
   max-width: calc(var(--primitives-spacing-20) * 9 + var(--primitives-spacing-5));
 }
 
 .headingLegacy {
   margin: 0;
   min-width: min(100%, calc(var(--primitives-spacing-20) * 9 + var(--primitives-spacing-5)));
-  font-family: 'Charis SIL', var(--primitives-fontFamily-display), serif;
-  font-size: calc(var(--primitives-fontSize-4xl) * 1px + var(--primitives-spacing-3));
-  font-weight: var(--semantic-typography-display-hero-lg-font-weight);
-  line-height: var(--semantic-typography-display-hero-lg-line-height);
-  letter-spacing: var(--semantic-typography-display-hero-lg-letter-spacing);
   text-align: left;
   color: var(--semantic-component-tag-label);
 }
@@ -205,16 +180,6 @@
       calc(var(--primitives-spacing-16) - var(--primitives-spacing-1))
       calc(var(--primitives-spacing-20) + var(--primitives-spacing-5))
       calc(var(--primitives-spacing-20) + var(--primitives-spacing-5));
-  }
-
-  .heading {
-    /* 56px = 44 + 12 */
-    font-size: calc(var(--primitives-fontSize-4xl) * 1px + var(--primitives-spacing-3));
-  }
-
-  .headingLegacy {
-    /* 40px — previous mid-desktop size */
-    font-size: var(--primitives-spacing-10);
   }
 
   .content .feature {
@@ -243,16 +208,6 @@
       calc(var(--primitives-spacing-20) * 2);
   }
 
-  .heading {
-    /* 72px = 64 + 8 */
-    font-size: calc(var(--primitives-fontSize-6xl) * 1px + var(--primitives-spacing-2));
-  }
-
-  .headingLegacy {
-    /* 56px — previous large-desktop size */
-    font-size: calc(var(--primitives-fontSize-4xl) * 1px + var(--primitives-spacing-3));
-  }
-
   .content .feature {
     right: calc(var(--primitives-spacing-20) * 2);
     bottom: calc(var(--primitives-spacing-20) * 2);
@@ -262,17 +217,13 @@
 
 @media (max-width: 1199px) {
   .content {
+    /* Tablet: looser side padding than mobile. */
     padding: calc(var(--primitives-spacing-20) * 2) var(--primitives-spacing-10)
-      var(--primitives-spacing-10);
+      var(--primitives-spacing-12);
   }
 
   .contentLegacy {
-    padding: var(--primitives-spacing-10);
-  }
-
-  .heading,
-  .headingLegacy {
-    font-size: calc(var(--primitives-fontSize-5xl) * 1px);
+    padding: var(--primitives-spacing-12) var(--primitives-spacing-10);
   }
 
   .headingLine {
@@ -281,44 +232,49 @@
 
   .content .feature {
     right: var(--primitives-spacing-10);
-    bottom: var(--primitives-spacing-10);
+    bottom: var(--primitives-spacing-12);
     max-width: calc(100% - var(--primitives-spacing-10) * 2);
   }
 }
 
 @media (max-width: 767px) {
   .content {
-    padding: calc(var(--primitives-spacing-20) * 2) var(--primitives-spacing-4)
-      var(--primitives-spacing-8);
+    padding: calc(var(--primitives-spacing-16) + var(--primitives-spacing-4))
+      var(--primitives-spacing-8) var(--primitives-spacing-6);
   }
 
   .contentLegacy {
-    padding: var(--primitives-spacing-4) var(--primitives-spacing-4) var(--primitives-spacing-8);
+    justify-content: stretch;
+    /* Clear header; sides + bottom match page inset (spacing-8). */
+    padding:
+      calc(var(--primitives-spacing-16) + var(--primitives-spacing-8))
+      var(--primitives-spacing-8)
+      var(--primitives-spacing-8);
   }
 
   .intro {
-    gap: var(--primitives-spacing-4);
     max-width: none;
   }
 
   .introLegacy {
-    gap: var(--primitives-spacing-4);
+    align-items: center;
+    align-self: center;
     max-width: none;
+    text-align: center;
+    margin-top: var(--primitives-spacing-6);
+  }
+
+  .headingLegacy {
+    text-align: center;
   }
 
   .bottomLegacy {
+    flex: 1 1 auto;
     flex-direction: column;
-    align-items: stretch;
-    gap: var(--primitives-spacing-10);
-  }
-
-  .heading,
-  .headingLegacy {
-    font-family: 'Charis SIL', var(--primitives-fontFamily-display), serif;
-    font-size: calc(var(--primitives-fontSize-4xl) * 1px);
-    font-weight: var(--primitives-fontWeight-regular);
-    line-height: var(--primitives-lineHeight-tight);
-    letter-spacing: var(--primitives-letterSpacing-tight);
+    justify-content: space-between;
+    align-items: center;
+    min-height: 0;
+    gap: 0;
   }
 
   .content .feature,

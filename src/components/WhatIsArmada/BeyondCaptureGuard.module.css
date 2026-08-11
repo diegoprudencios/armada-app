@@ -1,0 +1,47 @@
+/*
+  Beyond capture diagram: Armada mark + gem-gradient particle shell.
+  Tokens (verified): brand-deep panel, diagram-stroke, brand gem stops.
+*/
+
+.root {
+  --beyond-stroke: var(--diagram-stroke, #5a4a62);
+
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Pointer proximity contracts the particle shell (decorative). */
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.canvasHost {
+  position: absolute;
+  inset: 0;
+  /* Particles draw over the mark so front dots sit “outside” the logo. */
+  z-index: 1;
+}
+
+.canvasHost :global(canvas) {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mark {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.markSvg {
+  width: calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
+  height: calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
+  display: block;
+}

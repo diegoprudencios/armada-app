@@ -4,7 +4,7 @@ import styles from './ArmadaLogo.module.css'
 export interface ArmadaLogoProps {
   /** `mark` — diamond symbol only (mobile header). `full` — symbol + wordmark. */
   variant?: 'full' | 'mark'
-  /** Mark fill. `brand` — lavender/amber gradient (default). `white` — solid white. */
+  /** Mark fill. `brand` — gem gradient lavender→rose→amber (default). `white` — solid white. */
   markTone?: 'brand' | 'white'
   className?: string
 }
@@ -38,9 +38,15 @@ function GradientDefs({ ids }: { ids: GradientIds }) {
   return (
     <defs>
       {ids.map((id) => (
+        /*
+          User-space Y: 32 (bottom) → 0 (top). Reverse of the footer’s
+          lavender → rose → amber so the mark reads lavender at the tip,
+          rose mid, amber at the base — same gem stops as SiteFooter.
+        */
         <linearGradient key={id} id={id} x1="16" y1="32" x2="16" y2="0" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#F8D197" />
-          <stop offset="1" stopColor="#CA8AEA" />
+          <stop stopColor="var(--semantic-color-brand-amber)" />
+          <stop offset="0.48" stopColor="var(--semantic-color-brand-gradient-rose)" />
+          <stop offset="1" stopColor="var(--semantic-color-brand-lavender)" />
         </linearGradient>
       ))}
     </defs>

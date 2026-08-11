@@ -69,14 +69,16 @@ export function SiteFooter() {
         </ul>
       </div>
 
-      <img
-        className={styles.wordmark}
-        src={wordmarkWhite}
-        alt=""
-        width={1200}
-        height={210}
-        aria-hidden
-      />
+      <div className={styles.wordmarkWrap}>
+        <img
+          className={styles.wordmark}
+          src={wordmarkWhite}
+          alt=""
+          width={1200}
+          height={210}
+          aria-hidden
+        />
+      </div>
     </footer>
   )
 }

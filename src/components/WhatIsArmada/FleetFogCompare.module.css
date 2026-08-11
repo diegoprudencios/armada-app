@@ -7,13 +7,56 @@
   );
 
   position: relative;
-  margin: 0;
+  /* Leave margin-top undeclared when this figure is a .armada-site-stack child. */
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
   width: 100%;
   height: calc(var(--primitives-spacing-20) * 7 + var(--primitives-spacing-8));
   overflow: hidden;
   border-radius: var(--primitives-spacing-5);
   line-height: 0;
   background: var(--primitives-color-neutral-0);
+}
+
+/* Stretch into a split-panel media half (no fixed height / radius). */
+.rootFill {
+  height: 100%;
+  min-height: calc(var(--primitives-spacing-20) * 6);
+}
+
+/* Full-width privacy intro banner — capped at half the viewport. */
+.rootBanner {
+  height: 50vh;
+  max-height: 50vh;
+  min-height: calc(var(--primitives-spacing-20) * 4);
+}
+
+.root.rootBanner,
+.root.rootFill {
+  border-radius: 0;
+}
+
+/* Banner: no card chrome — white fill was reading as a 1px frame on mobile. */
+.root.rootBanner {
+  background: transparent;
+  border: 0;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Cover subpixel gaps so the photo meets the edges flush. */
+.rootBanner .image {
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  max-width: none;
+  margin-top: -1px;
+  margin-left: -1px;
+}
+
+.rootFill .topics {
+  gap: var(--primitives-spacing-12);
+  padding: 0 var(--primitives-spacing-6);
 }
 
 .image {
@@ -73,14 +116,6 @@
 }
 
 .label {
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  /* 12px — same midpoint as hero glass copy */
-  font-size: calc(
-    ((var(--primitives-fontSize-sm) + var(--primitives-fontSize-base)) / 2) * 1px
-  );
-  font-weight: var(--primitives-fontWeight-medium);
-  line-height: 1.3;
-  letter-spacing: var(--primitives-letterSpacing-normal);
   text-align: center;
   white-space: nowrap;
   color: var(--semantic-component-tag-label);
@@ -130,8 +165,20 @@
 }
 
 @media (max-width: 1199px) {
-  .root {
-    height: calc(var(--primitives-spacing-20) * 5);
+  /* Vertical layout: match other section animations — square frame. */
+  .root,
+  .rootFill {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1 / 1;
+  }
+
+  /* Banner stays a wide strip (not square) on compact screens. */
+  .rootBanner {
+    height: 50vh;
+    max-height: 50vh;
+    min-height: calc(var(--primitives-spacing-20) * 3);
+    aspect-ratio: auto;
   }
 
   .topics {
@@ -141,8 +188,7 @@
 }
 
 @media (max-width: 767px) {
-  .root {
-    height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-10));
+  .root:not(.rootBanner):not(.rootFill) {
     border-radius: var(--primitives-spacing-4);
   }
 

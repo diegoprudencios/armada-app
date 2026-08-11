@@ -10,7 +10,17 @@
         } catch (e) {}
       })();
     </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Match footer amber so iOS Safari chrome / home-indicator band isn’t white. -->
+    <meta name="theme-color" content="#f8d197" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <style>
+      /* Overscroll + gap behind the iOS bottom toolbar (body surface is otherwise white). */
+      html,
+      body {
+        background-color: #f8d197;
+      }
+    </style>
     <meta
       name="description"
       content="Armada — pluggable privacy infrastructure for stablecoins. Protects USDC balances for on-chain asset managers and private capital platforms."

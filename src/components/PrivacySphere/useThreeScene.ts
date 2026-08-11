@@ -1,5 +1,8 @@
 import { useEffect, type RefObject } from 'react'
 import * as THREE from 'three'
+import { Line2 } from 'three/examples/jsm/lines/Line2.js'
+import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js'
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js'
 /** Ink disk + Heroicons 24/outline EyeIcon (see asset comment). */
 import eyeBadgeUrl from '@/assets/privacy-eye-badge.svg'
 
@@ -10,6 +13,11 @@ const MERIDIAN_OPACITY = 1
 /** Skip this many radians at each pole so meridians don't hook into the wrap-around. */
 const MERIDIAN_POLE_CUT = 0.38
 const SPHERE_SPIN = 0.0048
+/**
+ * Match SVG/CSS diagram strokes (cubes, toggles, connectors): 1px screen.
+ * LineBasicMaterial ignores linewidth and reads thinner than those 1px strokes.
+ */
+const DIAGRAM_LINE_WIDTH = 1
 
 const CLUSTER_COUNT = 12
 const CLUSTER_RADIUS = 1.4
@@ -230,6 +238,38 @@ function createOutlineCircleGeometry(
   return geometry
 }
 
+function bufferPositions(geometry: THREE.BufferGeometry): Float32Array {
+  const attr = geometry.getAttribute('position')
+  const out = new Float32Array(attr.count * 3)
+  for (let i = 0; i < attr.count; i += 1) {
+    out[i * 3] = attr.getX(i)
+    out[i * 3 + 1] = attr.getY(i)
+    out[i * 3 + 2] = attr.getZ(i)
+  }
+  return out
+}
+
+/** Fat line at true 1px screen width — matches CSS/SVG diagram strokes. */
+function createDiagramLine(
+  positions: Float32Array,
+  material: LineMaterial,
+  closed = false,
+): Line2 {
+  let pts = positions
+  if (closed && positions.length >= 6) {
+    pts = new Float32Array(positions.length + 3)
+    pts.set(positions)
+    pts[positions.length] = positions[0]!
+    pts[positions.length + 1] = positions[1]!
+    pts[positions.length + 2] = positions[2]!
+  }
+  const geometry = new LineGeometry()
+  geometry.setPositions(pts as unknown as number[])
+  const line = new Line2(geometry, material)
+  line.computeLineDistances()
+  return line
+}
+
 function mulberry32(seed: number) {
   return () => {
     let t = (seed += 0x6d2b79f5)
@@ -272,12 +312,15 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     const sphereGroup = new THREE.Group()
     scene.add(sphereGroup)
 
-    const meridianMaterial = new THREE.LineBasicMaterial({
+    const meridianMaterial = new LineMaterial({
       color: rgbToHex(borderRgb),
+      linewidth: DIAGRAM_LINE_WIDTH,
       transparent: true,
       opacity: MERIDIAN_OPACITY,
+      depthTest: true,
+      depthWrite: false,
     })
-    const meridianGeometries: THREE.BufferGeometry[] = []
+    const diagramLines: Line2[] = []
     const cut = MERIDIAN_POLE_CUT
     for (let i = 0; i < MERIDIAN_COUNT; i += 1) {
       const lon = (i * Math.PI) / MERIDIAN_COUNT
@@ -287,9 +330,11 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
         [Math.PI + cut, Math.PI * 2 - cut],
       ]
       for (const [phiStart, phiEnd] of arcs) {
-        const geometry = createMeridianArcGeometry(SPHERE_RADIUS, lon, phiStart, phiEnd)
-        meridianGeometries.push(geometry)
-        sphereGroup.add(new THREE.Line(geometry, meridianMaterial))
+        const buffer = createMeridianArcGeometry(SPHERE_RADIUS, lon, phiStart, phiEnd)
+        const line = createDiagramLine(bufferPositions(buffer), meridianMaterial)
+        buffer.dispose()
+        diagramLines.push(line)
+        sphereGroup.add(line)
       }
     }
 
@@ -299,15 +344,20 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
     )
     sphereGroup.add(depthSphere)
 
-    /* Fixed silhouette — depthTest off so the depth shell cannot hide it. */
-    const outlineMaterial = new THREE.LineBasicMaterial({
+    /* Fixed silhouette — below front orbit badges (those use renderOrder 10). */
+    const outlineMaterial = new LineMaterial({
       color: rgbToHex(borderRgb),
+      linewidth: DIAGRAM_LINE_WIDTH,
       depthTest: false,
       depthWrite: false,
+      transparent: true,
+      opacity: 1,
     })
-    const outlineGeometry = createOutlineCircleGeometry(SPHERE_RADIUS, CAMERA_Z)
-    const outlineCircle = new THREE.LineLoop(outlineGeometry, outlineMaterial)
-    outlineCircle.renderOrder = 2
+    const outlineBuffer = createOutlineCircleGeometry(SPHERE_RADIUS, CAMERA_Z)
+    const outlineCircle = createDiagramLine(bufferPositions(outlineBuffer), outlineMaterial, true)
+    outlineBuffer.dispose()
+    outlineCircle.renderOrder = 1
+    diagramLines.push(outlineCircle)
     scene.add(outlineCircle)
 
     const clusterGroup = new THREE.Group()
@@ -395,6 +445,8 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
       camera.aspect = width / height
       camera.updateProjectionMatrix()
       renderer.setSize(width, height, false)
+      meridianMaterial.resolution.set(width, height)
+      outlineMaterial.resolution.set(width, height)
       applyOrbitScale()
     }
 
@@ -437,6 +489,14 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
         /* Constant orbit speed — scroll boost only affects sphere / cluster spin. */
         badge.angle -= ORBIT_BASE_SPEED * frameScale
         badge.sprite.position.copy(diagonalOrbitPosition(badge.angle, orbitPos))
+        /*
+          Front badges sit above wireframe (depthTest off + high renderOrder).
+          Back badges depth-test against the globe so they tuck behind.
+        */
+        badge.sprite.getWorldPosition(worldPos)
+        const inFront = worldPos.z > 0.12
+        badge.material.depthTest = !inFront
+        badge.sprite.renderOrder = inFront ? 10 : 0
       }
 
       renderFrame()
@@ -496,9 +556,10 @@ export function useThreeScene(containerRef: RefObject<HTMLElement | null>) {
       window.cancelAnimationFrame(frameId)
       observer.disconnect()
 
-      meridianGeometries.forEach((geometry) => geometry.dispose())
+      diagramLines.forEach((line) => {
+        line.geometry.dispose()
+      })
       meridianMaterial.dispose()
-      outlineGeometry.dispose()
       outlineMaterial.dispose()
       depthSphere.geometry.dispose()
       ;(depthSphere.material as THREE.Material).dispose()

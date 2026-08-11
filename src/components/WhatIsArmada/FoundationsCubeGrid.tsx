@@ -2,44 +2,36 @@ import { useEffect, useRef } from 'react'
 import styles from './FoundationsCubeGrid.module.css'
 
 /**
- * Isometric cube lattice for the foundations panel.
- * Outline cubes stay still; the center Armada cube floats.
- * Scroll down spreads the lattice; scroll up pulls it back to center.
+ * Foundations diagram: every cube is the same 2:1-projected 3D mesh.
+ * All faces are depth-sorted so front cubes occlude back ones.
+ * Center Armada cube: opaque sides, gradient top + inset logo; rises and yaws.
  *
- * 2:1 isometric with equal edge lengths on all faces (true cube).
  * EXCEPTION — sizes/gap from marketing ref; no cube tokens.
  */
-/** Odd size so there is a single floating center cube. */
 const GRID = 9
 const CENTER = (GRID - 1) / 2
 
-/** Half-width of the top diamond (= half horizontal diagonal). */
 const W = 44
-/** Half-height of the top diamond (2:1 iso). */
 const TOP_H = W / 2
-/** Edge length of the top rhombus — also used as vertical extrusion. */
 const EDGE = Math.sqrt(W * W + TOP_H * TOP_H)
-/** Vertical side height so faces match the top edges. */
-const H = EDGE
-/** Resting gap between cube centers. */
+const HALF = EDGE / 2
 const GAP_MIN = 8
-/** Fully spread gap at end of scroll scrub (subtle). */
 const GAP_MAX = 22
 const STEP_MIN = W + GAP_MIN
 const STEP_MAX = W + GAP_MAX
-/**
- * Shift resting lattice so the center sits on the STEP_MAX viewBox center line
- * (otherwise a tight cluster looks off-center in the oversized viewBox).
- */
-const LATTICE_Y_SHIFT = CENTER * (STEP_MAX - STEP_MIN)
 
-/**
- * Pre-projected cube-face mark from designs/cube-logo.svg (viewBox 0 0 122 60).
- * Already drawn in 2:1 isometric space — maps 1:1 onto the top diamond.
- */
+const SCALE = W / EDGE
+const SPACE_MIN = STEP_MIN / SCALE
+const SPACE_MAX = STEP_MAX / SCALE
+
+/** World-Y lift so the Armada cube clears the lattice tops. */
+const FLOAT_AMP = 52
+const FLOAT_CYCLE_MS = 5200
+/** Logo size as fraction of top face (lower = more margin). */
+const LOGO_INSET = 0.58
+
 const LOGO_W = 122
 const LOGO_H = 60
-
 const CUBE_LOGO_PATHS = [
   'M61 60L70.9855 55.0891H51.0145L61 60Z',
   'M44.432 51.8518H77.568L85.7961 47.8052H36.2039L44.432 51.8518Z',
@@ -49,170 +41,339 @@ const CUBE_LOGO_PATHS = [
   'M-1.5659e-06 30H31.4598L60.9968 15.4736L90.5338 30H122L61 0L-1.5659e-06 30Z',
 ] as const
 
-type Cell = {
-  row: number
-  col: number
-  /** Position at STEP_MIN (resting / scroll-up). */
-  cx: number
-  cy: number
-  isCenter: boolean
+type V3 = { x: number; y: number; z: number }
+type V2 = { x: number; y: number }
+
+type FaceKind = 'top' | 'side'
+
+type PaintedFace = {
+  kind: FaceKind
+  isArmada: boolean
+  d: string
+  depth: number
+  topQuad?: V2[]
 }
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
 }
 
-function buildCells(): Cell[] {
-  const cells: Cell[] = []
+/**
+ * Continuous bob: ease up then straight back down (no hold at the peak).
+ * Yaw starts with the rise and finishes as the cube settles.
+ */
+function sampleArmadaMotion(t: number): { y: number; yawRad: number } {
+  /* Smooth full-cycle sine: 0 → peak → 0 with no plateau. */
+  const y = -FLOAT_AMP * Math.sin(Math.PI * t)
+  const yawRad = t * Math.PI * 2
+
+  return { y, yawRad }
+}
+
+function rotateY(p: V3, rad: number): V3 {
+  const c = Math.cos(rad)
+  const s = Math.sin(rad)
+  return { x: p.x * c + p.z * s, y: p.y, z: -p.x * s + p.z * c }
+}
+
+function project(p: V3): V2 {
+  return {
+    x: (p.x - p.z) * SCALE,
+    y: ((p.x + p.z) * SCALE) / 2 - (p.y - HALF),
+  }
+}
+
+function facePath(points: V2[]): string {
+  return `${points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')} Z`
+}
+
+/** Outward normal from first three corners (right-hand winding). */
+function faceNormal(corners: V3[]): V3 {
+  const [a, b, c] = corners
+  const abx = b.x - a.x
+  const aby = b.y - a.y
+  const abz = b.z - a.z
+  const acx = c.x - a.x
+  const acy = c.y - a.y
+  const acz = c.z - a.z
+  return {
+    x: aby * acz - abz * acy,
+    y: abz * acx - abx * acz,
+    z: abx * acy - aby * acx,
+  }
+}
+
+/**
+ * Camera sits above toward +X/+Z. Face is visible when outward normal
+ * points toward the camera (n · cam > 0).
+ */
+function isFrontFacing(corners: V3[]): boolean {
+  const n = faceNormal(corners)
+  return n.x * 1 + n.y * 2 + n.z * 1 > 0
+}
+
+/** Larger = closer to camera; paint ascending (back → front). */
+function faceDepth(corners: V3[]): number {
+  return corners.reduce((sum, p) => sum + p.x + p.y + p.z, 0) / corners.length
+}
+
+/**
+ * Local faces with outward normals (CCW from outside).
+ * At yaw 0 the camera sees top, +X, and +Z.
+ */
+const LOCAL_FACES: { kind: FaceKind; corners: V3[] }[] = [
+  {
+    kind: 'top',
+    corners: [
+      { x: -HALF, y: HALF, z: -HALF },
+      { x: -HALF, y: HALF, z: HALF },
+      { x: HALF, y: HALF, z: HALF },
+      { x: HALF, y: HALF, z: -HALF },
+    ],
+  },
+  {
+    /* +Z */
+    kind: 'side',
+    corners: [
+      { x: -HALF, y: HALF, z: HALF },
+      { x: -HALF, y: -HALF, z: HALF },
+      { x: HALF, y: -HALF, z: HALF },
+      { x: HALF, y: HALF, z: HALF },
+    ],
+  },
+  {
+    /* +X */
+    kind: 'side',
+    corners: [
+      { x: HALF, y: HALF, z: HALF },
+      { x: HALF, y: -HALF, z: HALF },
+      { x: HALF, y: -HALF, z: -HALF },
+      { x: HALF, y: HALF, z: -HALF },
+    ],
+  },
+  {
+    /* -Z */
+    kind: 'side',
+    corners: [
+      { x: HALF, y: HALF, z: -HALF },
+      { x: HALF, y: -HALF, z: -HALF },
+      { x: -HALF, y: -HALF, z: -HALF },
+      { x: -HALF, y: HALF, z: -HALF },
+    ],
+  },
+  {
+    /* -X */
+    kind: 'side',
+    corners: [
+      { x: -HALF, y: HALF, z: -HALF },
+      { x: -HALF, y: -HALF, z: -HALF },
+      { x: -HALF, y: -HALF, z: HALF },
+      { x: -HALF, y: HALF, z: HALF },
+    ],
+  },
+]
+
+/**
+ * Map cube-logo.svg onto the inset top face.
+ * Asset is already isometric: tip (61,0) → screen-top corner, base → bottom.
+ * top[] order: [top, left, bottom, right] in screen space at yaw 0.
+ */
+function logoMatrix(top: V2[], inset: number): string {
+  const cx = top.reduce((sum, p) => sum + p.x, 0) / top.length
+  const cy = top.reduce((sum, p) => sum + p.y, 0) / top.length
+  const q = top.map((p) => ({
+    x: cx + (p.x - cx) * inset,
+    y: cy + (p.y - cy) * inset,
+  }))
+  const mid = { x: cx, y: cy }
+  /* SVG +x → right tip; SVG +y (down) → bottom tip — 90° from corner-bbox mapping. */
+  const right = q[3]
+  const down = q[2]
+  const a = (right.x - mid.x) / (LOGO_W / 2)
+  const b = (right.y - mid.y) / (LOGO_W / 2)
+  const c = (down.x - mid.x) / (LOGO_H / 2)
+  const d = (down.y - mid.y) / (LOGO_H / 2)
+  const e = mid.x - a * (LOGO_W / 2) - c * (LOGO_H / 2)
+  const f = mid.y - b * (LOGO_W / 2) - d * (LOGO_H / 2)
+  return `matrix(${a} ${b} ${c} ${d} ${e} ${f})`
+}
+
+type CubeSpec = { row: number; col: number; isArmada: boolean }
+
+const CUBES: CubeSpec[] = (() => {
+  const list: CubeSpec[] = []
   for (let row = 0; row < GRID; row += 1) {
     for (let col = 0; col < GRID; col += 1) {
-      cells.push({
-        row,
-        col,
-        cx: (col - row) * STEP_MIN,
-        cy: (col + row) * (STEP_MIN / 2) + LATTICE_Y_SHIFT,
-        isCenter: row === CENTER && col === CENTER,
+      list.push({ row, col, isArmada: row === CENTER && col === CENTER })
+    }
+  }
+  return list
+})()
+
+function cubeOrigin(row: number, col: number, space: number): V3 {
+  return {
+    x: (col - CENTER) * space,
+    y: 0,
+    z: (row - CENTER) * space,
+  }
+}
+
+function collectFaces(space: number, armadaYaw: number, armadaFloatY: number): PaintedFace[] {
+  const painted: PaintedFace[] = []
+
+  for (const cube of CUBES) {
+    const origin = cubeOrigin(cube.row, cube.col, space)
+    const yaw = cube.isArmada ? armadaYaw : 0
+    const floatY = cube.isArmada ? armadaFloatY : 0
+
+    for (const face of LOCAL_FACES) {
+      const world = face.corners.map((p) => {
+        const r = rotateY(p, yaw)
+        return {
+          x: r.x + origin.x,
+          /* Motion y is negative-up in the old screen sense → lift world +Y. */
+          y: r.y + origin.y - floatY,
+          z: r.z + origin.z,
+        }
+      })
+      if (!isFrontFacing(world)) continue
+
+      const screen = world.map(project)
+
+      painted.push({
+        kind: face.kind,
+        isArmada: cube.isArmada,
+        d: facePath(screen),
+        depth: faceDepth(world),
+        topQuad: face.kind === 'top' && cube.isArmada ? screen : undefined,
       })
     }
   }
-  /* Painter’s algorithm: back → front (row+col ascending). */
-  return cells.sort((a, b) => a.row + a.col - (b.row + b.col) || a.col - b.col)
+
+  painted.sort((a, b) => a.depth - b.depth)
+  return painted
 }
 
-function topPath(cx: number, cy: number): string {
-  return [
-    `M ${cx} ${cy - TOP_H}`,
-    `L ${cx + W} ${cy}`,
-    `L ${cx} ${cy + TOP_H}`,
-    `L ${cx - W} ${cy}`,
-    'Z',
-  ].join(' ')
-}
-
-function leftPath(cx: number, cy: number): string {
-  return [
-    `M ${cx - W} ${cy}`,
-    `L ${cx} ${cy + TOP_H}`,
-    `L ${cx} ${cy + TOP_H + H}`,
-    `L ${cx - W} ${cy + H}`,
-    'Z',
-  ].join(' ')
-}
-
-function rightPath(cx: number, cy: number): string {
-  return [
-    `M ${cx + W} ${cy}`,
-    `L ${cx} ${cy + TOP_H}`,
-    `L ${cx} ${cy + TOP_H + H}`,
-    `L ${cx + W} ${cy + H}`,
-    'Z',
-  ].join(' ')
-}
-
-function OutlineCube({ cx, cy }: { cx: number; cy: number }) {
-  return (
-    <g className={styles.outlineCube}>
-      <path className={styles.faceFill} d={leftPath(cx, cy)} />
-      <path className={styles.faceFill} d={rightPath(cx, cy)} />
-      <path className={styles.faceFill} d={topPath(cx, cy)} />
-    </g>
-  )
-}
-
-function ArmadaCube({ cx, cy }: { cx: number; cy: number }) {
-  /* Map logo onto the top diamond with inset margin (already isometric). */
-  const markInset = 0.62
-  const markTransform = [
-    `translate(${cx}, ${cy})`,
-    `scale(${((2 * W) / LOGO_W) * markInset}, ${((2 * TOP_H) / LOGO_H) * markInset})`,
-    `translate(${-LOGO_W / 2}, ${-LOGO_H / 2})`,
-  ].join(' ')
-
-  return (
-    <g className={styles.armadaCube}>
-      <path className={styles.faceFill} d={leftPath(cx, cy)} />
-      <path className={styles.faceFill} d={rightPath(cx, cy)} />
-      <path className={styles.faceTop} d={topPath(cx, cy)} />
-      <g className={styles.mark} transform={markTransform} aria-hidden>
-        {CUBE_LOGO_PATHS.map((d) => (
-          <path key={d} d={d} />
-        ))}
-      </g>
-    </g>
-  )
-}
-
-const CELLS = buildCells()
-
-/*
- * ViewBox matches the old 3×3 window (same cube scale), centered on the Armada cube.
- * The larger lattice extends past this window so cubes bleed at the panel edges.
- */
-const VB_PAD = 8
-const VIEW_EXTENT = 2 /* half-span in grid steps — same as former 3×3 */
+const VIEW_EXTENT = 2
 const viewSpan = VIEW_EXTENT * STEP_MAX
-const centerY = CENTER * STEP_MAX
-const VB_W = 2 * viewSpan + 2 * W + 2 * VB_PAD
-const VB_H = 2 * viewSpan + 2 * TOP_H + H + 2 * VB_PAD
-const VB_MIN_X = -VB_W / 2
-const VB_MIN_Y = centerY + H / 2 - VB_H / 2
-const VB_W_BOX = VB_W
-const VB_H_BOX = VB_H
+const VIEW_W = 2 * viewSpan + 2 * W + 16
+const VIEW_H = 2 * viewSpan + 2 * TOP_H + EDGE + FLOAT_AMP * 2 + 24
+const VIEW_MIN_X = -VIEW_W / 2
+const VIEW_MIN_Y = EDGE / 2 - VIEW_H / 2 - FLOAT_AMP * 0.35
 
-/**
- * Battle-tested foundations diagram: isometric cube grid with a floating Armada cube.
- * Lattice spacing scrubbed by scroll progress through the diagram.
- */
+const MAX_FACE_PATHS = GRID * GRID * 3
+
 export function FoundationsCubeGrid() {
   const rootRef = useRef<HTMLDivElement>(null)
-  const cellRefs = useRef<(SVGGElement | null)[]>([])
+  const layerRef = useRef<SVGGElement | null>(null)
+  const pathPoolRef = useRef<SVGPathElement[]>([])
+  const markRef = useRef<SVGGElement | null>(null)
+  const spaceRef = useRef(SPACE_MIN)
+  const motionRef = useRef({ y: 0, yaw: 0 })
 
   useEffect(() => {
     const root = rootRef.current
-    if (!root) return
+    const layer = layerRef.current
+    if (!root || !layer) return
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
-    let frame = 0
+    let scrubFrame = 0
+    let motionFrame = 0
     let listening = false
+    let disposed = false
 
-    const applySpread = (progress: number) => {
-      const dStep = (STEP_MAX - STEP_MIN) * progress
-      CELLS.forEach((cell, i) => {
-        const el = cellRefs.current[i]
-        if (!el) return
-        const dx = (cell.col - cell.row) * dStep
-        const dy = ((cell.col + cell.row) / 2 - CENTER) * dStep
-        if (dx === 0 && dy === 0) {
-          el.removeAttribute('transform')
+    const pool = pathPoolRef.current
+    if (pool.length === 0) {
+      for (let i = 0; i < MAX_FACE_PATHS; i += 1) {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        path.setAttribute('stroke-linejoin', 'round')
+        path.setAttribute('vector-effect', 'non-scaling-stroke')
+        path.style.display = 'none'
+        layer.insertBefore(path, markRef.current)
+        pool.push(path)
+      }
+    }
+
+    const rootStyle = getComputedStyle(root)
+    const fillSolid =
+      rootStyle.getPropertyValue('--cube-face-fill').trim() ||
+      rootStyle.getPropertyValue('--semantic-color-brand-deep').trim() ||
+      '#291433'
+    const stroke =
+      rootStyle.getPropertyValue('--cube-stroke').trim() ||
+      rootStyle.getPropertyValue('--diagram-stroke').trim() ||
+      '#5a4a62'
+
+    const paint = () => {
+      const faces = collectFaces(spaceRef.current, motionRef.current.yaw, motionRef.current.y)
+      let armadaTop: V2[] | undefined
+      let armadaTopIndex = -1
+
+      faces.forEach((face, i) => {
+        const path = pool[i]
+        if (!path) return
+        path.style.display = ''
+        path.setAttribute('d', face.d)
+        path.setAttribute('stroke', stroke)
+        path.setAttribute('stroke-width', '1')
+        /* Explicit fills — SVG root fill="none" must not win; CSS alone was unreliable. */
+        if (face.kind === 'top' && face.isArmada) {
+          path.setAttribute('fill', 'url(#armadaCubeTop)')
+          path.setAttribute('class', styles.faceTop)
         } else {
-          el.setAttribute('transform', `translate(${dx}, ${dy})`)
+          path.setAttribute('fill', fillSolid)
+          path.setAttribute('class', styles.faceFill)
+        }
+        if (face.topQuad) {
+          armadaTop = face.topQuad
+          armadaTopIndex = i
         }
       })
+      for (let i = faces.length; i < pool.length; i += 1) {
+        pool[i].style.display = 'none'
+      }
+
+      const mark = markRef.current
+      if (mark) {
+        if (armadaTop && armadaTopIndex >= 0 && pool[armadaTopIndex]) {
+          const afterTop = pool[armadaTopIndex].nextSibling
+          if (afterTop !== mark) layer.insertBefore(mark, afterTop)
+          mark.setAttribute('transform', logoMatrix(armadaTop, LOGO_INSET))
+          mark.style.display = ''
+        } else {
+          mark.style.display = 'none'
+        }
+      }
     }
 
     const scrub = () => {
-      frame = 0
+      scrubFrame = 0
       if (reducedMotion.matches) {
-        applySpread(0)
+        spaceRef.current = SPACE_MIN
         return
       }
-
       const rect = root.getBoundingClientRect()
       const viewH = window.innerHeight
       const travel = viewH + rect.height
       const passed = viewH - rect.top
       const raw = clamp(passed / travel, 0, 1)
-
-      /* Active in the middle of travel — tight on enter, spread as you leave. */
-      const startAt = 0.2
-      const endAt = 0.72
-      const progress = clamp((raw - startAt) / (endAt - startAt), 0, 1)
-      applySpread(progress)
+      spaceRef.current = SPACE_MIN + (SPACE_MAX - SPACE_MIN) * clamp((raw - 0.2) / 0.52, 0, 1)
     }
 
     const requestScrub = () => {
-      if (frame) return
-      frame = requestAnimationFrame(scrub)
+      if (scrubFrame) return
+      scrubFrame = requestAnimationFrame(scrub)
+    }
+
+    const tick = (now: number) => {
+      if (disposed) return
+      if (reducedMotion.matches) motionRef.current = { y: 0, yaw: 0 }
+      else {
+        const { y, yawRad } = sampleArmadaMotion((now % FLOAT_CYCLE_MS) / FLOAT_CYCLE_MS)
+        motionRef.current = { y, yaw: yawRad }
+      }
+      paint()
+      motionFrame = requestAnimationFrame(tick)
     }
 
     const startListening = () => {
@@ -241,15 +402,18 @@ export function FoundationsCubeGrid() {
     io.observe(root)
     requestScrub()
     startListening()
+    motionFrame = requestAnimationFrame(tick)
 
     const onMotionChange = () => requestScrub()
     reducedMotion.addEventListener('change', onMotionChange)
 
     return () => {
+      disposed = true
       io.disconnect()
       stopListening()
       reducedMotion.removeEventListener('change', onMotionChange)
-      if (frame) cancelAnimationFrame(frame)
+      if (scrubFrame) cancelAnimationFrame(scrubFrame)
+      if (motionFrame) cancelAnimationFrame(motionFrame)
     }
   }, [])
 
@@ -258,13 +422,12 @@ export function FoundationsCubeGrid() {
       ref={rootRef}
       className={styles.root}
       role="img"
-      aria-label="Isometric grid of cubes with the Armada cube floating at the center"
+      aria-label="Isometric grid of cubes with the Armada cube rising and spinning at the center"
     >
       <svg
         className={styles.svg}
-        viewBox={`${VB_MIN_X} ${VB_MIN_Y} ${VB_W_BOX} ${VB_H_BOX}`}
+        viewBox={`${VIEW_MIN_X} ${VIEW_MIN_Y} ${VIEW_W} ${VIEW_H}`}
         preserveAspectRatio="xMidYMid slice"
-        fill="none"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden
         focusable="false"
@@ -278,27 +441,19 @@ export function FoundationsCubeGrid() {
             y2="1"
             gradientUnits="objectBoundingBox"
           >
-            <stop offset="0%" stopColor="var(--semantic-color-brand-lavender)" />
-            <stop offset="100%" stopColor="var(--semantic-color-brand-amber)" />
+            <stop offset="0%" className={styles.gradStopLavender} />
+            <stop offset="52%" className={styles.gradStopRose} />
+            <stop offset="100%" className={styles.gradStopAmber} />
           </linearGradient>
         </defs>
 
-        {CELLS.map((cell, i) => (
-          <g
-            key={`${cell.row}-${cell.col}`}
-            ref={(el) => {
-              cellRefs.current[i] = el
-            }}
-          >
-            {cell.isCenter ? (
-              <g className={styles.float}>
-                <ArmadaCube cx={cell.cx} cy={cell.cy} />
-              </g>
-            ) : (
-              <OutlineCube cx={cell.cx} cy={cell.cy} />
-            )}
+        <g ref={layerRef}>
+          <g ref={markRef} className={styles.mark} aria-hidden>
+            {CUBE_LOGO_PATHS.map((d) => (
+              <path key={d} d={d} />
+            ))}
           </g>
-        ))}
+        </g>
       </svg>
     </div>
   )

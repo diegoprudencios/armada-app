@@ -1,0 +1,162 @@
+/*
+  Sticky path3 concentric gem rings (Figma) + gradient center + orbiting USDC.
+  Each ring: 3-stop gem stroke (~138pt), radii spaced to sit flush; some rings
+  rotated so the ramp direction varies. Stage blurs hard on scroll.
+  Tokens: brand-amber, lavender (wash), spacing, tag-label.
+  EXCEPTION — Figma stroke 138.347; gem hex in SVG stops; scroll blur 56px.
+*/
+
+.pin {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 220svh;
+  background: var(--semantic-color-brand-amber);
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--semantic-color-brand-amber);
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--semantic-color-brand-amber);
+  will-change: filter;
+}
+
+.svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  /* Scale path3 art past the viewport so rings read larger. */
+  width: 175%;
+  height: 175%;
+  margin: 0;
+  translate: -50% -50%;
+  overflow: visible;
+}
+
+.traveler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--primitives-spacing-24);
+  height: var(--primitives-spacing-24);
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  translate: -50% -50%;
+  will-change: transform;
+}
+
+.travelerToken {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.wash {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--semantic-color-brand-lavender) 0%, transparent);
+}
+
+.copy {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding:
+    var(--primitives-spacing-16)
+    var(--primitives-spacing-6);
+  background: transparent;
+  scroll-margin-top: 0;
+}
+
+.copyInner {
+  position: relative;
+  z-index: 1;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(var(--primitives-spacing-20) * 10);
+  text-align: center;
+}
+
+.copyTitle {
+  margin: 0;
+  color: var(--semantic-component-tag-label);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.copyBody {
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  max-width: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-11));
+  color: color-mix(in srgb, var(--semantic-component-tag-label) 80%, transparent);
+  text-wrap: pretty;
+}
+
+.ctaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--primitives-spacing-5);
+}
+
+.titleLine {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .copyTitle .titleLine {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 767px) {
+  .copy {
+    padding: var(--primitives-spacing-12) var(--primitives-spacing-4);
+  }
+
+  .copyTitle .titleLine {
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .traveler {
+    will-change: auto;
+  }
+
+  .stage {
+    will-change: auto;
+  }
+}

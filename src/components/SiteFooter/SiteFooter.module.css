@@ -1,40 +1,34 @@
 /*
-  Marketing footer gradient — Figma brand stops (amber → rose → lavender).
-  Exact stops match logo gem fills (#F8D197 / #CA8AEA); rose midpoint has no token yet.
+  Marketing footer gradient — shared gem stops from theme-overrides
+  (--semantic-color-brand-lavender / -gradient-rose / -amber).
 */
 .footer {
-  --footer-gradient-amber: #f8d197;
-  --footer-gradient-rose: #f39db0;
-  --footer-gradient-lavender: #ca8aea;
-
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: var(--primitives-spacing-16);
-  min-height: 70svh;
-  height: 70svh;
-  /* Side/bottom padding 0 so the wordmark can sit flush to edges */
+  gap: 0;
+  box-sizing: border-box;
+  /* Top only — wordmark sits flush to the bottom edge. */
   padding: var(--primitives-spacing-8) 0 0;
   overflow: hidden;
-  box-sizing: border-box;
   background: linear-gradient(
     180deg,
-    var(--footer-gradient-lavender) 0%,
-    var(--footer-gradient-rose) 52%,
-    var(--footer-gradient-amber) 100%
+    var(--semantic-color-brand-lavender) 0%,
+    var(--semantic-color-brand-gradient-rose) 52%,
+    var(--semantic-color-brand-amber) 100%
   );
   color: var(--primitives-color-neutral-50);
 }
 
+/* Desktop: logo | sitemap | socials. Mobile: logo+social, then sitemap below. */
 .topRow {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: start;
   gap: var(--primitives-spacing-6) var(--primitives-spacing-4);
+  box-sizing: border-box;
   width: 100%;
   padding: 0 var(--primitives-spacing-6);
-  box-sizing: border-box;
   z-index: 1;
 }
 
@@ -71,7 +65,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   width: 100%;
   max-width: 900px;
-  gap: var(--primitives-spacing-6) var(--primitives-spacing-10);
+  gap: var(--primitives-spacing-10) var(--primitives-spacing-6);
 }
 
 .column {
@@ -79,7 +73,7 @@
 }
 
 .columnTitle {
-  margin: 0 0 var(--primitives-spacing-2);
+  margin: 0 0 var(--primitives-spacing-3);
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(var(--primitives-fontSize-xs) * 1px);
   font-weight: var(--primitives-fontWeight-semibold);
@@ -95,7 +89,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--primitives-spacing-1);
+  gap: var(--primitives-spacing-2);
 }
 
 .link {
@@ -151,13 +145,17 @@
   outline-offset: 2px;
 }
 
-/* Asset is edge-tight (glyphs touch frame). Stretch full width, flush bottom. */
+.wordmarkWrap {
+  margin-top: var(--primitives-spacing-12);
+  flex-shrink: 0;
+  overflow: hidden;
+  line-height: 0;
+}
+
 .wordmark {
   display: block;
   width: 100%;
   height: auto;
-  margin-top: auto;
-  flex-shrink: 0;
   pointer-events: none;
   user-select: none;
 }
@@ -168,6 +166,8 @@
     grid-template-areas:
       'logo social'
       'nav nav';
+    gap: var(--primitives-spacing-12) var(--primitives-spacing-4);
+    padding: 0 var(--primitives-spacing-8);
   }
 
   .logoLink {
@@ -185,6 +185,7 @@
 
 @media (min-width: 768px) {
   .footer {
+    min-height: 70svh;
     padding-top: var(--primitives-spacing-10);
   }
 
@@ -197,6 +198,11 @@
     grid-template-columns: repeat(4, max-content);
     justify-content: space-between;
     gap: var(--primitives-spacing-6) 0;
+  }
+
+  .wordmarkWrap {
+    margin-top: auto;
+    padding-top: var(--primitives-spacing-12);
   }
 }
 

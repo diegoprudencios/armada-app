@@ -9,23 +9,14 @@ const SHOW_LEGACY_HERO = true
 
 const HEADING_LINES = ['Pluggable privacy', 'infrastructure for stablecoins'] as const
 
-const FEATURE_LINES = [
-  'Stablecoins are exposed by default.',
-  'Armada protects USDC balances for',
-  'organizational money on-chain.',
-] as const
+const FEATURE_COPY =
+  'Stablecoins are exposed by default. Armada protects USDC balances for organizational money on-chain.'
 
 function FeatureCard() {
   return (
     <div className={styles.feature}>
       <HeroUsdcSpinner />
-      <p className={styles.featureCopy}>
-        {FEATURE_LINES.map((line) => (
-          <span key={line} className={styles.featureLine}>
-            {line}
-          </span>
-        ))}
-      </p>
+      <p className={`armada-text-detail ${styles.featureCopy}`}>{FEATURE_COPY}</p>
     </div>
   )
 }
@@ -66,8 +57,11 @@ export function MarketingHero() {
       {SHOW_LEGACY_HERO ? (
         <div className={styles.contentLegacy}>
           <div className={styles.bottomLegacy}>
-            <div className={styles.introLegacy}>
-              <h1 id="marketing-hero-heading" className={styles.headingLegacy}>
+            <div className={`armada-site-stack ${styles.introLegacy}`}>
+              <h1
+                id="marketing-hero-heading"
+                className={`armada-text-title ${styles.headingLegacy}`}
+              >
                 {HEADING_LINES.map((line) => (
                   <span key={line} className={styles.headingLine}>
                     {line}
@@ -81,8 +75,11 @@ export function MarketingHero() {
         </div>
       ) : (
         <div className={styles.content}>
-          <div className={styles.intro}>
-            <h1 id="marketing-hero-heading" className={styles.heading}>
+          <div className={`armada-site-stack ${styles.intro}`}>
+            <h1
+              id="marketing-hero-heading"
+              className={`armada-text-title ${styles.heading}`}
+            >
               {HEADING_LINES.map((line) => (
                 <span key={line} className={styles.headingLine}>
                   {line}

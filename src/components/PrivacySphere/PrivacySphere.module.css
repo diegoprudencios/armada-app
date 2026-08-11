@@ -1,6 +1,6 @@
   /* Tokens used (verified in src/styles/tokens.css):
   - Text: --semantic-color-brand-ink
-  - Label fill: lavender → amber gradient (--semantic-color-brand-lavender / -amber)
+  - Label fill: footer gem gradient (lavender → rose → amber)
   EXCEPTION — label pill 180×56 (Figma); no matching tokens.
   EXCEPTION — diagram stroke #5A4A62 on brand-deep panels; no matching token.
   EXCEPTION — traveler blur 7px (ref soft in-pool half); no blur token.
@@ -44,8 +44,9 @@
   white-space: nowrap;
   background: linear-gradient(
     to right,
-    var(--semantic-color-brand-lavender),
-    var(--semantic-color-brand-amber)
+    var(--semantic-color-brand-lavender) 0%,
+    var(--semantic-color-brand-gradient-rose) 52%,
+    var(--semantic-color-brand-amber) 100%
   );
   pointer-events: none;
   /* left/top set in JS from sphere silhouette. */
@@ -137,11 +138,19 @@
   }
 }
 
-@media (max-width: 767px) {
-  /* 320×260 — wider than before so side orbits still clear. */
+@media (max-width: 1199px) {
+  /* Fit the square diagram frame; keep the wider stage ratio (4∶3). */
   .root {
-    width: calc(var(--primitives-spacing-20) * 4);
-    height: calc(var(--primitives-spacing-20) * 3 + var(--primitives-spacing-5));
+    width: min(100%, calc(var(--primitives-spacing-20) * 5));
+    height: auto;
+    aspect-ratio: 4 / 3;
+    max-height: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .root {
+    width: min(100%, calc(var(--primitives-spacing-20) * 4));
   }
 
   .traveler {
