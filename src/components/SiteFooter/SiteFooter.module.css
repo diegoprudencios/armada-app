@@ -167,6 +167,12 @@
     grid-area: nav;
   }
 
+  .sitemap {
+    grid-template-columns: 1fr;
+    gap: var(--primitives-spacing-6);
+    text-align: center;
+  }
+
   .socialList {
     grid-area: social;
   }
