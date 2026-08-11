@@ -23,14 +23,13 @@
 
 /*
   Marketing mobile type — stay on the scale:
-  title → fontSize-3xl (32px), body → fontSize-base (13px).
-  Desktop keeps site/title fluid clamp and site/body (17px).
+  title floor is fontSize-3xl (32px); body stays fontSize-md (15px).
 */
 @media (max-width: 767px) {
   :root,
   [data-theme='light'],
   [data-theme='dark'] {
     --semantic-typography-title-font-size: calc(var(--primitives-fontSize-3xl) * 1px);
-    --semantic-typography-body-font-size: calc(var(--primitives-fontSize-base) * 1px);
+    --semantic-typography-body-font-size: calc(var(--primitives-fontSize-md) * 1px);
   }
 }

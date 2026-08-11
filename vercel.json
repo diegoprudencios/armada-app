@@ -5,6 +5,8 @@
     { "src": "^/api/testing-feedback$", "dest": "/api/testing-feedback" },
     { "src": "^/homepage/?$", "dest": "/homepage.html" },
     { "src": "^/homepage2/?$", "dest": "/homepage2.html" },
+    { "src": "^/homepage3/?$", "dest": "/homepage3.html" },
+    { "src": "^/homepage4/?$", "dest": "/homepage4.html" },
     { "src": "^/pay-via-link/?$", "dest": "/pay-via-link.html" },
     { "src": "^/dashboard-v2/?$", "dest": "/dashboard-v2.html" },
     { "src": "^/dashboard/?$", "dest": "/dashboard.html" },

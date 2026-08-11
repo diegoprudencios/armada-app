@@ -1,5 +1,5 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
-import { NAV_MENUS } from '@/constants/siteNav'
+import { NAV_ITEMS, isNavMenu, type NavLink } from '@/constants/siteNav'
 import wordmarkWhite from '@/assets/armada-wordmark-white.svg'
 import styles from './SiteFooter.module.css'
 
@@ -7,6 +7,22 @@ const SOCIAL_LINKS = [
   { label: 'Discord', href: '#discord', icon: 'discord' as const },
   { label: 'X', href: '#x', icon: 'x' as const },
 ]
+
+/**
+ * Footer sitemap: direct nav links as-is; menus (e.g. Resources) flattened
+ * so Blog / Brand / Support sit as peers with the same title style.
+ */
+const FOOTER_LINKS: NavLink[] = NAV_ITEMS.flatMap((item) => {
+  if (isNavMenu(item)) {
+    return item.items.map((link) => ({
+      id: link.id,
+      label: link.title,
+      href: link.href,
+      ...(link.external ? { external: true as const } : {}),
+    }))
+  }
+  return [item]
+})
 
 function SocialIcon({ name }: { name: 'discord' | 'x' }) {
   if (name === 'discord') {
@@ -25,7 +41,7 @@ function SocialIcon({ name }: { name: 'discord' | 'x' }) {
 
 export function SiteFooter() {
   return (
-    <footer className={styles.footer} id="resources">
+    <footer className={styles.footer}>
       <div className={styles.topRow}>
         <a href="/" className={styles.logoLink} aria-label="Armada home">
           <ArmadaLogo variant="mark" markTone="white" className={styles.logo} />
@@ -33,26 +49,19 @@ export function SiteFooter() {
 
         <nav className={styles.nav} aria-label="Site map">
           <ul className={styles.sitemap}>
-            {NAV_MENUS.map((menu) => (
-              <li key={menu.id} className={styles.column}>
-                <h2 className={styles.columnTitle} id={`footer-${menu.id}`}>
-                  {menu.label}
+            {FOOTER_LINKS.map((item) => (
+              <li key={item.id} className={styles.column}>
+                <h2 className={`${styles.columnTitle} ${styles.columnTitleSolo}`} id={`footer-${item.id}`}>
+                  <a
+                    className={styles.columnTitleLink}
+                    href={item.href}
+                    {...(item.external
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {})}
+                  >
+                    {item.label}
+                  </a>
                 </h2>
-                <ul className={styles.columnLinks} aria-labelledby={`footer-${menu.id}`}>
-                  {menu.items.map((item) => (
-                    <li key={item.id}>
-                      <a
-                        className={styles.link}
-                        href={item.href}
-                        {...(item.external
-                          ? { target: '_blank', rel: 'noopener noreferrer' }
-                          : {})}
-                      >
-                        {item.title}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
               </li>
             ))}
           </ul>

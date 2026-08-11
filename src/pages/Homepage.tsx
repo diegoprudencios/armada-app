@@ -1,7 +1,10 @@
 import { useEffect } from 'react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { MarketingHero } from '@/components/MarketingHero'
-import { WhatIsArmada } from '@/components/WhatIsArmada'
+import {
+  WhatIsArmada,
+  type WhatIsArmadaFeaturesLayout,
+} from '@/components/WhatIsArmada'
 import { SiteFooter } from '@/components/SiteFooter'
 import styles from './Homepage.module.css'
 
@@ -9,7 +12,16 @@ import styles from './Homepage.module.css'
 const HOMEPAGE_CHROME_FILL = '#f8d197'
 const CHROME_FILL_CLASS = 'armada-homepage-chrome'
 
-export function Homepage() {
+export interface HomepageProps {
+  featuresLayout?: WhatIsArmadaFeaturesLayout
+  /** Sticky hero scroll-exit (drift + dissolve). `/homepage` only. */
+  heroScrollExit?: boolean
+}
+
+export function Homepage({
+  featuresLayout = 'stack',
+  heroScrollExit = false,
+}: HomepageProps) {
   useEffect(() => {
     const root = document.documentElement
     const body = document.body
@@ -39,8 +51,11 @@ export function Homepage() {
       </a>
       <SiteHeader />
       <main id="main-content" className={styles.main}>
-        <MarketingHero />
-        <WhatIsArmada />
+        <MarketingHero scrollExit={heroScrollExit} />
+        <WhatIsArmada
+          featuresLayout={featuresLayout}
+          introUnderHero={heroScrollExit}
+        />
       </main>
       <SiteFooter />
     </div>

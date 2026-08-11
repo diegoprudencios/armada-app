@@ -1,15 +1,7 @@
 import type { ComponentType, SVGProps } from 'react'
 import {
-  BookOpenIcon,
-  ChartBarIcon,
-  ChatBubbleLeftRightIcon,
-  CubeTransparentIcon,
   LifebuoyIcon,
-  MapIcon,
-  MegaphoneIcon,
   NewspaperIcon,
-  PuzzlePieceIcon,
-  ScaleIcon,
   SwatchIcon,
 } from '@heroicons/react/24/outline'
 
@@ -24,88 +16,51 @@ export type MegaMenuItem = {
   icon: NavIcon
 }
 
+/** Top-level item with a mega-menu panel. */
 export type NavMenu = {
   id: string
   label: string
   items: MegaMenuItem[]
 }
 
-export const NAV_MENUS: NavMenu[] = [
+/** Top-level item that links directly (no dropdown). */
+export type NavLink = {
+  id: string
+  label: string
+  href: string
+  external?: boolean
+}
+
+export type NavItem = NavLink | NavMenu
+
+export function isNavMenu(item: NavItem): item is NavMenu {
+  return 'items' in item && Array.isArray(item.items)
+}
+
+/**
+ * Primary site navigation.
+ * Only Resources opens a dropdown; other items are direct links.
+ */
+export const NAV_ITEMS: NavItem[] = [
   {
-    id: 'arm-token',
-    label: 'ARM Token',
-    items: [
-      {
-        id: 'governance',
-        title: 'Governance',
-        description: 'Vote on how the protocol runs',
-        href: 'https://gov.armada.blue',
-        external: true,
-        icon: ScaleIcon,
-      },
-      {
-        id: 'roadmap',
-        title: 'Roadmap',
-        description: "See what's shipping next",
-        href: '#roadmap',
-        icon: MapIcon,
-      },
-      {
-        id: 'dashboard',
-        title: 'Dashboard',
-        description: 'Protocol metrics and status',
-        href: '#dashboard',
-        icon: ChartBarIcon,
-      },
-    ],
+    id: 'use-cases',
+    label: 'Use cases',
+    href: '#use-cases',
   },
   {
-    id: 'community',
-    label: 'Community',
-    items: [
-      {
-        id: 'discord',
-        title: 'Discord',
-        description: 'Join the conversation',
-        href: '#discord',
-        icon: ChatBubbleLeftRightIcon,
-      },
-      {
-        id: 'x',
-        title: 'X',
-        description: 'Follow product updates',
-        href: '#x',
-        icon: MegaphoneIcon,
-      },
-    ],
+    id: 'developers',
+    label: 'Developers',
+    href: '#developers',
   },
   {
-    id: 'integrate',
-    label: 'Integrate Private USDC',
-    items: [
-      {
-        id: 'why-integrate',
-        title: 'Why integrate',
-        description: "Privacy your users don't have to think about",
-        href: '#why-integrate',
-        icon: CubeTransparentIcon,
-      },
-      {
-        id: 'docs',
-        title: 'Docs',
-        description: 'Technical guides and SDKs',
-        href: 'https://docs.armada.blue',
-        external: true,
-        icon: BookOpenIcon,
-      },
-      {
-        id: 'tool',
-        title: 'Tool',
-        description: 'Integration tooling for builders',
-        href: '#tool',
-        icon: PuzzlePieceIcon,
-      },
-    ],
+    id: 'security',
+    label: 'Security',
+    href: '#security',
+  },
+  {
+    id: 'protocol',
+    label: 'Protocol',
+    href: '#protocol',
   },
   {
     id: 'resources',
@@ -135,3 +90,6 @@ export const NAV_MENUS: NavMenu[] = [
     ],
   },
 ]
+
+/** @deprecated Prefer NAV_ITEMS — kept for any leftover imports. */
+export const NAV_MENUS: NavMenu[] = NAV_ITEMS.filter(isNavMenu)

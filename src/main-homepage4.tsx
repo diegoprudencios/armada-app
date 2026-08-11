@@ -4,8 +4,8 @@ import './styles/typography.css'
 import './styles/theme-overrides.css'
 import { initTheme } from '@/utils/theme'
 import { mountRoot } from '@/mountRoot'
-import { Homepage } from './pages/Homepage'
+import { Homepage4 } from './pages/Homepage4'
 
 initTheme()
 
-mountRoot(<Homepage heroScrollExit />)
+mountRoot(<Homepage4 />)

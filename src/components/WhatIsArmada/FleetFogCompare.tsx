@@ -29,8 +29,8 @@ const ICON_PX = 32
 
 export interface FleetFogCompareProps {
   className?: string
-  /** 'card' = fixed-height rounded figure; 'fill' = stretch to parent; 'banner' = full-width ≤50vh. */
-  layout?: 'card' | 'fill' | 'banner'
+  /** 'card' = fixed-height rounded figure; 'fill' = stretch to parent; 'banner' = full-width ≤50vh; 'cover' = 70vh over sticky privacy copy. */
+  layout?: 'card' | 'fill' | 'banner' | 'cover'
 }
 
 /**
@@ -119,6 +119,7 @@ export function FleetFogCompare({ className, layout = 'card' }: FleetFogCompareP
     styles.root,
     layout === 'fill' ? styles.rootFill : '',
     layout === 'banner' ? styles.rootBanner : '',
+    layout === 'cover' ? styles.rootCover : '',
     className,
   ]
     .filter(Boolean)

@@ -7,7 +7,7 @@ import {
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { Button } from '@/components/Button'
 import { NavMegaMenu } from '@/components/NavMegaMenu'
-import { NAV_MENUS } from '@/constants/siteNav'
+import { NAV_ITEMS, isNavMenu } from '@/constants/siteNav'
 import { openAppWithWallet } from '@/utils/appNavigation'
 import landingLogoWhite from '@/assets/landing-logo-white.png'
 import styles from './SiteHeader.module.css'
@@ -207,14 +207,30 @@ export function SiteHeader() {
             onMouseLeave={scheduleClose}
           >
             <ul className={styles.navList}>
-              {NAV_MENUS.map((menu) => {
-                const panelId = `${menuIdPrefix}-${menu.id}`
-                const isOpen = openMenuId === menu.id
+              {NAV_ITEMS.map((item) => {
+                if (!isNavMenu(item)) {
+                  return (
+                    <li key={item.id} className={styles.navItem}>
+                      <a
+                        className={styles.navLink}
+                        href={item.href}
+                        {...(item.external
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : {})}
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  )
+                }
+
+                const panelId = `${menuIdPrefix}-${item.id}`
+                const isOpen = openMenuId === item.id
                 return (
                   <li
-                    key={menu.id}
+                    key={item.id}
                     className={styles.navItem}
-                    onMouseEnter={() => scheduleOpen(menu.id)}
+                    onMouseEnter={() => scheduleOpen(item.id)}
                   >
                     <button
                       type="button"
@@ -225,14 +241,14 @@ export function SiteHeader() {
                       aria-haspopup="true"
                       aria-controls={panelId}
                       onClick={() =>
-                        setOpenMenuId((current) => (current === menu.id ? null : menu.id))
+                        setOpenMenuId((current) => (current === item.id ? null : item.id))
                       }
                       onFocus={() => {
                         clearTimers()
-                        setOpenMenuId(menu.id)
+                        setOpenMenuId(item.id)
                       }}
                     >
-                      {menu.label}
+                      {item.label}
                       <ChevronDownIcon
                         className={[styles.navChevron, isOpen && styles.navChevronOpen]
                           .filter(Boolean)
@@ -244,7 +260,7 @@ export function SiteHeader() {
                     </button>
                     {isOpen ? (
                       <NavMegaMenu
-                        menu={menu}
+                        menu={item}
                         id={panelId}
                         onNavigate={() => setOpenMenuId(null)}
                       />
@@ -305,21 +321,40 @@ export function SiteHeader() {
         >
           <nav aria-label="Primary mobile">
             <ul className={styles.mobileNavList}>
-              {NAV_MENUS.map((menu) => {
-                const expanded = mobileExpandedId === menu.id
-                const sectionId = `${mobileMenuId}-${menu.id}`
+              {NAV_ITEMS.map((item) => {
+                if (!isNavMenu(item)) {
+                  return (
+                    <li key={item.id} className={styles.mobileNavItem}>
+                      <a
+                        className={styles.mobileNavLink}
+                        href={item.href}
+                        onClick={closeMobile}
+                        {...(item.external
+                          ? { target: '_blank', rel: 'noopener noreferrer' }
+                          : {})}
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  )
+                }
+
+                const expanded = mobileExpandedId === item.id
+                const sectionId = `${mobileMenuId}-${item.id}`
                 return (
-                  <li key={menu.id} className={styles.mobileNavItem}>
+                  <li key={item.id} className={styles.mobileNavItem}>
                     <button
                       type="button"
                       className={styles.mobileNavLink}
                       aria-expanded={expanded}
                       aria-controls={sectionId}
                       onClick={() =>
-                        setMobileExpandedId((current) => (current === menu.id ? null : menu.id))
+                        setMobileExpandedId((current) =>
+                          current === item.id ? null : item.id,
+                        )
                       }
                     >
-                      {menu.label}
+                      {item.label}
                       <ChevronDownIcon
                         className={[styles.navChevron, expanded && styles.navChevronOpen]
                           .filter(Boolean)
@@ -331,7 +366,11 @@ export function SiteHeader() {
                     </button>
                     {expanded ? (
                       <div id={sectionId} className={styles.mobileMegaWrap}>
-                        <NavMegaMenu menu={menu} id={`${sectionId}-panel`} onNavigate={closeMobile} />
+                        <NavMegaMenu
+                          menu={item}
+                          id={`${sectionId}-panel`}
+                          onNavigate={closeMobile}
+                        />
                       </div>
                     ) : null}
                   </li>

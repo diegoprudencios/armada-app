@@ -104,12 +104,12 @@
   --semantic-typography-mono-xs-letter-spacing: var(--primitives-letterSpacing-normal);
   --semantic-typography-title-font-family: var(--primitives-fontFamily-display);
   --semantic-typography-title-font-weight: var(--primitives-fontWeight-regular);
-  --semantic-typography-title-font-size: clamp(2.75rem, 1.753rem + 2.08vw, 3.75rem);
+  --semantic-typography-title-font-size: clamp(2rem, 1.252rem + 1.56vw, 2.75rem);
   --semantic-typography-title-line-height: var(--primitives-lineHeight-tight);
   --semantic-typography-title-letter-spacing: var(--primitives-letterSpacing-tight);
   --semantic-typography-body-font-family: var(--primitives-fontFamily-ui);
   --semantic-typography-body-font-weight: var(--primitives-fontWeight-medium);
-  --semantic-typography-body-font-size: calc(var(--primitives-fontSize-lg) * 1px);
+  --semantic-typography-body-font-size: calc(var(--primitives-fontSize-md) * 1px);
   --semantic-typography-body-line-height: var(--primitives-lineHeight-normal);
   --semantic-typography-body-letter-spacing: var(--primitives-letterSpacing-normal);
   --semantic-typography-detail-font-family: var(--primitives-fontFamily-ui);
@@ -117,6 +117,9 @@
   --semantic-typography-detail-font-size: calc(var(--primitives-fontSize-base) * 1px);
   --semantic-typography-detail-line-height: var(--primitives-lineHeight-snug);
   --semantic-typography-detail-letter-spacing: var(--primitives-letterSpacing-normal);
+  /* Site stack: 0.5× title size, 1.6× body size */
+  --semantic-spacing-site-title-to-body: calc(var(--semantic-typography-title-font-size) * 0.5);
+  --semantic-spacing-site-body-to-cta: calc(var(--semantic-typography-body-font-size) * 1.6);
 }
 
 .armada-text-display-hero-lg {

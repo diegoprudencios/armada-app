@@ -1,11 +1,15 @@
 import { useEffect, useRef, type HTMLAttributes, type ReactNode } from 'react'
 import styles from './ScrollReveal.module.css'
 
+export type RevealMotion = 'slide' | 'fade'
+
 /**
  * Scroll-triggered cascade for a text block’s direct children
  * (title → body → CTA).
  */
-export function useScrollReveal<T extends HTMLElement = HTMLDivElement>() {
+export function useScrollReveal<T extends HTMLElement = HTMLDivElement>(
+  motion: RevealMotion = 'slide',
+) {
   const ref = useRef<T>(null)
 
   useEffect(() => {
@@ -32,11 +36,17 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>() {
         })
         io.disconnect()
       },
-      {
-        // Wait until the block is well into view so the slide-up is on-screen.
-        threshold: 0.35,
-        rootMargin: '0px 0px -18% 0px',
-      },
+      motion === 'fade'
+        ? {
+            // Fire as soon as the centered block enters the viewport.
+            threshold: 0,
+            rootMargin: '20% 0px 0px 0px',
+          }
+        : {
+            // Wait until the block is well into view so the slide-up is on-screen.
+            threshold: 0.35,
+            rootMargin: '0px 0px -18% 0px',
+          },
     )
 
     io.observe(root)
@@ -53,18 +63,28 @@ export function useScrollReveal<T extends HTMLElement = HTMLDivElement>() {
       io.disconnect()
       reducedMotion.removeEventListener('change', onMotionChange)
     }
-  }, [])
+  }, [motion])
 
-  return { ref, className: styles.stack }
+  return {
+    ref,
+    className: motion === 'fade' ? styles.stackFade : styles.stack,
+  }
 }
 
 type RevealStackProps = HTMLAttributes<HTMLDivElement> & {
   children: ReactNode
+  /** `slide` = translate up (default); `fade` = opacity only, earlier trigger. */
+  motion?: RevealMotion
 }
 
 /** Stack root that cascades direct children on scroll entry. */
-export function RevealStack({ children, className, ...rest }: RevealStackProps) {
-  const reveal = useScrollReveal()
+export function RevealStack({
+  children,
+  className,
+  motion = 'slide',
+  ...rest
+}: RevealStackProps) {
+  const reveal = useScrollReveal(motion)
   return (
     <div
       {...rest}

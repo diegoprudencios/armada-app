@@ -5,6 +5,14 @@
 */
 
 .section {
+  /* Shared with feature stack + intro fog so widths stay aligned. */
+  --section-stack-max: calc(
+    var(--primitives-spacing-20) * 18 + var(--primitives-spacing-16) - var(--primitives-spacing-1) /
+      2
+  );
+  --section-features-pad-x: var(--primitives-spacing-20);
+  /* Top of features band — also used as amber intro bottom pad. */
+  --section-features-pad-y: calc(var(--primitives-spacing-20) * 2);
   /* EXCEPTION — Figma marketing page fill (white), not amber-100. */
   --section-page-bg: #ffffff;
   /* EXCEPTION — Figma panel fill #f9f3ef (no matching token). */
@@ -37,14 +45,15 @@
   background: var(--semantic-color-brand-deep);
 }
 
-/* Stacked privacy intro: text band owns top padding; fog is full-bleed. */
+/* Stacked privacy intro: full-viewport amber + sticky copy; fog scrolls over. */
 .sectionIntroStack {
   padding-top: 0;
   gap: 0;
   align-items: stretch;
+  background: var(--primitives-color-amber-100);
 }
 
-/* —— Intro: title + body/CTA, then full-width fog —— */
+/* —— Intro: sticky 100svh centered copy; fog rises above it —— */
 
 .intro {
   display: flex;
@@ -54,38 +63,94 @@
   box-sizing: border-box;
   width: 100%;
   max-width: none;
-  padding: 0;
+  padding: 0 0 var(--section-features-pad-y);
   text-align: center;
   scroll-margin-top: 0;
+  background: var(--primitives-color-amber-100);
+}
+
+/* Sit under the full hero pin so copy is centered as the stage fades to amber. */
+.introUnderHero {
+  margin-top: var(--intro-under-hero-margin, calc(-100svh - 110svh));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .introUnderHero {
+    margin-top: 0;
+  }
+
+  .introTextHandoff {
+    opacity: 1;
+    pointer-events: auto;
+    will-change: auto;
+  }
+
+  .introHold {
+    height: 0;
+  }
 }
 
 .introText {
-  align-items: center;
-  align-self: center;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  align-self: stretch;
   box-sizing: border-box;
   width: 100%;
-  max-width: calc(
-    var(--primitives-spacing-20) * 12 + var(--primitives-spacing-12) + var(--primitives-spacing-1) /
-      2
-  );
-  /* 120px = spacing-20 + spacing-10 */
-  padding:
-    calc(var(--primitives-spacing-20) + var(--primitives-spacing-10))
-    var(--primitives-spacing-20);
+  max-width: none;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--primitives-spacing-20);
   text-align: center;
+  background: var(--primitives-color-amber-100);
+}
+
+/* Scroll-scrubbed by MarketingHero (--privacy-copy). Amber first, then this fades in. */
+.introTextHandoff {
+  opacity: var(--privacy-copy, 0);
+  will-change: opacity;
+  pointer-events: none;
+}
+
+:global(html[data-privacy-copy='on']) .introTextHandoff {
+  pointer-events: auto;
+}
+
+/* Keep sticky copy on screen after it fades in, before fog rises. */
+.introHold {
+  flex-shrink: 0;
+  height: var(--intro-hold-svh, 55svh);
+  pointer-events: none;
 }
 
 .introTitle {
   margin: 0;
   width: 100%;
-  max-width: none;
+  max-width: calc(
+    var(--primitives-spacing-20) * 12 + var(--primitives-spacing-12) + var(--primitives-spacing-1) /
+      2
+  );
   color: #000000;
   text-align: center;
   text-wrap: pretty;
 }
 
+/* Match feature stack width (same pad + max as .features > .stack). */
+.fogWrap {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 var(--section-features-pad-x);
+}
+
 .fog {
   width: 100%;
+  max-width: var(--section-stack-max);
+  margin-inline: auto;
 }
 
 .introBody {
@@ -208,9 +273,7 @@
   align-items: center;
   box-sizing: border-box;
   width: 100%;
-  padding:
-    calc(var(--primitives-spacing-20) * 2)
-    var(--primitives-spacing-20);
+  padding: var(--section-features-pad-y) var(--section-features-pad-x);
   background: linear-gradient(
     180deg,
     color-mix(in srgb, var(--semantic-color-brand-lavender) 40%, transparent) 0%,
@@ -225,10 +288,7 @@
   gap: var(--primitives-spacing-20);
   box-sizing: border-box;
   width: 100%;
-  max-width: calc(
-    var(--primitives-spacing-20) * 18 + var(--primitives-spacing-16) - var(--primitives-spacing-1) /
-      2
-  );
+  max-width: var(--section-stack-max);
 }
 
 .panel {
@@ -354,6 +414,296 @@
   text-wrap: pretty;
 }
 
+/* —— Homepage3: edge-aligned grid — full-bleed H, continuous V on container —— */
+
+.featuresGrid {
+  --features-pad-y: calc(var(--primitives-spacing-20) * 2);
+  --features-pad-x: var(--primitives-spacing-20);
+  /* EXCEPTION — blueprint line on cream / deep / gem band. */
+  --grid-line: color-mix(in srgb, #5a4a62 45%, transparent);
+
+  position: relative;
+  overflow: visible;
+  padding: var(--features-pad-y) var(--features-pad-x);
+}
+
+.stackGrid {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Continuous verticals on the content container edges (through panel gaps). */
+.stackGrid::before,
+.stackGrid::after {
+  content: '';
+  position: absolute;
+  top: calc(var(--features-pad-y) * -1);
+  bottom: calc(var(--features-pad-y) * -1);
+  width: 1px;
+  background: var(--grid-line);
+  z-index: 6;
+  pointer-events: none;
+}
+
+.stackGrid::before {
+  left: 0;
+}
+
+.stackGrid::after {
+  right: 0;
+}
+
+.panelGrid {
+  position: relative;
+  /* Let full-bleed horizontals escape; clip diagrams separately. */
+  overflow: visible;
+  border-radius: 0;
+  z-index: 1;
+}
+
+.panelGrid.panelSplit {
+  overflow: visible;
+}
+
+.panelGrid .panelDiagram {
+  overflow: hidden;
+}
+
+.gridLineH,
+.gridMid {
+  position: absolute;
+  background: var(--grid-line);
+  pointer-events: none;
+  z-index: 6;
+}
+
+/* Horizontals on panel top/bottom — span full viewport width. */
+.gridLineH {
+  left: 50%;
+  width: 100vw;
+  height: 1px;
+  transform: translateX(-50%);
+}
+
+.gridLineH[data-edge='top'] {
+  top: 0;
+}
+
+.gridLineH[data-edge='bottom'] {
+  bottom: 0;
+}
+
+/* 50/50 seam — full panel height. */
+.gridMid {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+/* —— Homepage4: varied bento (privacy + features) —— */
+
+.sectionBento {
+  /* Flush under hero; bento band owns padding. */
+  padding-top: 0;
+  gap: 0;
+  align-items: stretch;
+}
+
+.featuresBento {
+  padding:
+    calc(var(--primitives-spacing-20) + var(--primitives-spacing-10))
+    var(--primitives-spacing-10);
+}
+
+.stackBento {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--primitives-spacing-5);
+  align-items: stretch;
+  max-width: calc(
+    var(--primitives-spacing-20) * 18 + var(--primitives-spacing-16) - var(--primitives-spacing-1) /
+      2
+  );
+}
+
+.panelBento {
+  /* 580px — shared bento card height */
+  height: calc(var(--primitives-spacing-20) * 7 + var(--primitives-spacing-5));
+  min-height: calc(var(--primitives-spacing-20) * 7 + var(--primitives-spacing-5));
+  border-radius: var(--primitives-spacing-5);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px color-mix(in srgb, #000000 6%, transparent);
+}
+
+/* Bento type: title 32px / body 13px */
+.panelBento :global(.armada-text-title),
+.panelBento .panelTitle {
+  font-size: calc(var(--primitives-fontSize-3xl) * 1px);
+  line-height: 1.1;
+}
+
+.panelBento :global(.armada-text-body),
+.panelBento .panelBody {
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  line-height: 1.4;
+}
+
+.panelBento.panelSplit {
+  --panel-pad-x: var(--primitives-spacing-10);
+}
+
+/* Bento non-split cards: kill inherited .panel:not(.panelSplit) side padding so media is edge-flush. */
+.panelBento:not(.panelSplit) {
+  padding: 0;
+}
+
+/* Privacy — full width, copy | fog (no panel padding — media is edge-flush) */
+.bentoPrivacy {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+  align-items: stretch;
+  background: var(--section-panel-bg);
+}
+
+.bentoPrivacyCopy {
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--primitives-spacing-12) var(--primitives-spacing-10);
+  min-width: 0;
+}
+
+.bentoPrivacyMedia {
+  position: relative;
+  min-width: 0;
+  min-height: calc(var(--primitives-spacing-20) * 4);
+  overflow: hidden;
+  background: var(--semantic-color-brand-deep);
+}
+
+/* Capital — ~8/12, all deep + light type */
+.bentoCapital {
+  grid-column: 1 / span 8;
+  background: var(--semantic-color-brand-deep);
+}
+
+.bentoCapital .panelContent,
+.bentoCapital.panelSplit .panelContent {
+  background: transparent;
+}
+
+/* Compliance — ~4/12, vertical diagram → copy (diagram flush) */
+.bentoCompliance {
+  grid-column: 9 / -1;
+  display: flex;
+  flex-direction: column;
+  --panel-pad-x: var(--primitives-spacing-10);
+  --diagram-stroke: #5a4a62;
+  background: var(--section-panel-bg);
+}
+
+.bentoCompliance .panelDiagram {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: calc(var(--primitives-spacing-20) * 3);
+  width: 100%;
+  overflow: hidden;
+  background: var(--semantic-color-brand-deep);
+  --privacy-sphere-stroke: var(--diagram-stroke);
+  --toggle-stroke: var(--diagram-stroke);
+  --cube-stroke: var(--diagram-stroke);
+  --cube-face-fill: var(--semantic-color-brand-deep);
+}
+
+.bentoCompliance .panelContent {
+  flex: 0 0 auto;
+  height: auto;
+  max-width: none;
+  padding: var(--primitives-spacing-10);
+  background: var(--section-panel-bg);
+}
+
+/* Beyond — ~4/12 (inverse of capital row), cream + dark copy */
+.bentoBeyond {
+  grid-column: 1 / span 4;
+  display: grid;
+  grid-template-rows: minmax(calc(var(--primitives-spacing-20) * 3), 1fr) auto;
+  --diagram-stroke: #5a4a62;
+  background: var(--section-panel-bg);
+}
+
+.bentoBeyond .panelDiagram {
+  position: relative;
+  width: 100%;
+  min-height: calc(var(--primitives-spacing-20) * 3);
+  overflow: hidden;
+  background: transparent;
+  --privacy-sphere-stroke: var(--diagram-stroke);
+}
+
+.bentoBeyond .panelContent {
+  flex: 0 0 auto;
+  height: auto;
+  max-width: none;
+  padding: var(--primitives-spacing-8) var(--primitives-spacing-10)
+    var(--primitives-spacing-10);
+  background: transparent;
+}
+
+/* Deep-panel helpers (capital bento + stack / grid layouts) */
+.panelDeep .panelContentDeep {
+  justify-content: flex-start;
+  height: auto;
+  max-width: none;
+  padding: var(--primitives-spacing-8) var(--primitives-spacing-10)
+    var(--primitives-spacing-10);
+  background: transparent;
+}
+
+/* Capital split: keep content padding aligned with other bento splits */
+.bentoCapital.panelSplit .panelContentDeep {
+  padding:
+    var(--primitives-spacing-12)
+    var(--panel-pad-x)
+    var(--primitives-spacing-12)
+    var(--panel-pad-x);
+}
+
+.panelTitleDeep {
+  color: var(--semantic-component-tag-label);
+}
+
+.panelBodyDeep {
+  color: color-mix(in srgb, var(--semantic-component-tag-label) 72%, transparent);
+}
+
+.panelDeep :global(.ghostCta),
+.panelDeep .ghostCta {
+  color: var(--semantic-component-tag-label);
+}
+
+.panelDeep .ghostCta.ghostCta:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--semantic-component-tag-label) 10%, transparent);
+  color: var(--semantic-component-tag-label);
+}
+
+/* Foundations — ~8/12 (inverse of capital row), horizontal deep-left */
+.bentoFoundations {
+  grid-column: 5 / -1;
+}
+
+.panelBento .panelContent,
+.panelBento.panelSplit .panelContent {
+  z-index: 1;
+}
+
+.panelBento .panelDiagram {
+  z-index: 1;
+}
+
 @media (min-width: 768px) {
   .introTitle .titleLine,
   .introSplitTitle .titleLine,
@@ -418,18 +768,26 @@
 
   .intro {
     gap: 0;
-    padding: 0;
+    padding: 0 0 var(--section-features-pad-y);
+    --section-features-pad-x: var(--primitives-spacing-10);
+    --section-features-pad-y: var(--primitives-spacing-16);
   }
 
   .introText {
     max-width: none;
+    min-height: 100svh;
     padding:
       var(--primitives-spacing-16)
       var(--primitives-spacing-10);
   }
 
+  .fogWrap {
+    padding: 0 var(--section-features-pad-x);
+  }
+
   .fog {
     width: 100%;
+    max-width: var(--section-stack-max);
   }
 
   .introTitle {
@@ -473,7 +831,9 @@
   }
 
   .features {
-    padding: var(--primitives-spacing-16) var(--primitives-spacing-10);
+    padding: var(--section-features-pad-y) var(--section-features-pad-x);
+    --section-features-pad-x: var(--primitives-spacing-10);
+    --section-features-pad-y: var(--primitives-spacing-16);
   }
 
   .stack {
@@ -495,6 +855,57 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    padding: 0;
+  }
+
+  /* Stacked split: mid seam no longer matches layout. */
+  .gridMid {
+    display: none;
+  }
+
+  .featuresGrid {
+    --features-pad-y: var(--primitives-spacing-16);
+    --features-pad-x: var(--primitives-spacing-10);
+  }
+
+  .stackBento {
+    grid-template-columns: 1fr;
+  }
+
+  .bentoPrivacy,
+  .bentoCapital,
+  .bentoCompliance,
+  .bentoBeyond,
+  .bentoFoundations {
+    grid-column: 1 / -1;
+  }
+
+  .bentoPrivacy {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+  }
+
+  .bentoPrivacyMedia {
+    order: -1;
+    min-height: 0;
+    aspect-ratio: 16 / 10;
+  }
+
+  .bentoCompliance,
+  .bentoBeyond,
+  .bentoCapital,
+  .bentoFoundations {
+    height: auto;
+    min-height: 0;
+  }
+
+  .panelBento {
+    height: auto;
+    min-height: 0;
+  }
+
+  .panelBento:not(.panelSplit) {
     padding: 0;
   }
 
@@ -545,21 +956,75 @@
 
   .intro {
     gap: 0;
-    padding: 0;
+    padding: 0 0 var(--section-features-pad-y);
+    --section-features-pad-x: var(--primitives-spacing-8);
+    --section-features-pad-y: var(--primitives-spacing-20);
   }
 
   .introText {
+    min-height: 100svh;
     /* 80px top/bottom on mobile */
     padding:
       var(--primitives-spacing-20)
       var(--primitives-spacing-8);
   }
 
+  .fogWrap {
+    padding: 0 var(--section-features-pad-x);
+  }
+
   .features {
     /* Side inset matches panel content bottom padding (spacing-8). */
-    padding:
-      var(--primitives-spacing-20)
-      var(--primitives-spacing-8);
+    padding: var(--section-features-pad-y) var(--section-features-pad-x);
+    --section-features-pad-x: var(--primitives-spacing-8);
+    --section-features-pad-y: var(--primitives-spacing-20);
+  }
+
+  .featuresGrid {
+    --features-pad-y: var(--primitives-spacing-20);
+    --features-pad-x: var(--primitives-spacing-8);
+    padding: var(--features-pad-y) var(--features-pad-x);
+  }
+
+  .stackBento {
+    grid-template-columns: 1fr;
+    gap: var(--primitives-spacing-8);
+  }
+
+  .bentoPrivacy,
+  .bentoCapital,
+  .bentoCompliance,
+  .bentoBeyond,
+  .bentoFoundations {
+    grid-column: 1 / -1;
+  }
+
+  .bentoPrivacy {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 0;
+  }
+
+  .bentoPrivacyMedia {
+    order: -1;
+    aspect-ratio: 4 / 3;
+  }
+
+  .bentoBeyond {
+    grid-template-rows: minmax(calc(var(--primitives-spacing-20) * 2 + var(--primitives-spacing-10)), auto) auto;
+  }
+
+  .panelBento {
+    height: auto;
+    min-height: 0;
+  }
+
+  .panelBento:not(.panelSplit) {
+    padding: 0;
+  }
+
+  .featuresBento {
+    padding: var(--primitives-spacing-10) var(--primitives-spacing-8);
   }
 
   .stack {
