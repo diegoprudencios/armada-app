@@ -18,7 +18,7 @@ const CHAPTERS: Chapter[] = [
     id: 'privacy',
     mode: 'privacy',
     title: "Privacy your users don't have to think about",
-    body: "Add shielded USDC rails to your product through Armada's SDK, APIs, and compliance tooling. Built for platforms that manage, deploy, and move private capital on-chain.",
+    body: 'Add shielded USDC to your product with the SDK, APIs, and compliance tooling.',
     ctaLabel: 'Integrate and test',
     ctaHref: 'https://docs.armada.blue',
   },

@@ -7,15 +7,33 @@ import {
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { Button } from '@/components/Button'
 import { NavMegaMenu } from '@/components/NavMegaMenu'
-import { NAV_ITEMS, isNavMenu } from '@/constants/siteNav'
+import { NAV_ITEMS, isNavMenu, type NavLink } from '@/constants/siteNav'
 import { openAppWithWallet } from '@/utils/appNavigation'
 import landingLogoWhite from '@/assets/landing-logo-white.png'
 import styles from './SiteHeader.module.css'
+
+/**
+ * Mobile drawer links: flatten menus (e.g. Resources → Blog / Brand / Support)
+ * so they stack like the footer sitemap.
+ */
+const MOBILE_NAV_LINKS: NavLink[] = NAV_ITEMS.flatMap((item) => {
+  if (isNavMenu(item)) {
+    return item.items.map((link) => ({
+      id: link.id,
+      label: link.title,
+      href: link.href,
+      ...(link.external ? { external: true as const } : {}),
+    }))
+  }
+  return [item]
+})
 
 const SCROLL_THRESHOLD = 48
 const SCROLL_DELTA = 6
 const OPEN_DELAY_MS = 80
 const CLOSE_DELAY_MS = 160
+/** Matches `.mobilePanel` transform duration. */
+const MOBILE_DRAWER_MS = 320
 
 const SOCIAL_LINKS = [
   { label: 'Discord', href: '#discord', icon: 'discord' as const },
@@ -41,8 +59,10 @@ export function SiteHeader() {
   /** Fixed solid chrome — only while scrolling up (or mobile menu open). */
   const [floating, setFloating] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  /** Keep drawer mounted through the close slide. */
+  const [mobileMounted, setMobileMounted] = useState(false)
+  const [mobileEntered, setMobileEntered] = useState(false)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
-  const [mobileExpandedId, setMobileExpandedId] = useState<string | null>(null)
   const mobileMenuId = useId()
   const menuIdPrefix = useId()
   const burgerRef = useRef<HTMLButtonElement>(null)
@@ -51,12 +71,15 @@ export function SiteHeader() {
   const lastY = useRef(0)
   const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const drawerExitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const clearTimers = () => {
     if (openTimer.current) clearTimeout(openTimer.current)
     if (closeTimer.current) clearTimeout(closeTimer.current)
+    if (drawerExitTimer.current) clearTimeout(drawerExitTimer.current)
     openTimer.current = null
     closeTimer.current = null
+    drawerExitTimer.current = null
   }
 
   const scheduleOpen = (id: string) => {
@@ -82,7 +105,7 @@ export function SiteHeader() {
       const goingDown = y > lastY.current + SCROLL_DELTA
       const goingUp = y < lastY.current - SCROLL_DELTA
 
-      if (mobileOpen || openMenuId) {
+      if (mobileMounted || openMenuId) {
         // Keep chrome available while menus are open
         setFloating(!nearTop)
       } else if (nearTop) {
@@ -100,13 +123,46 @@ export function SiteHeader() {
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [mobileOpen, openMenuId])
+  }, [mobileMounted, openMenuId])
 
   useEffect(() => {
-    if ((mobileOpen || openMenuId) && window.scrollY > SCROLL_THRESHOLD) {
+    if ((mobileMounted || openMenuId) && window.scrollY > SCROLL_THRESHOLD) {
       setFloating(true)
     }
-  }, [mobileOpen, openMenuId])
+  }, [mobileMounted, openMenuId])
+
+  useEffect(() => {
+    if (!mobileOpen) {
+      setMobileEntered(false)
+      return
+    }
+    setMobileMounted(true)
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reducedMotion) {
+      setMobileEntered(true)
+      return
+    }
+    const frame = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setMobileEntered(true))
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [mobileOpen])
+
+  useEffect(() => {
+    if (mobileOpen || !mobileMounted) return
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reducedMotion) {
+      setMobileMounted(false)
+      return
+    }
+    drawerExitTimer.current = setTimeout(() => {
+      setMobileMounted(false)
+      drawerExitTimer.current = null
+    }, MOBILE_DRAWER_MS)
+    return () => {
+      if (drawerExitTimer.current) clearTimeout(drawerExitTimer.current)
+    }
+  }, [mobileOpen, mobileMounted])
 
   useEffect(() => {
     if (!openMenuId) return
@@ -131,17 +187,22 @@ export function SiteHeader() {
   useEffect(() => {
     if (!mobileOpen) return
     const panel = panelRef.current
-    const focusable = panel?.querySelectorAll<HTMLElement>(
-      'a[href], button:not(:disabled)',
-    )
-    focusable?.[0]?.focus()
+    const panelFocusable = panel
+      ? Array.from(
+          panel.querySelectorAll<HTMLElement>('a[href], button:not(:disabled)'),
+        )
+      : []
+    const burger = burgerRef.current
+    const focusable = burger ? [burger, ...panelFocusable] : panelFocusable
+    panelFocusable[0]?.focus()
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMobileOpen(false)
+        burger?.focus()
         return
       }
-      if (e.key !== 'Tab' || !focusable || focusable.length === 0) return
+      if (e.key !== 'Tab' || focusable.length === 0) return
       const first = focusable[0]
       const last = focusable[focusable.length - 1]
       if (e.shiftKey && document.activeElement === first) {
@@ -157,26 +218,32 @@ export function SiteHeader() {
   }, [mobileOpen])
 
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    document.body.style.overflow = mobileMounted ? 'hidden' : ''
     return () => {
       document.body.style.overflow = ''
     }
-  }, [mobileOpen])
+  }, [mobileMounted])
+
+  useEffect(() => {
+    const panel = panelRef.current
+    if (!panel) return
+    if (mobileOpen) panel.removeAttribute('inert')
+    else panel.setAttribute('inert', '')
+  }, [mobileOpen, mobileMounted])
 
   const closeMobile = () => {
     setMobileOpen(false)
-    setMobileExpandedId(null)
     burgerRef.current?.focus()
   }
 
   // Fixed solid bar only when floating (scroll-up) or mobile menu needs it.
   // Otherwise stay absolute so nothing flashes in when the hero header leaves.
-  const showSolid = floating || mobileOpen
+  const showSolid = floating || mobileMounted
   const headerClass = [
     styles.header,
     showSolid && styles.headerDocked,
     showSolid && styles.headerScrolled,
-    mobileOpen && styles.headerMenuOpen,
+    mobileMounted && styles.headerMenuOpen,
   ]
     .filter(Boolean)
     .join(' ')
@@ -186,7 +253,7 @@ export function SiteHeader() {
       <header className={headerClass}>
         <div className={styles.inner}>
           <a href="/" className={styles.logoLink} aria-label="Armada home">
-            {showSolid ? (
+            {showSolid && !mobileMounted ? (
               <ArmadaLogo variant="full" className={styles.logo} />
             ) : (
               <img
@@ -298,10 +365,10 @@ export function SiteHeader() {
             className={styles.burger}
             aria-expanded={mobileOpen}
             aria-controls={mobileMenuId}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-label={mobileMounted ? 'Close menu' : 'Open menu'}
             onClick={() => setMobileOpen((open) => !open)}
           >
-            {mobileOpen ? (
+            {mobileMounted ? (
               <XMarkIcon width={20} height={20} aria-hidden />
             ) : (
               <Bars3Icon width={20} height={20} aria-hidden />
@@ -310,100 +377,64 @@ export function SiteHeader() {
         </div>
       </header>
 
-      {mobileOpen ? (
+      {mobileMounted ? (
         <div
           ref={panelRef}
           id={mobileMenuId}
-          className={styles.mobilePanel}
+          className={[styles.mobilePanel, mobileEntered && styles.mobilePanelEntered]
+            .filter(Boolean)
+            .join(' ')}
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
         >
-          <nav aria-label="Primary mobile">
+          <nav className={styles.mobileNav} aria-label="Primary mobile">
             <ul className={styles.mobileNavList}>
-              {NAV_ITEMS.map((item) => {
-                if (!isNavMenu(item)) {
-                  return (
-                    <li key={item.id} className={styles.mobileNavItem}>
-                      <a
-                        className={styles.mobileNavLink}
-                        href={item.href}
-                        onClick={closeMobile}
-                        {...(item.external
-                          ? { target: '_blank', rel: 'noopener noreferrer' }
-                          : {})}
-                      >
-                        {item.label}
-                      </a>
-                    </li>
-                  )
-                }
-
-                const expanded = mobileExpandedId === item.id
-                const sectionId = `${mobileMenuId}-${item.id}`
-                return (
-                  <li key={item.id} className={styles.mobileNavItem}>
-                    <button
-                      type="button"
-                      className={styles.mobileNavLink}
-                      aria-expanded={expanded}
-                      aria-controls={sectionId}
-                      onClick={() =>
-                        setMobileExpandedId((current) =>
-                          current === item.id ? null : item.id,
-                        )
-                      }
-                    >
-                      {item.label}
-                      <ChevronDownIcon
-                        className={[styles.navChevron, expanded && styles.navChevronOpen]
-                          .filter(Boolean)
-                          .join(' ')}
-                        width={16}
-                        height={16}
-                        aria-hidden
-                      />
-                    </button>
-                    {expanded ? (
-                      <div id={sectionId} className={styles.mobileMegaWrap}>
-                        <NavMegaMenu
-                          menu={item}
-                          id={`${sectionId}-panel`}
-                          onNavigate={closeMobile}
-                        />
-                      </div>
-                    ) : null}
-                  </li>
-                )
-              })}
+              {MOBILE_NAV_LINKS.map((item) => (
+                <li key={item.id}>
+                  <a
+                    className={styles.mobileNavLink}
+                    href={item.href}
+                    onClick={closeMobile}
+                    {...(item.external
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {})}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
-          <ul className={styles.mobileSocialList} aria-label="Social links">
-            {SOCIAL_LINKS.map((social) => (
-              <li key={social.label}>
-                <a
-                  className={styles.socialLink}
-                  href={social.href}
-                  aria-label={social.label}
-                  onClick={closeMobile}
-                >
-                  <SocialIcon name={social.icon} />
-                </a>
-              </li>
-            ))}
-          </ul>
-          <Button
-            variant="ink"
-            size="lg"
-            label="Armada App"
-            showIcon
-            icon="arrow-right-micro"
-            onClick={() => {
-              closeMobile()
-              openAppWithWallet()
-            }}
-            className={styles.mobileCta}
-          />
+
+          <div className={styles.mobileFooter}>
+            <ul className={styles.mobileSocialList} aria-label="Social links">
+              {SOCIAL_LINKS.map((social) => (
+                <li key={social.label}>
+                  <a
+                    className={styles.mobileSocialLink}
+                    href={social.href}
+                    aria-label={social.label}
+                    onClick={closeMobile}
+                  >
+                    <SocialIcon name={social.icon} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <Button
+              variant="primary"
+              size="lg"
+              label="Armada App"
+              showIcon
+              icon="arrow-right-micro"
+              onClick={() => {
+                closeMobile()
+                openAppWithWallet()
+              }}
+              className={styles.mobileCta}
+            />
+          </div>
         </div>
       ) : null}
     </>

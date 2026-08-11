@@ -56,7 +56,7 @@ type Block = {
 const INTRO = {
   id: 'integrators',
   title: ['Privacy your users', "don't have to think about"] as [string, string],
-  body: "Add shielded USDC rails to your product through Armada's SDK, APIs, and compliance tooling. Built for platforms that manage, deploy, and move private capital on-chain.",
+  body: 'Add shielded USDC to your product with the SDK, APIs, and compliance tooling.',
   ctas: [
     {
       label: 'Integrate and test',
