@@ -1,6 +1,7 @@
 import heroBackground from '@/assets/hero-fleet-centered.webp'
 import heroBackgroundLegacy from '@/assets/new-fleet.webp'
 import { Button } from '@/components/Button'
+import { RevealStack } from '@/components/ScrollReveal'
 import { HeroUsdcSpinner } from './HeroUsdcSpinner'
 import styles from './MarketingHero.module.css'
 
@@ -57,7 +58,7 @@ export function MarketingHero() {
       {SHOW_LEGACY_HERO ? (
         <div className={styles.contentLegacy}>
           <div className={styles.bottomLegacy}>
-            <div className={`armada-site-stack ${styles.introLegacy}`}>
+            <RevealStack className={`armada-site-stack ${styles.introLegacy}`}>
               <h1
                 id="marketing-hero-heading"
                 className={`armada-text-title ${styles.headingLegacy}`}
@@ -69,13 +70,15 @@ export function MarketingHero() {
                 ))}
               </h1>
               <IntegrateCta className={styles.cta} />
-            </div>
-            <FeatureCard />
+            </RevealStack>
+            <RevealStack>
+              <FeatureCard />
+            </RevealStack>
           </div>
         </div>
       ) : (
         <div className={styles.content}>
-          <div className={`armada-site-stack ${styles.intro}`}>
+          <RevealStack className={`armada-site-stack ${styles.intro}`}>
             <h1
               id="marketing-hero-heading"
               className={`armada-text-title ${styles.heading}`}
@@ -87,9 +90,11 @@ export function MarketingHero() {
               ))}
             </h1>
             <IntegrateCta className={styles.cta} />
-          </div>
+          </RevealStack>
 
-          <FeatureCard />
+          <RevealStack>
+            <FeatureCard />
+          </RevealStack>
         </div>
       )}
     </section>

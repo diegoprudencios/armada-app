@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Button } from '@/components/Button'
 import type { ButtonVariant } from '@/components/Button'
+import { RevealStack } from '@/components/ScrollReveal'
 import { FleetFogCompare } from './FleetFogCompare'
 import { ComplianceToggleStack } from './ComplianceToggleStack'
 import { FoundationsCubeGrid } from './FoundationsCubeGrid'
@@ -143,13 +144,13 @@ function CtaRow({ ctas, align }: { ctas: Cta[]; align: 'center' | 'start' }) {
 function IntroCentered() {
   return (
     <div className={styles.intro} id="what-is-armada">
-      <div className={`armada-site-stack ${styles.introText}`}>
+      <RevealStack className={`armada-site-stack ${styles.introText}`}>
         <h2 id="integrators-heading" className={`armada-text-title ${styles.introTitle}`}>
           {`${INTRO.title[0]} ${INTRO.title[1]}`}
         </h2>
         <p className={`armada-text-body ${styles.introBody}`}>{INTRO.body}</p>
         <CtaRow ctas={INTRO.ctas} align="center" />
-      </div>
+      </RevealStack>
 
       <FleetFogCompare className={styles.fog} layout="banner" />
     </div>
@@ -159,7 +160,7 @@ function IntroCentered() {
 function IntroSplit() {
   return (
     <div className={styles.introSplit} id="what-is-armada">
-      <div className={`armada-site-stack ${styles.introSplitContent}`}>
+      <RevealStack className={`armada-site-stack ${styles.introSplitContent}`}>
         <h2
           id="integrators-heading"
           className={`armada-text-title ${styles.introSplitTitle}`}
@@ -169,7 +170,7 @@ function IntroSplit() {
         </h2>
         <p className={`armada-text-body ${styles.introSplitBody}`}>{INTRO.body}</p>
         <CtaRow ctas={INTRO.ctas} align="start" />
-      </div>
+      </RevealStack>
       <div className={styles.introSplitMedia}>
         <FleetFogCompare className={styles.fogSplit} layout="fill" />
       </div>
@@ -221,7 +222,7 @@ export function WhatIsArmada() {
                   .join(' ')}
                 aria-labelledby={`${block.id}-heading`}
               >
-                <div className={`armada-site-stack ${styles.panelContent}`}>
+                <RevealStack className={`armada-site-stack ${styles.panelContent}`}>
                   <h2
                     id={`${block.id}-heading`}
                     className={`armada-text-title ${styles.panelTitle}`}
@@ -234,7 +235,7 @@ export function WhatIsArmada() {
                   </h2>
                   <p className={`armada-text-body ${styles.panelBody}`}>{block.body}</p>
                   <CtaRow ctas={block.ctas} align="start" />
-                </div>
+                </RevealStack>
                 {isCapital ? (
                   <div className={styles.panelDiagram}>
                     <Suspense key={PRIVACY_SPHERE_VARIANT} fallback={null}>

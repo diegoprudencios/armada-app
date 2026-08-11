@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
 import type { ButtonVariant } from '@/components/Button'
+import { RevealStack } from '@/components/ScrollReveal'
 import styles from './UsdcLoopIntro.module.css'
 
 type Cta = {
@@ -320,7 +321,7 @@ export function UsdcLoopIntro({ content }: UsdcLoopIntroProps) {
           id="what-is-armada"
           aria-labelledby="integrators-heading"
         >
-          <div className={`armada-site-stack ${styles.copyInner}`}>
+          <RevealStack className={`armada-site-stack ${styles.copyInner}`}>
             <h2 id="integrators-heading" className={`armada-text-title ${styles.copyTitle}`}>
               <span className={styles.titleLine}>{content.title[0]}</span>
               <span className={styles.titleLine}>{content.title[1]}</span>
@@ -339,7 +340,7 @@ export function UsdcLoopIntro({ content }: UsdcLoopIntroProps) {
                 />
               ))}
             </div>
-          </div>
+          </RevealStack>
         </section>
       </div>
     </div>

@@ -1,0 +1,46 @@
+/*
+  Scroll entry: slide up 40px (--primitives-spacing-10) with cascade.
+  Toggle .isVisible on the stack root via RevealStack.
+*/
+
+.stack > * {
+  opacity: 0;
+  transform: translate3d(0, var(--primitives-spacing-10), 0);
+  transition-property: opacity, transform;
+  transition-duration: 700ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 0ms;
+}
+
+.stack.isVisible > * {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.stack.isVisible > *:nth-child(1) {
+  transition-delay: 0ms;
+}
+
+.stack.isVisible > *:nth-child(2) {
+  transition-delay: 100ms;
+}
+
+.stack.isVisible > *:nth-child(3) {
+  transition-delay: 200ms;
+}
+
+.stack.isVisible > *:nth-child(4) {
+  transition-delay: 300ms;
+}
+
+.stack.isVisible > *:nth-child(5) {
+  transition-delay: 400ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
