@@ -14,16 +14,23 @@
 */
 .heroPin {
   position: relative;
+  /*
+    Above the underlapped privacy sticky so scrolling back can re-show the hero.
+    Background stays transparent: after amber dissolve covers the stage, --hero-clear
+    fades the stage out onto the privacy amber sheet (seamless). An opaque pin bg
+    would permanently hide the privacy copy.
+  */
+  z-index: 2;
   width: 100%;
   box-sizing: border-box;
-  /* EXCEPTION — match WhatIsArmada privacy intro amber for seamless dissolve. */
-  background-color: var(--primitives-color-amber-100);
+  background-color: transparent;
+  isolation: isolate;
 }
 
 .heroSticky {
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: 0;
   width: 100%;
   /*
     lvh = largest viewport — stays tall when mobile browser chrome hides,
@@ -37,9 +44,35 @@
   /* Unitless 0→1, set by scroll scrub. */
   --hero-exit: 0;
   --hero-fade: 0;
-  /* Amber phase: stage clears so privacy copy can fade in afterward. */
-  opacity: calc(1 - var(--hero-fade));
+  --hero-clear: 0;
+  /*
+    Opacity is also set inline from --hero-clear so restore can’t stick at 0.
+    Dissolve covers the hero while opacity stays 1; then clear fades the stage.
+  */
+  opacity: 1;
   will-change: opacity;
+}
+
+/*
+  After scroll-back to the top, force hero chrome visible.
+*/
+.heroSticky[data-hero-at-rest='true'] {
+  opacity: 1 !important;
+}
+
+.heroSticky[data-hero-at-rest='true'] .dissolve {
+  opacity: 0;
+}
+
+.heroSticky[data-hero-at-rest='true'] .backgroundExit {
+  opacity: 1;
+  transform: none;
+}
+
+.heroSticky[data-hero-at-rest='true'] .introExit,
+.heroSticky[data-hero-at-rest='true'] .featureExit {
+  opacity: 1;
+  transform: none;
 }
 
 /*
@@ -84,13 +117,17 @@
   pointer-events: none;
 }
 
-/* White wash into the section below — compositor-only (opacity). */
+/* Amber wash — covers hero fully before the stage clears onto privacy. */
 .dissolve {
   position: absolute;
   inset: 0;
   z-index: 3;
-  /* EXCEPTION — match WhatIsArmada privacy intro amber. */
-  background: var(--primitives-color-amber-100);
+  /* EXCEPTION — match privacy gem wash at 0% (lavender 40% on amber). */
+  background: color-mix(
+    in srgb,
+    var(--semantic-color-brand-lavender) 40%,
+    var(--primitives-color-amber-100)
+  );
   opacity: var(--hero-fade);
   pointer-events: none;
   will-change: opacity;

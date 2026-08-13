@@ -45,12 +45,32 @@
   background: var(--semantic-color-brand-deep);
 }
 
-/* Stacked privacy intro: full-viewport amber + sticky copy; fog scrolls over. */
+/* Privacy + split cards: one 40% gem wash on amber, so sticky never punches through to page white. */
 .sectionIntroStack {
+  --gem-wash-base: var(--primitives-color-amber-100);
+  --gem-wash-start: color-mix(
+    in srgb,
+    var(--semantic-color-brand-lavender) 40%,
+    var(--gem-wash-base)
+  );
+  --gem-wash: linear-gradient(
+    180deg,
+    var(--gem-wash-start) 0%,
+    color-mix(
+        in srgb,
+        var(--semantic-color-brand-gradient-rose) 40%,
+        var(--gem-wash-base)
+      )
+      52%,
+    color-mix(in srgb, var(--semantic-color-brand-amber) 40%, var(--gem-wash-base)) 100%
+  );
+
   padding-top: 0;
   gap: 0;
   align-items: stretch;
-  background: var(--primitives-color-amber-100);
+  isolation: isolate;
+  background-color: var(--gem-wash-base);
+  background-image: var(--gem-wash);
 }
 
 /* —— Intro: desktop handoff uses sticky copy; default is normal flow —— */
@@ -66,12 +86,13 @@
   padding: 0 0 var(--section-features-pad-y);
   text-align: center;
   scroll-margin-top: 0;
-  background: var(--primitives-color-amber-100);
+  background: transparent;
 }
 
-/* Sit under the full hero pin so copy is centered as the stage fades to amber. */
+/* Sit under the full hero pin so copy is centered after amber clears. */
 .introUnderHero {
-  margin-top: var(--intro-under-hero-margin, calc(-100lvh - 110svh));
+  margin-top: var(--intro-under-hero-margin, calc(-100lvh - 140svh));
+  padding-bottom: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -79,20 +100,23 @@
     margin-top: 0;
   }
 
-  .introTextHandoff {
-    opacity: 1;
-    pointer-events: auto;
-    will-change: auto;
+  .introCopy {
+    opacity: 1 !important;
   }
 
   .introHold {
     height: 0;
   }
-}
 
-/* Centers the handoff copy in the first viewport. Desktop: passthrough. */
-.introLead {
-  display: contents;
+  .introExitPin {
+    height: auto;
+    min-height: 0;
+  }
+
+  .introTextSticky {
+    position: relative;
+    min-height: 100svh;
+  }
 }
 
 .introText {
@@ -106,33 +130,58 @@
   align-items: center;
   padding: var(--primitives-spacing-20);
   text-align: center;
-  background: var(--primitives-color-amber-100);
+  background: transparent;
 }
 
-/* Desktop sticky handoff only. */
-.introUnderHero .introText {
+/*
+  Exit pin: tall scrub range with a sticky stage inside (same pattern as hero).
+  Sibling holds below sticky release too early — pin height is the fade travel.
+*/
+.introExitPin {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  /* 100lvh + hero scrub + exit hold — see INTRO_EXIT_PIN_HEIGHT */
+  height: var(--intro-exit-pin-height, calc(100lvh + 204svh));
+  background: transparent;
+}
+
+/*
+  Sticky amber sheet fills the viewport while copy fades in place.
+  Stays put for the full pin scrub; cards only enter after the pin ends.
+*/
+.introTextSticky {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 0;
+  height: 100lvh;
   min-height: 100lvh;
+  /* Opaque 0% stop — a transparent sticky stacking context was showing page white. */
+  background-color: var(--gem-wash-start, var(--primitives-color-amber-100));
 }
 
-/* Scroll-scrubbed by MarketingHero (--privacy-copy). Amber first, then this fades in. */
-.introTextHandoff {
-  opacity: var(--privacy-copy, 0);
+/* Once privacy copy is on, sit above the cleared hero pin. */
+:global(html[data-privacy-copy='on']) .introTextSticky {
+  z-index: 5;
+}
+
+.introCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /*
+    Opacity is set by the intro scroll scrub (hero fade-in × card fade-out).
+    Default 0 until that runs so copy never flashes at full strength.
+  */
+  opacity: 0;
   will-change: opacity;
-  pointer-events: none;
 }
 
-:global(html[data-privacy-copy='on']) .introTextHandoff {
-  pointer-events: auto;
-}
-
-/* Keep sticky copy on screen after it fades in, before fog rises. */
 .introHold {
   flex-shrink: 0;
-  height: var(--intro-hold-svh, 55svh);
+  height: var(--intro-hold-svh, 100svh);
   pointer-events: none;
+  background: transparent;
 }
 
 .introTitle {
@@ -195,9 +244,8 @@
 .introSplit {
   --intro-pad-x: calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
 
-  display: grid;
-  /* minmax(0, …) so nowrap titles can’t inflate past a true 50/50. */
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   align-items: stretch;
   box-sizing: border-box;
   width: 100%;
@@ -294,6 +342,24 @@
 /* —— Feature band —— same gem stops as SiteFooter (lavender → rose → amber) —— */
 
 .features {
+  /* Opaque tints (not transparent mixes) so split cards don’t pick up mud from amber. */
+  --features-lavender: color-mix(
+    in srgb,
+    var(--semantic-color-brand-lavender) 22%,
+    var(--primitives-color-amber-100)
+  );
+  --features-rose: color-mix(
+    in srgb,
+    var(--semantic-color-brand-gradient-rose) 22%,
+    var(--primitives-color-amber-100)
+  );
+  --features-amber: color-mix(
+    in srgb,
+    var(--semantic-color-brand-amber) 28%,
+    var(--primitives-color-amber-100)
+  );
+  --features-tone: 0;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -302,10 +368,15 @@
   padding: var(--section-features-pad-y) var(--section-features-pad-x);
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--semantic-color-brand-lavender) 40%, transparent) 0%,
-    color-mix(in srgb, var(--semantic-color-brand-gradient-rose) 40%, transparent) 52%,
-    color-mix(in srgb, var(--semantic-color-brand-amber) 40%, transparent) 100%
+    var(--features-lavender) 0%,
+    var(--features-rose) 52%,
+    var(--features-amber) 100%
   );
+  color: #000000;
+}
+
+.sectionIntroStack .features {
+  background: none;
 }
 
 .stack {
@@ -315,6 +386,88 @@
   box-sizing: border-box;
   width: 100%;
   max-width: var(--section-stack-max);
+}
+
+/*
+  Desktop feature scroll: one card per 100vh, centered with ≥80px padding.
+  Tone 0 starts on the same amber as privacy, then morphs through gem colors.
+*/
+.featuresScroll {
+  padding: 0;
+  background: none;
+}
+
+/*
+  Overlap must not paint a fill — an opaque wash on top of the privacy copy
+  clips the title. Cards keep their own panel fills; the section gem wash shows through.
+*/
+.featuresOverlapIntro {
+  position: relative;
+  z-index: 6;
+  margin-top: calc(-1 * var(--intro-card-overlap, 64svh));
+  background: none;
+}
+
+.cardViewport {
+  --card-view-pad: var(--primitives-spacing-20); /* 80px min */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  padding: var(--card-view-pad) var(--section-features-pad-x);
+}
+
+.cardViewport .stack {
+  width: 100%;
+  max-width: var(--section-stack-max);
+}
+
+.cardViewport .panel {
+  height: calc(100vh - var(--card-view-pad) * 2);
+  min-height: calc(100vh - var(--card-view-pad) * 2);
+  max-height: calc(100vh - var(--card-view-pad) * 2);
+  /* Solid cream shell — no alpha over the amber→gem section wash. */
+  isolation: isolate;
+  opacity: 1;
+  background-color: var(--section-panel-bg);
+  background-image: none;
+}
+
+.cardViewport .panelSplit {
+  height: min(calc(100vh - var(--card-view-pad) * 2), var(--panel-split-max-h));
+  min-height: 0;
+  max-height: var(--panel-split-max-h);
+}
+
+.cardViewport .panelSplit .panelDiagram {
+  /* Force opaque deep half (WebGL canvas is alpha; bg must not wash with amber). */
+  opacity: 1;
+  background-color: var(--semantic-color-brand-deep);
+  background-image: none;
+  isolation: isolate;
+}
+
+@media (min-width: 1200px) {
+  .cardViewport {
+    --card-view-pad: calc(var(--primitives-spacing-20) + var(--primitives-spacing-5)); /* 100px */
+  }
+
+  .featuresScroll {
+    --section-features-pad-x: calc(var(--primitives-spacing-20) + var(--primitives-spacing-5));
+  }
+}
+
+@media (min-width: 1536px) {
+  .cardViewport {
+    --card-view-pad: calc(var(--primitives-spacing-20) * 2); /* 160px */
+  }
+
+  .featuresScroll {
+    --section-features-pad-x: calc(var(--primitives-spacing-20) * 2);
+  }
 }
 
 .panel {
@@ -340,6 +493,10 @@
 
 /* 50/50 split: cream copy | brand-deep diagram — edge to edge, sharp clip. */
 .panelSplit {
+  --panel-split-max-h: calc(
+    var(--primitives-spacing-20) * 7 + var(--primitives-spacing-10)
+  ); /* 600px */
+
   display: grid;
   /* minmax(0, …) so nowrap titles can’t inflate past a true 50/50. */
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -347,6 +504,10 @@
   gap: 0;
   padding: 0;
   overflow: hidden;
+  /* Cap below the default .panel ~700px height. */
+  height: var(--panel-split-max-h);
+  min-height: 0;
+  max-height: var(--panel-split-max-h);
   /* EXCEPTION — diagram stroke on deep half (no matching token). */
   --diagram-stroke: #5a4a62;
 }
@@ -592,6 +753,10 @@
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
   align-items: stretch;
   background: var(--section-panel-bg);
+}
+
+.bentoPrivacyCopyOnly {
+  grid-template-columns: 1fr;
 }
 
 .bentoPrivacyCopy {
@@ -949,6 +1114,9 @@
     flex-direction: column;
     align-items: stretch;
     padding: 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
   }
 
   /* Stacked split: mid seam no longer matches layout. */

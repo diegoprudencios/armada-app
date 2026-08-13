@@ -1,12 +1,16 @@
-import { lazy, Suspense, useEffect, useState, type CSSProperties } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Button } from '@/components/Button'
 import type { ButtonVariant } from '@/components/Button'
 import { RevealStack } from '@/components/ScrollReveal'
 import {
-  INTRO_HOLD_BEFORE_FOG_SVH,
+  COPY_EXIT_CARD,
+  INTRO_CARD_OVERLAP,
+  INTRO_EXIT_PIN_HEIGHT,
   INTRO_UNDER_HERO_MARGIN,
+  clamp01,
+  remap01,
+  smoothstep,
 } from '@/constants/homepageHandoff'
-import { FleetFogCompare } from './FleetFogCompare'
 import { ComplianceToggleStack } from './ComplianceToggleStack'
 import { FoundationsCubeGrid } from './FoundationsCubeGrid'
 import { BeyondCaptureGuard } from './BeyondCaptureGuard'
@@ -25,8 +29,8 @@ const PRIVACY_SPHERE_VARIANT: 'default' | 'story' = 'story'
 /**
  * Privacy intro layout:
  * - 'loop' — sticky concentric rings + wash fade + copy
- * - 'centered' — title + body/CTA above, full-width fog banner below
- * - 'split' — full-bleed 50/50: copy left | fog right
+ * - 'centered' — title + body/CTA (feature cards follow below)
+ * - 'split' — full-bleed 50/50: copy left | media right
  */
 const INTRO_LAYOUT: 'loop' | 'centered' | 'split' = 'centered'
 
@@ -170,6 +174,77 @@ function useDesktopHandoff(enabled: boolean) {
 
 function IntroCentered({ underHero = false }: { underHero?: boolean }) {
   const pinHandoff = useDesktopHandoff(underHero)
+  const copyRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!pinHandoff) {
+      document.documentElement.style.removeProperty('--privacy-exit')
+      return
+    }
+
+    const root = document.documentElement
+    let frame = 0
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+    const scrub = () => {
+      frame = 0
+      const copy = copyRef.current
+
+      if (reducedMotion.matches) {
+        root.style.setProperty('--privacy-exit', '0')
+        if (copy) {
+          copy.style.opacity = '1'
+          copy.style.removeProperty('pointer-events')
+        }
+        return
+      }
+
+      let exit = 0
+      const card = document.querySelector<HTMLElement>('[data-privacy-exit-card]')
+      if (card) {
+        const vh = window.innerHeight
+        const top = card.getBoundingClientRect().top
+        // Card top moves downward (startTop → endTop). remap01 interpolates both directions.
+        exit = smoothstep(
+          remap01(top, vh * COPY_EXIT_CARD.startTop, vh * COPY_EXIT_CARD.endTop),
+        )
+      }
+      root.style.setProperty('--privacy-exit', exit.toFixed(4))
+
+      if (copy) {
+        const copyIn =
+          parseFloat(root.style.getPropertyValue('--privacy-copy')) || 0
+        const copyOpacity = copyIn * (1 - exit)
+        copy.style.opacity = copyOpacity.toFixed(4)
+        if (copyOpacity < 0.05) copy.style.pointerEvents = 'none'
+        else copy.style.removeProperty('pointer-events')
+      }
+    }
+
+    const requestScrub = () => {
+      if (frame) return
+      frame = requestAnimationFrame(scrub)
+    }
+
+    window.addEventListener('scroll', requestScrub, { passive: true })
+    window.addEventListener('resize', requestScrub)
+    window.addEventListener('scrollend', requestScrub)
+    requestScrub()
+    reducedMotion.addEventListener('change', requestScrub)
+
+    return () => {
+      window.removeEventListener('scroll', requestScrub)
+      window.removeEventListener('resize', requestScrub)
+      window.removeEventListener('scrollend', requestScrub)
+      reducedMotion.removeEventListener('change', requestScrub)
+      if (frame) cancelAnimationFrame(frame)
+      root.style.removeProperty('--privacy-exit')
+      if (copyRef.current) {
+        copyRef.current.style.removeProperty('opacity')
+        copyRef.current.style.removeProperty('pointer-events')
+      }
+    }
+  }, [pinHandoff])
 
   const copyBlock = (
     <>
@@ -192,17 +267,18 @@ function IntroCentered({ underHero = false }: { underHero?: boolean }) {
         pinHandoff
           ? ({
               ['--intro-under-hero-margin' as string]: INTRO_UNDER_HERO_MARGIN,
-              ['--intro-hold-svh' as string]: `${INTRO_HOLD_BEFORE_FOG_SVH}svh`,
+              ['--intro-exit-pin-height' as string]: INTRO_EXIT_PIN_HEIGHT,
             } as CSSProperties)
           : undefined
       }
     >
       {pinHandoff ? (
-        <div className={styles.introLead}>
-          <div
-            className={`armada-site-stack ${styles.introText} ${styles.introTextHandoff}`}
-          >
-            {copyBlock}
+        <div className={styles.introExitPin}>
+          {/* Sticky stage — copy stays put until the first card is in view, then fades. */}
+          <div className={`${styles.introText} ${styles.introTextSticky}`}>
+            <div ref={copyRef} className={`armada-site-stack ${styles.introCopy}`}>
+              {copyBlock}
+            </div>
           </div>
         </div>
       ) : (
@@ -210,19 +286,6 @@ function IntroCentered({ underHero = false }: { underHero?: boolean }) {
           {copyBlock}
         </RevealStack>
       )}
-
-      {pinHandoff ? <div className={styles.introHold} aria-hidden /> : null}
-
-      <div
-        className={[styles.fogWrap, pinHandoff ? styles.fogWrapCover : '']
-          .filter(Boolean)
-          .join(' ')}
-      >
-        <FleetFogCompare
-          className={styles.fog}
-          layout={pinHandoff ? 'cover' : 'card'}
-        />
-      </div>
     </div>
   )
 }
@@ -241,9 +304,6 @@ function IntroSplit() {
         <p className={`armada-text-body ${styles.introSplitBody}`}>{INTRO.body}</p>
         <CtaRow ctas={INTRO.ctas} align="start" />
       </RevealStack>
-      <div className={styles.introSplitMedia}>
-        <FleetFogCompare className={styles.fogSplit} layout="fill" />
-      </div>
     </div>
   )
 }
@@ -279,7 +339,7 @@ function FeatureCopy({
   bodyClassName?: string
 }) {
   return (
-    <RevealStack className={`armada-site-stack ${contentClassName}`}>
+    <div className={`armada-site-stack ${contentClassName}`}>
       <h2
         id={headingId}
         className={`armada-text-title ${titleClassName ?? styles.panelTitle}`}
@@ -292,7 +352,182 @@ function FeatureCopy({
       </h2>
       <p className={`armada-text-body ${bodyClassName ?? styles.panelBody}`}>{block.body}</p>
       <CtaRow ctas={block.ctas} align="start" />
-    </RevealStack>
+    </div>
+  )
+}
+
+function FeaturePanel({
+  block,
+  isGrid,
+  isExitCard,
+}: {
+  block: Block
+  isGrid?: boolean
+  isExitCard?: boolean
+}) {
+  const isCapital = block.id === 'capital-in-motion'
+  const isCompliance = block.id === 'compliance'
+  const isBeyondCapture = block.id === 'beyond-capture'
+  const isFoundations = block.id === 'foundations'
+  const isPanelSplit =
+    isCapital || isCompliance || isBeyondCapture || isFoundations
+
+  return (
+    <article
+      id={block.id}
+      className={[
+        styles.panel,
+        isPanelSplit ? styles.panelSplit : '',
+        isCompliance || isFoundations ? styles.panelSplitDeepLeft : '',
+        isFoundations ? styles.panelCrop : '',
+        isGrid ? styles.panelGrid : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      aria-labelledby={`${block.id}-heading`}
+      {...(isExitCard ? { 'data-privacy-exit-card': '' } : {})}
+    >
+      {isGrid ? (
+        <>
+          <span className={styles.gridLineH} data-edge="top" aria-hidden />
+          <span className={styles.gridLineH} data-edge="bottom" aria-hidden />
+          {isPanelSplit ? <span className={styles.gridMid} aria-hidden /> : null}
+        </>
+      ) : null}
+      <FeatureCopy
+        block={block}
+        headingId={`${block.id}-heading`}
+        contentClassName={styles.panelContent}
+      />
+      <FeatureDiagram id={block.id} />
+    </article>
+  )
+}
+
+/**
+ * Desktop: one card per viewport with ≥80px padding; section bg shifts through
+ * gem colors as cards enter. Mobile: normal stacked layout + paddings.
+ */
+function FeatureCardsBand({
+  isGrid = false,
+  overlapIntro = false,
+}: {
+  isGrid?: boolean
+  overlapIntro?: boolean
+}) {
+  const desktop = useDesktopHandoff(true)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!desktop) {
+      rootRef.current?.style.removeProperty('--features-tone')
+      return
+    }
+
+    const root = rootRef.current
+    if (!root) return
+
+    let frame = 0
+    let listening = false
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+    const scrub = () => {
+      frame = 0
+      if (reducedMotion.matches) {
+        root.style.setProperty('--features-tone', '0')
+        return
+      }
+      const scrollable = Math.max(1, root.offsetHeight - window.innerHeight)
+      const raw = clamp01(-root.getBoundingClientRect().top / scrollable)
+      root.style.setProperty('--features-tone', smoothstep(raw).toFixed(4))
+    }
+
+    const requestScrub = () => {
+      if (frame) return
+      frame = requestAnimationFrame(scrub)
+    }
+
+    const startListening = () => {
+      if (listening) return
+      listening = true
+      window.addEventListener('scroll', requestScrub, { passive: true })
+      window.addEventListener('resize', requestScrub)
+      requestScrub()
+    }
+
+    const stopListening = () => {
+      if (!listening) return
+      listening = false
+      window.removeEventListener('scroll', requestScrub)
+      window.removeEventListener('resize', requestScrub)
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) startListening()
+        else stopListening()
+      },
+      { root: null, threshold: 0, rootMargin: '15% 0px' },
+    )
+
+    io.observe(root)
+    startListening()
+    reducedMotion.addEventListener('change', requestScrub)
+
+    return () => {
+      io.disconnect()
+      stopListening()
+      reducedMotion.removeEventListener('change', requestScrub)
+      if (frame) cancelAnimationFrame(frame)
+      root.style.removeProperty('--features-tone')
+    }
+  }, [desktop])
+
+  if (!desktop) {
+    return (
+      <div
+        className={[styles.features, isGrid ? styles.featuresGrid : '']
+          .filter(Boolean)
+          .join(' ')}
+      >
+        <div
+          className={[styles.stack, isGrid ? styles.stackGrid : '']
+            .filter(Boolean)
+            .join(' ')}
+        >
+          {FEATURES.map((block) => (
+            <FeaturePanel key={block.id} block={block} isGrid={isGrid} />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      ref={rootRef}
+      className={[
+        styles.features,
+        styles.featuresScroll,
+        overlapIntro ? styles.featuresOverlapIntro : '',
+        isGrid ? styles.featuresGrid : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      style={
+        overlapIntro
+          ? ({ ['--intro-card-overlap' as string]: INTRO_CARD_OVERLAP } as CSSProperties)
+          : undefined
+      }
+    >
+      {FEATURES.map((block, index) => (
+        <div key={block.id} className={styles.cardViewport}>
+          <div className={[styles.stack, isGrid ? styles.stackGrid : ''].filter(Boolean).join(' ')}>
+            <FeaturePanel block={block} isGrid={isGrid} isExitCard={index === 0} />
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -340,9 +575,9 @@ function BentoBand() {
   return (
     <div className={`${styles.features} ${styles.featuresBento}`}>
       <div className={`${styles.stack} ${styles.stackBento}`}>
-        {/* Privacy — wide: copy | fog */}
+        {/* Privacy — copy only (fog removed). */}
         <article
-          className={`${styles.panel} ${styles.panelBento} ${styles.bentoPrivacy}`}
+          className={`${styles.panel} ${styles.panelBento} ${styles.bentoPrivacy} ${styles.bentoPrivacyCopyOnly}`}
           id="what-is-armada"
           aria-labelledby="integrators-heading"
         >
@@ -358,9 +593,6 @@ function BentoBand() {
             <p className={`armada-text-body ${styles.panelBody}`}>{INTRO.body}</p>
             <CtaRow ctas={INTRO.ctas} align="start" />
           </RevealStack>
-          <div className={styles.bentoPrivacyMedia}>
-            <FleetFogCompare className={styles.fogSplit} layout="fill" />
-          </div>
         </article>
 
         {/* Capital — all deep, horizontal split */}
@@ -483,58 +715,7 @@ export function WhatIsArmada({
       {isSplit ? <IntroSplit /> : null}
       {isCentered ? <IntroCentered underHero={introUnderHero} /> : null}
 
-      <div
-        className={[styles.features, isGrid ? styles.featuresGrid : '']
-          .filter(Boolean)
-          .join(' ')}
-      >
-        <div
-          className={[styles.stack, isGrid ? styles.stackGrid : '']
-            .filter(Boolean)
-            .join(' ')}
-        >
-          {FEATURES.map((block) => {
-            const isCapital = block.id === 'capital-in-motion'
-            const isCompliance = block.id === 'compliance'
-            const isBeyondCapture = block.id === 'beyond-capture'
-            const isFoundations = block.id === 'foundations'
-            const isPanelSplit =
-              isCapital || isCompliance || isBeyondCapture || isFoundations
-            return (
-              <article
-                key={block.id}
-                id={block.id}
-                className={[
-                  styles.panel,
-                  isPanelSplit ? styles.panelSplit : '',
-                  isCompliance || isFoundations ? styles.panelSplitDeepLeft : '',
-                  isFoundations ? styles.panelCrop : '',
-                  isGrid ? styles.panelGrid : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                aria-labelledby={`${block.id}-heading`}
-              >
-                {isGrid ? (
-                  <>
-                    <span className={styles.gridLineH} data-edge="top" aria-hidden />
-                    <span className={styles.gridLineH} data-edge="bottom" aria-hidden />
-                    {isPanelSplit ? (
-                      <span className={styles.gridMid} aria-hidden />
-                    ) : null}
-                  </>
-                ) : null}
-                <FeatureCopy
-                  block={block}
-                  headingId={`${block.id}-heading`}
-                  contentClassName={styles.panelContent}
-                />
-                <FeatureDiagram id={block.id} />
-              </article>
-            )
-          })}
-        </div>
-      </div>
+      <FeatureCardsBand isGrid={isGrid} overlapIntro={introUnderHero} />
     </section>
   )
 }

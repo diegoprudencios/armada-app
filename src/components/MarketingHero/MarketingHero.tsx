@@ -108,13 +108,30 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
     const root = document.documentElement
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     let frame = 0
-    let listening = false
+
+    const applyRest = () => {
+      stage.style.setProperty('--hero-exit', '0')
+      stage.style.setProperty('--hero-fade', '0')
+      stage.style.setProperty('--hero-clear', '0')
+      stage.style.opacity = '1'
+      stage.style.removeProperty('pointer-events')
+      pin.style.zIndex = '2'
+      stage.dataset.heroAtRest = 'true'
+      root.style.setProperty('--privacy-copy', '0')
+      root.style.setProperty('--privacy-exit', '0')
+      root.dataset.privacyCopy = 'off'
+    }
 
     const clearHandoffVars = () => {
       stage.style.removeProperty('--hero-exit')
       stage.style.removeProperty('--hero-fade')
+      stage.style.removeProperty('--hero-clear')
+      stage.style.removeProperty('opacity')
       stage.style.removeProperty('pointer-events')
+      pin.style.removeProperty('z-index')
+      delete stage.dataset.heroAtRest
       root.style.removeProperty('--privacy-copy')
+      root.style.removeProperty('--privacy-exit')
       delete root.dataset.privacyCopy
     }
 
@@ -122,29 +139,41 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
       frame = 0
 
       if (reducedMotion.matches) {
-        stage.style.setProperty('--hero-exit', '0')
-        stage.style.setProperty('--hero-fade', '0')
+        applyRest()
         root.style.setProperty('--privacy-copy', '1')
         root.dataset.privacyCopy = 'on'
-        stage.style.removeProperty('pointer-events')
         return
       }
 
-      const rect = pin.getBoundingClientRect()
       const scrollable = Math.max(1, pin.offsetHeight - window.innerHeight)
-      const raw = clamp01(-rect.top / scrollable)
+      const raw = clamp01(-pin.getBoundingClientRect().top / scrollable)
 
-      // 1) Amber first — hero drifts + stage fades out.
+      if (raw <= 0.002) {
+        applyRest()
+        return
+      }
+
+      delete stage.dataset.heroAtRest
+
       const amber = smoothstep(remap01(raw, 0, HANDOFF.amberEnd))
       const drift = smoothstep(remap01(raw, 0, HANDOFF.amberEnd * 0.95))
-      // 2) Then privacy copy fades in (on amber, still centered under the pin).
+      const clear = smoothstep(remap01(raw, HANDOFF.clearStart, HANDOFF.clearEnd))
       const copy = smoothstep(remap01(raw, HANDOFF.copyStart, HANDOFF.copyEnd))
 
       stage.style.setProperty('--hero-exit', drift.toFixed(4))
       stage.style.setProperty('--hero-fade', amber.toFixed(4))
+      stage.style.setProperty('--hero-clear', clear.toFixed(4))
+      stage.style.opacity = (1 - clear).toFixed(4)
       root.style.setProperty('--privacy-copy', copy.toFixed(4))
-      root.dataset.privacyCopy = copy > 0.45 ? 'on' : 'off'
-      stage.style.pointerEvents = amber > 0.55 ? 'none' : ''
+      root.dataset.privacyCopy = copy > 0.01 ? 'on' : 'off'
+
+      if (clear >= 0.999) {
+        stage.style.pointerEvents = 'none'
+        pin.style.zIndex = '0'
+      } else {
+        stage.style.removeProperty('pointer-events')
+        pin.style.zIndex = '2'
+      }
     }
 
     const requestScrub = () => {
@@ -152,91 +181,96 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
       frame = requestAnimationFrame(scrub)
     }
 
-    const startListening = () => {
-      if (listening) return
-      listening = true
-      window.addEventListener('scroll', requestScrub, { passive: true })
-      window.addEventListener('resize', requestScrub)
-      requestScrub()
-    }
-
-    const stopListening = () => {
-      if (!listening) return
-      listening = false
-      window.removeEventListener('scroll', requestScrub)
-      window.removeEventListener('resize', requestScrub)
-    }
-
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) startListening()
-        else stopListening()
-      },
-      { root: null, threshold: 0, rootMargin: '10% 0px' },
-    )
-
-    io.observe(pin)
-    startListening()
+    window.addEventListener('scroll', requestScrub, { passive: true })
+    window.addEventListener('resize', requestScrub)
+    window.addEventListener('scrollend', requestScrub)
+    requestScrub()
 
     const onMotionChange = () => requestScrub()
     reducedMotion.addEventListener('change', onMotionChange)
 
     return () => {
-      io.disconnect()
-      stopListening()
+      window.removeEventListener('scroll', requestScrub)
+      window.removeEventListener('resize', requestScrub)
+      window.removeEventListener('scrollend', requestScrub)
       reducedMotion.removeEventListener('change', onMotionChange)
       if (frame) cancelAnimationFrame(frame)
       clearHandoffVars()
     }
   }, [pinHandoff])
 
+  const heroCopy = (
+    <>
+      <h1 id="marketing-hero-heading" className={`armada-text-title ${styles.heading}`}>
+        {HEADING_LINES.map((line) => (
+          <span key={line} className={styles.headingLine}>
+            {line}
+          </span>
+        ))}
+      </h1>
+      <IntegrateCta className={styles.cta} />
+    </>
+  )
+
+  const heroCopyLegacy = (
+    <>
+      <h1
+        id="marketing-hero-heading"
+        className={`armada-text-title ${styles.headingLegacy}`}
+      >
+        {HEADING_LINES.map((line) => (
+          <span key={line} className={styles.headingLine}>
+            {line}
+          </span>
+        ))}
+      </h1>
+      <IntegrateCta className={styles.cta} />
+    </>
+  )
+
   const heroInner = SHOW_LEGACY_HERO ? (
     <div className={styles.contentLegacy}>
       <div className={styles.bottomLegacy}>
-        <RevealStack
-          className={`armada-site-stack ${styles.introLegacy} ${pinHandoff ? styles.introExit : ''}`}
-        >
-          <h1
-            id="marketing-hero-heading"
-            className={`armada-text-title ${styles.headingLegacy}`}
-          >
-            {HEADING_LINES.map((line) => (
-              <span key={line} className={styles.headingLine}>
-                {line}
-              </span>
-            ))}
-          </h1>
-          <IntegrateCta className={styles.cta} />
-        </RevealStack>
-        <RevealStack
-          immediate
-          className={pinHandoff ? styles.featureExit : undefined}
-        >
-          <FeatureCard />
-        </RevealStack>
+        {pinHandoff ? (
+          <div className={`armada-site-stack ${styles.introLegacy} ${styles.introExit}`}>
+            {heroCopyLegacy}
+          </div>
+        ) : (
+          <RevealStack className={`armada-site-stack ${styles.introLegacy}`}>
+            {heroCopyLegacy}
+          </RevealStack>
+        )}
+        {pinHandoff ? (
+          <div className={styles.featureExit}>
+            <FeatureCard />
+          </div>
+        ) : (
+          <RevealStack immediate>
+            <FeatureCard />
+          </RevealStack>
+        )}
       </div>
     </div>
   ) : (
     <div className={styles.content}>
-      <RevealStack
-        className={`armada-site-stack ${styles.intro} ${pinHandoff ? styles.introExit : ''}`}
-      >
-        <h1 id="marketing-hero-heading" className={`armada-text-title ${styles.heading}`}>
-          {HEADING_LINES.map((line) => (
-            <span key={line} className={styles.headingLine}>
-              {line}
-            </span>
-          ))}
-        </h1>
-        <IntegrateCta className={styles.cta} />
-      </RevealStack>
-
-      <RevealStack
-        immediate
-        className={pinHandoff ? styles.featureExit : undefined}
-      >
-        <FeatureCard />
-      </RevealStack>
+      {pinHandoff ? (
+        <div className={`armada-site-stack ${styles.intro} ${styles.introExit}`}>
+          {heroCopy}
+        </div>
+      ) : (
+        <RevealStack className={`armada-site-stack ${styles.intro}`}>
+          {heroCopy}
+        </RevealStack>
+      )}
+      {pinHandoff ? (
+        <div className={styles.featureExit}>
+          <FeatureCard />
+        </div>
+      ) : (
+        <RevealStack immediate>
+          <FeatureCard />
+        </RevealStack>
+      )}
     </div>
   )
 
