@@ -21,6 +21,7 @@ export default defineConfig({
         homepage2: resolve(__dirname, 'homepage2.html'),
         homepage3: resolve(__dirname, 'homepage3.html'),
         homepage4: resolve(__dirname, 'homepage4.html'),
+        homepage5: resolve(__dirname, 'homepage5.html'),
         showcase: resolve(__dirname, 'showcase.html'),
         deposit: resolve(__dirname, 'deposit.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),

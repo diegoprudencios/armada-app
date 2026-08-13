@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function () {
+        document.documentElement.setAttribute('data-theme', 'light');
+        try {
+          localStorage.setItem('armada-theme', 'light');
+        } catch (e) {}
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f8d197" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <style>
+      html,
+      body {
+        background-color: #f8d197;
+      }
+    </style>
+    <meta
+      name="description"
+      content="Armada — homepage prototype with outlined split sections."
+    />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Charis+SIL:wght@400;700&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <title>Armada — Outlined split prototype</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main-homepage5.tsx"></script>
+  </body>
+</html>

@@ -14,7 +14,7 @@ const CHROME_FILL_CLASS = 'armada-homepage-chrome'
 
 export interface HomepageProps {
   featuresLayout?: WhatIsArmadaFeaturesLayout
-  /** Sticky hero scroll-exit (drift + dissolve). `/homepage` only. */
+  /** Sticky hero scroll-exit (drift + dissolve). `/homepage` and `/homepage5`. */
   heroScrollExit?: boolean
 }
 

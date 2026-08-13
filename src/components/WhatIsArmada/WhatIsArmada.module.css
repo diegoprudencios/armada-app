@@ -69,8 +69,16 @@
   gap: 0;
   align-items: stretch;
   isolation: isolate;
-  background-color: var(--gem-wash-base);
+  /*
+    Viewport-locked wash — same paint as .introTextSticky. A gradient sized to
+    this tall section was already rose/peach when the sticky 100lvh lavender
+    sheet unstuck, which showed as a hard horizontal seam through the cards.
+  */
+  background-color: var(--gem-wash-start);
   background-image: var(--gem-wash);
+  background-size: 100% 100lvh;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 /* —— Intro: desktop handoff uses sticky copy; default is normal flow —— */
@@ -156,13 +164,26 @@
   z-index: 0;
   height: 100lvh;
   min-height: 100lvh;
-  /* Opaque 0% stop — a transparent sticky stacking context was showing page white. */
+  /* Same viewport wash as .sectionIntroStack — opaque so sticky doesn’t punch to page white. */
   background-color: var(--gem-wash-start, var(--primitives-color-amber-100));
+  background-image: var(--gem-wash);
+  background-size: 100% 100lvh;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 /* Once privacy copy is on, sit above the cleared hero pin. */
 :global(html[data-privacy-copy='on']) .introTextSticky {
   z-index: 5;
+}
+
+/* iOS ignores background-attachment: fixed — flatten both layers to the 0% stop. */
+@supports (-webkit-touch-callout: none) {
+  .sectionIntroStack,
+  .introTextSticky {
+    background-attachment: scroll;
+    background-image: none;
+  }
 }
 
 .introCopy {
@@ -654,6 +675,23 @@
 
 .panelGrid .panelDiagram {
   overflow: hidden;
+}
+
+/*
+  Homepage5: copy half is transparent over the gem wash;
+  one Deep stroke around the whole split card.
+*/
+.panelOutlined.panelSplit,
+.cardViewport .panelOutlined.panelSplit {
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  border: calc(var(--primitives-borderWidth-default) * 1px) solid
+    var(--semantic-color-brand-deep);
+}
+
+.panelOutlined.panelSplit .panelContent {
+  background: transparent;
 }
 
 .gridLineH,

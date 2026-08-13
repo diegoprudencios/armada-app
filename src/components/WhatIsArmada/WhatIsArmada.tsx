@@ -308,7 +308,7 @@ function IntroSplit() {
   )
 }
 
-export type WhatIsArmadaFeaturesLayout = 'stack' | 'grid' | 'bento'
+export type WhatIsArmadaFeaturesLayout = 'stack' | 'grid' | 'bento' | 'outlined'
 
 export interface WhatIsArmadaProps {
   /**
@@ -316,6 +316,7 @@ export interface WhatIsArmadaProps {
    * - `stack` — current full-width stacked splits (default /homepage)
    * - `grid` — same splits with blueprint frame lines (/homepage3)
    * - `bento` — privacy + features as a varied bento grid (/homepage4)
+   * - `outlined` — transparent copy half + Deep 1px stroke (/homepage5)
    */
   featuresLayout?: WhatIsArmadaFeaturesLayout
   /**
@@ -359,10 +360,12 @@ function FeatureCopy({
 function FeaturePanel({
   block,
   isGrid,
+  isOutlined,
   isExitCard,
 }: {
   block: Block
   isGrid?: boolean
+  isOutlined?: boolean
   isExitCard?: boolean
 }) {
   const isCapital = block.id === 'capital-in-motion'
@@ -381,6 +384,7 @@ function FeaturePanel({
         isCompliance || isFoundations ? styles.panelSplitDeepLeft : '',
         isFoundations ? styles.panelCrop : '',
         isGrid ? styles.panelGrid : '',
+        isOutlined ? styles.panelOutlined : '',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -410,9 +414,11 @@ function FeaturePanel({
  */
 function FeatureCardsBand({
   isGrid = false,
+  isOutlined = false,
   overlapIntro = false,
 }: {
   isGrid?: boolean
+  isOutlined?: boolean
   overlapIntro?: boolean
 }) {
   const desktop = useDesktopHandoff(true)
@@ -496,7 +502,12 @@ function FeatureCardsBand({
             .join(' ')}
         >
           {FEATURES.map((block) => (
-            <FeaturePanel key={block.id} block={block} isGrid={isGrid} />
+            <FeaturePanel
+              key={block.id}
+              block={block}
+              isGrid={isGrid}
+              isOutlined={isOutlined}
+            />
           ))}
         </div>
       </div>
@@ -523,7 +534,12 @@ function FeatureCardsBand({
       {FEATURES.map((block, index) => (
         <div key={block.id} className={styles.cardViewport}>
           <div className={[styles.stack, isGrid ? styles.stackGrid : ''].filter(Boolean).join(' ')}>
-            <FeaturePanel block={block} isGrid={isGrid} isExitCard={index === 0} />
+            <FeaturePanel
+              block={block}
+              isGrid={isGrid}
+              isOutlined={isOutlined}
+              isExitCard={index === 0}
+            />
           </div>
         </div>
       ))}
@@ -687,6 +703,7 @@ export function WhatIsArmada({
   const isCentered = INTRO_LAYOUT === 'centered'
   const isGrid = featuresLayout === 'grid'
   const isBento = featuresLayout === 'bento'
+  const isOutlined = featuresLayout === 'outlined'
 
   if (isBento) {
     return (
@@ -715,7 +732,11 @@ export function WhatIsArmada({
       {isSplit ? <IntroSplit /> : null}
       {isCentered ? <IntroCentered underHero={introUnderHero} /> : null}
 
-      <FeatureCardsBand isGrid={isGrid} overlapIntro={introUnderHero} />
+      <FeatureCardsBand
+        isGrid={isGrid}
+        isOutlined={isOutlined}
+        overlapIntro={introUnderHero}
+      />
     </section>
   )
 }
