@@ -24,7 +24,7 @@
 .topRow {
   display: grid;
   grid-template-columns: auto 1fr auto;
-  align-items: start;
+  align-items: center;
   gap: var(--primitives-spacing-6) var(--primitives-spacing-4);
   box-sizing: border-box;
   width: 100%;
@@ -34,6 +34,8 @@
 
 .logoLink {
   display: inline-flex;
+  align-items: center;
+  align-self: center;
   flex-shrink: 0;
   line-height: 0;
   color: var(--primitives-color-neutral-50);
@@ -55,6 +57,7 @@
   min-width: 0;
   width: 100%;
   justify-self: center;
+  align-self: center;
 }
 
 .sitemap {
@@ -63,6 +66,7 @@
   padding: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
   width: 100%;
   max-width: 900px;
   gap: var(--primitives-spacing-10) var(--primitives-spacing-6);
@@ -74,6 +78,9 @@
 
 .columnTitle {
   margin: 0 0 var(--primitives-spacing-3);
+  display: flex;
+  align-items: center;
+  min-height: var(--primitives-spacing-10);
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(var(--primitives-fontSize-xs) * 1px);
   font-weight: var(--primitives-fontWeight-semibold);
@@ -110,8 +117,14 @@
   padding: 0;
   display: flex;
   align-items: center;
+  align-self: center;
   justify-self: end;
   gap: var(--primitives-spacing-1);
+}
+
+.socialList li {
+  display: flex;
+  align-items: center;
 }
 
 .socialLink {
