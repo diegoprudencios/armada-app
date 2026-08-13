@@ -70,9 +70,29 @@
   transition-delay: 280ms;
 }
 
+/*
+  Deep cascade: stagger [data-cascade] descendants (not layout wrappers).
+  Delay = --cascade-index × 100ms.
+*/
+.stackDeep [data-cascade] {
+  opacity: 0;
+  transform: translate3d(0, var(--primitives-spacing-10), 0);
+  transition-property: opacity, transform;
+  transition-duration: 700ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: 0ms;
+}
+
+.stackDeep.isVisible [data-cascade] {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition-delay: calc(var(--cascade-index, 0) * 100ms);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .stack > *,
-  .stackFade > * {
+  .stackFade > *,
+  .stackDeep [data-cascade] {
     opacity: 1;
     transform: none;
     transition: none;

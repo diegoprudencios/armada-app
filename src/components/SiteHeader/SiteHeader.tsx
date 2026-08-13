@@ -29,7 +29,10 @@ const MOBILE_NAV_LINKS: NavLink[] = NAV_ITEMS.flatMap((item) => {
 })
 
 const SCROLL_THRESHOLD = 48
+/** Hide as soon as the user turns downward. */
 const SCROLL_DELTA = 6
+/** Dock the solid bar after this much continuous upward travel. */
+const SHOW_AFTER_UP_VIEW = 0.5
 const OPEN_DELAY_MS = 80
 const CLOSE_DELAY_MS = 160
 /** Matches `.mobilePanel` transform duration. */
@@ -69,6 +72,7 @@ export function SiteHeader() {
   const panelRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<HTMLElement>(null)
   const lastY = useRef(0)
+  const upTravel = useRef(0)
   const openTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const drawerExitTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -98,23 +102,30 @@ export function SiteHeader() {
 
   useEffect(() => {
     lastY.current = window.scrollY
+    upTravel.current = 0
 
     const onScroll = () => {
       const y = window.scrollY
       const nearTop = y <= SCROLL_THRESHOLD
       const goingDown = y > lastY.current + SCROLL_DELTA
-      const goingUp = y < lastY.current - SCROLL_DELTA
+      const goingUp = y < lastY.current
 
       if (mobileMounted || openMenuId) {
         // Keep chrome available while menus are open
         setFloating(!nearTop)
+        upTravel.current = 0
       } else if (nearTop) {
         // Absolute hero header only — never dock a second bar
         setFloating(false)
-      } else if (goingUp) {
-        setFloating(true)
+        upTravel.current = 0
       } else if (goingDown) {
         setFloating(false)
+        upTravel.current = 0
+      } else if (goingUp) {
+        upTravel.current += lastY.current - y
+        if (upTravel.current >= window.innerHeight * SHOW_AFTER_UP_VIEW) {
+          setFloating(true)
+        }
       }
 
       lastY.current = y
@@ -239,10 +250,27 @@ export function SiteHeader() {
   // Fixed solid bar only when floating (scroll-up) or mobile menu needs it.
   // Otherwise stay absolute so nothing flashes in when the hero header leaves.
   const showSolid = floating || mobileMounted
+  const [slideIn, setSlideIn] = useState(false)
+
+  useEffect(() => {
+    if (!showSolid) {
+      setSlideIn(false)
+      return
+    }
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) {
+      setSlideIn(true)
+      return
+    }
+    const frame = requestAnimationFrame(() => setSlideIn(true))
+    return () => cancelAnimationFrame(frame)
+  }, [showSolid])
+
   const headerClass = [
     styles.header,
     showSolid && styles.headerDocked,
     showSolid && styles.headerScrolled,
+    showSolid && slideIn && styles.headerSlideIn,
     mobileMounted && styles.headerMenuOpen,
   ]
     .filter(Boolean)

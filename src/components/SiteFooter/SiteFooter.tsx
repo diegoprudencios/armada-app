@@ -1,4 +1,5 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { cascadeStyle, useScrollReveal } from '@/components/ScrollReveal'
 import { NAV_ITEMS, isNavMenu, type NavLink } from '@/constants/siteNav'
 import wordmarkWhite from '@/assets/armada-wordmark-white.svg'
 import styles from './SiteFooter.module.css'
@@ -40,17 +41,31 @@ function SocialIcon({ name }: { name: 'discord' | 'x' }) {
 }
 
 export function SiteFooter() {
+  const reveal = useScrollReveal<HTMLElement>({ deep: true })
+  const socialStart = 1 + FOOTER_LINKS.length
+
   return (
-    <footer className={styles.footer}>
+    <footer ref={reveal.ref} className={`${styles.footer} ${reveal.className}`}>
       <div className={styles.topRow}>
-        <a href="/" className={styles.logoLink} aria-label="Armada home">
+        <a
+          href="/"
+          className={styles.logoLink}
+          aria-label="Armada home"
+          data-cascade=""
+          style={cascadeStyle(0)}
+        >
           <ArmadaLogo variant="mark" markTone="white" className={styles.logo} />
         </a>
 
         <nav className={styles.nav} aria-label="Site map">
           <ul className={styles.sitemap}>
-            {FOOTER_LINKS.map((item) => (
-              <li key={item.id} className={styles.column}>
+            {FOOTER_LINKS.map((item, index) => (
+              <li
+                key={item.id}
+                className={styles.column}
+                data-cascade=""
+                style={cascadeStyle(1 + index)}
+              >
                 <h2 className={`${styles.columnTitle} ${styles.columnTitleSolo}`} id={`footer-${item.id}`}>
                   <a
                     className={styles.columnTitleLink}
@@ -68,8 +83,8 @@ export function SiteFooter() {
         </nav>
 
         <ul className={styles.socialList} aria-label="Social links">
-          {SOCIAL_LINKS.map((social) => (
-            <li key={social.label}>
+          {SOCIAL_LINKS.map((social, index) => (
+            <li key={social.label} data-cascade="" style={cascadeStyle(socialStart + index)}>
               <a className={styles.socialLink} href={social.href} aria-label={social.label}>
                 <SocialIcon name={social.icon} />
               </a>
@@ -78,7 +93,11 @@ export function SiteFooter() {
         </ul>
       </div>
 
-      <div className={styles.wordmarkWrap}>
+      <div
+        className={styles.wordmarkWrap}
+        data-cascade=""
+        style={cascadeStyle(socialStart + SOCIAL_LINKS.length)}
+      >
         <img
           className={styles.wordmark}
           src={wordmarkWhite}
