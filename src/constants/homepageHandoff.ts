@@ -27,11 +27,11 @@ export const HANDOFF = {
   clearStart: 0.4,
   clearEnd: 0.55,
   /**
-   * Privacy copy fades in after the stage is clear.
-   * Must not equal clearEnd — a `clear >= 1 → copy = 1` shortcut would skip this window.
+   * Privacy copy fades in as the stage finishes clearing.
+   * Starts slightly before clearEnd so the block is readable sooner.
    */
-  copyStart: 0.55,
-  copyEnd: 0.92,
+  copyStart: 0.48,
+  copyEnd: 0.86,
 } as const
 
 /**

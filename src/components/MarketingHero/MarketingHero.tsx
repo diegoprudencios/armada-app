@@ -1,8 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type AnimationEvent } from 'react'
 import heroBackground from '@/assets/hero-fleet-centered.webp'
 import heroBackgroundLegacy from '@/assets/new-fleet.webp'
 import { Button } from '@/components/Button'
-import { RevealStack } from '@/components/ScrollReveal'
 import {
   HANDOFF,
   HERO_PIN_HEIGHT,
@@ -52,9 +51,18 @@ function smoothstep(t: number) {
   return x * x * (3 - 2 * x)
 }
 
-function FeatureCard() {
+function FeatureCard({
+  className,
+  onAnimationEnd,
+}: {
+  className?: string
+  onAnimationEnd?: (event: AnimationEvent<HTMLDivElement>) => void
+}) {
   return (
-    <div className={styles.feature}>
+    <div
+      className={[styles.feature, className].filter(Boolean).join(' ')}
+      onAnimationEnd={onAnimationEnd}
+    >
       <HeroUsdcSpinner />
       <p className={`armada-text-detail ${styles.featureCopy}`}>{FEATURE_COPY}</p>
     </div>
@@ -84,19 +92,61 @@ export interface MarketingHeroProps {
   scrollExit?: boolean
 }
 
+/** Keep in sync with `.backgroundSettle` duration. */
+const HERO_BG_SETTLE_MS = 920
+const HERO_HEADER_TO_COPY_MS = 180
+const HERO_COPY_TO_USDC_MS = 220
+
 export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
   const pinRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
   const pinHandoff = useDesktopHandoff(scrollExit)
+  const [copyReady, setCopyReady] = useState(false)
+  const [copyEntered, setCopyEntered] = useState(false)
+  const [usdcReady, setUsdcReady] = useState(false)
+  const [usdcEntered, setUsdcEntered] = useState(false)
+  const [settleBg, setSettleBg] = useState(true)
 
   const backgroundUrl = SHOW_LEGACY_HERO ? heroBackgroundLegacy : heroBackground
   const backgroundClass = [
     styles.background,
     SHOW_LEGACY_HERO && styles.backgroundBottom,
-    pinHandoff && styles.backgroundExit,
+    settleBg && styles.backgroundSettle,
   ]
     .filter(Boolean)
     .join(' ')
+
+  useLayoutEffect(() => {
+    const root = document.documentElement
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+    if (reduced.matches) {
+      root.dataset.heroEnter = 'chrome'
+      setCopyReady(true)
+      setCopyEntered(true)
+      setUsdcReady(true)
+      setUsdcEntered(true)
+      setSettleBg(false)
+      return
+    }
+
+    root.dataset.heroEnter = 'bg'
+    const headerAt = HERO_BG_SETTLE_MS
+    const copyAt = headerAt + HERO_HEADER_TO_COPY_MS
+    const usdcAt = copyAt + HERO_COPY_TO_USDC_MS
+    const timers = [
+      window.setTimeout(() => {
+        root.dataset.heroEnter = 'chrome'
+      }, headerAt),
+      window.setTimeout(() => setCopyReady(true), copyAt),
+      window.setTimeout(() => setUsdcReady(true), usdcAt),
+    ]
+
+    return () => {
+      timers.forEach((id) => window.clearTimeout(id))
+      delete root.dataset.heroEnter
+    }
+  }, [])
 
   useEffect(() => {
     if (!pinHandoff) return
@@ -228,48 +278,81 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
     </>
   )
 
+  const introLegacyClass = pinHandoff
+    ? `armada-site-stack ${styles.introLegacy} ${styles.introExit}`
+    : `armada-site-stack ${styles.introLegacy}`
+  const introClass = pinHandoff
+    ? `armada-site-stack ${styles.intro} ${styles.introExit}`
+    : `armada-site-stack ${styles.intro}`
+
+  const backgroundNode = (
+    <div
+      className={backgroundClass}
+      style={{ backgroundImage: `url(${backgroundUrl})` }}
+      aria-hidden
+      onAnimationEnd={() => setSettleBg(false)}
+    />
+  )
+
+  const finishCopyEnter = (event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) setCopyEntered(true)
+  }
+  const finishUsdcEnter = (event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target === event.currentTarget) setUsdcEntered(true)
+  }
+
+  const usdcEnterClass = !usdcReady
+    ? styles.chromePending
+    : usdcEntered
+      ? undefined
+      : styles.featureEnter
+
   const heroInner = SHOW_LEGACY_HERO ? (
     <div className={styles.contentLegacy}>
       <div className={styles.bottomLegacy}>
-        {pinHandoff ? (
-          <RevealStack className={`armada-site-stack ${styles.introLegacy} ${styles.introExit}`}>
+        {copyReady ? (
+          <div
+            className={[introLegacyClass, !copyEntered && styles.copyEnter]
+              .filter(Boolean)
+              .join(' ')}
+            onAnimationEnd={finishCopyEnter}
+          >
             {heroCopyLegacy}
-          </RevealStack>
+          </div>
         ) : (
-          <RevealStack className={`armada-site-stack ${styles.introLegacy}`}>
+          <div className={`${styles.introLegacy} ${styles.chromePending}`} aria-hidden>
             {heroCopyLegacy}
-          </RevealStack>
+          </div>
         )}
         {pinHandoff ? (
           <div className={styles.featureExit}>
-            <FeatureCard />
+            <FeatureCard className={usdcEnterClass} onAnimationEnd={finishUsdcEnter} />
           </div>
         ) : (
-          <RevealStack immediate>
-            <FeatureCard />
-          </RevealStack>
+          <FeatureCard className={usdcEnterClass} onAnimationEnd={finishUsdcEnter} />
         )}
       </div>
     </div>
   ) : (
     <div className={styles.content}>
-      {pinHandoff ? (
-        <RevealStack className={`armada-site-stack ${styles.intro} ${styles.introExit}`}>
+      {copyReady ? (
+        <div
+          className={[introClass, !copyEntered && styles.copyEnter].filter(Boolean).join(' ')}
+          onAnimationEnd={finishCopyEnter}
+        >
           {heroCopy}
-        </RevealStack>
+        </div>
       ) : (
-        <RevealStack className={`armada-site-stack ${styles.intro}`}>
+        <div className={`${styles.intro} ${styles.chromePending}`} aria-hidden>
           {heroCopy}
-        </RevealStack>
+        </div>
       )}
       {pinHandoff ? (
         <div className={styles.featureExit}>
-          <FeatureCard />
+          <FeatureCard className={usdcEnterClass} onAnimationEnd={finishUsdcEnter} />
         </div>
       ) : (
-        <RevealStack immediate>
-          <FeatureCard />
-        </RevealStack>
+        <FeatureCard className={usdcEnterClass} onAnimationEnd={finishUsdcEnter} />
       )}
     </div>
   )
@@ -277,11 +360,7 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
   if (!pinHandoff) {
     return (
       <section className={styles.hero} aria-labelledby="marketing-hero-heading">
-        <div
-          className={backgroundClass}
-          style={{ backgroundImage: `url(${backgroundUrl})` }}
-          aria-hidden
-        />
+        {backgroundNode}
         <div className={styles.overlay} aria-hidden />
         {heroInner}
       </section>
@@ -296,11 +375,9 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
       aria-labelledby="marketing-hero-heading"
     >
       <div ref={stageRef} className={styles.heroSticky}>
-        <div
-          className={backgroundClass}
-          style={{ backgroundImage: `url(${backgroundUrl})` }}
-          aria-hidden
-        />
+        <div className={styles.backgroundExit} aria-hidden>
+          {backgroundNode}
+        </div>
         <div className={styles.overlay} aria-hidden />
         {heroInner}
         {/* EXCEPTION — match WhatIsArmada privacy intro amber for seamless dissolve. */}

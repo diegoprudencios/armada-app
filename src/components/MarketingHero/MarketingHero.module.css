@@ -68,13 +68,13 @@
   transform: none;
 }
 
-.heroSticky[data-hero-at-rest='true'] .introExit {
+.heroSticky[data-hero-at-rest='true'] .introExit:not(.copyEnter):not(.chromePending) {
   opacity: 1;
   transform: none;
   will-change: auto;
 }
 
-.heroSticky[data-hero-at-rest='true'] .featureExit .feature {
+.heroSticky[data-hero-at-rest='true'] .featureExit .feature:not(.featureEnter):not(.chromePending) {
   opacity: 1;
   transform: none;
 }
@@ -104,10 +104,51 @@
 }
 
 .backgroundExit {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
   transform-origin: center center;
   transform: scale(calc(1 + var(--hero-exit) * 0.08));
   opacity: calc(1 - var(--hero-exit) * 0.45);
   will-change: transform, opacity;
+}
+
+/* Load: Ken Burns zoom-out. Duration matches HERO_BG_SETTLE_MS. */
+.backgroundSettle {
+  transform-origin: center bottom;
+  animation: heroBgSettle 920ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes heroBgSettle {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.chromePending {
+  opacity: 0 !important;
+  transform: none;
+  pointer-events: none;
+}
+
+.copyEnter,
+.featureEnter {
+  animation: heroChromeEnter 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes heroChromeEnter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, var(--primitives-spacing-10), 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .overlay {
@@ -472,11 +513,20 @@
   }
 
   .backgroundExit,
+  .backgroundSettle,
   .introExit,
-  .featureExit .feature {
+  .featureExit .feature,
+  .copyEnter,
+  .featureEnter {
     transform: none;
     opacity: 1;
     will-change: auto;
+    animation: none;
+  }
+
+  .chromePending {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .dissolve {
