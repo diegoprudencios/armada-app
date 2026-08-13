@@ -50,7 +50,6 @@
     Dissolve covers the hero while opacity stays 1; then clear fades the stage.
   */
   opacity: 1;
-  will-change: opacity;
 }
 
 /*
@@ -58,7 +57,6 @@
 */
 .heroSticky[data-hero-at-rest='true'] {
   opacity: 1 !important;
-  will-change: auto;
 }
 
 .heroSticky[data-hero-at-rest='true'] .dissolve {
@@ -70,11 +68,15 @@
   transform: none;
 }
 
-.heroSticky[data-hero-at-rest='true'] .introExit,
-.heroSticky[data-hero-at-rest='true'] .featureExit {
+.heroSticky[data-hero-at-rest='true'] .introExit {
   opacity: 1;
   transform: none;
   will-change: auto;
+}
+
+.heroSticky[data-hero-at-rest='true'] .featureExit .feature {
+  opacity: 1;
+  transform: none;
 }
 
 /*
@@ -146,7 +148,11 @@
   will-change: transform, opacity;
 }
 
-.featureExit {
+/*
+  Motion lives on .feature, not this wrapper. Ancestor opacity/transform
+  (and will-change) create a stacking context and drop backdrop-filter.
+*/
+.featureExit .feature {
   transform: translate(
     calc(var(--hero-exit) * var(--primitives-spacing-20) * 2.5),
     calc(var(--hero-exit) * var(--primitives-spacing-4) * -1)
@@ -407,11 +413,10 @@
     );
   }
 
-  .featureExit {
-    transform: translate3d(
+  .featureExit .feature {
+    transform: translate(
       0,
-      calc(var(--hero-exit) * var(--primitives-spacing-20) * 1.75),
-      0
+      calc(var(--hero-exit) * var(--primitives-spacing-20) * 1.75)
     );
   }
 }
@@ -464,12 +469,11 @@
   .heroSticky {
     position: relative;
     opacity: 1;
-    will-change: auto;
   }
 
   .backgroundExit,
   .introExit,
-  .featureExit {
+  .featureExit .feature {
     transform: none;
     opacity: 1;
     will-change: auto;
