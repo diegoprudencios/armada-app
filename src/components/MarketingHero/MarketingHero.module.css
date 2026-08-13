@@ -58,6 +58,7 @@
 */
 .heroSticky[data-hero-at-rest='true'] {
   opacity: 1 !important;
+  will-change: auto;
 }
 
 .heroSticky[data-hero-at-rest='true'] .dissolve {
@@ -73,6 +74,7 @@
 .heroSticky[data-hero-at-rest='true'] .featureExit {
   opacity: 1;
   transform: none;
+  will-change: auto;
 }
 
 /*
@@ -145,13 +147,11 @@
 }
 
 .featureExit {
-  transform: translate3d(
+  transform: translate(
     calc(var(--hero-exit) * var(--primitives-spacing-20) * 2.5),
-    calc(var(--hero-exit) * var(--primitives-spacing-4) * -1),
-    0
+    calc(var(--hero-exit) * var(--primitives-spacing-4) * -1)
   );
   opacity: calc(1 - var(--hero-exit) * 1.15);
-  will-change: transform, opacity;
 }
 
 /* —— Active layout: centered title + CTA, USDC glass bottom-right —— */
@@ -216,7 +216,6 @@
   padding: var(--primitives-spacing-4) var(--primitives-spacing-5)
     var(--primitives-spacing-5) var(--primitives-spacing-4);
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
-  isolation: isolate;
   overflow: hidden;
   /* EXCEPTION — Figma blur container: #000 @ 30%, background blur 25. */
   background: color-mix(in srgb, #000000 30%, transparent);

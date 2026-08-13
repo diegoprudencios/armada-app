@@ -12,11 +12,6 @@ const DESIGN_TOTAL_W = TOGGLE_WIDTH_PX + STACK_INDENT_PX
 
 /** ~1.35px/frame at 60fps — frame-rate independent. */
 const BASE_SPEED_PX_PER_SEC = 1.35 * 60
-/** Maps scroll velocity (px/ms) into boost added per scroll event. */
-const SCROLL_VELOCITY_GAIN = 0.45
-const SCROLL_MAX_BOOST = 4
-/** Per-frame decay at 60fps; applied with Math.pow(..., dt*60). */
-const SCROLL_DECAY_PER_FRAME_60 = 0.92
 
 type ToggleItem = {
   id: number
@@ -33,7 +28,7 @@ function buildItems(): ToggleItem[] {
 /**
  * Infinite stack of compliance toggles rising bottom→top.
  * Each toggle flips on (gradient + shield) as it crosses the viewport midline.
- * Scroll boosts travel speed. Motion is delta-timed (same speed on 60/120Hz).
+ * Motion is delta-timed (same speed on 60/120Hz).
  * Size fits the diagram column via ResizeObserver; dial --compliance-anim-scale in CSS.
  */
 export function ComplianceToggleStack() {
@@ -53,9 +48,6 @@ export function ComplianceToggleStack() {
     let frameId = 0
     let disposed = false
     let offset = 0
-    let scrollBoost = 0
-    let lastScrollY = window.scrollY
-    let lastScrollTs = performance.now()
     let lastFrameTs = performance.now()
 
     const toggles = toggleRefs.current.filter(Boolean) as HTMLDivElement[]
@@ -112,22 +104,6 @@ export function ComplianceToggleStack() {
       }
     }
 
-    const onScroll = () => {
-      if (disposed || reducedMotion.matches) return
-      const now = performance.now()
-      const y = window.scrollY
-      const dy = Math.abs(y - lastScrollY)
-      const dt = Math.max(now - lastScrollTs, 1)
-      lastScrollY = y
-      lastScrollTs = now
-
-      const velocityPxPerMs = dy / dt
-      scrollBoost = Math.min(
-        SCROLL_MAX_BOOST,
-        scrollBoost + velocityPxPerMs * SCROLL_VELOCITY_GAIN,
-      )
-    }
-
     const tick = (now: number) => {
       if (disposed) return
 
@@ -136,14 +112,11 @@ export function ComplianceToggleStack() {
       let wrapped = false
 
       if (!reducedMotion.matches && dtSec > 0) {
-        scrollBoost *= Math.pow(SCROLL_DECAY_PER_FRAME_60, dtSec * 60)
-        if (scrollBoost < 0.02) scrollBoost = 0
-
         const layoutScale =
           toggles[0] && toggles[0].offsetHeight > 0
             ? toggles[0].offsetHeight / TOGGLE_HEIGHT_PX
             : 1
-        const speed = BASE_SPEED_PX_PER_SEC * layoutScale * (1 + scrollBoost)
+        const speed = BASE_SPEED_PX_PER_SEC * layoutScale
         offset += speed * dtSec
         if (loopHeight > 0 && offset >= loopHeight) {
           offset -= loopHeight
@@ -168,14 +141,12 @@ export function ComplianceToggleStack() {
       resizeObserver.observe(host)
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true })
     updateActiveStates(true)
     frameId = window.requestAnimationFrame(tick)
 
     return () => {
       disposed = true
       resizeObserver?.disconnect()
-      window.removeEventListener('scroll', onScroll)
       window.cancelAnimationFrame(frameId)
     }
   }, [])

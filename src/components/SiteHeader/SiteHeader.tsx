@@ -349,7 +349,7 @@ export function SiteHeader() {
               ))}
             </ul>
             <Button
-              variant="ink"
+              variant="primary"
               size="md"
               label="Armada App"
               showIcon
