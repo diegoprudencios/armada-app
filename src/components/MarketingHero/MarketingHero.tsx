@@ -232,9 +232,9 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
     <div className={styles.contentLegacy}>
       <div className={styles.bottomLegacy}>
         {pinHandoff ? (
-          <div className={`armada-site-stack ${styles.introLegacy} ${styles.introExit}`}>
+          <RevealStack className={`armada-site-stack ${styles.introLegacy} ${styles.introExit}`}>
             {heroCopyLegacy}
-          </div>
+          </RevealStack>
         ) : (
           <RevealStack className={`armada-site-stack ${styles.introLegacy}`}>
             {heroCopyLegacy}
@@ -254,9 +254,9 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
   ) : (
     <div className={styles.content}>
       {pinHandoff ? (
-        <div className={`armada-site-stack ${styles.intro} ${styles.introExit}`}>
+        <RevealStack className={`armada-site-stack ${styles.intro} ${styles.introExit}`}>
           {heroCopy}
-        </div>
+        </RevealStack>
       ) : (
         <RevealStack className={`armada-site-stack ${styles.intro}`}>
           {heroCopy}

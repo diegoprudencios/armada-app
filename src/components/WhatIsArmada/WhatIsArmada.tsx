@@ -339,7 +339,7 @@ function FeatureCopy({
   bodyClassName?: string
 }) {
   return (
-    <div className={`armada-site-stack ${contentClassName}`}>
+    <RevealStack className={`armada-site-stack ${contentClassName}`}>
       <h2
         id={headingId}
         className={`armada-text-title ${titleClassName ?? styles.panelTitle}`}
@@ -352,7 +352,7 @@ function FeatureCopy({
       </h2>
       <p className={`armada-text-body ${bodyClassName ?? styles.panelBody}`}>{block.body}</p>
       <CtaRow ctas={block.ctas} align="start" />
-    </div>
+    </RevealStack>
   )
 }
 
