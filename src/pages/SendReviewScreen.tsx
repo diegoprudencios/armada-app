@@ -1,4 +1,3 @@
-import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
 import { SendReviewSummary } from '@/components/SendReviewSummary'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
@@ -15,9 +14,6 @@ import {
   type SendFlowVariant,
 } from './sendFlowConstants'
 import styles from './SendReviewScreen.module.css'
-
-const TOKEN_BADGE_PX = 40
-const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
 
 export interface SendReviewScreenProps {
   amount: string
@@ -47,6 +43,12 @@ export function SendReviewScreen({
   const networkName = isPrivate ? undefined : sendNetworkDisplayName(chain)
   const confirmLabel = sendReviewConfirmLabel(variant)
 
+  const amountBlock = (
+    <div className={styles.amountRow}>
+      <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
+    </div>
+  )
+
   const summary = (
     <SendReviewSummary
       recipientAddress={recipient}
@@ -60,7 +62,6 @@ export function SendReviewScreen({
   )
 
   if (keypadMobileLayout) {
-    // Amount stays on the amount screen behind the sheet — don't repeat it here.
     return (
       <div className={styles.sheetColumn}>
         {summary}
@@ -82,28 +83,29 @@ export function SendReviewScreen({
 
   return (
     <div className={styles.column}>
-      <div className={modalStepBodyEnter}>
-        <h1 className={styles.title}>{sendReviewTitle(variant)}</h1>
-
-        <div className={styles.amountRow}>
-          <div className={styles.amountGroup}>
-            <div className={styles.tokenBadge} aria-hidden>
-              <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
-            </div>
-            <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
-          </div>
+      <div className={`${styles.body} ${modalStepBodyEnter}`}>
+        <div className={styles.titleBlock}>
+          <h1 className={styles.title}>{sendReviewTitle(variant)}</h1>
+          {amountBlock}
         </div>
-
         {summary}
       </div>
 
       <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>
-        <Button variant="secondary" size="lg" label="Back" showIcon={false} onClick={onBack} />
+        <Button
+          variant="secondary"
+          size="lg"
+          label="Back"
+          showIcon={false}
+          className={styles.cancelButton}
+          onClick={onBack}
+        />
         <Button
           variant="primary"
           size="lg"
           label={confirmLabel}
           showIcon={false}
+          className={styles.confirmButton}
           onClick={onConfirm}
           testingClickId={
             variant === 'withdraw' ? 'withdraw_og_confirm_button' : 'send_confirm_button'

@@ -1,6 +1,22 @@
+.shellScrim {
+  z-index: 300;
+}
+
 .shellPanel {
+  width: min(100%, calc(var(--primitives-spacing-20) * 5 - var(--primitives-spacing-5)));
   box-shadow: none;
-  background: var(--semantic-color-surface-default);
+  background: var(--semantic-color-surface-default) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+.shellSheet {
+  box-shadow: none;
+  background: var(--semantic-color-surface-default) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   overflow-x: clip;
   max-width: 100%;
 }

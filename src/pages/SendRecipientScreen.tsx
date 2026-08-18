@@ -1,9 +1,9 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/solid'
-import { ArrowRightIcon, GlobeAltIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { ArrowRightIcon, ClipboardDocumentIcon, GlobeAltIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { Button } from '@/components/Button'
-import { modalStepBodyEnter } from '@/components/ModalShell'
+import iconButtonStyles from '@/components/IconButton/IconButton.module.css'
 import { useEnvironment } from '@/hooks/useEnvironment'
 import { useListboxKeyboard } from '@/hooks/useListboxKeyboard'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
@@ -17,8 +17,7 @@ import {
   isValidRecipientAddress,
   RECENT_SEND_ADDRESSES,
   SEND_CHAIN_OPTIONS,
-  sendRecipientTitleLead,
-  SEND_RECIPIENT_TITLE_TAIL,
+  sendRecipientTitle,
   type SendChainId,
   type SendFlowVariant,
 } from './sendFlowConstants'
@@ -33,6 +32,7 @@ export interface SendRecipientScreenProps {
   showRecentAddresses?: boolean
   onRecipientChange: (recipient: string) => void
   onChainChange: (chain: SendChainId) => void
+  onCancel: () => void
   onContinue: () => void
 }
 
@@ -43,17 +43,21 @@ export function SendRecipientScreen({
   showRecentAddresses = true,
   onRecipientChange,
   onChainChange,
+  onCancel,
   onContinue,
 }: SendRecipientScreenProps) {
   const inputId = useId()
   const listboxId = useId()
-  const chainRootRef = useRef<HTMLDivElement>(null)
-  const pasteToggleRef = useRef(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const chainRootRef = useRef<HTMLDivElement>(null)
+  const chainListboxRef = useRef<HTMLUListElement>(null)
+  const clipboardAddressRef = useRef<HTMLSpanElement>(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [clipboardHasAddress, setClipboardHasAddress] = useState(false)
+  const [clipboardAddress, setClipboardAddress] = useState<string | null>(null)
+  const [mockNextIsZeroX, setMockNextIsZeroX] = useState(false)
   const [inputFocused, setInputFocused] = useState(false)
   const [fittedAddress, setFittedAddress] = useState(recipient)
+  const [fittedClipboardAddress, setFittedClipboardAddress] = useState('')
   const [environment] = useEnvironment()
   const isMobile = useMobileLayout()
   const isMock = environment === 'mock'
@@ -61,7 +65,12 @@ export function SendRecipientScreen({
   const trimmed = recipient.trim()
   const hasInput = trimmed.length > 0
   const hasAddress = isValidRecipientAddress(trimmed)
-  const showPasteButton = !hasInput && (isMock || clipboardHasAddress)
+  const clipboardPreview = isMock
+    ? mockNextIsZeroX
+      ? DEMO_0X_RECIPIENT
+      : DEMO_ZK_RECIPIENT
+    : clipboardAddress
+  const showClipboardPaste = !hasInput && Boolean(clipboardPreview)
   const showRecentList = showRecentAddresses && !(isMobile && hasAddress)
   const isPrivate = hasAddress && isArmadaAddress(trimmed)
   const isPublic = hasAddress && isPublicAddress(trimmed)
@@ -96,7 +105,33 @@ export function SendRecipientScreen({
     const observer = new ResizeObserver(fitToInputWidth)
     observer.observe(input)
     return () => observer.disconnect()
-  }, [trimmed, recipient, showPasteButton, hasInput, inputFocused])
+  }, [trimmed, recipient, hasInput, inputFocused])
+
+  useLayoutEffect(() => {
+    if (!showClipboardPaste || !clipboardPreview) {
+      setFittedClipboardAddress('')
+      return
+    }
+
+    const el = clipboardAddressRef.current
+    if (!el) return
+
+    function fitClipboardAddress() {
+      const node = clipboardAddressRef.current
+      if (!node || !clipboardPreview) return
+      const style = getComputedStyle(node)
+      const font = [style.fontStyle, style.fontWeight, style.fontSize, style.fontFamily]
+        .filter(Boolean)
+        .join(' ')
+      setFittedClipboardAddress(truncateMiddleToWidth(clipboardPreview, node.clientWidth, font))
+    }
+
+    fitClipboardAddress()
+    if (typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(fitClipboardAddress)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [showClipboardPaste, clipboardPreview])
 
   function selectChain(next: SendChainId) {
     onChainChange(next)
@@ -122,8 +157,21 @@ export function SendRecipientScreen({
   }, [])
 
   useEffect(() => {
+    if (!menuOpen) return
+    chainListboxRef.current?.focus()
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!chainRootRef.current?.contains(event.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [menuOpen])
+
+  useEffect(() => {
     if (isMock || hasInput) {
-      setClipboardHasAddress(false)
       return
     }
 
@@ -132,7 +180,7 @@ export function SendRecipientScreen({
     async function probeClipboard() {
       const address = await readRecipientFromClipboard()
       if (!cancelled) {
-        setClipboardHasAddress(address !== null)
+        setClipboardAddress(address)
       }
     }
 
@@ -151,21 +199,10 @@ export function SendRecipientScreen({
     }
   }, [isMock, hasInput])
 
-  useEffect(() => {
-    if (!menuOpen) return
-    function handlePointerDown(event: MouseEvent) {
-      if (!chainRootRef.current?.contains(event.target as Node)) {
-        setMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', handlePointerDown)
-    return () => document.removeEventListener('mousedown', handlePointerDown)
-  }, [menuOpen])
-
   async function handlePaste() {
     if (isMock) {
-      const next = pasteToggleRef.current ? DEMO_0X_RECIPIENT : DEMO_ZK_RECIPIENT
-      pasteToggleRef.current = !pasteToggleRef.current
+      const next = mockNextIsZeroX ? DEMO_0X_RECIPIENT : DEMO_ZK_RECIPIENT
+      setMockNextIsZeroX((current) => !current)
       onRecipientChange(next)
       inputRef.current?.blur()
       return
@@ -188,16 +225,67 @@ export function SendRecipientScreen({
     inputRef.current?.blur()
   }
 
+  const privacyBadge =
+    isPrivate || isPublic ? (
+      <div className={`${styles.privacyBadge} ${styles.actionRowReveal}`} role="status">
+        <span
+          className={[
+            styles.privacyIcon,
+            isPrivate ? styles.brandBadge : styles.privacyIconPublic,
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          aria-hidden
+        >
+          {isPrivate ? (
+            <ArmadaLogo variant="mark" markTone="deep" className={styles.brandMark} />
+          ) : (
+            <GlobeAltIcon className={styles.privacyIconSvg} strokeWidth={1.75} />
+          )}
+        </span>
+        <div className={styles.privacyCopy}>
+          <span className={styles.privacyTitle}>
+            {isPrivate ? 'Private address' : 'Public address'}
+          </span>
+          <span className={styles.privacySubtitle}>
+            {isPrivate
+              ? 'Transaction will be fully private'
+              : "Transfer won't be fully private"}
+          </span>
+        </div>
+      </div>
+    ) : null
+
+  const actionRow = (
+    <div className={`${styles.buttonRow} ${styles.enterCtas}`}>
+      <Button
+        variant="secondary"
+        size="lg"
+        label="Cancel"
+        showIcon={false}
+        onClick={onCancel}
+      />
+      <Button
+        variant="primary"
+        size="lg"
+        label={hasAddress ? 'Continue' : 'Enter address'}
+        showIcon={false}
+        disabled={!hasAddress}
+        dimWhenDisabled={false}
+        onClick={onContinue}
+      />
+    </div>
+  )
+
   return (
     <div className={styles.column}>
-      <div className={`${styles.body} ${modalStepBodyEnter}`}>
-        <h1 className={styles.title}>
-          {sendRecipientTitleLead(variant)}
-          <br />
-          {SEND_RECIPIENT_TITLE_TAIL}
-        </h1>
+      <div className={styles.body}>
+        <div className={`${styles.card} ${styles.enterCard}`}>
+          <h1 className={`armada-text-ui-body-lg ${styles.cardTitle}`}>
+            {sendRecipientTitle(variant)}
+          </h1>
 
-        <div className={styles.addressBlock}>
+          <div className={styles.addressBlock}>
           <div className={styles.addressField}>
             <input
               ref={inputRef}
@@ -216,11 +304,6 @@ export function SendRecipientScreen({
               autoCapitalize="off"
               aria-label="Recipient address"
             />
-            {showPasteButton ? (
-              <button type="button" className={styles.pasteButton} onClick={() => void handlePaste()}>
-                Paste
-              </button>
-            ) : null}
             {hasInput ? (
               <button
                 type="button"
@@ -233,6 +316,38 @@ export function SendRecipientScreen({
               </button>
             ) : null}
           </div>
+
+          {showClipboardPaste && clipboardPreview ? (
+            <button
+              type="button"
+              className={styles.clipboardPaste}
+              onClick={() => void handlePaste()}
+            >
+              <span
+                className={[
+                  iconButtonStyles.button,
+                  iconButtonStyles.sizeMd,
+                  iconButtonStyles.frosted,
+                  styles.clipboardPasteIcon,
+                ].join(' ')}
+                aria-hidden
+              >
+                <span className={iconButtonStyles.icon}>
+                  <ClipboardDocumentIcon strokeWidth={1.5} />
+                </span>
+              </span>
+              <span className={styles.clipboardPasteCopy}>
+                <span className={styles.clipboardPasteLabel}>Paste from clipboard</span>
+                <span
+                  ref={clipboardAddressRef}
+                  className={styles.clipboardPasteAddress}
+                  title={clipboardPreview}
+                >
+                  {fittedClipboardAddress || clipboardPreview}
+                </span>
+              </span>
+            </button>
+          ) : null}
 
           {isPublic ? (
             <div className={styles.networkRoot} ref={chainRootRef}>
@@ -248,15 +363,20 @@ export function SendRecipientScreen({
                 <span className={styles.networkIconSlot} aria-hidden>
                   <SelectedNetworkIcon size={NETWORK_ICON_SIZE} variant="background" />
                 </span>
-                <span className={styles.networkName}>{selectedChain.label}</span>
+                <span className={styles.networkCopy}>
+                  <span className={styles.networkLabel}>Network</span>
+                  <span className={styles.networkName}>{selectedChain.label}</span>
+                </span>
                 <ChevronDownIcon className={styles.chevron} aria-hidden />
               </button>
 
               {menuOpen ? (
                 <ul
+                  ref={chainListboxRef}
                   id={listboxId}
                   className={styles.networkMenu}
                   role="listbox"
+                  tabIndex={-1}
                   aria-label="Network"
                   aria-activedescendant={chainActiveDescendantId}
                   onKeyDown={handleChainListboxKeyDown}
@@ -290,10 +410,15 @@ export function SendRecipientScreen({
               ) : null}
             </div>
           ) : null}
+          </div>
+
+          {privacyBadge}
         </div>
 
+        {actionRow}
+
         {showRecentList ? (
-          <div className={styles.recentSection}>
+          <div className={`${styles.recentSection} ${styles.enterRecent}`}>
             <span className={styles.recentLabel}>Recent address</span>
             <ul className={styles.recentList}>
               {RECENT_SEND_ADDRESSES.map((item) => (
@@ -315,46 +440,6 @@ export function SendRecipientScreen({
           </div>
         ) : null}
       </div>
-
-      {hasAddress ? (
-        <div className={`${styles.footer} ${styles.actionRowReveal}`}>
-          <div className={styles.privacyBadge}>
-            <span
-              className={[
-                styles.privacyIcon,
-                isPrivate ? styles.brandBadge : styles.privacyIconPublic,
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              aria-hidden
-            >
-              {isPrivate ? (
-                <ArmadaLogo variant="mark" markTone="white" className={styles.brandMark} />
-              ) : (
-                <GlobeAltIcon className={styles.privacyIconSvg} strokeWidth={1.75} />
-              )}
-            </span>
-            <div className={styles.privacyCopy}>
-              <span className={styles.privacyTitle}>
-                {isPrivate ? 'Private address' : 'Public address'}
-              </span>
-              <span className={styles.privacySubtitle}>
-                {isPrivate
-                  ? 'Transaction will be fully private'
-                  : "Transfer won't be fully private"}
-              </span>
-            </div>
-          </div>
-          <Button
-            variant="primary"
-            size="lg"
-            label="Continue"
-            showIcon={false}
-            className={styles.continueButton}
-            onClick={onContinue}
-          />
-        </div>
-      ) : null}
     </div>
   )
 }

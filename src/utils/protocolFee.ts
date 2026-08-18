@@ -4,3 +4,8 @@ export function formatProtocolFeeLabel(feeUsdc: number): string {
   const resolved = Number.isFinite(feeUsdc) && feeUsdc > 0 ? feeUsdc : 0
   return `${formatUsdcAmount(resolved, 2)} USDC`
 }
+
+export function formatShieldFeeCaption(feeUsdc: number): string {
+  const resolved = Number.isFinite(feeUsdc) && feeUsdc > 0 ? feeUsdc : 0
+  return `+ $${formatUsdcAmount(resolved, 2)} FEE`
+}

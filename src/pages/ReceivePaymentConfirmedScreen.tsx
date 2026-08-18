@@ -1,4 +1,3 @@
-import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
 import { ReceivePaymentReviewSummary } from '@/components/ReceivePaymentReviewSummary'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
@@ -7,9 +6,6 @@ import { formatUsdcAmount } from '@/utils/format'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
 import type { SendChainId } from './sendFlowConstants'
 import styles from './DepositConfirmedScreen.module.css'
-
-const TOKEN_BADGE_PX = 40
-const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
 
 export interface ReceivePaymentConfirmedScreenProps {
   amount: string
@@ -37,14 +33,10 @@ export function ReceivePaymentConfirmedScreen({
 
   return (
     <div className={styles.column}>
-      <div className={modalStepBodyEnter}>
-        <h1 className={styles.title}>Payment received</h1>
-
-        <div className={styles.amountRow}>
-          <div className={styles.amountGroup}>
-            <div className={styles.tokenBadge} aria-hidden>
-              <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
-            </div>
+      <div className={`${styles.body} ${modalStepBodyEnter}`}>
+        <div className={styles.titleBlock}>
+          <h1 className={styles.title}>Payment received</h1>
+          <div className={styles.amountRow}>
             <span className={styles.amountValue}>{amountLabel}</span>
           </div>
         </div>
@@ -60,8 +52,22 @@ export function ReceivePaymentConfirmedScreen({
       </div>
 
       <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>
-        <Button variant="secondary" size="lg" label="View on explorer" showIcon={false} onClick={onViewExplorer} />
-        <Button variant="primary" size="lg" label="Go to dashboard" showIcon={false} onClick={onGoToDashboard} />
+        <Button
+          variant="secondary"
+          size="lg"
+          label="View on explorer"
+          showIcon={false}
+          className={styles.cancelButton}
+          onClick={onViewExplorer}
+        />
+        <Button
+          variant="primary"
+          size="lg"
+          label="Go to dashboard"
+          showIcon={false}
+          className={styles.confirmButton}
+          onClick={onGoToDashboard}
+        />
       </div>
     </div>
   )

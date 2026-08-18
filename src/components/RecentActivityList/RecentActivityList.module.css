@@ -1,6 +1,8 @@
 .root {
-  --activity-surface: color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent);
+  --activity-surface: var(--semantic-color-frost);
   width: 100%;
+  max-width: none;
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
   gap: var(--primitives-spacing-4);
@@ -46,8 +48,26 @@
   text-underline-offset: calc(var(--primitives-spacing-1) * 0.5);
 }
 
-.viewAllButton:hover {
-  color: var(--semantic-color-text-muted);
+@media (hover: hover) and (pointer: fine) {
+  .viewAllButton:hover {
+    color: var(--semantic-color-text-muted);
+  }
+
+  .item:hover {
+    background: var(--semantic-color-frost-hover);
+  }
+
+  .rootFull .item:hover {
+    background: var(--semantic-color-surface-hover);
+  }
+}
+
+.item:active {
+  background: var(--semantic-color-frost-pressed);
+}
+
+.rootFull .item:active {
+  background: var(--primitives-color-purple-50);
 }
 
 .viewAllButton:focus-visible {
@@ -58,6 +78,7 @@
 
 .rootFull {
   animation: none;
+  max-width: none;
 }
 
 .rootPreview {
@@ -133,10 +154,6 @@
   font: inherit;
   color: inherit;
   transition: background-color 160ms ease;
-}
-
-.item:hover {
-  background: var(--semantic-color-surface-hover);
 }
 
 .item:focus-visible {

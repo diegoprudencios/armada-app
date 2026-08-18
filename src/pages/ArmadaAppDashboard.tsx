@@ -1,4 +1,5 @@
-import { type CSSProperties } from 'react'
+import { type CSSProperties, useState } from 'react'
+import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { DASHBOARD_ACTIVITY_BOTTOM_SPACING_PX } from '@/constants/activityList'
 import { BalanceCard } from '@/components/BalanceCard'
 import { DASHBOARD_TOOLTIP_ENTER_DELAY_MS } from '@/components/BalanceCard/balanceRevealMotion'
@@ -7,11 +8,20 @@ import { DashboardHeader } from '@/components/DashboardHeader'
 import { DepositTooltip } from '@/components/DepositTooltip'
 import { RecentActivityList } from '@/components/RecentActivityList'
 import { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
+import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { useRequireConnectedWallet } from '@/hooks/useRequireConnectedWallet'
 import { getDashboardVersionFromPath } from '@/utils/dashboardVersion'
 import { DashboardOverlays } from './DashboardOverlays'
 import { DashboardCardStack } from './DashboardCardStack'
+import { EarnChooserSheet } from './EarnChooserSheet'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
+import {
+  DEMO_EARN_APY,
+  EARN_APY_BANNER_BODY,
+  EARN_APY_BANNER_TOOLTIP,
+  earnApyBannerHeadline,
+  formatDemoApy,
+} from './earnFlowConstants'
 import styles from './ArmadaAppDashboard.module.css'
 
 export interface ArmadaAppDashboardProps {
@@ -28,6 +38,8 @@ export function ArmadaAppDashboard({
   onRequest,
   onMore,
 }: ArmadaAppDashboardProps) {
+  const isMobile = useMobileLayout()
+  const [vaultChooserOpen, setVaultChooserOpen] = useState(false)
   const state = useDashboardDemoState(initialBalance)
   const {
     wallet,
@@ -36,6 +48,7 @@ export function ArmadaAppDashboard({
     dashboardBalance,
     balanceRoll,
     showDepositTooltip,
+    showEarnBanner,
     openConnect,
     connectWallet,
     selectActiveWallet,
@@ -93,6 +106,7 @@ export function ArmadaAppDashboard({
       <DashboardCardStack
         stackClassName={isV2 ? styles.cardStackV2 : undefined}
         showDepositTooltip={showDepositTooltip}
+        showEarnBanner={showEarnBanner}
         activityVisible={showActivity}
         tooltipEnterStyle={
           {
@@ -115,7 +129,10 @@ export function ArmadaAppDashboard({
             onWithdraw={openWithdraw}
             vaultBalance={earningBalance}
             vaultRollFromValue={balanceRoll.vaultFromValue}
-            onVaultOpen={() => openEarn('add')}
+            onVaultOpen={() => {
+              if (isMobile) setVaultChooserOpen(true)
+              else openEarn('add')
+            }}
             activityVisible={activityVisible}
             onToggleActivity={toggleActivity}
             balanceHidden={balanceHidden}
@@ -131,8 +148,28 @@ export function ArmadaAppDashboard({
           />
         }
         depositTooltip={
-          <DepositTooltip variant={isV2 ? 'v2' : undefined} onDeposit={openDeposit} />
+          <DepositTooltip stretch variant={isV2 ? 'v2' : undefined} onDeposit={openDeposit} />
         }
+        earnBanner={
+          <DepositTooltip
+            stretch
+            BadgeIcon={ChartBarIcon}
+            badgeBackground="white"
+            iconTileTone="purple"
+            headline={earnApyBannerHeadline(DEMO_EARN_APY)}
+            ariaLabel={`Estimated yearly yield ${formatDemoApy(DEMO_EARN_APY)}`}
+            body={EARN_APY_BANNER_BODY}
+            infoTooltip={EARN_APY_BANNER_TOOLTIP}
+            onDeposit={() => openEarn('add')}
+          />
+        }
+      />
+
+      <EarnChooserSheet
+        open={vaultChooserOpen}
+        onClose={() => setVaultChooserOpen(false)}
+        onAdd={() => openEarn('add')}
+        onWithdraw={() => openEarn('withdraw')}
       />
 
       <DashboardOverlays state={state} />

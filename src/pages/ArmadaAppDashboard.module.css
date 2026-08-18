@@ -25,8 +25,9 @@
   z-index: 0;
   background: linear-gradient(
     to bottom,
-    var(--primitives-color-purple-300),
-    var(--primitives-color-amber-300)
+    var(--semantic-color-brand-lavender) 0%,
+    var(--semantic-color-brand-gradient-rose) 50%,
+    var(--semantic-color-brand-amber) 100%
   );
   opacity: 0.4;
   pointer-events: none;
@@ -91,12 +92,12 @@
 .cardStack {
   position: relative;
   z-index: 1;
-  width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-10) * 0.5);
+  width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-5));
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--primitives-spacing-8);
+  align-items: stretch;
+  gap: var(--primitives-spacing-6);
 }
 
 .cardStackV2 {
@@ -106,9 +107,9 @@
 .primaryStack {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
-  gap: var(--primitives-spacing-8);
+  gap: var(--primitives-spacing-6);
 }
 
 .cardStackBalance,
@@ -123,8 +124,7 @@
 
 .cardStackTooltip {
   flex-shrink: 0;
-  display: flex;
-  justify-content: center;
+  display: block;
 }
 
 .cardStackActivity {
@@ -134,17 +134,23 @@
 @media (min-width: 768px) {
   .shell {
     padding-block-start: 0;
+    padding-block-end: var(--semantic-spacing-page-block);
     background-color: var(--semantic-color-surface-bg);
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: 100% 100dvh;
   }
 
+  .shell[data-activity-visible='true'] {
+    padding-block-end: var(--semantic-spacing-page-block);
+  }
+
   :global([data-theme='light']) .shell {
     background-image: linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--primitives-color-purple-300) 40%, var(--semantic-color-surface-bg)),
-      color-mix(in srgb, var(--primitives-color-amber-300) 40%, var(--semantic-color-surface-bg))
+      color-mix(in srgb, var(--semantic-color-brand-lavender) 40%, var(--semantic-color-surface-bg)) 0%,
+      color-mix(in srgb, var(--semantic-color-brand-gradient-rose) 40%, var(--semantic-color-surface-bg)) 50%,
+      color-mix(in srgb, var(--semantic-color-brand-amber) 40%, var(--semantic-color-surface-bg)) 100%
     );
   }
 
@@ -184,10 +190,7 @@
   .cardStack {
     position: relative;
     z-index: 1;
-    padding-top: calc(
-      var(--primitives-spacing-5) + var(--primitives-spacing-10) + var(--primitives-spacing-12) +
-        var(--primitives-spacing-6) + var(--primitives-spacing-1) * 0.5
-    );
+    padding-top: var(--semantic-spacing-page-block);
   }
 }
 

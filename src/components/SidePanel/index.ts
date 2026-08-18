@@ -1,1 +1,1 @@
-export { SidePanel, type SidePanelProps } from './SidePanel'
+export { SidePanel, SIDE_PANEL_EXIT_MS, type SidePanelProps } from './SidePanel'

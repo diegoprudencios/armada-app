@@ -345,15 +345,23 @@
   color: var(--semantic-color-text-muted);
 }
 
-.ethereumPanelToolbar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  width: 100%;
+.walletMenuPanelEthereum {
+  position: relative;
+  padding-top: var(--primitives-spacing-10);
 }
 
-.ethereumPanelToolbar .closeButton {
-  margin: 0;
+.ethereumPanelClose {
+  position: absolute;
+  top: var(--primitives-spacing-5);
+  right: 0;
+  z-index: 1;
+  width: var(--primitives-spacing-8);
+  height: var(--primitives-spacing-8);
+}
+
+.ethereumPanelClose > span {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
 }
 
 .ethereumPanelBody {
@@ -366,9 +374,16 @@
 .ethereumPanelContent {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   width: 100%;
   min-width: 0;
+}
+
+.ethereumWalletCluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 .ethereumWalletIdentity {
@@ -377,6 +392,7 @@
   align-items: center;
   gap: var(--primitives-spacing-3);
   width: 100%;
+  padding-right: 0;
   text-align: center;
 }
 
@@ -400,10 +416,51 @@
 
 .ethereumActionRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  gap: var(--primitives-spacing-3);
+  gap: var(--primitives-spacing-5);
+  width: 100%;
   margin-top: var(--primitives-spacing-10);
+}
+
+.walletMenuPanelEthereum .ethereumLabeledAction > span:first-child {
+  width: var(--primitives-spacing-12);
+  height: var(--primitives-spacing-12);
+  background: var(--primitives-color-purple-50);
+}
+
+.walletMenuPanelEthereum .ethereumLabeledAction > span:first-child :global(svg) {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .walletMenuPanelEthereum .ethereumLabeledAction:hover:not(:disabled) > span:first-child {
+    background: var(--primitives-color-purple-100);
+  }
+}
+
+.walletMenuPanelEthereum .ethereumLabeledAction:active:not(:disabled) > span:first-child {
+  background: var(--primitives-color-purple-100);
+}
+
+.ethereumUsdcBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--primitives-spacing-2);
+  width: 100%;
+  margin-top: var(--semantic-spacing-section-gap);
+}
+
+.ethereumUsdcLabel {
+  margin: 0;
+  padding-left: var(--primitives-spacing-1);
+  font-family: var(--semantic-typography-ui-label-md-font-family);
+  font-size: var(--semantic-typography-ui-label-md-font-size);
+  font-weight: var(--semantic-typography-ui-label-md-font-weight);
+  letter-spacing: var(--semantic-typography-ui-label-md-letter-spacing);
+  color: var(--semantic-color-text-muted);
 }
 
 .ethereumUsdcRow {
@@ -411,10 +468,10 @@
   align-items: center;
   gap: var(--primitives-spacing-3);
   width: 100%;
-  margin-top: var(--primitives-spacing-10);
+  margin-top: 0;
   padding: var(--primitives-spacing-3);
-  border-radius: calc(var(--primitives-spacing-5) / 2);
-  background: var(--wallet-row-surface);
+  border-radius: calc(var(--primitives-borderRadius-xl) * 1px);
+  background: var(--primitives-color-purple-50);
   box-sizing: border-box;
 }
 
@@ -476,7 +533,30 @@
 
 .ethereumDepositButton {
   width: 100%;
-  margin-top: var(--primitives-spacing-4);
+  margin-top: var(--primitives-spacing-5);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--semantic-color-brand-amber) 80%, transparent) 0%,
+    color-mix(in srgb, var(--semantic-color-brand-gradient-rose) 80%, transparent) 50%,
+    color-mix(in srgb, var(--semantic-color-brand-lavender) 80%, transparent) 100%
+  );
+  color: var(--semantic-color-text-primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ethereumPanelBody .ethereumDepositButton:hover:not(:disabled) {
+    filter: brightness(1.04);
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--semantic-color-brand-amber) 80%, transparent) 0%,
+      color-mix(in srgb, var(--semantic-color-brand-gradient-rose) 80%, transparent) 50%,
+      color-mix(in srgb, var(--semantic-color-brand-lavender) 80%, transparent) 100%
+    );
+  }
+}
+
+.ethereumPanelBody .ethereumDepositButton:active:not(:disabled) {
+  filter: brightness(0.96);
 }
 
 .ethereumDepositButtonIcon {
@@ -666,9 +746,14 @@
   white-space: nowrap;
 }
 
-.filterMenuOption:hover,
 .filterMenuOptionHighlighted {
   background: var(--semantic-color-surface-hover);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .filterMenuOption:hover {
+    background: var(--semantic-color-surface-hover);
+  }
 }
 
 .filterMenuOption:focus-visible {
@@ -977,19 +1062,16 @@
     padding-top: 0;
   }
 
+  .walletMenuPanelEthereum {
+    padding-top: var(--primitives-spacing-10);
+  }
+
   .closeButton {
     display: none;
   }
 
   .panelFooter {
     padding-bottom: var(--primitives-spacing-4);
-  }
-}
-
-@media (hover: none) {
-  .tokenRow:hover .tokenRowContent,
-  .tokenRow:focus-within .tokenRowContent {
-    transform: translateX(calc(var(--wallet-deposit-slide) * -0.85));
   }
 }
 

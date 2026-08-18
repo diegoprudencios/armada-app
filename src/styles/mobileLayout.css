@@ -8,3 +8,5 @@
     var(--primitives-spacing-12) + var(--mobile-safe-area-bottom)
   );
 }
+
+/* Hover fills stay on fine pointers (mouse). Touch uses :active / tap-to-open tooltips. */

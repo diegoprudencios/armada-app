@@ -25,6 +25,8 @@ import { formatUsdcAmount } from '@/utils/format'
 import { resolveRequestLinkActivityLabel } from '@/utils/dashboardActivity'
 import { formatTimeAgo } from '@/utils/formatTimeAgo'
 import usdcAmount from '@/styles/usdcAmount.module.css'
+import { hidePeekEventHandlers } from '@/hooks/useHidePeek'
+import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { ActivityAllPanel } from './ActivityAllPanel'
 import styles from './RecentActivityList.module.css'
 
@@ -99,12 +101,22 @@ interface ActivityListItemsProps {
 }
 
 function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityListItemsProps) {
+  const isMobile = useMobileLayout()
+  const [peekedId, setPeekedId] = useState<string | null>(null)
+
   return (
     <ul className={styles.list}>
       {items.map((item) => {
         const Icon = ACTIVITY_ICONS[item.kind]
         const amountLabel = formatActivityAmount(item)
-        const amountTone = activityAmountTone(item, balanceRevealed)
+        const itemRevealed = balanceRevealed || peekedId === item.id
+        const amountTone = activityAmountTone(item, itemRevealed)
+        const peekHandlers = hidePeekEventHandlers(
+          !balanceRevealed,
+          () => setPeekedId(item.id),
+          () => setPeekedId((current) => (current === item.id ? null : current)),
+          isMobile,
+        )
 
         return (
           <li key={item.id}>
@@ -112,6 +124,7 @@ function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityList
               type="button"
               className={styles.item}
               onClick={() => onItemClick?.(item)}
+              {...peekHandlers}
             >
               <span className={styles.iconBadge} aria-hidden>
                 <Icon className={styles.icon} strokeWidth={1.5} />
@@ -122,9 +135,9 @@ function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityList
               </div>
               <span
                 className={[styles.amount, usdcAmount.font, amountTone].filter(Boolean).join(' ')}
-                aria-label={balanceRevealed ? amountLabel : 'Amount hidden'}
+                aria-label={itemRevealed ? amountLabel : 'Amount hidden'}
               >
-                <BalanceScrambleValue value={amountLabel} revealed={balanceRevealed} />
+                <BalanceScrambleValue value={amountLabel} revealed={itemRevealed} />
               </span>
             </button>
           </li>

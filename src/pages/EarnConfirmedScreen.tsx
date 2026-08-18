@@ -1,4 +1,3 @@
-import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
 import { EarnReviewSummary } from '@/components/EarnReviewSummary'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
@@ -10,11 +9,7 @@ import {
   earnConfirmedTitle,
   type EarnTab,
 } from './earnFlowConstants'
-import flowStep from '@/styles/modalFlowStep.module.css'
-import styles from './EarnConfirmedScreen.module.css'
-
-const TOKEN_BADGE_PX = 40
-const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
+import styles from './DepositConfirmedScreen.module.css'
 
 export interface EarnConfirmedScreenProps {
   tab: EarnTab
@@ -35,18 +30,15 @@ export function EarnConfirmedScreen({
 }: EarnConfirmedScreenProps) {
   const amountNum = parseActiveAmount(amount)
   const feeUsdc = calculateSendFee(amountNum)
+  const amountLabel = formatUsdcAmount(amountNum)
 
   return (
-    <div className={flowStep.column}>
-      <div className={modalStepBodyEnter}>
-        <h1 className={flowStep.title}>{earnConfirmedTitle(tab)}</h1>
-
-        <div className={styles.amountRow}>
-          <div className={styles.amountGroup}>
-            <div className={styles.tokenBadge} aria-hidden>
-              <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
-            </div>
-            <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
+    <div className={styles.column}>
+      <div className={`${styles.body} ${modalStepBodyEnter}`}>
+        <div className={styles.titleBlock}>
+          <h1 className={styles.title}>{earnConfirmedTitle(tab)}</h1>
+          <div className={styles.amountRow}>
+            <span className={styles.amountValue}>{amountLabel}</span>
           </div>
         </div>
 
@@ -59,6 +51,7 @@ export function EarnConfirmedScreen({
           size="lg"
           label="View on explorer"
           showIcon={false}
+          className={styles.cancelButton}
           onClick={onViewExplorer}
         />
         <Button
@@ -66,6 +59,7 @@ export function EarnConfirmedScreen({
           size="lg"
           label="Go to dashboard"
           showIcon={false}
+          className={styles.confirmButton}
           onClick={onGoToDashboard}
         />
       </div>

@@ -13,6 +13,7 @@ import { DepositProcessingStepper } from '@/components/DepositProcessingStepper'
 import { DepositReviewSummary } from '@/components/DepositReviewSummary'
 import { DepositTooltip } from '@/components/DepositTooltip'
 import { IconButton } from '@/components/IconButton'
+import { SegmentedControl } from '@/components/SegmentedControl'
 import { SendButton } from '@/components/SendButton'
 import { StatusChip } from '@/components/StatusChip'
 import { Steps } from '@/components/Steps'
@@ -96,6 +97,8 @@ function SubLabel({ children }: { children: ReactNode }) {
 
 export function Showcase() {
   const [ghostActive, setGhostActive] = useState(false)
+  const [segmentedEarn, setSegmentedEarn] = useState<'add' | 'withdraw'>('add')
+  const [segmentedExpiry, setSegmentedExpiry] = useState<'1d' | '7d' | '30d'>('7d')
   const [depositStep, setDepositStep] = useState(2)
   const [stepsStatus, setStepsStatus] = useState<'default' | 'confirmed'>('default')
   const [processingStage, setProcessingStage] = useState(1)
@@ -178,6 +181,13 @@ export function Showcase() {
             aria-label="Ghost icon button active"
             onClick={() => setGhostActive((value) => !value)}
           />
+          <IconButton variant="frosted" size="md" icon={sampleIcon} aria-label="Frosted icon button" />
+        </div>
+        <SubLabel>Frosted sizes</SubLabel>
+        <div className={styles.row}>
+          <IconButton variant="frosted" size="sm" icon={sampleIcon} aria-label="Frosted small" />
+          <IconButton variant="frosted" size="md" icon={sampleIcon} aria-label="Frosted medium" />
+          <IconButton variant="frosted" size="lg" icon={sampleIcon} aria-label="Frosted large" />
         </div>
         <SubLabel>Disabled</SubLabel>
         <div className={styles.row}>
@@ -185,6 +195,34 @@ export function Showcase() {
           <IconButton variant="gradient" icon={sampleIcon} aria-label="Gradient disabled" disabled />
           <IconButton variant="ghost" icon={sampleIcon} aria-label="Ghost disabled" disabled />
         </div>
+      </ShowcaseSection>
+
+      <ShowcaseSection id="segmented-control" title="SegmentedControl">
+        <SubLabel>Small</SubLabel>
+        <div className={styles.row}>
+          <SegmentedControl
+            size="sm"
+            aria-label="Earn mode"
+            value={segmentedEarn}
+            onChange={setSegmentedEarn}
+            options={[
+              { id: 'add', label: 'Add funds' },
+              { id: 'withdraw', label: 'Withdraw' },
+            ]}
+          />
+        </div>
+        <SubLabel>Medium</SubLabel>
+        <SegmentedControl
+          size="md"
+          aria-label="Link expiry"
+          value={segmentedExpiry}
+          onChange={setSegmentedExpiry}
+          options={[
+            { id: '1d', label: '1 day' },
+            { id: '7d', label: '7 days' },
+            { id: '30d', label: '30 days' },
+          ]}
+        />
       </ShowcaseSection>
 
       <ShowcaseSection id="send-button" title="SendButton">
@@ -319,7 +357,7 @@ export function Showcase() {
           <Steps
             steps={DEPOSIT_STEPS}
             currentStep={depositStep}
-            flowLabel="Deposit"
+            flowLabel="Shield"
             status={stepsStatus}
           />
         </div>
@@ -419,7 +457,7 @@ export function Showcase() {
         </div>
         <div className={styles.balanceFrame}>
           <BalanceCard
-            balance={hasDeposit ? 123283.23 : 0}
+            balance={hasDeposit ? 10000 : 0}
             actionLayout={balanceLayout}
             hasActivityItems={activityVisible}
             vaultBalance={showVaultPosition ? 250 : 0}

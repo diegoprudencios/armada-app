@@ -3,16 +3,23 @@ import {
   useEffect,
   useId,
   useRef,
+  useState,
   type MutableRefObject,
   type ReactNode,
   type Ref,
 } from 'react'
 import { WalletIcon } from '@heroicons/react/24/solid'
-import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
+import iconButtonStyles from '@/components/IconButton/IconButton.module.css'
+import { SegmentedControl } from '@/components/SegmentedControl'
 import { AmountExceededWarning } from '@/components/AmountExceededWarning'
 import { NumericKeypad, type NumericKeypadKey } from '@/components/NumericKeypad'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
+import {
+  BALANCE_ROLL_DIGIT_STAGGER_MS,
+  BALANCE_ROLL_DURATION_MS,
+} from '@/components/BalanceCard/balanceRevealMotion'
+import { RollingBalanceValue } from '@/components/RollingBalanceValue'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import {
   amountExceedsBalance,
@@ -27,16 +34,15 @@ import {
 } from '@/utils/amountInput'
 import { depositAmountExceedsBalance, maxDepositAmount } from '@/utils/depositFee'
 import { formatWalletBalance } from '@/utils/format'
-import { formatProtocolFeeLabel } from '@/utils/protocolFee'
+import { formatShieldFeeCaption } from '@/utils/protocolFee'
 import styles from './AmountInputScreen.module.css'
-
-const TOKEN_BADGE_PX = 40
-const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
 
 export type AmountInputBalanceMode = 'simple' | 'deposit-fee-aware'
 export type AmountInputPrimaryLabelMode = 'dynamic' | 'static'
 /** `input` = system keyboard (default). `keypad` = on-screen numeric pad. */
 export type AmountInputEntryMode = 'input' | 'keypad'
+export type AmountInputLayout = 'default' | 'shield'
+export type ShieldDirection = 'shield' | 'unshield'
 
 export interface AmountInputScreenProps {
   title: string
@@ -59,13 +65,21 @@ export interface AmountInputScreenProps {
   showBalanceControls?: boolean
   entryMode?: AmountInputEntryMode
   headerSlot?: ReactNode
+  /** Rendered above the amount card (e.g. Earn APY hint). */
+  introSlot?: ReactNode
   footerSlot?: ReactNode
+  /** Hide the in-card heading (amount field still uses `amountAriaLabel`). */
+  hideTitle?: boolean
   /** Re-focus amount input when this value changes (e.g. Earn tab). */
   focusKey?: unknown
   /** Optional ref for modal initial focus on open (input mode only). */
   amountInputRef?: Ref<HTMLInputElement>
   columnClassName?: string
   titleClassName?: string
+  /** `shield` = Shield/Unshield tabs, glass card. */
+  layout?: AmountInputLayout
+  shieldDirection?: ShieldDirection
+  onShieldDirectionChange?: (direction: ShieldDirection) => void
 }
 
 function formatAmountInputValue(value: number): string {
@@ -91,6 +105,20 @@ function commitAmount(next: string, onAmountChange: (amount: string) => void) {
   onAmountChange(hasActiveAmount(next) ? next : '')
 }
 
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+function amountPercentRollMs(formatted: string): number {
+  const digitCount = formatted.replace(/\D/g, '').length
+  return (
+    BALANCE_ROLL_DURATION_MS +
+    Math.max(0, digitCount - 1) * BALANCE_ROLL_DIGIT_STAGGER_MS +
+    80
+  )
+}
+
 export function AmountInputScreen({
   title,
   balance,
@@ -107,16 +135,23 @@ export function AmountInputScreen({
   showBalanceControls = true,
   entryMode = 'input',
   headerSlot,
+  introSlot,
   footerSlot,
+  hideTitle = false,
   focusKey,
   amountInputRef: amountInputRefProp,
   columnClassName,
   titleClassName,
+  layout = 'default',
+  shieldDirection = 'shield',
+  onShieldDirectionChange,
 }: AmountInputScreenProps) {
+  const isShieldLayout = layout === 'shield'
   const isMobile = useMobileLayout()
   const amountInputId = useId()
   const amountErrorId = useId()
   const amountDisplayId = useId()
+  const feeCaptionId = useId()
   const internalAmountInputRef = useRef<HTMLInputElement | null>(null)
   const isKeypad = entryMode === 'keypad'
   /** Mobile keypad: single sticky CTA, no cancel. */
@@ -141,20 +176,63 @@ export function AmountInputScreen({
     ? resolveExceedsBalance(amount, balance, balanceMode)
     : false
   const canReview = hasAmount && !exceedsBalance
-  const primaryLabel =
-    primaryActionLabel ??
-    (primaryLabelMode === 'static' ? 'Review' : hasAmount ? 'Review' : 'Input amount')
+  const primaryLabel = canReview
+    ? (primaryActionLabel ?? 'Review')
+    : 'Input amount'
   const feeUsdc = calculateFee(parseActiveAmount(amount))
-  const feeLabel = formatProtocolFeeLabel(feeUsdc)
+  const feeCaption = formatShieldFeeCaption(feeUsdc)
   const showFeeRow = hasAmount && feeUsdc > 0
+  const showFeeCaption = showBalanceControls
   const maxAmount = resolveMaxAmount(balance, balanceMode)
   const displayAmount = formatAmountInputDisplay(amount)
+  const [amountRoll, setAmountRoll] = useState<{
+    fromValue: string
+    toValue: string
+    trigger: number
+  } | null>(null)
+  const amountRollTimeoutRef = useRef<number | null>(null)
+  const isAmountRolling = amountRoll !== null
+
+  function clearAmountRoll() {
+    if (amountRollTimeoutRef.current !== null) {
+      window.clearTimeout(amountRollTimeoutRef.current)
+      amountRollTimeoutRef.current = null
+    }
+    setAmountRoll(null)
+  }
+
+  function applyPresetAmount(next: string) {
+    const toValue = formatAmountInputDisplay(next) || '0'
+    const fromValue = displayAmount || '0'
+    commitAmount(next, onAmountChange)
+
+    if (prefersReducedMotion() || fromValue === toValue) {
+      clearAmountRoll()
+      return
+    }
+
+    if (amountRollTimeoutRef.current !== null) {
+      window.clearTimeout(amountRollTimeoutRef.current)
+    }
+
+    setAmountRoll((prev) => ({
+      fromValue,
+      toValue,
+      trigger: (prev?.trigger ?? 0) + 1,
+    }))
+    amountRollTimeoutRef.current = window.setTimeout(() => {
+      amountRollTimeoutRef.current = null
+      setAmountRoll(null)
+    }, amountPercentRollMs(toValue))
+  }
 
   function handleAmountChange(raw: string) {
+    clearAmountRoll()
     commitAmount(sanitizeAmountInput(raw), onAmountChange)
   }
 
   function handleKeypadKey(key: NumericKeypadKey) {
+    clearAmountRoll()
     if (key === 'backspace') {
       commitAmount(applyKeypadBackspace(amount), onAmountChange)
       return
@@ -167,12 +245,27 @@ export function AmountInputScreen({
   }
 
   function applyPercent(percent: number) {
-    onAmountChange(formatAmountInputValue(maxAmount * percent))
+    applyPresetAmount(formatAmountInputValue(maxAmount * percent))
   }
 
   function handleMax() {
-    onAmountChange(formatAmountInputValue(maxAmount))
+    applyPresetAmount(formatAmountInputValue(maxAmount))
   }
+
+  useEffect(() => {
+    return () => {
+      if (amountRollTimeoutRef.current !== null) {
+        window.clearTimeout(amountRollTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const prevFocusKeyRef = useRef(focusKey)
+  useEffect(() => {
+    if (prevFocusKeyRef.current === focusKey) return
+    prevFocusKeyRef.current = focusKey
+    clearAmountRoll()
+  }, [focusKey])
 
   useEffect(() => {
     if (isKeypad) return
@@ -188,50 +281,104 @@ export function AmountInputScreen({
     .filter(Boolean)
     .join(' ')
   const headingClassName = [styles.title, titleClassName].filter(Boolean).join(' ')
+  const cardTitleClassName = ['armada-text-ui-body-lg', styles.cardTitle].join(' ')
+  const showCardTitle = !hideTitle
+  const cardTitle = showCardTitle ? (
+    <h1 className={cardTitleClassName}>{title}</h1>
+  ) : null
+  const amountDescribedBy = [
+    exceedsBalance ? amountErrorId : null,
+    showFeeCaption && showFeeRow ? feeCaptionId : null,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   const amountBlock = (
     <AmountExceededWarning id={amountErrorId} visible={exceedsBalance} message={exceedMessage}>
-      <div className={styles.amountGroup}>
-        <div className={styles.tokenBadge} aria-hidden>
-          <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
+      <div className={styles.amountStack}>
+        <div className={styles.amountGroup}>
+          <div className={styles.amountField}>
+            {isKeypad ? (
+              <p
+                id={amountDisplayId}
+                className={[
+                  styles.amountDisplay,
+                  exceedsBalance && styles.amountInputError,
+                  isAmountRolling && styles.amountValueHidden,
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                aria-live="polite"
+                aria-atomic="true"
+                aria-label={amountAriaLabel}
+                aria-invalid={exceedsBalance || undefined}
+                aria-describedby={amountDescribedBy || undefined}
+              >
+                {displayAmount || '0'}
+              </p>
+            ) : (
+              <input
+                ref={setAmountInputRef}
+                id={amountInputId}
+                className={[
+                  styles.amountInput,
+                  exceedsBalance && styles.amountInputError,
+                  isAmountRolling && styles.amountValueHidden,
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder="0"
+                value={displayAmount}
+                onChange={(event) => handleAmountChange(event.target.value)}
+                aria-label={amountAriaLabel}
+                aria-invalid={exceedsBalance || undefined}
+                aria-describedby={amountDescribedBy || undefined}
+                size={Math.max(1, displayAmount.length || 1)}
+                readOnly={isAmountRolling}
+              />
+            )}
+            {isAmountRolling && amountRoll ? (
+              <span className={styles.amountRollLayer} aria-hidden>
+                <RollingBalanceValue
+                  key={amountRoll.trigger}
+                  value={amountRoll.toValue}
+                  fromValue={amountRoll.fromValue}
+                  mode="fromValue"
+                  rollTrigger={amountRoll.trigger}
+                  rollStartMs={0}
+                />
+              </span>
+            ) : null}
+          </div>
         </div>
-        <div className={styles.amountField}>
-          {isKeypad ? (
-            <p
-              id={amountDisplayId}
-              className={[styles.amountDisplay, exceedsBalance && styles.amountInputError]
-                .filter(Boolean)
-                .join(' ')}
-              aria-live="polite"
-              aria-atomic="true"
-              aria-label={amountAriaLabel}
-              aria-invalid={exceedsBalance || undefined}
-              aria-describedby={exceedsBalance ? amountErrorId : undefined}
-            >
-              {displayAmount || '0'}
-            </p>
-          ) : (
-            <input
-              ref={setAmountInputRef}
-              id={amountInputId}
-              className={[styles.amountInput, exceedsBalance && styles.amountInputError]
-                .filter(Boolean)
-                .join(' ')}
-              type="text"
-              inputMode="decimal"
-              autoComplete="off"
-              placeholder="0"
-              value={displayAmount}
-              onChange={(event) => handleAmountChange(event.target.value)}
-              aria-label={amountAriaLabel}
-              aria-invalid={exceedsBalance || undefined}
-              aria-describedby={exceedsBalance ? amountErrorId : undefined}
-              size={Math.max(1, displayAmount.length || 1)}
-            />
-          )}
-        </div>
+        {showFeeCaption ? (
+          <p
+            id={feeCaptionId}
+            className={`armada-text-ui-label-md ${styles.feeCaption}`}
+            role="status"
+            aria-live="polite"
+          >
+            {showFeeRow ? feeCaption : '\u00a0'}
+          </p>
+        ) : null}
       </div>
     </AmountExceededWarning>
+  )
+
+  const shieldTabs = (
+    <SegmentedControl
+      size="sm"
+      aria-label="Shield or unshield"
+      value={shieldDirection ?? 'shield'}
+      onChange={(next) => onShieldDirectionChange?.(next)}
+      options={[
+        { id: 'shield', label: 'Shield' },
+        { id: 'unshield', label: 'Unshield' },
+      ]}
+    />
   )
 
   const balanceControls = (
@@ -253,28 +400,18 @@ export function AmountInputScreen({
           </span>
         </div>
         <div className={styles.pctPills}>
-          <button type="button" className={styles.pctPill} onClick={() => applyPercent(0.25)}>
+          <button type="button" className={[styles.pctPill, iconButtonStyles.frostedFill].join(' ')} onClick={() => applyPercent(0.25)}>
             25%
           </button>
-          <button type="button" className={styles.pctPill} onClick={() => applyPercent(0.5)}>
+          <button type="button" className={[styles.pctPill, iconButtonStyles.frostedFill].join(' ')} onClick={() => applyPercent(0.5)}>
             50%
           </button>
-          <button type="button" className={styles.pctPill} onClick={() => applyPercent(0.75)}>
+          <button type="button" className={[styles.pctPill, iconButtonStyles.frostedFill].join(' ')} onClick={() => applyPercent(0.75)}>
             75%
           </button>
-          <button type="button" className={styles.pctPill} onClick={handleMax}>
+          <button type="button" className={[styles.pctPill, iconButtonStyles.frostedFill].join(' ')} onClick={handleMax}>
             Max
           </button>
-        </div>
-      </div>
-
-      <div
-        className={[styles.feeReveal, showFeeRow && styles.feeRevealOpen].filter(Boolean).join(' ')}
-        aria-hidden={!showFeeRow}
-      >
-        <div className={styles.feeRow}>
-          <span className={styles.feeLabel}>Fee</span>
-          <span className={styles.feeValue}>{feeLabel}</span>
         </div>
       </div>
     </div>
@@ -299,6 +436,7 @@ export function AmountInputScreen({
         size="lg"
         label={secondaryAction.label}
         showIcon={false}
+        className={styles.cancelButton}
         onClick={secondaryAction.onClick}
       />
       <Button
@@ -308,6 +446,7 @@ export function AmountInputScreen({
         showIcon={false}
         disabled={!canReview}
         dimWhenDisabled={false}
+        className={styles.confirmButton}
         onClick={onReview}
       />
     </div>
@@ -321,8 +460,11 @@ export function AmountInputScreen({
             .filter(Boolean)
             .join(' ')}
         >
-          {headerSlot}
-          {isKeypadMobile ? null : <h1 className={headingClassName}>{title}</h1>}
+          {headerSlot && !isShieldLayout ? headerSlot : null}
+          {introSlot}
+          {isShieldLayout || hideTitle || isKeypadMobile ? null : (
+            <h1 className={headingClassName}>{title}</h1>
+          )}
           {isKeypadMobile ? (
             <>
               <div className={`${styles.keypadAmountCenter} ${styles.keypadEnterAmount}`}>
@@ -357,11 +499,14 @@ export function AmountInputScreen({
   return (
     <div className={rootClassName}>
       <div className={modalStepBodyEnter}>
-        {headerSlot}
-        <h1 className={headingClassName}>{title}</h1>
+        {introSlot}
 
         <div className={styles.card}>
-          {amountBlock}
+          <div className={styles.cardTop}>
+            {isShieldLayout ? shieldTabs : headerSlot}
+            {cardTitle}
+            {amountBlock}
+          </div>
           {showBalanceControls ? balanceControls : null}
         </div>
 

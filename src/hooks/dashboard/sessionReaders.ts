@@ -26,7 +26,8 @@ export function readInitialHasCompletedDeposit(): boolean {
   if (stored) return true
   if ((readDemoDashboardSession()?.balance ?? 0) > 0) return true
   return readInitialRecentActivity().some(
-    (item) => item.kind === 'deposit' || item.kind === 'receiveLink',
+    (item) =>
+      item.kind === 'deposit' || item.kind === 'receiveLink' || item.kind === 'receive',
   )
 }
 

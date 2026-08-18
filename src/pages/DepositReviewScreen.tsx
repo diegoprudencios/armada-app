@@ -1,4 +1,3 @@
-import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
 import { DepositReviewSummary } from '@/components/DepositReviewSummary'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
@@ -10,10 +9,6 @@ import {
   DEMO_WALLET_ADDRESS,
 } from './depositFlowConstants'
 import styles from './DepositReviewScreen.module.css'
-
-const TOKEN_BADGE_PX = 40
-/** @web3icons branded assets use an 18px circle in a 24px viewBox — scale up to fill the badge. */
-const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
 
 export interface DepositReviewScreenProps {
   amount: string
@@ -42,12 +37,7 @@ export function DepositReviewScreen({
 
   const amountBlock = (
     <div className={styles.amountRow}>
-      <div className={styles.amountGroup}>
-        <div className={styles.tokenBadge} aria-hidden>
-          <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
-        </div>
-        <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
-      </div>
+      <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
     </div>
   )
 
@@ -85,18 +75,28 @@ export function DepositReviewScreen({
   return (
     <div className={styles.column}>
       <div className={`${styles.body} ${modalStepBodyEnter}`}>
-        <h1 className={styles.title}>Review your deposit</h1>
-        {amountBlock}
+        <div className={styles.titleBlock}>
+          <h1 className={styles.title}>Review your USDC deposit</h1>
+          {amountBlock}
+        </div>
         {summary}
       </div>
 
       <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>
-        <Button variant="secondary" size="lg" label="Back" showIcon={false} onClick={onBack} />
+        <Button
+          variant="secondary"
+          size="lg"
+          label="Back"
+          showIcon={false}
+          className={styles.cancelButton}
+          onClick={onBack}
+        />
         <Button
           variant="primary"
           size="lg"
-          label="Confirm deposit"
+          label="Confirm"
           showIcon={false}
+          className={styles.confirmButton}
           onClick={onConfirm}
           testingClickId="deposit_confirm_button"
         />

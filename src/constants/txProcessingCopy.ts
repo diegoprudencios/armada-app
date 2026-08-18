@@ -79,7 +79,7 @@ export function earnProcessingStages(tab: EarnTab): ReadonlyArray<TxProgressStag
   const finalLabel = tab === 'add' ? 'Adding to vault' : 'Withdrawing'
   const finalCompletedLabel = tab === 'add' ? 'Earning' : 'Returned to balance'
   const finalSubtitle =
-    tab === 'add' ? 'Funds are entering the yield vault' : 'Funds are returning to your balance'
+    tab === 'add' ? 'USDC is entering the yield vault' : 'USDC is returning to your balance'
 
   return [
     {
@@ -101,21 +101,28 @@ export function earnProcessingStages(tab: EarnTab): ReadonlyArray<TxProgressStag
   ]
 }
 
+export const TX_PROGRESS_CLOSE_SUBTITLE_LINES = [
+  'You can close this window.',
+  "We'll keep processing in the background.",
+] as const
+
 export interface TxProgressCardCopy {
-  /** Sentence case in copy; rendered uppercase in the card. */
+  /** Sentence case in copy; used for accessible name. */
   tag: string
   title: string
   titleBreakAfter?: string
   /** Explicit line breaks (takes precedence over `titleBreakAfter`). */
   titleLines?: readonly string[]
   subtitle: string
+  subtitleLines?: readonly string[]
 }
 
 export const DEPOSIT_PROGRESS_CARD_COPY: TxProgressCardCopy = {
   tag: 'Deposit in progress',
-  title: 'Your assets are being shielded',
-  titleLines: ['Your assets are', 'being shielded'],
-  subtitle: 'You are almost ready to move funds privately.',
+  title: 'Your USDC is being shielded',
+  titleLines: ['Your USDC is', 'being shielded'],
+  subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
+  subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
 }
 
 export function sendProgressCardCopy(mode: SendProcessingCopyMode): TxProgressCardCopy {
@@ -124,7 +131,8 @@ export function sendProgressCardCopy(mode: SendProcessingCopyMode): TxProgressCa
       tag: 'Withdrawal in progress',
       title: 'Your withdraw is in progress',
       titleLines: ['Your withdraw', 'is in progress'],
-      subtitle: 'USDC is being sent back to your wallet.',
+      subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
+      subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
     }
   }
 
@@ -133,14 +141,16 @@ export function sendProgressCardCopy(mode: SendProcessingCopyMode): TxProgressCa
       tag: 'Private send in progress',
       title: 'Sending your USDC privately',
       titleBreakAfter: 'your',
-      subtitle: 'Only you and the recipient can see this payment.',
+      subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
+      subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
     }
   }
 
   return {
     tag: 'Send in progress',
     title: 'Unshielding your USDC',
-    subtitle: "This transaction won't be fully private.",
+    subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
+    subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
   }
 }
 
@@ -148,16 +158,18 @@ export function earnProgressCardCopy(tab: EarnTab): TxProgressCardCopy {
   if (tab === 'add') {
     return {
       tag: earnProcessingTitle('add'),
-      title: 'Depositing funds into the vault',
-      titleBreakAfter: 'funds',
-      subtitle: 'USDC is being deposited to start earning yield.',
+      title: 'Depositing USDC into the vault',
+      titleBreakAfter: 'USDC',
+      subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
+      subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
     }
   }
 
   return {
     tag: earnProcessingTitle('withdraw'),
     title: 'Your withdrawal is in progress',
-    subtitle: 'Funds are returning from the vault to your balance.',
+    subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
+    subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
   }
 }
 

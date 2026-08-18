@@ -1,38 +1,32 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowDownTrayIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline'
 import type { AmountInputEntryMode } from '@/components/AmountInputScreen'
 import { BottomSheet, afterBottomSheetHandoff } from '@/components/BottomSheet'
 import { FlowModalOverlay } from '@/components/FlowModalOverlay'
-import { ModalShell, modalStepShell } from '@/components/ModalShell'
+import { ModalShell, ModalStepSwitch } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
+import { SegmentedControl } from '@/components/SegmentedControl'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { resolveAmountEntryMode } from '@/utils/amountEntryMode'
 import { EarnAmountScreen } from './EarnAmountScreen'
-import chooserStyles from './EarnChooserSheet.module.css'
 import { EarnProcessingScreen } from './EarnProcessingScreen'
 import { EarnReviewScreen } from './EarnReviewScreen'
 import {
   DEMO_EARN_APY,
   EARN_PROGRESS_STEPS,
-  formatDemoApy,
+  EARN_TABS,
   type EarnModalStep,
   type EarnTab,
 } from './earnFlowConstants'
 
 const EARN_STEP_NUMBER: Record<EarnModalStep, number> = {
-  choose: 1,
   amount: 1,
   review: 2,
   processing: 3,
   confirmed: 3,
 }
 
-function earnSimpleHeaderTitle(step: EarnModalStep, tab: EarnTab): string {
-  if (step === 'confirmed') return ''
-  if (step === 'amount' || step === 'review' || step === 'processing') {
-    return tab === 'add' ? 'Deposit to vault' : 'Withdraw from vault'
-  }
-  return 'Earn'
+function earnSimpleHeaderTitle(step: EarnModalStep): string {
+  return step === 'confirmed' ? '' : 'Earn'
 }
 
 function earnAmountEntryModeFromSearch(search = window.location.search): AmountInputEntryMode {
@@ -48,10 +42,7 @@ export interface EarnModalFlowProps {
   confirmedAt?: number | null
   onClose: () => void
   onTabChange: (tab: EarnTab) => void
-  onChooseDeposit: () => void
-  onChooseWithdraw: () => void
   onAmountChange: (amount: string) => void
-  onAmountBack: () => void
   onAmountReview: (amount: string) => void
   onReviewBack: () => void
   onReviewConfirm: () => void
@@ -69,10 +60,7 @@ export function EarnModalFlow({
   confirmedAt,
   onClose,
   onTabChange,
-  onChooseDeposit,
-  onChooseWithdraw,
   onAmountChange,
-  onAmountBack,
   onAmountReview,
   onReviewBack,
   onReviewConfirm,
@@ -81,20 +69,19 @@ export function EarnModalFlow({
   onConfirmedGoToDashboard,
 }: EarnModalFlowProps) {
   const [exiting, setExiting] = useState(false)
-  const [chooserOpen, setChooserOpen] = useState(step === 'choose')
   const [reviewSheetOpen, setReviewSheetOpen] = useState(false)
   const confirmAfterSheetExitRef = useRef(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const amountInputRef = useRef<HTMLInputElement>(null)
   const onCloseRef = useRef(onClose)
   onCloseRef.current = onClose
-  const chooserIntentRef = useRef<'close' | 'deposit' | 'withdraw' | null>(null)
   const amountEntryMode = useMemo(() => earnAmountEntryModeFromSearch(), [])
   const isMobile = useMobileLayout()
   const useKeypadMobileChrome = amountEntryMode === 'keypad' && isMobile
   const isConfirmStep = step === 'processing' || step === 'confirmed'
   const isConfirmed = step === 'confirmed'
-  const showModal = !(useKeypadMobileChrome && step === 'choose')
+  const showMobileEarnTabs =
+    useKeypadMobileChrome && (step === 'amount' || step === 'review')
 
   const requestClose = useCallback(() => {
     setExiting((current) => (current ? current : true))
@@ -105,19 +92,6 @@ export function EarnModalFlow({
     const timer = window.setTimeout(() => onCloseRef.current(), MODAL_EXIT_TOTAL_MS)
     return () => window.clearTimeout(timer)
   }, [exiting])
-
-  useEffect(() => {
-    if (step === 'choose') {
-      chooserIntentRef.current = null
-      const timer = afterBottomSheetHandoff(() => {
-        setChooserOpen(true)
-      })
-      return () => window.clearTimeout(timer)
-    }
-    if (chooserIntentRef.current !== 'deposit' && chooserIntentRef.current !== 'withdraw') {
-      setChooserOpen(false)
-    }
-  }, [step])
 
   useEffect(() => {
     if (!useKeypadMobileChrome) {
@@ -139,37 +113,10 @@ export function EarnModalFlow({
     requestClose()
   }
 
-  function handleChooserClose() {
-    chooserIntentRef.current = 'close'
-    setChooserOpen(false)
-  }
-
-  function handleChooserExited() {
-    const intent = chooserIntentRef.current
-    chooserIntentRef.current = null
-    afterBottomSheetHandoff(() => {
-      if (intent === 'deposit') {
-        onChooseDeposit()
-        return
-      }
-      if (intent === 'withdraw') {
-        onChooseWithdraw()
-        return
-      }
-      if (intent === 'close' || step === 'choose') {
-        onClose()
-      }
-    })
-  }
-
-  function handleChooseDeposit() {
-    chooserIntentRef.current = 'deposit'
-    setChooserOpen(false)
-  }
-
-  function handleChooseWithdraw() {
-    chooserIntentRef.current = 'withdraw'
-    setChooserOpen(false)
+  function handleTabChange(next: EarnTab) {
+    if (next === tab) return
+    onTabChange(next)
+    onAmountChange('')
   }
 
   function handleReviewConfirm() {
@@ -204,9 +151,9 @@ export function EarnModalFlow({
       entryMode={amountEntryMode}
       hideModeTabs={useKeypadMobileChrome}
       amountInputRef={amountEntryMode === 'input' ? amountInputRef : undefined}
-      onTabChange={onTabChange}
+      onTabChange={handleTabChange}
       onAmountChange={onAmountChange}
-      onCancel={useKeypadMobileChrome ? onAmountBack : requestClose}
+      onCancel={requestClose}
       onReview={onAmountReview}
     />
   )
@@ -256,63 +203,8 @@ export function EarnModalFlow({
     step === 'review'
       ? handleReviewBack
       : step === 'amount'
-        ? onAmountBack
+        ? requestClose
         : undefined
-
-  const chooserSheet = useKeypadMobileChrome ? (
-    <BottomSheet
-      open={chooserOpen}
-      onClose={handleChooserClose}
-      onExited={handleChooserExited}
-      title="Earn"
-      ariaLabel="Earn"
-    >
-      <div className={chooserStyles.sheet}>
-        <div className={chooserStyles.apyBlock}>
-          <p className={chooserStyles.apyLabel}>Estimated APY</p>
-          <p className={chooserStyles.apyValue}>{formatDemoApy(apy)}</p>
-          <p className={chooserStyles.apyCaveat}>
-            Based on the vault&apos;s recent rate; the actual yield earned will vary.
-          </p>
-        </div>
-
-        <div className={chooserStyles.list} role="menu">
-          <button
-            type="button"
-            className={chooserStyles.item}
-            role="menuitem"
-            onClick={handleChooseDeposit}
-            data-testing-click="vault_deposit_choose_button"
-          >
-            <span className={chooserStyles.itemLead}>
-              <span className={chooserStyles.iconBadge}>
-                <ArrowDownTrayIcon className={chooserStyles.icon} strokeWidth={1.5} />
-              </span>
-              <span className={chooserStyles.label}>Deposit to the vault</span>
-            </span>
-          </button>
-          <button
-            type="button"
-            className={chooserStyles.item}
-            role="menuitem"
-            onClick={handleChooseWithdraw}
-            data-testing-click="vault_withdraw_choose_button"
-          >
-            <span className={chooserStyles.itemLead}>
-              <span className={chooserStyles.iconBadge}>
-                <ArrowUpTrayIcon className={chooserStyles.icon} strokeWidth={1.5} />
-              </span>
-              <span className={chooserStyles.label}>Withdraw from the vault</span>
-            </span>
-          </button>
-        </div>
-      </div>
-    </BottomSheet>
-  ) : null
-
-  if (!showModal) {
-    return chooserSheet
-  }
 
   return (
     <>
@@ -335,16 +227,29 @@ export function EarnModalFlow({
             useKeypadMobileChrome && step === 'processing' ? 'immersive' : 'default'
           }
           headerTitle={
-            useKeypadMobileChrome ? earnSimpleHeaderTitle(step, tab) : undefined
+            useKeypadMobileChrome && !showMobileEarnTabs
+              ? earnSimpleHeaderTitle(step)
+              : undefined
+          }
+          headerCenter={
+            showMobileEarnTabs ? (
+              <SegmentedControl<EarnTab>
+                size="sm"
+                aria-label="Add to vault or withdraw"
+                value={tab}
+                onChange={handleTabChange}
+                options={EARN_TABS}
+              />
+            ) : undefined
           }
           onBack={useKeypadMobileChrome ? keypadBack : undefined}
           exiting={exiting}
           onClose={requestClose}
           closeButtonRef={closeButtonRef}
         >
-          <div key={stepShellKey} className={modalStepShell}>
+          <ModalStepSwitch stepKey={stepShellKey} skipExit={exiting}>
             {renderStep()}
-          </div>
+          </ModalStepSwitch>
         </ModalShell>
       </FlowModalOverlay>
 
@@ -366,8 +271,6 @@ export function EarnModalFlow({
           />
         </BottomSheet>
       ) : null}
-
-      {chooserSheet}
     </>
   )
 }

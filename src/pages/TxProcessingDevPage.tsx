@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { DepositProcessingStepper } from '@/components/DepositProcessingStepper'
 import { EarnProcessingStepper } from '@/components/EarnProcessingStepper'
-import { ModalShell, modalStepShell } from '@/components/ModalShell'
+import { ModalShell, ModalStepSwitch } from '@/components/ModalShell'
 import {
   TRANSACTION_PROGRESS_VARIANTS,
   type TransactionProgressVariant,
@@ -224,9 +224,9 @@ export function TxProcessingDevPage() {
         flowLabel={flow.flowLabel}
         onClose={() => undefined}
       >
-        <div key={progressVariant} className={modalStepShell}>
+        <ModalStepSwitch stepKey={progressVariant}>
           {flow.renderStepper(stage, progressVariant, completed)}
-        </div>
+        </ModalStepSwitch>
       </ModalShell>
 
       <aside className={toolbarClassName} aria-label="Processing screen dev controls">

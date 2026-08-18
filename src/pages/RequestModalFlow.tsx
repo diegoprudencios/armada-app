@@ -3,7 +3,7 @@ import { CheckIcon, ClipboardDocumentIcon, LinkIcon } from '@heroicons/react/24/
 import type { AmountInputEntryMode } from '@/components/AmountInputScreen'
 import { BottomSheet, afterBottomSheetHandoff } from '@/components/BottomSheet'
 import { FlowModalOverlay } from '@/components/FlowModalOverlay'
-import { ModalShell, modalStepShell } from '@/components/ModalShell'
+import { ModalShell, ModalStepSwitch } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { resolveAmountEntryMode } from '@/utils/amountEntryMode'
@@ -33,8 +33,9 @@ const REQUEST_STEP_NUMBER: Record<RequestModalStep, number> = {
 }
 
 const REQUEST_SIMPLE_HEADER_TITLE: Partial<Record<RequestModalStep, string>> = {
-  amount: 'Request',
-  details: 'Request',
+  amount: 'Request via link',
+  /** Details opens as a sheet over amount — shell title stays Request via link. */
+  details: 'Request via link',
   link: '',
   confirmed: '',
 }
@@ -102,6 +103,8 @@ export function RequestModalFlow({
 }: RequestModalFlowProps) {
   const [exiting, setExiting] = useState(false)
   const [chooserOpen, setChooserOpen] = useState(step === 'choose')
+  const [detailsSheetOpen, setDetailsSheetOpen] = useState(false)
+  const createAfterSheetExitRef = useRef(false)
   const [addressCopied, setAddressCopied] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const amountInputRef = useRef<HTMLInputElement>(null)
@@ -139,6 +142,21 @@ export function RequestModalFlow({
     }
   }, [step])
 
+  useEffect(() => {
+    if (!useKeypadMobileChrome) {
+      setDetailsSheetOpen(false)
+      createAfterSheetExitRef.current = false
+      return
+    }
+    if (step === 'details') {
+      setDetailsSheetOpen(true)
+      return
+    }
+    if (!createAfterSheetExitRef.current) {
+      setDetailsSheetOpen(false)
+    }
+  }, [step, useKeypadMobileChrome])
+
   useEffect(
     () => () => {
       if (copyCloseTimerRef.current) clearTimeout(copyCloseTimerRef.current)
@@ -147,6 +165,16 @@ export function RequestModalFlow({
   )
 
   function handleCreateLink() {
+    if (useKeypadMobileChrome && step === 'details') {
+      createAfterSheetExitRef.current = true
+      setDetailsSheetOpen(false)
+      return
+    }
+
+    commitCreateLink()
+  }
+
+  function commitCreateLink() {
     const nextRequestId = createPaymentRequestId()
     const nextExpiresAt = Date.now() + requestLinkExpiryMs(expiryId)
     const trimmedNote = note.trim()
@@ -264,29 +292,12 @@ export function RequestModalFlow({
       )
     }
 
-    if (useKeypadMobileChrome) {
-      if (step === 'amount') {
-        return amountScreen
-      }
-      if (step === 'details') {
-        return (
-          <RequestDetailsScreen
-            amount={amount}
-            note={note}
-            expiryId={expiryId}
-            keypadMobileLayout
-            onNoteChange={onNoteChange}
-            onExpiryChange={onExpiryChange}
-            onBack={onDetailsBack}
-            onCreateLink={handleCreateLink}
-          />
-        )
-      }
+    if (useKeypadMobileChrome && (step === 'amount' || step === 'details')) {
+      return amountScreen
     }
 
     return (
       <RequestReceiveScreen
-        privateAddress={privateAddress}
         amount={amount}
         note={note}
         expiryId={expiryId}
@@ -294,13 +305,50 @@ export function RequestModalFlow({
         onAmountChange={onAmountChange}
         onNoteChange={onNoteChange}
         onExpiryChange={onExpiryChange}
+        onCancel={requestClose}
         onCreateLink={handleCreateLink}
       />
     )
   }
 
+  function handleDetailsBack() {
+    createAfterSheetExitRef.current = false
+    setDetailsSheetOpen(false)
+    onDetailsBack()
+  }
+
+  function handleDetailsSheetExited() {
+    if (!createAfterSheetExitRef.current) return
+    createAfterSheetExitRef.current = false
+    afterBottomSheetHandoff(() => {
+      commitCreateLink()
+    })
+  }
+
   const keypadBack =
-    step === 'details' ? onDetailsBack : step === 'amount' ? onAmountBack : undefined
+    step === 'details' ? handleDetailsBack : step === 'amount' ? onAmountBack : undefined
+
+  const detailsSheet = useKeypadMobileChrome ? (
+    <BottomSheet
+      open={detailsSheetOpen}
+      onClose={handleDetailsBack}
+      onExited={handleDetailsSheetExited}
+      title="Details"
+      ariaLabel="Link expiry and note"
+      showClose={false}
+    >
+      <RequestDetailsScreen
+        amount={amount}
+        note={note}
+        expiryId={expiryId}
+        keypadMobileLayout
+        onNoteChange={onNoteChange}
+        onExpiryChange={onExpiryChange}
+        onBack={handleDetailsBack}
+        onCreateLink={handleCreateLink}
+      />
+    </BottomSheet>
+  ) : null
 
   const chooserSheet = useKeypadMobileChrome ? (
     <BottomSheet
@@ -348,6 +396,9 @@ export function RequestModalFlow({
     </BottomSheet>
   ) : null
 
+  const stepShellKey =
+    useKeypadMobileChrome && (step === 'amount' || step === 'details') ? 'amount' : step
+
   if (!showModal) {
     return chooserSheet
   }
@@ -373,19 +424,22 @@ export function RequestModalFlow({
           flowLabel="Request"
           chrome={useKeypadMobileChrome ? 'simple' : 'default'}
           headerTitle={
-            useKeypadMobileChrome ? REQUEST_SIMPLE_HEADER_TITLE[step] ?? 'Request' : undefined
+            useKeypadMobileChrome
+              ? REQUEST_SIMPLE_HEADER_TITLE[step] ?? 'Request via link'
+              : undefined
           }
           onBack={useKeypadMobileChrome ? keypadBack : undefined}
           exiting={exiting}
           onClose={requestClose}
           closeButtonRef={closeButtonRef}
         >
-          <div key={step} className={modalStepShell}>
+          <ModalStepSwitch stepKey={stepShellKey} skipExit={exiting}>
             {renderStep()}
-          </div>
+          </ModalStepSwitch>
         </ModalShell>
       </FlowModalOverlay>
       {chooserSheet}
+      {detailsSheet}
     </>
   )
 }

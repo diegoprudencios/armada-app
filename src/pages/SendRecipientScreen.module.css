@@ -1,53 +1,103 @@
 .column {
   width: 100%;
   max-width: 434px;
-  flex: 1;
+  flex: 0 0 auto;
   min-height: 0;
-  height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 0;
-  padding-bottom: calc(var(--primitives-spacing-5) + var(--mobile-safe-area-bottom, 0px));
+  padding-bottom: 0;
   box-sizing: border-box;
 }
 
 .body {
-  flex: 1;
+  flex: 0 0 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: var(--primitives-spacing-8);
-  overflow-x: clip;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: visible;
 }
 
-.title {
-  composes: displayLg from '../styles/displayLgTitle.module.css';
+.enterCard,
+.enterCtas,
+.enterRecent {
+  opacity: 0;
+  animation: recipientStageEnter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.enterCard {
+  animation-delay: var(--modal-step-enter-delay, 360ms);
+}
+
+.enterCtas {
+  animation-delay: calc(var(--modal-step-enter-delay, 360ms) + 360ms);
+}
+
+.enterRecent {
+  animation-delay: calc(var(--modal-step-enter-delay, 360ms) + 500ms);
+}
+
+@keyframes recipientStageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--primitives-spacing-10));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--primitives-spacing-5);
+  padding: var(--primitives-spacing-8);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent) 0%,
+    color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent) 100%
+  );
+  backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
+  -webkit-backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
+  border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
+}
+
+.cardTitle {
   margin: 0;
   width: 100%;
+  padding-left: var(--primitives-spacing-1);
   color: var(--semantic-color-text-primary);
-  text-align: center;
+  text-align: left;
+  box-sizing: border-box;
+  font-weight: var(--primitives-fontWeight-medium);
 }
 
 .addressBlock {
   display: flex;
   flex-direction: column;
-  gap: var(--primitives-spacing-3);
+  gap: var(--primitives-spacing-5);
   width: 100%;
 }
 
 .addressField {
   display: flex;
   align-items: center;
-  gap: var(--primitives-spacing-5);
+  gap: var(--primitives-spacing-3);
   width: 100%;
-  height: var(--primitives-spacing-16);
+  height: calc(var(--primitives-spacing-12) + var(--primitives-spacing-2));
+  min-height: calc(var(--primitives-spacing-12) + var(--primitives-spacing-2));
   padding: 0 var(--primitives-spacing-5);
-  border-radius: calc(var(--primitives-spacing-5) / 2);
-  background: var(--primitives-color-neutral-50);
+  border-radius: calc(var(--primitives-borderRadius-xl) * 1px);
+  background: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
   box-sizing: border-box;
 }
 
@@ -59,8 +109,7 @@
   border: none;
   background: transparent;
   font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
-  /* ≥16px prevents iOS Safari zoom-on-focus */
-  font-size: calc(var(--primitives-fontSize-lg) * 1px);
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
   font-weight: var(--primitives-fontWeight-medium);
   color: var(--semantic-color-text-primary);
   outline: none;
@@ -76,35 +125,61 @@
   color: var(--semantic-color-text-muted);
 }
 
-.pasteButton {
-  flex-shrink: 0;
-  display: inline-flex;
+.clipboardPaste {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  height: var(--primitives-spacing-8);
-  padding: 0 var(--primitives-spacing-4);
+  gap: var(--primitives-spacing-3);
+  width: 100%;
+  min-height: var(--primitives-spacing-12);
+  margin: 0;
+  padding: 0;
   border: none;
-  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
-  background: var(--semantic-color-brand-lavender);
-  font-family: var(--primitives-fontFamily-ui), sans-serif;
-  font-size: calc(var(--primitives-fontSize-sm) * 1px);
-  font-weight: var(--primitives-fontWeight-medium);
-  color: var(--semantic-color-text-primary);
+  background: transparent;
   cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.15s ease;
+  text-align: left;
+  box-sizing: border-box;
 }
 
-.pasteButton:active {
-  transform: translateY(1px);
-}
-
-.pasteButton:hover {
-  opacity: 0.92;
-}
-
-.pasteButton:focus-visible {
+.clipboardPaste:focus-visible {
   outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
-  outline-offset: calc(var(--primitives-spacing-1) * 0.5);
+  outline-offset: calc(var(--primitives-spacing-1) * 1px);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
+}
+
+.clipboardPaste:hover .clipboardPasteIcon {
+  background: var(--primitives-color-neutral-50);
+}
+
+.clipboardPasteIcon {
+  pointer-events: none;
+}
+
+.clipboardPasteCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--primitives-spacing-1);
+  min-width: 0;
+  flex: 1;
+}
+
+.clipboardPasteLabel {
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  font-weight: var(--primitives-fontWeight-regular);
+  color: var(--semantic-color-text-muted);
+}
+
+.clipboardPasteAddress {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-family: var(--primitives-fontFamily-ui), sans-serif;
+  font-size: calc(var(--primitives-fontSize-base) * 1px);
+  font-weight: var(--primitives-fontWeight-regular);
+  color: var(--semantic-color-text-primary);
 }
 
 .clearButton {
@@ -154,11 +229,11 @@
   align-items: center;
   gap: var(--primitives-spacing-3);
   width: 100%;
-  height: var(--primitives-spacing-16);
-  padding: 0 var(--primitives-spacing-5);
+  min-height: calc(var(--primitives-spacing-12) + var(--primitives-spacing-2));
+  padding: var(--primitives-spacing-2) var(--primitives-spacing-5);
   border: none;
-  border-radius: calc(var(--primitives-spacing-5) / 2);
-  background: var(--primitives-color-neutral-50);
+  border-radius: calc(var(--primitives-borderRadius-xl) * 1px);
+  background: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
   cursor: pointer;
   text-align: left;
   box-sizing: border-box;
@@ -186,8 +261,22 @@
   display: block;
 }
 
-.networkName {
+.networkCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--primitives-spacing-1);
+  min-width: 0;
   flex: 1;
+}
+
+.networkLabel {
+  composes: labelSmRegular from '../styles/typographyComposites.module.css';
+  color: var(--semantic-color-text-muted);
+}
+
+.networkName {
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(var(--primitives-fontSize-base) * 1px);
   font-weight: var(--primitives-fontWeight-medium);
@@ -217,6 +306,15 @@
     color-mix(in srgb, var(--semantic-color-surface-bg) 55%, transparent);
 }
 
+.networkMenu:focus {
+  outline: none;
+}
+
+.networkMenu:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 0.5);
+}
+
 .networkOption {
   display: flex;
   align-items: center;
@@ -239,6 +337,11 @@
   background: var(--semantic-color-surface-hover);
 }
 
+.networkOption:focus-visible {
+  outline: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-focus);
+  outline-offset: calc(var(--primitives-spacing-1) * 0.5);
+}
+
 .actionRowReveal {
   --recipient-reveal-duration: 360ms;
   --recipient-reveal-easing: cubic-bezier(0.22, 1, 0.36, 1);
@@ -247,7 +350,7 @@
   will-change: opacity, transform;
 }
 
-.footer.actionRowReveal {
+.privacyBadge.actionRowReveal {
   animation-delay: 70ms;
 }
 
@@ -265,9 +368,9 @@
 
 .privacyBadge {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: var(--primitives-spacing-3);
   width: 100%;
   min-width: 0;
@@ -284,23 +387,24 @@
 }
 
 .brandBadge {
-  border-radius: calc(var(--semantic-borderRadius-button) * 1px);
+  border-radius: calc(var(--primitives-borderRadius-full) * 1px);
   background: linear-gradient(
     to bottom,
-    var(--semantic-component-button-gradient-default-from),
-    var(--semantic-component-button-gradient-default-to)
+    var(--semantic-color-brand-lavender) 0%,
+    var(--semantic-color-brand-gradient-rose) 48%,
+    var(--semantic-color-brand-amber) 100%
   );
 }
 
 .brandMark {
   width: var(--primitives-spacing-5);
   height: var(--primitives-spacing-5);
-  color: var(--semantic-component-tag-label);
 }
 
 .privacyIconPublic {
   border-radius: calc(var(--primitives-borderRadius-full) * 1px);
   background: var(--semantic-color-text-primary);
+  color: var(--semantic-color-surface-default);
 }
 
 .privacyIconSvg {
@@ -311,10 +415,10 @@
 .privacyCopy {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--primitives-spacing-1);
   min-width: 0;
-  text-align: center;
+  text-align: left;
 }
 
 .privacyTitle {
@@ -323,7 +427,7 @@
   font-weight: var(--primitives-fontWeight-semibold);
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-primary);
-  text-align: center;
+  text-align: left;
 }
 
 .privacySubtitle {
@@ -332,27 +436,19 @@
   font-weight: var(--primitives-fontWeight-regular);
   line-height: var(--primitives-lineHeight-tight);
   color: var(--semantic-color-text-secondary);
-  text-align: center;
+  text-align: left;
 }
 
-.footer {
-  flex-shrink: 0;
-  width: 100%;
+.buttonRow {
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
   gap: var(--primitives-spacing-5);
-  padding-top: var(--primitives-spacing-5);
-  box-sizing: border-box;
+  width: 100%;
+  flex-shrink: 0;
 }
 
-.continueButton {
-  flex: 0 0 auto;
-  align-self: stretch;
-  width: 100%;
+.buttonRow > * {
+  flex: 1;
   max-width: none;
-  min-height: var(--semantic-component-button-primary-lg-height);
-  height: var(--semantic-component-button-primary-lg-height);
 }
 
 .recentSection {
@@ -448,7 +544,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .actionRowReveal {
+  .card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .actionRowReveal,
+  .enterCard,
+  .enterCtas,
+  .enterRecent {
     animation: none;
     opacity: 1;
     transform: none;
@@ -459,3 +563,27 @@
     transition: none;
   }
 }
+
+@media (max-width: 767px) {
+  .column {
+    flex: 1;
+    height: 100%;
+    padding-bottom: calc(var(--primitives-spacing-5) + var(--mobile-safe-area-bottom, 0px));
+  }
+
+  .body {
+    flex: 1;
+    overflow-x: clip;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .card {
+    padding: var(--primitives-spacing-5);
+  }
+
+  .addressInput {
+    font-size: calc(var(--primitives-fontSize-lg) * 1px);
+  }
+}
+

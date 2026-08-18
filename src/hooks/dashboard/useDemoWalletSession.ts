@@ -95,6 +95,18 @@ export function useDemoWalletSession({ onFullSessionReset }: UseDemoWalletSessio
     setWallet(demoWalletFromConnected(nextActive))
   }
 
+  function adjustActiveWalletUsdc(delta: number) {
+    if (!activeWalletId || !Number.isFinite(delta) || delta === 0) return
+
+    setConnectedWallets((prev) =>
+      prev.map((entry) => {
+        if (entry.id !== activeWalletId) return entry
+        const next = Math.round((entry.usdcBalance + delta) * 100) / 100
+        return { ...entry, usdcBalance: Math.max(0, next) }
+      }),
+    )
+  }
+
   function requireWallet(): boolean {
     if (wallet) return true
     openConnect()
@@ -112,6 +124,7 @@ export function useDemoWalletSession({ onFullSessionReset }: UseDemoWalletSessio
     selectActiveWallet,
     activateWallet,
     disconnectWallet,
+    adjustActiveWalletUsdc,
     clearWalletState,
     requireWallet,
   }

@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { ChevronRightIcon } from '@heroicons/react/24/outline'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
 import { RollingBalanceValue } from '@/components/RollingBalanceValue'
+import { hidePeekEventHandlers } from '@/hooks/useHidePeek'
+import { useMobileLayout } from '@/hooks/useMobileLayout'
 import {
   DEMO_EARN_APY,
   estimateVaultEarnedSoFar,
@@ -19,7 +22,7 @@ export interface VaultPositionBarProps {
   vaultRollActive?: boolean
   vaultRollFromValue?: string
   vaultRollTrigger?: number
-  balanceRevealed?: boolean
+  balanceHidden?: boolean
   onOpen?: () => void
 }
 
@@ -30,16 +33,29 @@ export function VaultPositionBar({
   vaultRollActive = false,
   vaultRollFromValue,
   vaultRollTrigger = 0,
-  balanceRevealed = true,
+  balanceHidden = false,
   onOpen,
 }: VaultPositionBarProps) {
+  const isMobile = useMobileLayout()
+  const [peekVault, setPeekVault] = useState(false)
+  const balanceRevealed = !balanceHidden || peekVault
+
   if (balance <= 0 && !vaultRollActive) return null
 
   const formattedBalance = formatUsdcAmount(balance)
   const resolvedEarned = earnedAmount ?? estimateVaultEarnedSoFar(balance, apy)
   const formattedEarned = formatEarnedSoFarAmount(resolvedEarned)
+  const formattedApy = `${apy.toFixed(1)}%`
+  const earningLabel = formatVaultEarningLabel(apy)
   const amountLabel = balanceRevealed ? `${formattedBalance} USDC` : 'Vault balance hidden'
   const earnedLabel = balanceRevealed ? `${formattedEarned} earned` : 'Earned amount hidden'
+  const apyLabel = balanceRevealed ? earningLabel : 'APY hidden'
+  const peekHandlers = hidePeekEventHandlers(
+    balanceHidden,
+    () => setPeekVault(true),
+    () => setPeekVault(false),
+    isMobile,
+  )
 
   const amountDisplay =
     vaultRollActive && vaultRollFromValue !== undefined && balanceRevealed ? (
@@ -66,7 +82,9 @@ export function VaultPositionBar({
             {amountDisplay}
             <span className={styles.amountSuffix}>USDC</span>
           </span>
-          <span className={styles.apr}>{formatVaultEarningLabel(apy)}</span>
+          <span className={styles.apr} aria-label={apyLabel}>
+            Earning <BalanceScrambleValue value={formattedApy} revealed={balanceRevealed} /> APR
+          </span>
         </div>
       </div>
 
@@ -84,14 +102,20 @@ export function VaultPositionBar({
 
   if (onOpen) {
     return (
-      <button type="button" className={styles.root} aria-label="Open vault" onClick={onOpen}>
+      <button
+        type="button"
+        className={styles.root}
+        aria-label="Manage vault"
+        onClick={onOpen}
+        {...peekHandlers}
+      >
         {content}
       </button>
     )
   }
 
   return (
-    <div className={styles.root} aria-label="Vault position">
+    <div className={styles.root} aria-label="Vault position" {...peekHandlers}>
       {content}
     </div>
   )

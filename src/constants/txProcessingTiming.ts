@@ -16,6 +16,13 @@ export interface TxProcessingDemoTiming {
   completedHoldMs?: number
 }
 
+/** Total wait until `onComplete` — keep in sync with `scheduleTxProcessingDemo`. */
+export function txProcessingSettleDelayMs(timing: TxProcessingDemoTiming = {}): number {
+  const stageAdvanceMs = timing.stageAdvanceMs ?? TX_PROCESSING_STAGE_ADVANCE_MS
+  const completedHoldMs = timing.completedHoldMs ?? TX_PROCESSING_COMPLETED_HOLD_MS
+  return stageAdvanceMs * 3 + completedHoldMs
+}
+
 /** Demo timing for modal processing screens: stages advance, then a brief completed beat. */
 export function scheduleTxProcessingDemo(
   callbacks: TxProcessingDemoCallbacks,

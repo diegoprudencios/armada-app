@@ -1,10 +1,11 @@
+import { GlobeAltIcon } from '@heroicons/react/24/outline'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
 import { formatProtocolFeeLabel } from '@/utils/protocolFee'
-import { isArmadaAddress, type SendFlowVariant } from '@/pages/sendFlowConstants'
+import { isArmadaAddress, sendPrivacyNotice, type SendFlowVariant } from '@/pages/sendFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
-import styles from './SendReviewSummary.module.css'
+import styles from '../DepositReviewSummary/DepositReviewSummary.module.css'
 
 export interface SendReviewSummaryProps {
   recipientAddress: string
@@ -25,13 +26,11 @@ export function SendReviewSummary({
   amount,
   feeUsdc,
   confirmedAt,
-  variant = 'send',
   tone = 'default',
 }: SendReviewSummaryProps) {
   const isPrivate = isArmadaAddress(recipientAddress)
+  const privacyNotice = sendPrivacyNotice(isPrivate)
   const total = amount + feeUsdc
-  const amountLabel = `${formatUsdcAmount(amount, 2)} USDC`
-  const amountRowLabel = variant === 'withdraw' ? 'Withdrawal amount' : 'Send amount'
   const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const totalLabel = `${formatUsdcAmount(total, 2)} USDC`
   const summaryClassName = [styles.summary, tone === 'neutral' && styles.summaryNeutral]
@@ -52,7 +51,7 @@ export function SendReviewSummary({
           <span className={styles.summaryLabel}>From your private account</span>
           <span className={styles.summaryValue}>
             <span className={styles.valueWithIcon}>
-              <ArmadaLogo variant="mark" className={styles.armadaIcon} />
+              <ArmadaLogo variant="mark" markTone="deep" className={styles.armadaIcon} />
               <span>{truncateAddress(armadaAddress)}</span>
             </span>
           </span>
@@ -62,19 +61,11 @@ export function SendReviewSummary({
           <span className={styles.summaryValue}>
             <span className={styles.valueWithIcon}>
               {isPrivate ? (
-                <ArmadaLogo variant="mark" className={styles.armadaIcon} />
+                <ArmadaLogo variant="mark" markTone="deep" className={styles.armadaIcon} />
               ) : null}
               <span>{truncateAddress(recipientAddress)}</span>
             </span>
           </span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Privacy</span>
-          <span className={styles.summaryValue}>{isPrivate ? 'Private' : 'Public'}</span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>{amountRowLabel}</span>
-          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{amountLabel}</span>
         </div>
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Fees</span>
@@ -85,6 +76,27 @@ export function SendReviewSummary({
         <span className={styles.summaryTotalLabel}>Total</span>
         <span className={[styles.summaryTotalValue, usdcAmount.font].join(' ')}>{totalLabel}</span>
       </div>
+      {!confirmedAt ? (
+        <div className={styles.privacyNotice} role="note">
+          <span
+            className={[
+              styles.privacyNoticeIcon,
+              isPrivate ? styles.privacyNoticeIconPrivate : styles.privacyNoticeIconPublic,
+            ].join(' ')}
+            aria-hidden
+          >
+            {isPrivate ? (
+              <ArmadaLogo variant="mark" markTone="deep" className={styles.privacyNoticeMark} />
+            ) : (
+              <GlobeAltIcon className={styles.privacyNoticeMark} strokeWidth={1.75} />
+            )}
+          </span>
+          <div className={styles.privacyNoticeCopy}>
+            <p className={styles.privacyNoticeTitle}>{privacyNotice.title}</p>
+            <p className={styles.privacyNoticeBody}>{privacyNotice.body}</p>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

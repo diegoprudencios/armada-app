@@ -4,6 +4,15 @@
   flex-shrink: 0;
 }
 
+.markDeep,
+.fullDeep {
+  color: var(--semantic-color-brand-deep);
+}
+
+.fullDeep svg {
+  display: block;
+}
+
 .fullWrap svg,
 .fullWrap img {
   height: 100%;

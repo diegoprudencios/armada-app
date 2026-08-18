@@ -7,6 +7,7 @@ import { matchesActivityKindFilter, matchesActivityTxHashSearch } from '@/utils/
 import { ActivityKindFilters, type ActivityKindFilter } from './ActivityKindFilters'
 import { ActivityTxHashSearch } from './ActivityTxHashSearch'
 import searchStyles from './ActivityTxHashSearch.module.css'
+import panelStyles from './ActivityAllPanel.module.css'
 import { RecentActivityList } from './RecentActivityList'
 
 export interface ActivityAllPanelProps {
@@ -53,8 +54,10 @@ export function ActivityAllPanel({
 
   const list = (
     <>
-      <ActivityTxHashSearch value={hashQuery} onChange={setHashQuery} />
-      <ActivityKindFilters value={kindFilter} onChange={setKindFilter} />
+      <div className={panelStyles.toolbar}>
+        <ActivityTxHashSearch value={hashQuery} onChange={setHashQuery} />
+        <ActivityKindFilters value={kindFilter} onChange={setKindFilter} />
+      </div>
       {showFilterEmpty ? (
         <p className={searchStyles.searchEmpty}>No transactions match your filters.</p>
       ) : (
@@ -77,7 +80,7 @@ export function ActivityAllPanel({
   }
 
   return (
-    <SidePanel open={open} onClose={onClose} title="Recent activity">
+    <SidePanel open={open} onClose={onClose} title="Recent activity" panelClassName={panelStyles.panel}>
       {list}
     </SidePanel>
   )

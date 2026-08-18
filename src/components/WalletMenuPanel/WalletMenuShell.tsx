@@ -51,14 +51,26 @@ export function WalletMenuShell({
 
   if (isMobile) {
     return (
-      <BottomSheet open={open} onClose={onClose} ariaLabel="Wallet" sheetClassName={shellStyles.shellPanel}>
+      <BottomSheet
+        open={open}
+        onClose={onClose}
+        ariaLabel="Wallet"
+        sheetClassName={shellStyles.shellSheet}
+        scrimClassName={shellStyles.shellScrim}
+      >
         {panel}
       </BottomSheet>
     )
   }
 
   return (
-    <SidePanel open={open} onClose={onClose} ariaLabel="Wallet" panelClassName={shellStyles.shellPanel}>
+    <SidePanel
+      open={open}
+      onClose={onClose}
+      ariaLabel="Wallet"
+      panelClassName={shellStyles.shellPanel}
+      scrimClassName={shellStyles.shellScrim}
+    >
       {panel}
     </SidePanel>
   )

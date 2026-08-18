@@ -18,11 +18,14 @@
   border: none;
   background: rgb(255 255 255 / 0.4);
   color: var(--semantic-color-text-primary);
+  transition: opacity 180ms ease;
 }
 
-.root .trigger:hover:not(:disabled) {
-  background: rgb(255 255 255 / 0.52);
-  border-color: transparent;
+@media (hover: hover) and (pointer: fine) {
+  .root .trigger:hover:not(:disabled) {
+    background: rgb(255 255 255 / 0.52);
+    border-color: transparent;
+  }
 }
 
 .root .trigger:active:not(:disabled) {
@@ -60,4 +63,15 @@
   font-variant-numeric: tabular-nums;
   color: var(--semantic-color-text-primary);
   white-space: nowrap;
+}
+
+.triggerHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root .trigger {
+    transition: none;
+  }
 }

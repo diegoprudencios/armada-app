@@ -1,25 +1,20 @@
 import { formatUsdcAmount } from '@/utils/format'
-import { shouldUseKeypadMobileChrome } from '@/utils/amountEntryMode'
 
 export const EARN_PROGRESS_STEPS = ['Amount', 'Review', 'Confirm'] as const
 
 export type EarnTab = 'add' | 'withdraw'
 
-/** Desktop: amount → review → … Mobile: choose → amount → review → … */
-export type EarnModalStep = 'choose' | 'amount' | 'review' | 'processing' | 'confirmed'
+/** Amount → review → confirm (desktop and mobile). */
+export type EarnModalStep = 'amount' | 'review' | 'processing' | 'confirmed'
 
 export const EARN_TABS: ReadonlyArray<{ id: EarnTab; label: string }> = [
-  { id: 'add', label: 'Add funds' },
+  { id: 'add', label: 'Add to vault' },
   { id: 'withdraw', label: 'Withdraw' },
 ]
 
 /** Demo vault APY — matches BalanceCard ellipses menu meta. */
 export const DEMO_EARN_APY = 4.2
 
-/** True when Earn should open the chooser sheet first (mobile keypad by default). */
-export function shouldOpenEarnChooser(search = window.location.search): boolean {
-  return shouldUseKeypadMobileChrome(search)
-}
 export const EARN_PROCESSING_STAGES = [
   { id: 'build-proof', label: 'Preparing transaction' },
   { id: 'submit-relayer', label: 'Submitting privately' },
@@ -30,13 +25,11 @@ export function earnFinalStageLabel(tab: EarnTab): string {
 }
 
 export function earnAmountQuestion(tab: EarnTab): string {
-  return tab === 'add'
-    ? 'How much USDC do you want to add to the vault?'
-    : 'How much USDC do you want to withdraw from the vault?'
+  return tab === 'add' ? 'Deposit USDC to the vault' : 'Withdraw USDC from the vault'
 }
 
 export function earnReviewTitle(tab: EarnTab): string {
-  return tab === 'add' ? 'Review your deposit' : 'Review your withdrawal'
+  return tab === 'add' ? 'Review your USDC deposit' : 'Review your USDC withdrawal'
 }
 
 export function earnConfirmLabel(tab: EarnTab): string {
@@ -44,7 +37,7 @@ export function earnConfirmLabel(tab: EarnTab): string {
 }
 
 export function earnConfirmedTitle(tab: EarnTab): string {
-  return tab === 'add' ? 'Deposit to vault complete' : 'Withdrawal from vault complete'
+  return tab === 'add' ? 'USDC deposit complete' : 'USDC withdrawal complete'
 }
 
 export function earnProcessingTitle(tab: EarnTab): string {
@@ -55,6 +48,15 @@ export function formatDemoApy(apy: number): string {
   if (apy <= 0) return 'Unavailable'
   return `~${apy.toFixed(1)}%`
 }
+
+export function earnApyBannerHeadline(apy: number = DEMO_EARN_APY): string {
+  return `Earn ${formatDemoApy(apy)} APY`
+}
+
+export const EARN_APY_BANNER_BODY = 'Deposit into the vault and start earning now.'
+
+export const EARN_APY_BANNER_TOOLTIP =
+  'The APY is an estimate from recent vault performance.'
 
 /** Demo accrued yield for vault bar — ~30 days at the quoted APY. */
 export function estimateVaultEarnedSoFar(

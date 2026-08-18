@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react'
-import { shouldOpenEarnChooser, type EarnTab } from '@/pages/earnFlowConstants'
+import { useEffect, useRef, useState } from 'react'
+import { type EarnTab } from '@/pages/earnFlowConstants'
+import { txProcessingSettleDelayMs } from '@/constants/txProcessingTiming'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import { readActivityUserHidden } from '@/utils/demoDashboardSession'
@@ -15,56 +16,48 @@ export interface UseEarnFlowOptions {
   activity: DashboardActivityState
 }
 
+type EarnSnapshot = { amount: number; tab: EarnTab }
+
+const EARN_SETTLE_DELAY_MS = txProcessingSettleDelayMs()
+
 export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOptions) {
-  const [earnStep, setEarnStep] = useState<EarnStep | null>(null)
+  const [earnStep, setEarnStepState] = useState<EarnStep | null>(null)
   const [earnTab, setEarnTab] = useState<EarnTab>('add')
   const [earnAmount, setEarnAmount] = useState('')
   const [earnConfirmedAt, setEarnConfirmedAt] = useState<number | null>(null)
-  const pendingEarnRef = useRef<{ amount: number; tab: EarnTab } | null>(null)
+  const snapshotRef = useRef<EarnSnapshot | null>(null)
+  const settledRef = useRef(false)
+  const settleTimerRef = useRef<number | null>(null)
+  const earnAmountRef = useRef(earnAmount)
+  const earnTabRef = useRef(earnTab)
+  earnAmountRef.current = earnAmount
+  earnTabRef.current = earnTab
 
-  function resetEarnUi() {
-    setEarnStep(null)
-    setEarnAmount('')
-    setEarnTab('add')
-    setEarnConfirmedAt(null)
-    pendingEarnRef.current = null
+  function cancelSettleTimer() {
+    if (settleTimerRef.current == null) return
+    window.clearTimeout(settleTimerRef.current)
+    settleTimerRef.current = null
   }
 
-  function openEarn(tab: EarnTab = 'add') {
-    if (!walletSession.requireWallet()) return
-    setEarnTab(tab)
-    setEarnAmount('')
-    setEarnStep(shouldOpenEarnChooser() ? 'choose' : 'amount')
-  }
+  function applyEarnSettlement() {
+    if (activity.activityReceiptRef.current) return
+    if (settledRef.current) return
 
-  function closeEarn() {
-    if (activity.activityReceiptRef.current) {
-      activity.activityReceiptRef.current = false
-      resetEarnUi()
-      return
-    }
+    const snapshot = snapshotRef.current
+    if (!snapshot || snapshot.amount <= 0) return
 
-    setEarnStep(null)
-    setEarnAmount('')
-    setEarnTab('add')
-    setEarnConfirmedAt(null)
-
-    const pending = pendingEarnRef.current
-    pendingEarnRef.current = null
-
-    if (!pending || pending.amount <= 0) return
-
-    activity.prependRecentActivity(createEarnActivity(pending.amount, pending.tab))
+    settledRef.current = true
+    activity.prependRecentActivity(createEarnActivity(snapshot.amount, snapshot.tab))
 
     const balanceFrom = formatUsdcAmount(balances.dashboardBalance)
     const vaultFrom = formatUsdcAmount(balances.earningBalance)
 
-    if (pending.tab === 'add') {
-      balances.setDashboardBalance((prev) => prev - pending.amount)
-      balances.setEarningBalance((prev) => prev + pending.amount)
+    if (snapshot.tab === 'add') {
+      balances.setDashboardBalance((prev) => prev - snapshot.amount)
+      balances.setEarningBalance((prev) => prev + snapshot.amount)
     } else {
-      balances.setEarningBalance((prev) => prev - pending.amount)
-      balances.setDashboardBalance((prev) => prev + pending.amount)
+      balances.setEarningBalance((prev) => prev - snapshot.amount)
+      balances.setDashboardBalance((prev) => prev + snapshot.amount)
     }
 
     balances.setBalanceRoll((roll) => ({
@@ -79,20 +72,76 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
     }
   }
 
-  function completeEarn() {
-    if (activity.activityReceiptRef.current) return
+  function armEarnSettlement() {
+    if (settleTimerRef.current != null) return
 
-    const moved = parseActiveAmount(earnAmount)
-    if (moved > 0) {
-      pendingEarnRef.current = { amount: moved, tab: earnTab }
+    snapshotRef.current = {
+      amount: parseActiveAmount(earnAmountRef.current),
+      tab: earnTabRef.current,
     }
+    settledRef.current = false
+    settleTimerRef.current = window.setTimeout(() => {
+      settleTimerRef.current = null
+      applyEarnSettlement()
+    }, EARN_SETTLE_DELAY_MS)
+  }
+
+  function setEarnStep(next: EarnStep | null) {
+    if (next === 'processing') armEarnSettlement()
+    setEarnStepState(next)
+  }
+
+  function resetEarnUi() {
+    cancelSettleTimer()
+    snapshotRef.current = null
+    settledRef.current = false
+    setEarnStepState(null)
+    setEarnAmount('')
+    setEarnTab('add')
+    setEarnConfirmedAt(null)
+  }
+
+  function hideEarnUi() {
+    setEarnStepState(null)
+    setEarnAmount('')
+    setEarnTab('add')
+    setEarnConfirmedAt(null)
+  }
+
+  useEffect(() => () => cancelSettleTimer(), [])
+
+  function openEarn(tab: EarnTab = 'add') {
+    if (!walletSession.requireWallet()) return
+    setEarnTab(tab)
+    setEarnAmount('')
+    setEarnStepState('amount')
+  }
+
+  function closeEarn() {
+    if (activity.activityReceiptRef.current) {
+      activity.activityReceiptRef.current = false
+      resetEarnUi()
+      return
+    }
+
+    if (settleTimerRef.current != null) {
+      hideEarnUi()
+      return
+    }
+
+    applyEarnSettlement()
+    resetEarnUi()
+  }
+
+  function completeEarn() {
+    applyEarnSettlement()
   }
 
   function openEarnConfirmedFromActivity(tab: EarnTab, amountLabel: string, confirmedAt: number) {
     setEarnTab(tab)
     setEarnAmount(amountLabel)
     setEarnConfirmedAt(confirmedAt)
-    setEarnStep('confirmed')
+    setEarnStepState('confirmed')
   }
 
   const earnSourceBalance = earnTab === 'add' ? balances.dashboardBalance : balances.earningBalance

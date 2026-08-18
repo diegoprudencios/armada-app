@@ -1,8 +1,15 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { DepositChainId } from '@/constants/depositChains'
+import {
+  DEPOSIT_PROCESSING_COMPLETED_HOLD_MS,
+  DEPOSIT_PROCESSING_STAGE_ADVANCE_MS,
+  txProcessingSettleDelayMs,
+} from '@/constants/txProcessingTiming'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import { createDepositActivity } from '@/utils/dashboardActivity'
+import { depositTotalCost } from '@/utils/depositFee'
+import { readActivityUserHidden } from '@/utils/demoDashboardSession'
 import type { DemoWalletSession } from './useDemoWalletSession'
 import type { DemoBalances } from './useDemoBalances'
 import type { DashboardActivityState } from './useDashboardActivity'
@@ -14,33 +21,122 @@ export interface UseDepositFlowOptions {
   activity: DashboardActivityState
 }
 
+type DepositSnapshot = { amount: number; chain: DepositChainId }
+
+const DEPOSIT_SETTLE_DELAY_MS = txProcessingSettleDelayMs({
+  stageAdvanceMs: DEPOSIT_PROCESSING_STAGE_ADVANCE_MS,
+  completedHoldMs: DEPOSIT_PROCESSING_COMPLETED_HOLD_MS,
+})
+
 export function useDepositFlow({ walletSession, balances, activity }: UseDepositFlowOptions) {
-  const [depositStep, setDepositStep] = useState<DepositStep | null>(null)
+  const [depositStep, setDepositStepState] = useState<DepositStep | null>(null)
   const [depositAmount, setDepositAmount] = useState('')
   const [depositChain, setDepositChain] = useState<DepositChainId>('sepolia')
   const [depositConfirmedAt, setDepositConfirmedAt] = useState<number | null>(null)
-  const pendingDepositRef = useRef(0)
+  const [depositSkipEnter, setDepositSkipEnter] = useState(false)
+  const snapshotRef = useRef<DepositSnapshot | null>(null)
+  const settledRef = useRef(false)
+  const settleTimerRef = useRef<number | null>(null)
+  const depositAmountRef = useRef(depositAmount)
+  const depositChainRef = useRef(depositChain)
+  depositAmountRef.current = depositAmount
+  depositChainRef.current = depositChain
+
+  function cancelSettleTimer() {
+    if (settleTimerRef.current == null) return
+    window.clearTimeout(settleTimerRef.current)
+    settleTimerRef.current = null
+  }
+
+  function applyDepositSettlement() {
+    if (activity.activityReceiptRef.current) return
+    if (settledRef.current) return
+
+    const snapshot = snapshotRef.current
+    if (!snapshot || snapshot.amount <= 0) return
+
+    settledRef.current = true
+    balances.setHasCompletedDeposit(true)
+    activity.prependRecentActivity(createDepositActivity(snapshot.amount, snapshot.chain))
+    walletSession.adjustActiveWalletUsdc(-depositTotalCost(snapshot.amount))
+    balances.setDashboardBalance((prev) => {
+      const next = prev + snapshot.amount
+      balances.setBalanceRoll((roll) => ({
+        trigger: roll.trigger + 1,
+        mode: 'fromValue',
+        fromValue: formatUsdcAmount(prev),
+      }))
+      if (!readActivityUserHidden()) {
+        activity.scheduleActivityReveal(activity.activityRevealDelayAfterRollMs(formatUsdcAmount(next)))
+      }
+      return next
+    })
+  }
+
+  function armDepositSettlement() {
+    if (settleTimerRef.current != null) return
+
+    const amount = parseActiveAmount(depositAmountRef.current)
+    snapshotRef.current = { amount, chain: depositChainRef.current }
+    settledRef.current = false
+    settleTimerRef.current = window.setTimeout(() => {
+      settleTimerRef.current = null
+      applyDepositSettlement()
+    }, DEPOSIT_SETTLE_DELAY_MS)
+  }
+
+  function setDepositStep(next: DepositStep | null) {
+    if (next === 'processing') armDepositSettlement()
+    setDepositStepState(next)
+  }
 
   function resetDepositUi() {
-    setDepositStep(null)
+    cancelSettleTimer()
+    snapshotRef.current = null
+    settledRef.current = false
+    setDepositStepState(null)
     setDepositAmount('')
     setDepositChain('sepolia')
     setDepositConfirmedAt(null)
-    pendingDepositRef.current = 0
+    setDepositSkipEnter(false)
   }
 
-  function openDeposit() {
-    if (!walletSession.requireWallet()) return
+  function hideDepositUi() {
+    setDepositStepState(null)
     setDepositAmount('')
     setDepositChain('sepolia')
-    setDepositStep('amount')
+    setDepositConfirmedAt(null)
+    setDepositSkipEnter(false)
+  }
+
+  useEffect(() => () => cancelSettleTimer(), [])
+
+  function openDeposit() {
+    openDepositWithAmount('')
+  }
+
+  function openDepositWithAmount(initialAmount: string) {
+    if (!walletSession.requireWallet()) return
+    setDepositSkipEnter(false)
+    setDepositAmount(initialAmount)
+    setDepositChain('sepolia')
+    setDepositStepState('amount')
+  }
+
+  function openDepositReview(amount: string) {
+    if (!walletSession.requireWallet()) return
+    setDepositSkipEnter(true)
+    setDepositAmount(amount)
+    setDepositChain('sepolia')
+    setDepositStepState('review')
   }
 
   function openDepositFromWallet(walletId: string, chain: DepositChainId) {
     if (!walletSession.activateWallet(walletId)) return
+    setDepositSkipEnter(false)
     setDepositAmount('')
     setDepositChain(chain)
-    setDepositStep('amount')
+    setDepositStepState('amount')
   }
 
   function closeDeposit() {
@@ -50,38 +146,17 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
       return
     }
 
-    const deposited = pendingDepositRef.current
-    const chain = depositChain
-    pendingDepositRef.current = 0
-    setDepositStep(null)
-    setDepositAmount('')
-    setDepositChain('sepolia')
-    setDepositConfirmedAt(null)
-
-    if (deposited > 0) {
-      activity.prependRecentActivity(createDepositActivity(deposited, chain))
-      const fromValue = formatUsdcAmount(balances.dashboardBalance)
-      const nextBalance = balances.dashboardBalance + deposited
-      balances.setDashboardBalance(nextBalance)
-      balances.setBalanceRoll((roll) => ({
-        trigger: roll.trigger + 1,
-        mode: 'fromValue',
-        fromValue,
-      }))
-      activity.scheduleActivityReveal(
-        activity.activityRevealDelayAfterRollMs(formatUsdcAmount(nextBalance)),
-      )
+    if (settleTimerRef.current != null) {
+      hideDepositUi()
+      return
     }
+
+    applyDepositSettlement()
+    resetDepositUi()
   }
 
   function completeDeposit() {
-    if (activity.activityReceiptRef.current) return
-
-    const deposited = parseActiveAmount(depositAmount)
-    if (deposited > 0) {
-      pendingDepositRef.current = deposited
-    }
-    balances.setHasCompletedDeposit(true)
+    applyDepositSettlement()
   }
 
   function openDepositConfirmedFromActivity(
@@ -92,7 +167,7 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
     setDepositChain(chain)
     setDepositAmount(amountLabel)
     setDepositConfirmedAt(confirmedAt)
-    setDepositStep('confirmed')
+    setDepositStepState('confirmed')
   }
 
   return {
@@ -100,11 +175,14 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
     depositAmount,
     depositChain,
     depositConfirmedAt,
+    depositSkipEnter,
     setDepositStep,
     setDepositAmount,
     setDepositChain,
     setDepositConfirmedAt,
     openDeposit,
+    openDepositWithAmount,
+    openDepositReview,
     openDepositFromWallet,
     closeDeposit,
     completeDeposit,

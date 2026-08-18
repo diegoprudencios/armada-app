@@ -4,27 +4,34 @@ import styles from './ArmadaAppDashboard.module.css'
 export interface DashboardCardStackProps {
   stackClassName?: string
   showDepositTooltip: boolean
+  showEarnBanner?: boolean
   activityVisible: boolean
   balanceCard: ReactNode
   activityList?: ReactNode
   depositTooltip?: ReactNode
+  earnBanner?: ReactNode
   tooltipEnterStyle?: CSSProperties
 }
 
 export function DashboardCardStack({
   stackClassName,
   showDepositTooltip,
+  showEarnBanner = false,
   activityVisible,
   balanceCard,
   activityList,
   depositTooltip,
+  earnBanner,
   tooltipEnterStyle,
 }: DashboardCardStackProps) {
+  const showPromoBanner =
+    (showDepositTooltip && Boolean(depositTooltip)) || (showEarnBanner && Boolean(earnBanner))
+
   return (
     <div
       className={[styles.cardStack, stackClassName].filter(Boolean).join(' ')}
       data-activity-visible={activityVisible ? 'true' : 'false'}
-      data-deposit-tooltip={showDepositTooltip ? 'visible' : 'hidden'}
+      data-deposit-tooltip={showPromoBanner ? 'visible' : 'hidden'}
     >
       <div className={styles.primaryStack}>
         <div className={styles.cardStackBalance}>{balanceCard}</div>
@@ -34,6 +41,14 @@ export function DashboardCardStack({
             style={tooltipEnterStyle}
           >
             {depositTooltip}
+          </div>
+        ) : null}
+        {showEarnBanner && earnBanner ? (
+          <div
+            className={[styles.cardStackTooltip, styles.tooltipEnter].join(' ')}
+            style={tooltipEnterStyle}
+          >
+            {earnBanner}
           </div>
         ) : null}
       </div>

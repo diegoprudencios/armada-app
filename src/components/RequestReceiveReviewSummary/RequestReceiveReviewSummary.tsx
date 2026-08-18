@@ -36,7 +36,7 @@ export function RequestReceiveReviewSummary({
           <span className={styles.summaryLabel}>To your private account</span>
           <span className={styles.summaryValue}>
             <span className={styles.valueWithIcon}>
-              <ArmadaLogo variant="mark" className={styles.armadaIcon} />
+              <ArmadaLogo variant="mark" markTone="deep" className={styles.armadaIcon} />
               <span>{truncateAddress(armadaAddress)}</span>
             </span>
           </span>

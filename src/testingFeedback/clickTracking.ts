@@ -12,7 +12,7 @@ const LABEL_CLICK_ID_MAP: Record<string, string> = {
   request: 'request_button',
   withdraw: 'withdraw_og_button',
   earn: 'vault_open_button',
-  'deposit to the vault': 'vault_deposit_choose_button',
+  'add more to the vault': 'vault_deposit_choose_button',
   'withdraw from the vault': 'vault_withdraw_choose_button',
   'create link': 'request_create_link_button',
   'confirm send': 'send_confirm_button',

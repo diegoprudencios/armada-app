@@ -1,8 +1,11 @@
 import { useMemo, type CSSProperties } from 'react'
+import { TokenBadge } from '@/components/TokenBadge'
 import type { TxProgressCardCopy } from '@/constants/txProcessingCopy'
 import styles from './TxProgressCard.module.css'
 
 const TICK_COUNT = 60
+/** Matches `--primitives-spacing-10` (40px) inside the 80px tick ring. */
+const USDC_BADGE_PX = 40
 
 export type TxProgressCardVariant = 'card' | 'immersive'
 
@@ -47,6 +50,24 @@ function ProgressTitle({ copy }: { copy: TxProgressCardCopy }) {
   )
 }
 
+function ProgressSubtitle({ copy }: { copy: TxProgressCardCopy }) {
+  const lines = copy.subtitleLines
+
+  if (lines && lines.length > 0) {
+    return (
+      <p className={styles.subtitle}>
+        {lines.map((line) => (
+          <span key={line} className={styles.subtitleLine}>
+            {line}
+          </span>
+        ))}
+      </p>
+    )
+  }
+
+  return <p className={styles.subtitle}>{copy.subtitle}</p>
+}
+
 export function TxProgressCard({ copy, variant = 'card', className }: TxProgressCardProps) {
   const ticks = useMemo(() => Array.from({ length: TICK_COUNT }, (_, index) => index), [])
   const immersive = variant === 'immersive'
@@ -54,21 +75,20 @@ export function TxProgressCard({ copy, variant = 'card', className }: TxProgress
   const cls = [styles.card, immersive && styles.cardImmersive, className].filter(Boolean).join(' ')
 
   return (
-    <section className={cls} aria-label={copy.tag}>
-      <div className={styles.tickRing} aria-hidden>
-        {ticks.map((index) => (
-          <span key={index} className={styles.tick} style={{ '--i': index } as CSSProperties} />
-        ))}
-      </div>
-
+    <section className={cls} aria-label={copy.title}>
       <div className={styles.content}>
-        {immersive ? null : <p className={styles.tag}>{copy.tag}</p>}
+        <div className={styles.tickRing} aria-hidden>
+          {ticks.map((index) => (
+            <span key={index} className={styles.tick} style={{ '--i': index } as CSSProperties} />
+          ))}
+          <TokenBadge size={USDC_BADGE_PX} className={styles.token} />
+        </div>
 
         <div className={styles.titleBlock}>
           <ProgressTitle copy={copy} />
         </div>
 
-        <p className={styles.subtitle}>{copy.subtitle}</p>
+        <ProgressSubtitle copy={copy} />
       </div>
     </section>
   )

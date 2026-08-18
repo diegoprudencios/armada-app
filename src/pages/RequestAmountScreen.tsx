@@ -26,6 +26,7 @@ export function RequestAmountScreen({
   return (
     <AmountInputScreen
       title="How much USDC?"
+      hideTitle={entryMode === 'keypad'}
       balance={0}
       amount={amount}
       entryMode={entryMode}

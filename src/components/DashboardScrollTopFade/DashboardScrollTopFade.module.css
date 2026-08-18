@@ -17,7 +17,7 @@
 :global([data-theme='light']) .fade {
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--primitives-color-purple-300) 40%, var(--semantic-color-surface-bg)) 0%,
+    color-mix(in srgb, var(--semantic-color-brand-lavender) 40%, var(--semantic-color-surface-bg)) 0%,
     transparent 100%
   );
 }

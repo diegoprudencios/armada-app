@@ -43,7 +43,7 @@ export function ReceivePaymentReviewSummary({
           <span className={styles.summaryLabel}>From</span>
           <span className={styles.summaryValue}>
             <span className={styles.valueWithIcon}>
-              {isPrivate ? <ArmadaLogo variant="mark" className={styles.armadaIcon} /> : null}
+              {isPrivate ? <ArmadaLogo variant="mark" markTone="deep" className={styles.armadaIcon} /> : null}
               <span>{truncateAddress(sender)}</span>
             </span>
           </span>
@@ -52,14 +52,10 @@ export function ReceivePaymentReviewSummary({
           <span className={styles.summaryLabel}>To your private account</span>
           <span className={styles.summaryValue}>
             <span className={styles.valueWithIcon}>
-              <ArmadaLogo variant="mark" className={styles.armadaIcon} />
+              <ArmadaLogo variant="mark" markTone="deep" className={styles.armadaIcon} />
               <span>{truncateAddress(armadaAddress)}</span>
             </span>
           </span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Privacy</span>
-          <span className={styles.summaryValue}>{isPrivate ? 'Private' : 'Public'}</span>
         </div>
         <div className={styles.summaryRow}>
           <span className={styles.summaryLabel}>Transaction</span>

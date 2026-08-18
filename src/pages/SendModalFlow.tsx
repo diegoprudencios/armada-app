@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { AmountInputEntryMode } from '@/components/AmountInputScreen'
 import { BottomSheet, afterBottomSheetHandoff } from '@/components/BottomSheet'
 import { FlowModalOverlay } from '@/components/FlowModalOverlay'
-import { ModalShell, modalStepShell } from '@/components/ModalShell'
+import { ModalShell, ModalStepSwitch } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { resolveAmountEntryMode } from '@/utils/amountEntryMode'
@@ -165,6 +165,7 @@ export function SendModalFlow({
       chain={chain}
       onRecipientChange={onRecipientChange}
       onChainChange={onChainChange}
+      onCancel={requestClose}
       onContinue={onRecipientContinue}
     />
   )
@@ -250,9 +251,9 @@ export function SendModalFlow({
         onClose={requestClose}
         closeButtonRef={closeButtonRef}
       >
-        <div key={stepShellKey} className={modalStepShell}>
+        <ModalStepSwitch stepKey={stepShellKey} skipExit={exiting}>
           {renderStep()}
-        </div>
+        </ModalStepSwitch>
       </ModalShell>
 
       {useKeypadMobileChrome ? (

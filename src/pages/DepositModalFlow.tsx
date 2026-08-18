@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { DepositChainId } from '@/constants/depositChains'
-import type { AmountInputEntryMode } from '@/components/AmountInputScreen'
+import type { AmountInputEntryMode, ShieldDirection } from '@/components/AmountInputScreen'
 import { BottomSheet, afterBottomSheetHandoff } from '@/components/BottomSheet'
 import { FlowModalOverlay } from '@/components/FlowModalOverlay'
-import { ModalShell, modalStepShell } from '@/components/ModalShell'
+import { ModalShell, ModalStepSwitch } from '@/components/ModalShell'
+import { SegmentedControl } from '@/components/SegmentedControl'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { resolveAmountEntryMode } from '@/utils/amountEntryMode'
@@ -32,9 +33,9 @@ const DEPOSIT_STEP_NUMBER: Record<DepositModalStep, number> = {
 }
 
 const DEPOSIT_SIMPLE_HEADER_TITLE: Partial<Record<DepositModalStep, string>> = {
-  amount: 'Deposit',
-  /** Review opens as a sheet over amount — shell title stays Deposit. */
-  review: 'Deposit',
+  amount: 'Shield',
+  /** Review opens as a sheet over amount — shell title stays Shield. */
+  review: 'Shield',
   wallet: 'Confirm',
   processing: 'Deposit in progress',
   /** Confirmed uses the in-screen “Deposit confirmed” headline — no shell title. */
@@ -46,12 +47,14 @@ export interface DepositModalFlowProps {
   amount: string
   chain: DepositChainId
   depositWalletBalance?: number
+  armadaBalance?: number
   walletAddress?: string
   walletProvider?: string
   confirmedAt?: number | null
   onClose: () => void
   onAmountChange: (amount: string) => void
   onAmountReview: (amount: string, chain: DepositChainId) => void
+  onUnshieldReview?: (amount: string) => void
   onReviewBack: () => void
   onReviewConfirm: () => void
   onWalletComplete: () => void
@@ -59,6 +62,7 @@ export interface DepositModalFlowProps {
   onProcessingComplete: () => void
   onConfirmedViewExplorer?: () => void
   onConfirmedGoToDashboard: () => void
+  skipEnter?: boolean
 }
 
 export function DepositModalFlow({
@@ -66,12 +70,14 @@ export function DepositModalFlow({
   amount,
   chain,
   depositWalletBalance = Number(DEPOSIT_WALLET_BALANCE),
+  armadaBalance = 0,
   walletAddress,
   walletProvider,
   confirmedAt,
   onClose,
   onAmountChange,
   onAmountReview,
+  onUnshieldReview,
   onReviewBack,
   onReviewConfirm,
   onWalletComplete,
@@ -79,8 +85,10 @@ export function DepositModalFlow({
   onProcessingComplete,
   onConfirmedViewExplorer,
   onConfirmedGoToDashboard,
+  skipEnter = false,
 }: DepositModalFlowProps) {
   const [exiting, setExiting] = useState(false)
+  const [direction, setDirection] = useState<ShieldDirection>('shield')
   const [reviewSheetOpen, setReviewSheetOpen] = useState(false)
   const confirmAfterSheetExitRef = useRef(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -92,6 +100,8 @@ export function DepositModalFlow({
   const useKeypadMobileChrome = amountEntryMode === 'keypad' && isMobile
   const isConfirmStep = step === 'processing' || step === 'confirmed'
   const isConfirmed = step === 'confirmed'
+  const showMobileShieldTabs =
+    useKeypadMobileChrome && (step === 'amount' || step === 'review' || step === 'wallet')
 
   const requestClose = useCallback(() => {
     setExiting((current) => (current ? current : true))
@@ -148,14 +158,22 @@ export function DepositModalFlow({
 
   const amountScreen = (
     <DepositAmountScreen
-      balance={depositWalletBalance}
+      balance={direction === 'unshield' ? armadaBalance : depositWalletBalance}
       amount={amount}
       chain={chain}
+      direction={direction}
+      onDirectionChange={setDirection}
       entryMode={amountEntryMode}
       amountInputRef={amountEntryMode === 'input' ? amountInputRef : undefined}
       onAmountChange={onAmountChange}
       onCancel={requestClose}
-      onReview={onAmountReview}
+      onReview={(nextAmount, nextChain) => {
+        if (direction === 'unshield') {
+          onUnshieldReview?.(nextAmount)
+          return
+        }
+        onAmountReview(nextAmount, nextChain)
+      }}
     />
   )
 
@@ -216,25 +234,42 @@ export function DepositModalFlow({
 
   return (
     <FlowModalOverlay
-      label="Deposit"
+      label="Shield"
       exiting={exiting}
       onClose={requestClose}
       initialFocusRef={
         step === 'amount' && amountEntryMode === 'input' ? amountInputRef : undefined
       }
+      skipEnter={skipEnter}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell
         steps={[...DEPOSIT_PROGRESS_STEPS]}
         currentStep={DEPOSIT_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
-        flowLabel="Deposit"
+        flowLabel="Shield"
         chrome={useKeypadMobileChrome ? 'simple' : 'default'}
         surface={
           useKeypadMobileChrome && step === 'processing' ? 'immersive' : 'default'
         }
         headerTitle={
-          useKeypadMobileChrome ? DEPOSIT_SIMPLE_HEADER_TITLE[step] ?? 'Deposit' : undefined
+          useKeypadMobileChrome && !showMobileShieldTabs
+            ? DEPOSIT_SIMPLE_HEADER_TITLE[step] ?? 'Shield'
+            : undefined
+        }
+        headerCenter={
+          showMobileShieldTabs ? (
+            <SegmentedControl<ShieldDirection>
+              size="sm"
+              aria-label="Shield or unshield"
+              value={direction}
+              onChange={setDirection}
+              options={[
+                { id: 'shield', label: 'Shield' },
+                { id: 'unshield', label: 'Unshield' },
+              ]}
+            />
+          ) : undefined
         }
         onBack={
           useKeypadMobileChrome
@@ -249,9 +284,9 @@ export function DepositModalFlow({
         onClose={requestClose}
         closeButtonRef={closeButtonRef}
       >
-        <div key={stepShellKey} className={modalStepShell}>
+        <ModalStepSwitch stepKey={stepShellKey} skipExit={exiting}>
           {renderStep()}
-        </div>
+        </ModalStepSwitch>
       </ModalShell>
 
       {useKeypadMobileChrome ? (

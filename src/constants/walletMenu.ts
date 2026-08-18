@@ -4,7 +4,7 @@ import { DEMO_ADDRESS_BY_PROVIDER } from '@/pages/depositFlowConstants'
 import { connectedWalletId } from '@/utils/walletMenu'
 
 export const DEMO_USDC_BY_PROVIDER: Record<DemoWalletProvider, number> = {
-  metamask: 123_283.23,
+  metamask: 10_000,
   phantom: 4_520.5,
   walletconnect: 890.12,
 }
@@ -24,7 +24,7 @@ export const DEMO_USDC_HOLDINGS: readonly WalletUsdcHolding[] = [
     id: 'holding-metamask-sepolia',
     walletId: connectedWalletId('metamask', DEMO_ADDRESS_BY_PROVIDER.metamask),
     chain: 'sepolia',
-    balance: 100_000,
+    balance: 10_000,
   },
   {
     id: 'holding-metamask-base',

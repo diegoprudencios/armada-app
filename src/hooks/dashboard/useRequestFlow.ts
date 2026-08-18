@@ -2,9 +2,9 @@ import { useState } from 'react'
 import type { SendChainId } from '@/pages/sendFlowConstants'
 import {
   DEFAULT_REQUEST_LINK_EXPIRY_ID,
-  shouldOpenRequestChooser,
   type RequestLinkExpiryId,
 } from '@/pages/requestFlowConstants'
+import { shouldUseKeypadMobileChrome } from '@/utils/amountEntryMode'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { readActivityUserHidden } from '@/utils/demoDashboardSession'
 import { createRequestLinkActivity, findRequestLinkActivity } from '@/utils/dashboardActivity'
@@ -69,7 +69,7 @@ export function useRequestFlow({ walletSession, activity }: UseRequestFlowOption
     setRequestId('')
     setRequestExpiresAt(0)
     setRequestLinkRevoked(false)
-    setRequestStep(shouldOpenRequestChooser() ? 'choose' : 'receive')
+    setRequestStep(shouldUseKeypadMobileChrome() ? 'amount' : 'receive')
   }
 
   function closeRequest() {

@@ -55,22 +55,33 @@ export function isValidRecipientAddress(address: string): boolean {
 
 export type SendFlowVariant = 'send' | 'withdraw'
 
-export function sendRecipientTitleLead(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Where do you want to' : 'Who do you want to'
+export function sendRecipientTitle(variant: SendFlowVariant): string {
+  return variant === 'withdraw' ? 'Where do you want to send your USDC?' : 'Send your USDC to:'
 }
 
-export const SEND_RECIPIENT_TITLE_TAIL = 'send your USDC?'
-
 export function sendReviewTitle(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Review your withdrawal' : 'Review transfer'
+  return variant === 'withdraw' ? 'Review your USDC unshield' : 'Review your USDC transfer'
 }
 
 export function sendReviewConfirmLabel(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Confirm withdrawal' : 'Confirm send'
+  return variant === 'withdraw' ? 'Confirm' : 'Confirm send'
+}
+
+export function sendPrivacyNotice(isPrivate: boolean): { title: string; body: string } {
+  if (isPrivate) {
+    return {
+      title: 'Private transfer.',
+      body: 'You are sending to an Armada address.',
+    }
+  }
+  return {
+    title: 'Public transfer.',
+    body: 'You are sending to an external address.',
+  }
 }
 
 export function sendConfirmedTitle(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Withdrawal complete' : 'Send confirmed'
+  return variant === 'withdraw' ? 'USDC unshield confirmed' : 'USDC send confirmed'
 }
 
 export function sendWalletSignLabel(variant: SendFlowVariant): string {

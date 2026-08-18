@@ -2,7 +2,7 @@ import type { DepositChainId } from '@/constants/depositChains'
 
 export const DEPOSIT_PROGRESS_STEPS = ['Amount', 'Review', 'Wallet', 'Confirm'] as const
 
-export const DEPOSIT_WALLET_BALANCE = '123283.23'
+export const DEPOSIT_WALLET_BALANCE = '10000'
 export const DEPOSIT_FEE = '0.00'
 
 export const DEMO_WALLET_ADDRESS = '0x6545454534534534534534534534534534534'

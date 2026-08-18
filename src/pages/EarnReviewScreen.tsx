@@ -1,4 +1,3 @@
-import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { Button } from '@/components/Button'
 import { EarnReviewSummary } from '@/components/EarnReviewSummary'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
@@ -11,11 +10,8 @@ import {
   earnReviewTitle,
   type EarnTab,
 } from './earnFlowConstants'
-import flowStep from '@/styles/modalFlowStep.module.css'
+import reviewStyles from './DepositReviewScreen.module.css'
 import styles from './EarnReviewScreen.module.css'
-
-const TOKEN_BADGE_PX = 40
-const TOKEN_ICON_SIZE = Math.round((TOKEN_BADGE_PX * 24) / 18)
 
 export interface EarnReviewScreenProps {
   tab: EarnTab
@@ -38,6 +34,12 @@ export function EarnReviewScreen({
   const amountNum = parseActiveAmount(amount)
   const feeUsdc = calculateSendFee(amountNum)
   const confirmLabel = earnConfirmLabel(tab)
+
+  const amountBlock = (
+    <div className={reviewStyles.amountRow}>
+      <span className={reviewStyles.amountValue}>{formatUsdcAmount(amountNum)}</span>
+    </div>
+  )
 
   const summary = (
     <EarnReviewSummary
@@ -76,21 +78,13 @@ export function EarnReviewScreen({
   }
 
   return (
-    <div className={flowStep.column}>
-      <div className={modalStepBodyEnter}>
-        <h1 className={flowStep.title}>{earnReviewTitle(tab)}</h1>
-
-        <div className={styles.amountRow}>
-          <div className={styles.amountGroup}>
-            <div className={styles.tokenBadge} aria-hidden>
-              <TokenUSDC size={TOKEN_ICON_SIZE} variant="branded" className={styles.tokenBadgeIcon} />
-            </div>
-            <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
-          </div>
+    <div className={reviewStyles.column}>
+      <div className={`${reviewStyles.body} ${modalStepBodyEnter}`}>
+        <div className={reviewStyles.titleBlock}>
+          <h1 className={reviewStyles.title}>{earnReviewTitle(tab)}</h1>
+          {amountBlock}
         </div>
-
         {summary}
-
         {tab === 'withdraw' ? (
           <p className={styles.slippageNotice}>
             The vault rate moves with each new block. Your final USDC may differ slightly from
@@ -99,13 +93,21 @@ export function EarnReviewScreen({
         ) : null}
       </div>
 
-      <div className={`${styles.buttonRow} ${modalActionRowEnter}`}>
-        <Button variant="secondary" size="lg" label="Back" showIcon={false} onClick={onBack} />
+      <div className={`${reviewStyles.buttonRow} ${modalActionRowEnter}`}>
+        <Button
+          variant="secondary"
+          size="lg"
+          label="Back"
+          showIcon={false}
+          className={reviewStyles.cancelButton}
+          onClick={onBack}
+        />
         <Button
           variant="primary"
           size="lg"
           label={confirmLabel}
           showIcon={false}
+          className={reviewStyles.confirmButton}
           onClick={onConfirm}
           testingClickId={
             tab === 'add' ? 'vault_deposit_confirm_button' : 'vault_withdraw_confirm_button'

@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { AmountInputEntryMode } from '@/components/AmountInputScreen'
+import type { AmountInputEntryMode, ShieldDirection } from '@/components/AmountInputScreen'
 import { BottomSheet, afterBottomSheetHandoff } from '@/components/BottomSheet'
 import { FlowModalOverlay } from '@/components/FlowModalOverlay'
-import { ModalShell, modalStepShell } from '@/components/ModalShell'
+import { ModalShell, ModalStepSwitch } from '@/components/ModalShell'
 import { MODAL_EXIT_TIMING_VARS, MODAL_EXIT_TOTAL_MS } from '@/components/ModalShell/modalExitMotion'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { resolveAmountEntryMode } from '@/utils/amountEntryMode'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
-import { SendAmountScreen } from './SendAmountScreen'
+import { DepositAmountScreen } from './DepositAmountScreen'
 import { SendProcessingScreen } from './SendProcessingScreen'
 import { SendRecipientScreen } from './SendRecipientScreen'
 import { SendReviewScreen } from './SendReviewScreen'
@@ -32,7 +32,7 @@ const WITHDRAW_SIMPLE_HEADER_TITLE: Partial<Record<WithdrawModalStep, string>> =
   /** Review opens as a sheet over amount — shell title stays Withdraw. */
   review: 'Withdraw',
   processing: 'Withdraw in progress',
-  /** Confirmed uses the in-screen “Withdrawal complete” headline — no shell title. */
+  /** Confirmed uses the in-screen “Unshield confirmed” headline — no shell title. */
   confirmed: '',
 }
 
@@ -42,6 +42,7 @@ export interface WithdrawModalFlowProps {
   recipient: string
   chain: SendChainId
   armadaBalance: number
+  depositWalletBalance?: number
   armadaAddress?: string
   confirmedAt?: number | null
   onClose: () => void
@@ -51,11 +52,13 @@ export interface WithdrawModalFlowProps {
   onAmountChange: (amount: string) => void
   onAmountBack: () => void
   onAmountReview: (amount: string) => void
+  onShieldReview?: (amount: string) => void
   onReviewBack: () => void
   onReviewConfirm: () => void
   onProcessingComplete: () => void
   onConfirmedViewExplorer?: () => void
   onConfirmedGoToDashboard: () => void
+  skipEnter?: boolean
 }
 
 export function WithdrawModalFlow({
@@ -64,6 +67,7 @@ export function WithdrawModalFlow({
   recipient,
   chain,
   armadaBalance,
+  depositWalletBalance = 0,
   armadaAddress,
   confirmedAt,
   onClose,
@@ -73,13 +77,16 @@ export function WithdrawModalFlow({
   onAmountChange,
   onAmountBack,
   onAmountReview,
+  onShieldReview,
   onReviewBack,
   onReviewConfirm,
   onProcessingComplete,
   onConfirmedViewExplorer,
   onConfirmedGoToDashboard,
+  skipEnter = false,
 }: WithdrawModalFlowProps) {
   const [exiting, setExiting] = useState(false)
+  const [direction, setDirection] = useState<ShieldDirection>('unshield')
   const [reviewSheetOpen, setReviewSheetOpen] = useState(false)
   const confirmAfterSheetExitRef = useRef(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
@@ -147,14 +154,22 @@ export function WithdrawModalFlow({
   }
 
   const amountScreen = (
-    <SendAmountScreen
-      balance={armadaBalance}
+    <DepositAmountScreen
+      balance={direction === 'shield' ? depositWalletBalance : armadaBalance}
       amount={amount}
+      direction={direction}
+      onDirectionChange={setDirection}
       entryMode={amountEntryMode}
       amountInputRef={amountEntryMode === 'input' ? amountInputRef : undefined}
       onAmountChange={onAmountChange}
-      onBack={onAmountBack}
-      onReview={onAmountReview}
+      onCancel={onAmountBack}
+      onReview={(nextAmount) => {
+        if (direction === 'shield') {
+          onShieldReview?.(nextAmount)
+          return
+        }
+        onAmountReview(nextAmount)
+      }}
     />
   )
 
@@ -166,6 +181,7 @@ export function WithdrawModalFlow({
       showRecentAddresses={false}
       onRecipientChange={onRecipientChange}
       onChainChange={onChainChange}
+      onCancel={requestClose}
       onContinue={onRecipientContinue}
     />
   )
@@ -234,6 +250,7 @@ export function WithdrawModalFlow({
       initialFocusRef={
         step === 'amount' && amountEntryMode === 'input' ? amountInputRef : undefined
       }
+      skipEnter={skipEnter}
       style={exiting ? MODAL_EXIT_TIMING_VARS : undefined}
     >
       <ModalShell
@@ -253,9 +270,9 @@ export function WithdrawModalFlow({
         onClose={requestClose}
         closeButtonRef={closeButtonRef}
       >
-        <div key={stepShellKey} className={modalStepShell}>
+        <ModalStepSwitch stepKey={stepShellKey} skipExit={exiting}>
           {renderStep()}
-        </div>
+        </ModalStepSwitch>
       </ModalShell>
 
       {useKeypadMobileChrome ? (

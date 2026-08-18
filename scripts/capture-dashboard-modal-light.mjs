@@ -26,7 +26,7 @@ async function main() {
   await page.goto(BASE_URL)
   await setTheme(page, 'light')
   await page.getByRole('button', { name: 'Deposit' }).click()
-  await page.getByText('How much do you want to deposit?').waitFor()
+  await page.getByText('Shield your USDC').waitFor()
   await page.waitForTimeout(300)
   await page.screenshot({
     path: join(OUT_DIR, 'dashboard-modal-light.png'),

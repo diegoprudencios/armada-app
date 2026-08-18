@@ -30,18 +30,18 @@ async function captureStep(page, name, theme) {
 async function goToReview(page) {
   await page.getByRole('textbox', { name: 'Deposit amount' }).fill('1000')
   await page.getByRole('button', { name: 'Review' }).click()
-  await page.getByText('Review your deposit').waitFor()
+  await page.getByText('Review your USDC deposit').waitFor()
 }
 
 async function goToProcessing(page) {
   await goToReview(page)
   await page.getByRole('button', { name: 'Confirm deposit' }).click()
-  await page.getByText('Your assets are being shielded.').waitFor()
+  await page.getByText('Your USDC is being shielded').waitFor()
 }
 
 async function goToConfirmed(page) {
   await goToProcessing(page)
-  await page.getByText('Deposit confirmed').waitFor({ timeout: 12000 })
+  await page.getByText('USDC deposit confirmed').waitFor({ timeout: 12000 })
 }
 
 async function main() {

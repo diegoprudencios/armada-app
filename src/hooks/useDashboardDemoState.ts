@@ -96,6 +96,11 @@ export function useDashboardDemoState(initialBalance = 0) {
     !balances.hasCompletedDeposit &&
     balances.dashboardBalance <= 0
 
+  const showEarnBanner =
+    Boolean(walletSession.wallet) &&
+    balances.hasCompletedDeposit &&
+    balances.earningBalance <= 0
+
   function openActivityReceipt(item: DashboardActivityItem) {
     if (!walletSession.wallet) return
 
@@ -163,6 +168,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     depositAmount: deposit.depositAmount,
     depositChain: deposit.depositChain,
     depositConfirmedAt: deposit.depositConfirmedAt,
+    depositSkipEnter: deposit.depositSkipEnter,
     sendStep: send.sendStep,
     sendAmount: send.sendAmount,
     sendRecipient: send.sendRecipient,
@@ -177,6 +183,8 @@ export function useDashboardDemoState(initialBalance = 0) {
     withdrawAmount: withdraw.withdrawAmount,
     withdrawChain: withdraw.withdrawChain,
     withdrawConfirmedAt: withdraw.withdrawConfirmedAt,
+    withdrawSkipRecipient: withdraw.withdrawSkipRecipient,
+    withdrawSkipEnter: withdraw.withdrawSkipEnter,
     requestStep: request.requestStep,
     requestAmount: request.requestAmount,
     requestNote: request.requestNote,
@@ -200,6 +208,7 @@ export function useDashboardDemoState(initialBalance = 0) {
     earnSourceBalance: earn.earnSourceBalance,
     balanceRoll: balances.balanceRoll,
     showDepositTooltip,
+    showEarnBanner,
     openConnect: walletSession.openConnect,
     dismissConnect: walletSession.dismissConnect,
     connectWallet: walletSession.connectWallet,
@@ -216,6 +225,14 @@ export function useDashboardDemoState(initialBalance = 0) {
     closeEarn: earn.closeEarn,
     completeEarn: earn.completeEarn,
     openWithdraw: withdraw.openWithdraw,
+    switchToUnshieldReview: (amount: string) => {
+      deposit.resetDepositUi()
+      withdraw.openUnshieldReview(amount)
+    },
+    switchToShieldReview: (amount: string) => {
+      withdraw.resetWithdrawUi()
+      deposit.openDepositReview(amount)
+    },
     closeWithdraw: withdraw.closeWithdraw,
     completeWithdraw: withdraw.completeWithdraw,
     openRequest: request.openRequest,

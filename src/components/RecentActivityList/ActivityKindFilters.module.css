@@ -21,7 +21,7 @@
   border-radius: calc(var(--semantic-borderRadius-item) * 1px);
   border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--semantic-color-border-default);
   cursor: pointer;
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent);
+  background: var(--semantic-color-frost);
   color: var(--semantic-color-text-primary);
   font-family: var(--primitives-fontFamily-ui), sans-serif;
   font-size: calc(var(--primitives-fontSize-sm) * 1px);
@@ -32,8 +32,10 @@
   transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 
-.filterBtn:hover {
-  background: var(--semantic-color-surface-hover);
+@media (hover: hover) and (pointer: fine) {
+  .filterBtn:hover:not(.filterBtnActive) {
+    background: var(--semantic-color-surface-hover);
+  }
 }
 
 .filterBtnActive {

@@ -55,7 +55,6 @@
 
 /* Primary */
 .primary { background: var(--semantic-component-button-primary-bg); color: var(--semantic-component-button-primary-text); }
-.primary:hover:not(:disabled) { background: var(--semantic-component-button-primary-bg-hover); }
 .primary:active:not(:disabled) { background: var(--semantic-component-button-primary-bg-active); }
 .primary:disabled { background: var(--semantic-component-button-primary-bg-disabled); color: var(--semantic-component-button-primary-text-disabled); }
 .primary.keepEnabledLook:disabled {
@@ -65,7 +64,6 @@
 
 /* Secondary */
 .secondary { background: var(--semantic-component-button-secondary-bg); color: var(--semantic-component-button-secondary-text); border-color: transparent; }
-.secondary:hover:not(:disabled) { background: var(--semantic-component-button-secondary-bg-hover); border-color: transparent; }
 .secondary:active:not(:disabled) { background: var(--semantic-component-button-secondary-bg-active); }
 
 :global([data-theme='light']) .secondary:active:not(:disabled) {
@@ -75,25 +73,21 @@
 
 /* Ghost — text matches secondary (no border) */
 .ghost { background: transparent; color: var(--semantic-component-button-secondary-text); }
-.ghost:hover:not(:disabled) { background: var(--semantic-component-button-ghost-bg-hover); color: var(--semantic-component-button-secondary-text); }
 .ghost:active:not(:disabled) { background: var(--semantic-component-button-ghost-bg-active); }
 .ghost:disabled { color: var(--semantic-component-button-secondary-text-disabled); }
 
 /* Gradient */
 .gradient { border: none; background: linear-gradient(to right, var(--primitives-color-amber-300) 0%, var(--primitives-color-purple-500) 100%); color: var(--semantic-component-button-gradient-text); }
-.gradient:hover:not(:disabled) { background: linear-gradient(to right, var(--primitives-color-amber-200) 0%, var(--primitives-color-purple-200) 100%); }
 .gradient:active:not(:disabled) { background: linear-gradient(to right, var(--primitives-color-amber-400) 0%, var(--primitives-color-purple-400) 100%); }
 
 /* Ink — black fill, white label (marketing / on-media CTAs) */
 .ink { background: var(--semantic-component-button-ink-bg); color: var(--semantic-component-button-ink-text); }
-.ink:hover:not(:disabled) { background: var(--semantic-component-button-ink-bg-hover); }
 .ink:active:not(:disabled) { background: var(--semantic-component-button-ink-bg-active); }
 .ink:disabled { background: var(--semantic-component-button-ink-bg-disabled); color: var(--semantic-component-button-ink-text-disabled); }
 .ink.keepEnabledLook:disabled {
   background: var(--semantic-component-button-ink-bg);
   color: var(--semantic-component-button-ink-text);
 }
-a.ink:hover:not([aria-disabled='true']) { background: var(--semantic-component-button-ink-bg-hover); }
 a.ink:active:not([aria-disabled='true']) { background: var(--semantic-component-button-ink-bg-active); }
 a.ink[aria-disabled='true'] {
   background: var(--semantic-component-button-ink-bg-disabled);
@@ -113,4 +107,13 @@ a.ink[aria-disabled='true'] {
 .iconSvg {
   display: block;
   color: currentColor;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .primary:hover:not(:disabled) { background: var(--semantic-component-button-primary-bg-hover); }
+  .secondary:hover:not(:disabled) { background: var(--semantic-component-button-secondary-bg-hover); border-color: transparent; }
+  .ghost:hover:not(:disabled) { background: var(--semantic-component-button-ghost-bg-hover); color: var(--semantic-component-button-secondary-text); }
+  .gradient:hover:not(:disabled) { background: linear-gradient(to right, var(--primitives-color-amber-200) 0%, var(--primitives-color-purple-200) 100%); }
+  .ink:hover:not(:disabled),
+  a.ink:hover:not([aria-disabled='true']) { background: var(--semantic-component-button-ink-bg-hover); }
 }

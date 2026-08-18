@@ -31,8 +31,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.key:hover {
-  background: color-mix(in srgb, var(--semantic-color-text-primary) 6%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .key:hover {
+    background: color-mix(in srgb, var(--semantic-color-text-primary) 6%, transparent);
+  }
 }
 
 .key:active {

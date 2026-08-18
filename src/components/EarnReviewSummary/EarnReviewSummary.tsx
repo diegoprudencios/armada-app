@@ -3,7 +3,7 @@ import { formatUsdcAmount } from '@/utils/format'
 import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import { formatDemoApy, type EarnTab } from '@/pages/earnFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
-import styles from './EarnReviewSummary.module.css'
+import styles from '../DepositReviewSummary/DepositReviewSummary.module.css'
 
 export interface EarnReviewSummaryProps {
   tab: EarnTab

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
-  ArrowRightOnRectangleIcon,
+  PowerIcon,
   ArrowTopRightOnSquareIcon,
   CheckIcon,
   ClipboardDocumentIcon,
@@ -12,14 +12,12 @@ import {
 import NetworkEthereum from '@web3icons/react/icons/networks/NetworkEthereum'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { ConnectWalletPicker } from '@/components/ConnectWalletPicker'
+import { BalanceActionButton } from '@/components/BalanceActionButton'
+import { IconButton } from '@/components/IconButton'
 import { BalanceScrambleValue } from '@/components/BalanceScrambleValue'
 import balanceCardStyles from '@/components/BalanceCard/BalanceCard.module.css'
-import { IconButton } from '@/components/IconButton'
-import iconButtonStyles from '@/components/IconButton/IconButton.module.css'
 import { SendButton } from '@/components/SendButton'
 import { Tag } from '@/components/Tag'
-import { Tooltip } from '@/components/Tooltip'
-import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { WalletProviderIcon } from '@/components/WalletPillMenu/WalletPillMenu'
 import {
   WALLET_PANEL_ETHEREUM_CHAIN,
@@ -83,30 +81,33 @@ export function WalletMenuPanelEthereum({
 
   return (
     <div className={styles.scrollContent}>
-      <div className={styles.walletMenuPanel}>
+      <div className={`${styles.walletMenuPanel} ${styles.walletMenuPanelEthereum}`}>
         {showClose ? (
-          <div className={styles.ethereumPanelToolbar}>
-            <button type="button" className={styles.closeButton} aria-label="Close wallet menu" onClick={onClose}>
-              <XMarkIcon width={20} height={20} strokeWidth={2} aria-hidden />
-            </button>
-          </div>
+          <IconButton
+            variant="frosted"
+            size="sm"
+            className={styles.ethereumPanelClose}
+            aria-label="Close wallet menu"
+            icon={<XMarkIcon strokeWidth={2} />}
+            onClick={onClose}
+          />
         ) : null}
-
         <div className={styles.ethereumPanelBody}>
           {wallet ? (
             <div className={styles.ethereumPanelContent}>
-              <div className={styles.ethereumWalletIdentity}>
-                <span className={styles.ethereumWalletHeroIcon} aria-hidden>
-                  <WalletProviderIcon provider={wallet.provider} size={ETHEREUM_WALLET_HERO_ICON_SIZE} />
-                </span>
-                <p className={styles.ethereumWalletAddress}>{truncateAddress(wallet.address)}</p>
-                <Tag label={WALLET_PANEL_ETHEREUM_NETWORK_LABEL} />
-              </div>
+              <div className={styles.ethereumWalletCluster}>
+                <div className={styles.ethereumWalletIdentity}>
+                  <span className={styles.ethereumWalletHeroIcon} aria-hidden>
+                    <WalletProviderIcon provider={wallet.provider} size={ETHEREUM_WALLET_HERO_ICON_SIZE} />
+                  </span>
+                  <p className={styles.ethereumWalletAddress}>{truncateAddress(wallet.address)}</p>
+                  <Tag label={WALLET_PANEL_ETHEREUM_NETWORK_LABEL} />
+                </div>
 
-              <div className={styles.ethereumActionRow}>
-                <WalletActionTooltip label={balanceHidden ? 'Show balance' : 'Hide balance'}>
-                  <IconButton
-                    variant="secondary"
+                <div className={styles.ethereumActionRow}>
+                  <BalanceActionButton
+                    label={balanceHidden ? 'Show' : 'Hide'}
+                    className={styles.ethereumLabeledAction}
                     icon={
                       balanceHidden ? (
                         <EyeSlashIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} aria-hidden />
@@ -114,15 +115,11 @@ export function WalletMenuPanelEthereum({
                         <EyeIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} aria-hidden />
                       )
                     }
-                    aria-label={balanceHidden ? 'Show balance' : 'Hide balance'}
-                    aria-pressed={balanceHidden}
                     onClick={() => onBalanceHiddenChange?.(!balanceHidden)}
                   />
-                </WalletActionTooltip>
-
-                <WalletActionTooltip label={copied ? 'Copied' : 'Copy address'}>
-                  <IconButton
-                    variant="secondary"
+                  <BalanceActionButton
+                    label={copied ? 'Copied' : 'Copy'}
+                    className={styles.ethereumLabeledAction}
                     icon={
                       copied ? (
                         <CheckIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} aria-hidden />
@@ -130,39 +127,46 @@ export function WalletMenuPanelEthereum({
                         <ClipboardDocumentIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} />
                       )
                     }
-                    aria-label={copied ? 'Address copied' : 'Copy wallet address'}
                     onClick={() => void handleCopy()}
                   />
-                </WalletActionTooltip>
-
-                <WalletActionTooltip label="View on explorer">
-                  <ExplorerIconLink href={ethereumExplorerAddressUrl(wallet.address)} />
-                </WalletActionTooltip>
-
-                <WalletActionTooltip label="Disconnect">
-                  <IconButton
-                    variant="secondary"
-                    icon={<ArrowRightOnRectangleIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} />}
-                    aria-label="Disconnect wallet"
+                  <BalanceActionButton
+                    label="Explorer"
+                    className={styles.ethereumLabeledAction}
+                    icon={<ArrowTopRightOnSquareIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} />}
+                    onClick={() => {
+                      window.open(
+                        ethereumExplorerAddressUrl(wallet.address),
+                        '_blank',
+                        'noopener,noreferrer',
+                      )
+                    }}
+                  />
+                  <BalanceActionButton
+                    label="Disconnect"
+                    className={styles.ethereumLabeledAction}
+                    icon={<PowerIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} />}
                     onClick={() => onDisconnectWallet(wallet.id)}
                   />
-                </WalletActionTooltip>
+                </div>
               </div>
 
-              <div className={styles.ethereumUsdcRow}>
-                <UsdcChainIcon />
-                <div className={styles.tokenIdentity}>
-                  <p className={styles.listPrimary}>USDC</p>
-                  <p className={styles.listSecondary}>{WALLET_PANEL_ETHEREUM_NETWORK_LABEL}</p>
+              <div className={styles.ethereumUsdcBlock}>
+                <p className={styles.ethereumUsdcLabel}>Your USDC wallet balance</p>
+                <div className={styles.ethereumUsdcRow}>
+                  <UsdcChainIcon />
+                  <div className={styles.tokenIdentity}>
+                    <p className={styles.listPrimary}>USDC</p>
+                    <p className={styles.listSecondary}>{WALLET_PANEL_ETHEREUM_NETWORK_LABEL}</p>
+                  </div>
+                  <p className={styles.tokenBalance}>
+                    <BalanceScrambleValue value={balanceLabel} revealed={!balanceHidden} />
+                  </p>
                 </div>
-                <p className={styles.tokenBalance}>
-                  <BalanceScrambleValue value={balanceLabel} revealed={!balanceHidden} />
-                </p>
               </div>
 
               <SendButton
                 variant="gradient"
-                label="DEPOSIT"
+                label="Shield your USDC"
                 icon={<PlusIcon className={styles.ethereumDepositButtonIcon} strokeWidth={1.5} />}
                 className={styles.ethereumDepositButton}
                 onClick={handleDeposit}
@@ -179,30 +183,6 @@ export function WalletMenuPanelEthereum({
         </div>
       </div>
     </div>
-  )
-}
-
-function WalletActionTooltip({ label, children }: { label: string; children: ReactNode }) {
-  const isMobile = useMobileLayout()
-
-  if (isMobile) return children
-
-  return <Tooltip variant="action" content={label}>{children}</Tooltip>
-}
-
-function ExplorerIconLink({ href }: { href: string }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="View wallet on explorer"
-      className={[iconButtonStyles.button, iconButtonStyles.secondary].join(' ')}
-    >
-      <span className={iconButtonStyles.icon} aria-hidden>
-        <ArrowTopRightOnSquareIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} />
-      </span>
-    </a>
   )
 }
 
