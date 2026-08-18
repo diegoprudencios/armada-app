@@ -26,7 +26,8 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
   const [earnAmount, setEarnAmount] = useState('')
   const [earnConfirmedAt, setEarnConfirmedAt] = useState<number | null>(null)
   const snapshotRef = useRef<EarnSnapshot | null>(null)
-  const settledRef = useRef(false)
+  const ledgerSettledRef = useRef(false)
+  const balanceSettledRef = useRef(false)
   const settleTimerRef = useRef<number | null>(null)
   const earnAmountRef = useRef(earnAmount)
   const earnTabRef = useRef(earnTab)
@@ -39,15 +40,25 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
     settleTimerRef.current = null
   }
 
-  function applyEarnSettlement() {
+  function applyEarnLedger() {
     if (activity.activityReceiptRef.current) return
-    if (settledRef.current) return
+    if (ledgerSettledRef.current) return
 
     const snapshot = snapshotRef.current
     if (!snapshot || snapshot.amount <= 0) return
 
-    settledRef.current = true
+    ledgerSettledRef.current = true
     activity.prependRecentActivity(createEarnActivity(snapshot.amount, snapshot.tab))
+  }
+
+  function applyEarnVisibleBalance() {
+    if (activity.activityReceiptRef.current) return
+    if (balanceSettledRef.current) return
+
+    const snapshot = snapshotRef.current
+    if (!snapshot || snapshot.amount <= 0) return
+
+    balanceSettledRef.current = true
 
     const balanceFrom = formatUsdcAmount(balances.dashboardBalance)
     const vaultFrom = formatUsdcAmount(balances.earningBalance)
@@ -79,10 +90,11 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
       amount: parseActiveAmount(earnAmountRef.current),
       tab: earnTabRef.current,
     }
-    settledRef.current = false
+    ledgerSettledRef.current = false
+    balanceSettledRef.current = false
     settleTimerRef.current = window.setTimeout(() => {
       settleTimerRef.current = null
-      applyEarnSettlement()
+      applyEarnLedger()
     }, EARN_SETTLE_DELAY_MS)
   }
 
@@ -94,14 +106,8 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
   function resetEarnUi() {
     cancelSettleTimer()
     snapshotRef.current = null
-    settledRef.current = false
-    setEarnStepState(null)
-    setEarnAmount('')
-    setEarnTab('add')
-    setEarnConfirmedAt(null)
-  }
-
-  function hideEarnUi() {
+    ledgerSettledRef.current = false
+    balanceSettledRef.current = false
     setEarnStepState(null)
     setEarnAmount('')
     setEarnTab('add')
@@ -124,17 +130,14 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
       return
     }
 
-    if (settleTimerRef.current != null) {
-      hideEarnUi()
-      return
-    }
-
-    applyEarnSettlement()
+    cancelSettleTimer()
+    applyEarnLedger()
+    applyEarnVisibleBalance()
     resetEarnUi()
   }
 
   function completeEarn() {
-    applyEarnSettlement()
+    applyEarnLedger()
   }
 
   function openEarnConfirmedFromActivity(tab: EarnTab, amountLabel: string, confirmedAt: number) {

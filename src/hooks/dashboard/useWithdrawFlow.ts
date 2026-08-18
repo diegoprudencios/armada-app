@@ -36,7 +36,8 @@ export function useWithdrawFlow({ walletSession, balances, activity }: UseWithdr
   const [withdrawSkipRecipient, setWithdrawSkipRecipient] = useState(false)
   const [withdrawSkipEnter, setWithdrawSkipEnter] = useState(false)
   const snapshotRef = useRef<WithdrawSnapshot | null>(null)
-  const settledRef = useRef(false)
+  const ledgerSettledRef = useRef(false)
+  const balanceSettledRef = useRef(false)
   const settleTimerRef = useRef<number | null>(null)
   const withdrawAmountRef = useRef(withdrawAmount)
   const withdrawChainRef = useRef(withdrawChain)
@@ -51,14 +52,14 @@ export function useWithdrawFlow({ walletSession, balances, activity }: UseWithdr
     settleTimerRef.current = null
   }
 
-  function applyWithdrawSettlement() {
+  function applyWithdrawLedger() {
     if (activity.activityReceiptRef.current) return
-    if (settledRef.current) return
+    if (ledgerSettledRef.current) return
 
     const snapshot = snapshotRef.current
     if (!snapshot || snapshot.amount <= 0) return
 
-    settledRef.current = true
+    ledgerSettledRef.current = true
     activity.prependRecentActivity(createWithdrawActivity(snapshot.amount, snapshot.chain, snapshot.recipient))
     const ownWalletAddress = walletSession.wallet?.address
     if (
@@ -67,6 +68,16 @@ export function useWithdrawFlow({ walletSession, balances, activity }: UseWithdr
     ) {
       walletSession.adjustActiveWalletUsdc(snapshot.amount)
     }
+  }
+
+  function applyWithdrawVisibleBalance() {
+    if (activity.activityReceiptRef.current) return
+    if (balanceSettledRef.current) return
+
+    const snapshot = snapshotRef.current
+    if (!snapshot || snapshot.amount <= 0) return
+
+    balanceSettledRef.current = true
     balances.setDashboardBalance((prev) => {
       balances.setBalanceRoll((roll) => ({
         trigger: roll.trigger + 1,
@@ -88,10 +99,11 @@ export function useWithdrawFlow({ walletSession, balances, activity }: UseWithdr
       chain: withdrawChainRef.current,
       recipient: withdrawRecipientRef.current,
     }
-    settledRef.current = false
+    ledgerSettledRef.current = false
+    balanceSettledRef.current = false
     settleTimerRef.current = window.setTimeout(() => {
       settleTimerRef.current = null
-      applyWithdrawSettlement()
+      applyWithdrawLedger()
     }, WITHDRAW_SETTLE_DELAY_MS)
   }
 
@@ -103,17 +115,8 @@ export function useWithdrawFlow({ walletSession, balances, activity }: UseWithdr
   function resetWithdrawUi() {
     cancelSettleTimer()
     snapshotRef.current = null
-    settledRef.current = false
-    setWithdrawStepState(null)
-    setWithdrawRecipient('')
-    setWithdrawAmount('')
-    setWithdrawChain('ethereum')
-    setWithdrawConfirmedAt(null)
-    setWithdrawSkipRecipient(false)
-    setWithdrawSkipEnter(false)
-  }
-
-  function hideWithdrawUi() {
+    ledgerSettledRef.current = false
+    balanceSettledRef.current = false
     setWithdrawStepState(null)
     setWithdrawRecipient('')
     setWithdrawAmount('')
@@ -164,17 +167,14 @@ export function useWithdrawFlow({ walletSession, balances, activity }: UseWithdr
       return
     }
 
-    if (settleTimerRef.current != null) {
-      hideWithdrawUi()
-      return
-    }
-
-    applyWithdrawSettlement()
+    cancelSettleTimer()
+    applyWithdrawLedger()
+    applyWithdrawVisibleBalance()
     resetWithdrawUi()
   }
 
   function completeWithdraw() {
-    applyWithdrawSettlement()
+    applyWithdrawLedger()
   }
 
   function openWithdrawConfirmedFromActivity(

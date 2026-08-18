@@ -41,7 +41,8 @@ export function useSendFlow({ walletSession, balances, activity }: UseSendFlowOp
   const [sendConfirmedAt, setSendConfirmedAt] = useState<number | null>(null)
   const pendingPayViaLinkRef = useRef<PendingPayViaLink | null>(null)
   const snapshotRef = useRef<SendSnapshot | null>(null)
-  const settledRef = useRef(false)
+  const ledgerSettledRef = useRef(false)
+  const balanceSettledRef = useRef(false)
   const settleTimerRef = useRef<number | null>(null)
   const sendAmountRef = useRef(sendAmount)
   const sendRecipientRef = useRef(sendRecipient)
@@ -68,22 +69,34 @@ export function useSendFlow({ walletSession, balances, activity }: UseSendFlowOp
     settleTimerRef.current = null
   }
 
-  function applySendSettlement() {
+  function applySendLedger() {
     if (activity.activityReceiptRef.current) return
-    if (settledRef.current) return
+    if (ledgerSettledRef.current) return
 
     const snapshot = snapshotRef.current
     if (!snapshot || snapshot.amount <= 0) return
 
-    settledRef.current = true
+    ledgerSettledRef.current = true
+
+    if (snapshot.pendingPay) return
+
+    activity.prependRecentActivity(createSendActivity(snapshot.amount, snapshot.recipient, snapshot.chain))
+  }
+
+  function applySendVisibleBalance() {
+    if (activity.activityReceiptRef.current) return
+    if (balanceSettledRef.current) return
+
+    const snapshot = snapshotRef.current
+    if (!snapshot || snapshot.amount <= 0) return
+
+    balanceSettledRef.current = true
 
     if (snapshot.pendingPay) {
       activity.settleReceiveLinkPayment(snapshot.pendingPay.requestId, snapshot.amount, snapshot.pendingPay.note)
       pendingPayViaLinkRef.current = null
       return
     }
-
-    activity.prependRecentActivity(createSendActivity(snapshot.amount, snapshot.recipient, snapshot.chain))
     balances.setDashboardBalance((prev) => {
       balances.setBalanceRoll((roll) => ({
         trigger: roll.trigger + 1,
@@ -106,10 +119,11 @@ export function useSendFlow({ walletSession, balances, activity }: UseSendFlowOp
       chain: sendChainRef.current,
       pendingPay: pendingPayViaLinkRef.current,
     }
-    settledRef.current = false
+    ledgerSettledRef.current = false
+    balanceSettledRef.current = false
     settleTimerRef.current = window.setTimeout(() => {
       settleTimerRef.current = null
-      applySendSettlement()
+      applySendLedger()
     }, SEND_SETTLE_DELAY_MS)
   }
 
@@ -121,16 +135,9 @@ export function useSendFlow({ walletSession, balances, activity }: UseSendFlowOp
   function resetSendUi() {
     cancelSettleTimer()
     snapshotRef.current = null
-    settledRef.current = false
+    ledgerSettledRef.current = false
+    balanceSettledRef.current = false
     pendingPayViaLinkRef.current = null
-    setSendStepState(null)
-    setSendAmount('')
-    setSendRecipient('')
-    setSendChain('ethereum')
-    setSendConfirmedAt(null)
-  }
-
-  function hideSendUi() {
     setSendStepState(null)
     setSendAmount('')
     setSendRecipient('')
@@ -155,17 +162,14 @@ export function useSendFlow({ walletSession, balances, activity }: UseSendFlowOp
       return
     }
 
-    if (settleTimerRef.current != null) {
-      hideSendUi()
-      return
-    }
-
-    applySendSettlement()
+    cancelSettleTimer()
+    applySendLedger()
+    applySendVisibleBalance()
     resetSendUi()
   }
 
   function completeSend() {
-    applySendSettlement()
+    applySendLedger()
   }
 
   function openSendConfirmedFromActivity(
