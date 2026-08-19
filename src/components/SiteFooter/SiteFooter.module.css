@@ -9,6 +9,8 @@
   gap: 0;
   box-sizing: border-box;
   /* Top only — wordmark sits flush to the bottom edge. */
+  /* EXCEPTION — marketing footer fills most of the viewport (no height token). */
+  min-height: 100svh;
   padding: var(--primitives-spacing-8) 0 0;
   overflow: hidden;
   background: linear-gradient(
@@ -148,7 +150,8 @@
 }
 
 .wordmarkWrap {
-  margin-top: var(--primitives-spacing-12);
+  margin-top: auto;
+  padding-top: var(--primitives-spacing-12);
   flex-shrink: 0;
   overflow: hidden;
   line-height: 0;
@@ -207,7 +210,6 @@
 
 @media (min-width: 768px) {
   .footer {
-    min-height: 70svh;
     padding-top: var(--primitives-spacing-10);
   }
 
@@ -222,10 +224,6 @@
     gap: var(--primitives-spacing-6) 0;
   }
 
-  .wordmarkWrap {
-    margin-top: auto;
-    padding-top: var(--primitives-spacing-12);
-  }
 }
 
 @media (min-width: 1024px) {

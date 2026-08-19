@@ -37,7 +37,7 @@ type Block = {
 const INTRO = {
   id: 'integrators',
   title: ['Privacy your users', "don't have to think about"] as [string, string],
-  body: 'Add shielded USDC to your product with the SDK, APIs, and compliance tooling.',
+  body: 'Add shielded USDC to your product.',
   ctas: [
     {
       label: 'Integrate and test',
@@ -52,7 +52,7 @@ const FEATURES: Block[] = [
   {
     id: 'capital-in-motion',
     title: ['Protecting capital', 'in motion'],
-    body: 'Shield your relationships: balances, counterparties, allocation activity, and transaction history while continuing to operate with USDC.',
+    body: 'Shield your relationships while continuing to operate with USDC.',
     ctas: [
       {
         label: 'Integrate and test',
@@ -65,7 +65,7 @@ const FEATURES: Block[] = [
   {
     id: 'compliance',
     title: ['Compliance without', 'intermediaries'],
-    body: 'Give authorized parties access to the records they need without making financial activity visible to the entire market.',
+    body: 'Only you give authorized parties access to the records they need.',
     ctas: [
       {
         label: 'Integrate and test',
