@@ -5,8 +5,8 @@ import { WhatIsArmada } from '@/components/WhatIsArmada'
 import { SiteFooter } from '@/components/SiteFooter'
 import styles from './Homepage.module.css'
 
-/** Footer end / iOS chrome fill — matches theme-overrides brand-amber. */
-const HOMEPAGE_CHROME_FILL = '#f8d197'
+/** Footer end / iOS chrome fill — theme-overrides `--semantic-color-brand-amber`. */
+const HOMEPAGE_CHROME_FILL_TOKEN = '--semantic-color-brand-amber'
 const CHROME_FILL_CLASS = 'armada-homepage-chrome'
 
 export interface HomepageProps {
@@ -30,7 +30,8 @@ export function Homepage({
       document.head.appendChild(themeMeta)
     }
     const previousTheme = themeMeta.getAttribute('content')
-    themeMeta.setAttribute('content', HOMEPAGE_CHROME_FILL)
+    const chromeFill = getComputedStyle(root).getPropertyValue(HOMEPAGE_CHROME_FILL_TOKEN).trim()
+    if (chromeFill) themeMeta.setAttribute('content', chromeFill)
 
     return () => {
       root.classList.remove(CHROME_FILL_CLASS)

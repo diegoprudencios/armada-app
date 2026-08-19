@@ -6,7 +6,6 @@
 :global(html.armada-homepage-chrome),
 :global(body.armada-homepage-chrome) {
   background-color: var(--semantic-color-brand-amber) !important;
-  background-color: #f8d197 !important;
 }
 
 .page {
