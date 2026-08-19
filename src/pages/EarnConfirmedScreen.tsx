@@ -9,7 +9,7 @@ import {
   earnConfirmedTitle,
   type EarnTab,
 } from './earnFlowConstants'
-import styles from './DepositConfirmedScreen.module.css'
+import styles from './ConfirmedScreen.module.css'
 
 export interface EarnConfirmedScreenProps {
   tab: EarnTab

@@ -4,7 +4,7 @@ import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell
 import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
-import styles from './DepositConfirmedScreen.module.css'
+import styles from './ConfirmedScreen.module.css'
 
 export interface RequestPaidConfirmedScreenProps {
   amount: string

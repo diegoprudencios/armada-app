@@ -249,7 +249,7 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
     <>
       <h1
         id="marketing-hero-heading"
-        className={`armada-text-title ${styles.headingLegacy}`}
+        className={`armada-text-title ${styles.heading}`}
       >
         {HEADING_LINES.map((line) => (
           <span key={line} className={styles.headingLine}>
@@ -262,8 +262,8 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
   )
 
   const introClass = pinHandoff
-    ? `armada-site-stack ${styles.introLegacy} ${styles.introExit}`
-    : `armada-site-stack ${styles.introLegacy}`
+    ? `armada-site-stack ${styles.intro} ${styles.introExit}`
+    : `armada-site-stack ${styles.intro}`
 
   const backgroundNode = (
     <div
@@ -288,8 +288,8 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
       : styles.featureEnter
 
   const heroInner = (
-    <div className={styles.contentLegacy}>
-      <div className={styles.bottomLegacy}>
+    <div className={styles.content}>
+      <div className={styles.bottom}>
         {copyReady ? (
           <div
             className={[introClass, !copyEntered && styles.copyEnter]
@@ -300,7 +300,7 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
             {heroCopy}
           </div>
         ) : (
-          <div className={`${styles.introLegacy} ${styles.chromePending}`} aria-hidden>
+          <div className={`${styles.intro} ${styles.chromePending}`} aria-hidden>
             {heroCopy}
           </div>
         )}

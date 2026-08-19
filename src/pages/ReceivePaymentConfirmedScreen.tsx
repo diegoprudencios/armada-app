@@ -5,7 +5,7 @@ import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import { DEMO_ARMADA_ADDRESS } from './depositFlowConstants'
 import type { SendChainId } from './sendFlowConstants'
-import styles from './DepositConfirmedScreen.module.css'
+import styles from './ConfirmedScreen.module.css'
 
 export interface ReceivePaymentConfirmedScreenProps {
   amount: string
