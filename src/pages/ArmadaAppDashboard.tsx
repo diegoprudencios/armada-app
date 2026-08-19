@@ -49,7 +49,11 @@ export function ArmadaAppDashboard({
     dashboardBalance,
     balanceRoll,
     showDepositTooltip,
+    depositTooltipPersistVisible,
+    depositTooltipExiting,
     showEarnBanner,
+    earnBannerHandoffEnter,
+    earnBannerPersistVisible,
     openConnect,
     connectWallet,
     disconnectWallet,
@@ -108,7 +112,11 @@ export function ArmadaAppDashboard({
       </div>
       <DashboardCardStack
         showDepositTooltip={showDepositTooltip}
+        depositTooltipPersistVisible={depositTooltipPersistVisible}
+        depositTooltipExiting={depositTooltipExiting}
         showEarnBanner={showEarnBanner}
+        earnBannerHandoffEnter={earnBannerHandoffEnter}
+        earnBannerPersistVisible={earnBannerPersistVisible}
         activityVisible={showActivity}
         tooltipEnterStyle={
           {

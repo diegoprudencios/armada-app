@@ -98,14 +98,11 @@
 
 .amountDisplay:focus,
 .amountDisplay:focus-visible {
-  color: var(--semantic-color-text-muted);
+  color: var(--semantic-color-text-primary);
 }
 
-@media (max-width: 767px) {
-  .amountDisplay:focus,
-  .amountDisplay:focus-visible {
-    color: var(--semantic-color-text-primary);
-  }
+.amountDisplay.amountEmpty {
+  color: var(--semantic-color-text-muted);
 }
 
 .keypadPad {
@@ -359,6 +356,13 @@
 
 .amountInput:focus,
 .amountInput:focus-visible {
+  color: var(--semantic-color-text-primary);
+}
+
+.amountInput.amountEmpty,
+.amountInput.amountEmpty::placeholder,
+.amountInput.amountEmpty:focus::placeholder,
+.amountInput.amountEmpty:focus-visible::placeholder {
   color: var(--semantic-color-text-muted);
 }
 
@@ -366,22 +370,8 @@
   font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
   font-weight: var(--primitives-fontWeight-regular);
   font-size: calc(var(--primitives-fontSize-4xl) * 1px);
-  color: var(--semantic-color-text-primary);
-  opacity: 1;
-}
-
-.amountInput:focus::placeholder,
-.amountInput:focus-visible::placeholder {
   color: var(--semantic-color-text-muted);
-}
-
-@media (max-width: 767px) {
-  .amountInput:focus,
-  .amountInput:focus-visible,
-  .amountInput:focus::placeholder,
-  .amountInput:focus-visible::placeholder {
-    color: var(--semantic-color-text-primary);
-  }
+  opacity: 1;
 }
 
 .amountInputError,

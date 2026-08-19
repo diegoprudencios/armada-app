@@ -5,6 +5,10 @@ import {
   DEPOSIT_PROCESSING_STAGE_ADVANCE_MS,
   txProcessingSettleDelayMs,
 } from '@/constants/txProcessingTiming'
+import {
+  activityRevealDelayAfterFirstShieldMs,
+  vaultWithdrawDashboardHoldMs,
+} from '@/components/BalanceCard/balanceRevealMotion'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import { createDepositActivity } from '@/utils/dashboardActivity'
@@ -38,6 +42,7 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
   const ledgerSettledRef = useRef(false)
   const balanceSettledRef = useRef(false)
   const settleTimerRef = useRef<number | null>(null)
+  const visibleBalanceTimerRef = useRef<number | null>(null)
   const depositAmountRef = useRef(depositAmount)
   const depositChainRef = useRef(depositChain)
   depositAmountRef.current = depositAmount
@@ -49,6 +54,30 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
     settleTimerRef.current = null
   }
 
+  function cancelVisibleBalanceTimer() {
+    if (visibleBalanceTimerRef.current == null) return
+    window.clearTimeout(visibleBalanceTimerRef.current)
+    visibleBalanceTimerRef.current = null
+  }
+
+  function clearDepositSnapshot() {
+    snapshotRef.current = null
+    ledgerSettledRef.current = false
+    balanceSettledRef.current = false
+  }
+
+  function dismissDepositModal() {
+    setDepositStepState(null)
+    setDepositAmount('')
+    setDepositConfirmedAt(null)
+    setDepositSkipEnter(false)
+  }
+
+  function settleVisibleBalance() {
+    applyDepositVisibleBalance()
+    clearDepositSnapshot()
+  }
+
   function applyDepositLedger() {
     if (activity.activityReceiptRef.current) return
     if (ledgerSettledRef.current) return
@@ -57,7 +86,6 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
     if (!snapshot || snapshot.amount <= 0) return
 
     ledgerSettledRef.current = true
-    balances.setHasCompletedDeposit(true)
     activity.prependRecentActivity(createDepositActivity(snapshot.amount, snapshot.chain))
     walletSession.adjustActiveWalletUsdc(-depositTotalCost(snapshot.amount))
   }
@@ -70,15 +98,21 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
     if (!snapshot || snapshot.amount <= 0) return
 
     balanceSettledRef.current = true
+    balances.setHasCompletedDeposit(true)
     balances.setDashboardBalance((prev) => {
       const next = prev + snapshot.amount
+      const isFirstShield = prev <= 0
       balances.setBalanceRoll((roll) => ({
         trigger: roll.trigger + 1,
         mode: 'fromValue',
         fromValue: formatUsdcAmount(prev),
       }))
       if (!readActivityUserHidden()) {
-        activity.scheduleActivityReveal(activity.activityRevealDelayAfterRollMs(formatUsdcAmount(next)))
+        activity.scheduleActivityReveal(
+          isFirstShield
+            ? activityRevealDelayAfterFirstShieldMs(formatUsdcAmount(next))
+            : activity.activityRevealDelayAfterRollMs(formatUsdcAmount(next)),
+        )
       }
       return next
     })
@@ -104,9 +138,8 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
 
   function resetDepositUi() {
     cancelSettleTimer()
-    snapshotRef.current = null
-    ledgerSettledRef.current = false
-    balanceSettledRef.current = false
+    cancelVisibleBalanceTimer()
+    clearDepositSnapshot()
     setDepositStepState(null)
     setDepositAmount('')
     setDepositChain('sepolia')
@@ -114,7 +147,13 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
     setDepositSkipEnter(false)
   }
 
-  useEffect(() => () => cancelSettleTimer(), [])
+  useEffect(
+    () => () => {
+      cancelSettleTimer()
+      cancelVisibleBalanceTimer()
+    },
+    [],
+  )
 
   function openDeposit() {
     openDepositWithAmount('')
@@ -122,6 +161,8 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
 
   function openDepositWithAmount(initialAmount: string) {
     if (!walletSession.requireWallet()) return
+    cancelVisibleBalanceTimer()
+    settleVisibleBalance()
     setDepositSkipEnter(false)
     setDepositAmount(initialAmount)
     setDepositChain('sepolia')
@@ -138,6 +179,8 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
 
   function openDepositFromWallet(walletId: string, chain: DepositChainId) {
     if (!walletSession.activateWallet(walletId)) return
+    cancelVisibleBalanceTimer()
+    settleVisibleBalance()
     setDepositSkipEnter(false)
     setDepositAmount('')
     setDepositChain(chain)
@@ -153,8 +196,18 @@ export function useDepositFlow({ walletSession, balances, activity }: UseDeposit
 
     cancelSettleTimer()
     applyDepositLedger()
-    applyDepositVisibleBalance()
-    resetDepositUi()
+    dismissDepositModal()
+
+    const holdMs = snapshotRef.current ? vaultWithdrawDashboardHoldMs() : 0
+    if (holdMs <= 0) {
+      settleVisibleBalance()
+      return
+    }
+
+    visibleBalanceTimerRef.current = window.setTimeout(() => {
+      visibleBalanceTimerRef.current = null
+      settleVisibleBalance()
+    }, holdMs)
   }
 
   function completeDeposit() {

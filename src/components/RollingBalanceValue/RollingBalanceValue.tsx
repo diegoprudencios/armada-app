@@ -52,33 +52,46 @@ function buildDisplayTokens(
   mode: BalanceRollMode,
   fromValue?: string,
 ): DisplayToken[] {
-  const toTokens = tokenizeBalance(toValue)
-  const fromDigits =
-    mode === 'fromValue' && fromValue
-      ? tokenizeBalance(fromValue)
-          .filter((token): token is Extract<BalanceToken, { type: 'digit' }> => token.type === 'digit')
-          .map((token) => token.digit)
-      : []
-
-  const toDigitCount = toTokens.filter((token) => token.type === 'digit').length
-  while (fromDigits.length < toDigitCount) {
-    fromDigits.unshift(0)
+  if (mode !== 'fromValue' || !fromValue) {
+    return tokenizeBalance(toValue).map((token, index, tokens) => {
+      if (token.type === 'separator') return { type: 'separator', char: token.char, key: token.key }
+      const digitIndex = tokens.slice(0, index).filter((item) => item.type === 'digit').length
+      return {
+        type: 'digit',
+        key: token.key,
+        digitIndex,
+        fromDigit: 0,
+        toDigit: token.digit,
+      }
+    })
   }
 
+  const fromDigits = tokenizeBalance(fromValue)
+    .filter((token): token is Extract<BalanceToken, { type: 'digit' }> => token.type === 'digit')
+    .map((token) => token.digit)
+  const toDigits = tokenizeBalance(toValue)
+    .filter((token): token is Extract<BalanceToken, { type: 'digit' }> => token.type === 'digit')
+    .map((token) => token.digit)
+
+  const width = Math.max(fromDigits.length, toDigits.length)
+  while (fromDigits.length < width) fromDigits.unshift(0)
+  while (toDigits.length < width) toDigits.unshift(0)
+
+  const skeleton = fromValue.length >= toValue.length ? fromValue : toValue
+  const skeletonTokens = tokenizeBalance(skeleton)
   let digitIndex = 0
 
-  return toTokens.map((token) => {
+  return skeletonTokens.map((token) => {
     if (token.type === 'separator') {
       return { type: 'separator', char: token.char, key: token.key }
     }
 
-    const fromDigit = mode === 'fromZero' ? 0 : (fromDigits[digitIndex] ?? 0)
     const displayDigit: DisplayDigit = {
       type: 'digit',
       key: token.key,
       digitIndex,
-      fromDigit,
-      toDigit: token.digit,
+      fromDigit: fromDigits[digitIndex] ?? 0,
+      toDigit: toDigits[digitIndex] ?? 0,
     }
     digitIndex += 1
     return displayDigit

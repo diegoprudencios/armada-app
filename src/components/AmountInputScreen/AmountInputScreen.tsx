@@ -318,6 +318,7 @@ export function AmountInputScreen({
                 tabIndex={-1}
                 className={[
                   styles.amountDisplay,
+                  !hasAmount && styles.amountEmpty,
                   exceedsBalance && styles.amountInputError,
                   isAmountRolling && styles.amountValueHidden,
                 ]
@@ -337,6 +338,7 @@ export function AmountInputScreen({
                 id={amountInputId}
                 className={[
                   styles.amountInput,
+                  !hasAmount && styles.amountEmpty,
                   exceedsBalance && styles.amountInputError,
                   isAmountRolling && styles.amountValueHidden,
                 ]

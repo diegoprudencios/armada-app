@@ -1,9 +1,13 @@
-import { type CSSProperties, type ReactNode } from 'react'
+import { type CSSProperties, type ReactNode, useEffect, useState } from 'react'
 import styles from './ArmadaAppDashboard.module.css'
 
 export interface DashboardCardStackProps {
   showDepositTooltip: boolean
+  depositTooltipPersistVisible?: boolean
+  depositTooltipExiting?: boolean
   showEarnBanner?: boolean
+  earnBannerHandoffEnter?: boolean
+  earnBannerPersistVisible?: boolean
   activityVisible: boolean
   balanceCard: ReactNode
   activityList?: ReactNode
@@ -15,7 +19,11 @@ export interface DashboardCardStackProps {
 
 export function DashboardCardStack({
   showDepositTooltip,
+  depositTooltipPersistVisible = false,
+  depositTooltipExiting = false,
   showEarnBanner = false,
+  earnBannerHandoffEnter = false,
+  earnBannerPersistVisible = false,
   activityVisible,
   balanceCard,
   activityList,
@@ -37,19 +45,32 @@ export function DashboardCardStack({
         <div className={styles.cardStackBalance}>{balanceCard}</div>
         {showDepositTooltip && depositTooltip ? (
           <div
-            className={[styles.cardStackTooltip, styles.tooltipEnter].join(' ')}
-            style={tooltipEnterStyle}
+            className={[
+              styles.cardStackTooltip,
+              depositTooltipExiting
+                ? styles.tooltipHandoffExit
+                : depositTooltipPersistVisible
+                  ? styles.tooltipVisible
+                  : styles.tooltipEnter,
+            ].join(' ')}
+            style={
+              depositTooltipPersistVisible || depositTooltipExiting
+                ? undefined
+                : tooltipEnterStyle
+            }
           >
-            {depositTooltip}
+            <div className={styles.cardStackTooltipInner}>{depositTooltip}</div>
           </div>
         ) : null}
         {showEarnBanner && earnBanner ? (
-          <div
-            className={[styles.cardStackTooltip, styles.tooltipEnter].join(' ')}
-            style={tooltipEnterStyle}
+          <EarnBannerSlot
+            key="earn-apy-banner"
+            handoffEnter={earnBannerHandoffEnter}
+            persistVisible={earnBannerPersistVisible}
+            tooltipEnterStyle={tooltipEnterStyle}
           >
             {earnBanner}
-          </div>
+          </EarnBannerSlot>
         ) : null}
       </div>
       {activityVisible && activityList ? (
@@ -57,6 +78,57 @@ export function DashboardCardStack({
           {activityList}
         </div>
       ) : null}
+    </div>
+  )
+}
+
+function EarnBannerSlot({
+  handoffEnter,
+  persistVisible,
+  tooltipEnterStyle,
+  children,
+}: {
+  handoffEnter: boolean
+  persistVisible: boolean
+  tooltipEnterStyle?: CSSProperties
+  children: ReactNode
+}) {
+  const [handoffSettled, setHandoffSettled] = useState(!handoffEnter)
+
+  useEffect(() => {
+    if (!handoffEnter) {
+      setHandoffSettled(true)
+      return
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setHandoffSettled(true)
+      return
+    }
+    setHandoffSettled(false)
+  }, [handoffEnter])
+
+  const enterClass = handoffEnter
+    ? styles.tooltipHandoffEnter
+    : persistVisible
+      ? styles.tooltipVisible
+      : styles.tooltipEnter
+
+  return (
+    <div
+      className={[
+        styles.cardStackTooltip,
+        enterClass,
+        handoffSettled ? styles.tooltipHandoffSettled : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      style={handoffEnter || persistVisible ? undefined : tooltipEnterStyle}
+      onAnimationEnd={(event) => {
+        if (event.target !== event.currentTarget) return
+        setHandoffSettled(true)
+      }}
+    >
+      <div className={styles.cardStackTooltipInner}>{children}</div>
     </div>
   )
 }

@@ -22,6 +22,7 @@ export interface VaultPositionBarProps {
   vaultRollActive?: boolean
   vaultRollFromValue?: string
   vaultRollTrigger?: number
+  keepMounted?: boolean
   balanceHidden?: boolean
   onOpen?: () => void
 }
@@ -33,6 +34,7 @@ export function VaultPositionBar({
   vaultRollActive = false,
   vaultRollFromValue,
   vaultRollTrigger = 0,
+  keepMounted = false,
   balanceHidden = false,
   onOpen,
 }: VaultPositionBarProps) {
@@ -40,7 +42,7 @@ export function VaultPositionBar({
   const [peekVault, setPeekVault] = useState(false)
   const balanceRevealed = !balanceHidden || peekVault
 
-  if (balance <= 0 && !vaultRollActive) return null
+  if (balance <= 0 && !vaultRollActive && !keepMounted) return null
 
   const formattedBalance = formatUsdcAmount(balance)
   const resolvedEarned = earnedAmount ?? estimateVaultEarnedSoFar(balance, apy)

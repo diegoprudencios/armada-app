@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useEarnBannerHandoff, useDepositTooltipHandoff } from './dashboard/useEarnBannerHandoff'
 import { useEnvironment } from '@/hooks/useEnvironment'
 import { writeDemoDashboardSession } from '@/utils/demoDashboardSession'
 import { returnToLanding } from '@/utils/appNavigation'
@@ -91,15 +92,26 @@ export function useDashboardDemoState(initialBalance = 0) {
     activity.recentActivity,
   ])
 
-  const showDepositTooltip =
-    Boolean(walletSession.wallet) &&
-    !balances.hasCompletedDeposit &&
-    balances.dashboardBalance <= 0
-
+  const depositTooltipHandoff = useDepositTooltipHandoff(
+    Boolean(walletSession.wallet),
+    balances.hasCompletedDeposit,
+    balances.dashboardBalance,
+  )
+  const earnBannerHandoff = useEarnBannerHandoff(
+    Boolean(walletSession.wallet),
+    balances.hasCompletedDeposit,
+    balances.earningBalance,
+    balances.dashboardBalance,
+  )
+  const showDepositTooltip = depositTooltipHandoff.showDepositTooltip
   const showEarnBanner =
-    Boolean(walletSession.wallet) &&
-    balances.hasCompletedDeposit &&
-    balances.earningBalance <= 0
+    earnBannerHandoff.showEarnBanner && !showDepositTooltip
+  const earnBannerHandoffEnter =
+    earnBannerHandoff.earnBannerHandoffEnter ||
+    (showEarnBanner && depositTooltipHandoff.revealEarnBanner)
+  const earnBannerPersistVisible = earnBannerHandoff.earnBannerPersistVisible
+  const depositTooltipPersistVisible = depositTooltipHandoff.depositTooltipPersistVisible
+  const depositTooltipExiting = depositTooltipHandoff.depositTooltipExiting
 
   function openActivityReceipt(item: DashboardActivityItem) {
     if (!walletSession.wallet) return
@@ -208,7 +220,11 @@ export function useDashboardDemoState(initialBalance = 0) {
     earnSourceBalance: earn.earnSourceBalance,
     balanceRoll: balances.balanceRoll,
     showDepositTooltip,
+    depositTooltipPersistVisible,
+    depositTooltipExiting,
     showEarnBanner,
+    earnBannerHandoffEnter,
+    earnBannerPersistVisible,
     openConnect: walletSession.openConnect,
     dismissConnect: walletSession.dismissConnect,
     connectWallet: walletSession.connectWallet,

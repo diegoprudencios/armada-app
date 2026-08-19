@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { type EarnTab } from '@/pages/earnFlowConstants'
 import { txProcessingSettleDelayMs } from '@/constants/txProcessingTiming'
+import { vaultWithdrawDashboardHoldMs } from '@/components/BalanceCard/balanceRevealMotion'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import { readActivityUserHidden } from '@/utils/demoDashboardSession'
@@ -29,6 +30,7 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
   const ledgerSettledRef = useRef(false)
   const balanceSettledRef = useRef(false)
   const settleTimerRef = useRef<number | null>(null)
+  const visibleBalanceTimerRef = useRef<number | null>(null)
   const earnAmountRef = useRef(earnAmount)
   const earnTabRef = useRef(earnTab)
   earnAmountRef.current = earnAmount
@@ -38,6 +40,30 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
     if (settleTimerRef.current == null) return
     window.clearTimeout(settleTimerRef.current)
     settleTimerRef.current = null
+  }
+
+  function cancelVisibleBalanceTimer() {
+    if (visibleBalanceTimerRef.current == null) return
+    window.clearTimeout(visibleBalanceTimerRef.current)
+    visibleBalanceTimerRef.current = null
+  }
+
+  function clearEarnSnapshot() {
+    snapshotRef.current = null
+    ledgerSettledRef.current = false
+    balanceSettledRef.current = false
+  }
+
+  function dismissEarnModal() {
+    setEarnStepState(null)
+    setEarnAmount('')
+    setEarnConfirmedAt(null)
+  }
+
+  function settleVisibleBalance() {
+    applyEarnVisibleBalance()
+    clearEarnSnapshot()
+    setEarnTab('add')
   }
 
   function applyEarnLedger() {
@@ -105,19 +131,26 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
 
   function resetEarnUi() {
     cancelSettleTimer()
-    snapshotRef.current = null
-    ledgerSettledRef.current = false
-    balanceSettledRef.current = false
+    cancelVisibleBalanceTimer()
+    clearEarnSnapshot()
     setEarnStepState(null)
     setEarnAmount('')
     setEarnTab('add')
     setEarnConfirmedAt(null)
   }
 
-  useEffect(() => () => cancelSettleTimer(), [])
+  useEffect(
+    () => () => {
+      cancelSettleTimer()
+      cancelVisibleBalanceTimer()
+    },
+    [],
+  )
 
   function openEarn(tab: EarnTab = 'add') {
     if (!walletSession.requireWallet()) return
+    cancelVisibleBalanceTimer()
+    settleVisibleBalance()
     setEarnTab(tab)
     setEarnAmount('')
     setEarnStepState('amount')
@@ -132,8 +165,19 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
 
     cancelSettleTimer()
     applyEarnLedger()
-    applyEarnVisibleBalance()
-    resetEarnUi()
+    dismissEarnModal()
+
+    const holdMs = snapshotRef.current ? vaultWithdrawDashboardHoldMs() : 0
+
+    if (holdMs <= 0) {
+      settleVisibleBalance()
+      return
+    }
+
+    visibleBalanceTimerRef.current = window.setTimeout(() => {
+      visibleBalanceTimerRef.current = null
+      settleVisibleBalance()
+    }, holdMs)
   }
 
   function completeEarn() {

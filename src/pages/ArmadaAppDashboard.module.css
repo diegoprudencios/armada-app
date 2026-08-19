@@ -83,10 +83,22 @@
 @media (prefers-reduced-motion: reduce) {
   .headerBand,
   .tooltipEnter,
+  .tooltipHandoffEnter,
+  .tooltipHandoffExit,
   .cardStackActivity {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+
+  .tooltipHandoffEnter {
+    grid-template-rows: 1fr;
+    margin-block-start: 0;
+  }
+
+  .tooltipHandoffExit {
+    opacity: 0;
+    grid-template-rows: 0fr;
   }
 }
 
@@ -102,11 +114,12 @@
 }
 
 .primaryStack {
+  --dashboard-promo-gap: var(--primitives-spacing-6);
   display: flex;
   flex-direction: column;
   align-items: stretch;
   width: 100%;
-  gap: var(--primitives-spacing-6);
+  gap: var(--dashboard-promo-gap);
 }
 
 .cardStackBalance,
@@ -121,7 +134,57 @@
 
 .cardStackTooltip {
   flex-shrink: 0;
-  display: block;
+  display: grid;
+  grid-template-rows: 1fr;
+}
+
+.cardStackTooltipInner {
+  min-height: 0;
+  overflow: visible;
+}
+
+.tooltipHandoffEnter {
+  animation: dashboardTooltipHandoffEnter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.tooltipHandoffExit {
+  animation: dashboardTooltipHandoffExit 360ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.tooltipHandoffExit .cardStackTooltipInner,
+.tooltipHandoffEnter:not(.tooltipHandoffSettled) .cardStackTooltipInner {
+  overflow: hidden;
+}
+
+.tooltipVisible {
+  opacity: 1;
+}
+
+@keyframes dashboardTooltipHandoffExit {
+  from {
+    opacity: 1;
+    grid-template-rows: 1fr;
+    margin-block-start: 0;
+  }
+
+  to {
+    opacity: 0;
+    grid-template-rows: 0fr;
+    margin-block-start: calc(-1 * var(--dashboard-promo-gap));
+  }
+}
+@keyframes dashboardTooltipHandoffEnter {
+  from {
+    opacity: 0;
+    grid-template-rows: 0fr;
+    margin-block-start: calc(-1 * var(--dashboard-promo-gap));
+  }
+
+  to {
+    opacity: 1;
+    grid-template-rows: 1fr;
+    margin-block-start: 0;
+  }
 }
 
 .cardStackActivity {
@@ -245,7 +308,7 @@
   }
 
   .primaryStack {
-    gap: var(--primitives-spacing-3);
+    --dashboard-promo-gap: var(--primitives-spacing-3);
   }
 
   .tooltipEnter {
