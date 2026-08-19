@@ -258,7 +258,9 @@ export function AmountInputScreen({
   }
 
   function applyPercent(percent: number) {
-    applyPresetAmount(formatAmountInputValue(maxAmount * percent))
+    const principal = balance * percent
+    const capped = Math.min(principal, maxAmount)
+    applyPresetAmount(formatAmountInputValue(capped))
   }
 
   function handleMax() {

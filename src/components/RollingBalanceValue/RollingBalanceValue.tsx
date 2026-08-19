@@ -47,6 +47,21 @@ function tokenizeBalance(value: string): BalanceToken[] {
   return tokens
 }
 
+function parseAmountParts(value: string): { intDigits: number[]; fracDigits: number[] } {
+  const cleaned = value.replace(/,/g, '')
+  const dot = cleaned.indexOf('.')
+  const intPart = (dot === -1 ? cleaned : cleaned.slice(0, dot)) || '0'
+  const fracPart = dot === -1 ? '' : cleaned.slice(dot + 1)
+  return {
+    intDigits: intPart.split('').map((char) => Number(char)),
+    fracDigits: fracPart.split('').map((char) => Number(char)),
+  }
+}
+
+function groupedIntegerSkeleton(intDigits: number[]): string {
+  return intDigits.join('').replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
+
 function buildDisplayTokens(
   toValue: string,
   mode: BalanceRollMode,
@@ -66,22 +81,25 @@ function buildDisplayTokens(
     })
   }
 
-  const fromDigits = tokenizeBalance(fromValue)
-    .filter((token): token is Extract<BalanceToken, { type: 'digit' }> => token.type === 'digit')
-    .map((token) => token.digit)
-  const toDigits = tokenizeBalance(toValue)
-    .filter((token): token is Extract<BalanceToken, { type: 'digit' }> => token.type === 'digit')
-    .map((token) => token.digit)
+  const from = parseAmountParts(fromValue)
+  const to = parseAmountParts(toValue)
+  const intWidth = Math.max(from.intDigits.length, to.intDigits.length, 1)
+  const fracWidth = Math.max(from.fracDigits.length, to.fracDigits.length)
 
-  const width = Math.max(fromDigits.length, toDigits.length)
-  while (fromDigits.length < width) fromDigits.unshift(0)
-  while (toDigits.length < width) toDigits.unshift(0)
+  while (from.intDigits.length < intWidth) from.intDigits.unshift(0)
+  while (to.intDigits.length < intWidth) to.intDigits.unshift(0)
+  while (from.fracDigits.length < fracWidth) from.fracDigits.push(0)
+  while (to.fracDigits.length < fracWidth) to.fracDigits.push(0)
 
-  const skeleton = fromValue.length >= toValue.length ? fromValue : toValue
-  const skeletonTokens = tokenizeBalance(skeleton)
+  const skeleton = fracWidth > 0
+    ? `${groupedIntegerSkeleton(to.intDigits)}.${'0'.repeat(fracWidth)}`
+    : groupedIntegerSkeleton(to.intDigits)
+
+  const fromDigits = [...from.intDigits, ...from.fracDigits]
+  const toDigits = [...to.intDigits, ...to.fracDigits]
   let digitIndex = 0
 
-  return skeletonTokens.map((token) => {
+  return tokenizeBalance(skeleton).map((token) => {
     if (token.type === 'separator') {
       return { type: 'separator', char: token.char, key: token.key }
     }
