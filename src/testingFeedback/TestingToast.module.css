@@ -29,7 +29,7 @@
 }
 
 /* Desktop: bottom-right, offset left of the feedback FAB */
-@media (min-width: 768px) {
+@media (min-width: 480px) {
   .toast {
     right: calc(
       var(--primitives-spacing-4) + env(safe-area-inset-right, 0px) + var(--primitives-spacing-11) +
@@ -44,7 +44,7 @@
 }
 
 /* Mobile: bottom center, stacked above the FAB when present */
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .toast {
     left: 50%;
     right: auto;

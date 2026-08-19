@@ -144,7 +144,7 @@
   width: 100%;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .column {
     padding: var(--primitives-spacing-5);
   }

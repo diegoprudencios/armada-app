@@ -34,7 +34,7 @@
 }
 
 /* Desktop: side sheet */
-@media (min-width: 768px) {
+@media (min-width: 480px) {
   .panel {
     top: 0;
     right: 0;
@@ -47,7 +47,7 @@
 }
 
 /* Mobile: full-width bottom sheet */
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .panel {
     left: 0;
     right: 0;

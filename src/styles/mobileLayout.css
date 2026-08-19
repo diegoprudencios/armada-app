@@ -1,4 +1,4 @@
-/* Shared mobile layout tokens — keep in sync with MOBILE_LAYOUT_MAX_WIDTH_PX (767). */
+/* Shared mobile layout tokens — keep in sync with MOBILE_LAYOUT_MAX_WIDTH_PX (479). */
 
 :root {
   --mobile-safe-area-top: env(safe-area-inset-top, 0px);

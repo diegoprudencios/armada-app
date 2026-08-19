@@ -564,7 +564,7 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .column {
     flex: 1;
     height: 100%;

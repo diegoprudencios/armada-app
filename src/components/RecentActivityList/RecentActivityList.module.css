@@ -214,7 +214,7 @@
   color: var(--semantic-color-text-primary);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .copy {
     min-width: 0;
   }

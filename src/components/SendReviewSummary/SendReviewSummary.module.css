@@ -10,7 +10,7 @@
   text-align: left;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .privacyNotice {
     background: var(--primitives-color-purple-50);
   }

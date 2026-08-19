@@ -298,7 +298,7 @@
   white-space: nowrap;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .walletMenuPanel {
     padding-top: var(--primitives-spacing-10);
   }

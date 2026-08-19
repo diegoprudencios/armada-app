@@ -17,7 +17,7 @@ function getMobileLayoutServerSnapshot() {
   return false
 }
 
-/** True when viewport width is ≤767px (touch-first mobile layout). */
+/** True when viewport width is ≤479px (phone layout: bottom sheets, keypad). */
 export function useMobileLayout() {
   return useSyncExternalStore(subscribe, getMobileLayoutSnapshot, getMobileLayoutServerSnapshot)
 }

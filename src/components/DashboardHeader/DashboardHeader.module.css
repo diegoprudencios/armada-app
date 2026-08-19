@@ -1,4 +1,4 @@
-/* Full viewport width with 20px horizontal inset — logo left, wallet right. */
+/* Full viewport width with horizontal inset — logo left, wallet right. */
 .header {
   width: 100%;
   display: flex;
@@ -50,7 +50,7 @@
   z-index: 1;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .header {
     min-height: var(--primitives-spacing-11);
     gap: var(--primitives-spacing-3);

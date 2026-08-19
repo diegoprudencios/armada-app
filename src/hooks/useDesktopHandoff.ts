@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { MOBILE_LAYOUT_MAX_WIDTH_PX } from '@/constants/viewportBreakpoints'
+import { MARKETING_LAYOUT_MAX_WIDTH_PX } from '@/constants/viewportBreakpoints'
 
-/** Pair with `@media (max-width: 767px)` — desktop handoff is the next pixel up. */
-const DESKTOP_HANDOFF_QUERY = `(min-width: ${MOBILE_LAYOUT_MAX_WIDTH_PX + 1}px)`
+/** Pair with homepage `@media (max-width: 767px)` — desktop handoff is the next pixel up. */
+const DESKTOP_HANDOFF_QUERY = `(min-width: ${MARKETING_LAYOUT_MAX_WIDTH_PX + 1}px)`
 
 /**
  * Desktop-only sticky / pin handoff. When `enabled` is false, always inactive

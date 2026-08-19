@@ -42,7 +42,7 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .linkCard {
     padding: var(--primitives-spacing-5);
   }
@@ -187,7 +187,7 @@
   color: var(--semantic-color-text-muted);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .amountInput:focus,
   .amountInput:focus-visible,
   .amountInput:focus::placeholder,

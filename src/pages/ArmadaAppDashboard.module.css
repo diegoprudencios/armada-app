@@ -8,6 +8,8 @@
   display: flex;
   flex-direction: column;
   isolation: isolate;
+  /* Phone-column dashboard: fill the view only when the viewport is this narrow. */
+  --dashboard-column-width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-5));
 }
 
 .shell[data-activity-visible='true'] {
@@ -46,6 +48,7 @@
   z-index: 100;
   width: 100%;
   padding-inline: var(--primitives-spacing-5);
+  box-sizing: border-box;
   margin-bottom: calc(
     var(--primitives-spacing-12) + var(--primitives-spacing-6) + var(--primitives-spacing-1) * 0.5
   );
@@ -105,8 +108,11 @@
 .cardStack {
   position: relative;
   z-index: 1;
-  width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-5));
+  width: 100%;
+  max-width: var(--dashboard-column-width);
   margin-inline: auto;
+  align-self: center;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -211,7 +217,7 @@
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 480px) {
   .shell {
     padding-block-start: 0;
     padding-block-end: var(--semantic-spacing-page-block);
@@ -261,9 +267,13 @@
     left: 0;
     right: 0;
     z-index: 100;
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
     margin-bottom: 0;
     padding-block-start: var(--primitives-spacing-5);
     padding-block-end: 0;
+    padding-inline: var(--primitives-spacing-5);
     background: transparent;
   }
 
@@ -274,8 +284,8 @@
   }
 }
 
-/* Mobile layout — keep in sync with MOBILE_LAYOUT_MAX_WIDTH_PX (767). */
-@media (max-width: 767px) {
+/* Phone layout — keep in sync with MOBILE_LAYOUT_MAX_WIDTH_PX (479). */
+@media (max-width: 479px) {
   .shell {
     min-height: 100dvh;
     overflow-x: clip;
@@ -295,11 +305,7 @@
 
   .cardStack {
     flex: 0 0 auto;
-    width: 100%;
-    max-width: none;
-    align-self: stretch;
     padding-inline: var(--primitives-spacing-4);
-    box-sizing: border-box;
     gap: var(--primitives-spacing-6);
   }
 

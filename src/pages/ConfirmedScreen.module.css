@@ -121,7 +121,7 @@
   background: color-mix(in srgb, var(--primitives-color-neutral-50) 55%, transparent);
 }
 
-@media (max-width: 767px) {
+@media (max-width: 479px) {
   .column {
     padding: var(--primitives-spacing-5);
   }
