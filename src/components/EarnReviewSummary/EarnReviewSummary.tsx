@@ -1,9 +1,14 @@
 import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
+import {
+  ReviewSummary,
+  ReviewSummaryRow,
+  ReviewSummaryTotalRow,
+  type ReviewSummaryTone,
+} from '@/components/ReviewSummary'
 import { formatUsdcAmount } from '@/utils/format'
 import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import { formatDemoApy, type EarnTab } from '@/pages/earnFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
-import styles from '../DepositReviewSummary/DepositReviewSummary.module.css'
 
 export interface EarnReviewSummaryProps {
   tab: EarnTab
@@ -12,7 +17,7 @@ export interface EarnReviewSummaryProps {
   feeUsdc: number
   confirmedAt?: number
   /** Soft cool-gray fills for the summary table (e.g. white bottom sheet). */
-  tone?: 'default' | 'neutral'
+  tone?: ReviewSummaryTone
 }
 
 export function EarnReviewSummary({
@@ -28,37 +33,21 @@ export function EarnReviewSummary({
   const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const total = amount + feeUsdc
   const totalLabel = `${formatUsdcAmount(total, 2)} USDC`
-  const summaryClassName = [styles.summary, tone === 'neutral' && styles.summaryNeutral]
-    .filter(Boolean)
-    .join(' ')
 
   return (
-    <div className={summaryClassName}>
-      <div className={styles.summaryBody}>
-        {confirmedAt ? <TransactionDateTimeRow confirmedAt={confirmedAt} /> : null}
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Mode</span>
-          <span className={styles.summaryValue}>{modeLabel}</span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Estimated APY</span>
-          <span className={styles.summaryValue}>{formatDemoApy(apy)}</span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>{amountRowLabel}</span>
-          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>
-            {formatUsdcAmount(amount)} USDC
-          </span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Estimated fee</span>
-          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{feeLabel}</span>
-        </div>
-      </div>
-      <div className={styles.summaryTotalRow}>
-        <span className={styles.summaryTotalLabel}>Total</span>
-        <span className={[styles.summaryTotalValue, usdcAmount.font].join(' ')}>{totalLabel}</span>
-      </div>
-    </div>
+    <ReviewSummary
+      tone={tone}
+      total={<ReviewSummaryTotalRow valueClassName={usdcAmount.font}>{totalLabel}</ReviewSummaryTotalRow>}
+    >
+      {confirmedAt ? <TransactionDateTimeRow confirmedAt={confirmedAt} /> : null}
+      <ReviewSummaryRow label="Mode">{modeLabel}</ReviewSummaryRow>
+      <ReviewSummaryRow label="Estimated APY">{formatDemoApy(apy)}</ReviewSummaryRow>
+      <ReviewSummaryRow label={amountRowLabel} valueClassName={usdcAmount.font}>
+        {formatUsdcAmount(amount)} USDC
+      </ReviewSummaryRow>
+      <ReviewSummaryRow label="Estimated fee" valueClassName={usdcAmount.font}>
+        {feeLabel}
+      </ReviewSummaryRow>
+    </ReviewSummary>
   )
 }

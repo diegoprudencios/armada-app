@@ -1,10 +1,17 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import {
+  ReviewSummary,
+  ReviewSummaryRow,
+  ReviewSummaryTotalRow,
+  ReviewSummaryValueWithIcon,
+  reviewSummaryMarkIconClassName,
+  type ReviewSummaryTone,
+} from '@/components/ReviewSummary'
 import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { WalletProviderIcon } from '@/components/WalletPillMenu/WalletPillMenu'
 import { formatUsdcAmount, truncateAddress, truncateArmadaAddress } from '@/utils/format'
 import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import usdcAmount from '@/styles/usdcAmount.module.css'
-import styles from './DepositReviewSummary.module.css'
 
 const ROW_ICON_PX = 16
 
@@ -17,7 +24,7 @@ export interface DepositReviewSummaryProps {
   armadaAddress: string
   confirmedAt?: number
   /** Soft cool-gray fills for the summary table (e.g. white bottom sheet). */
-  tone?: 'default' | 'neutral'
+  tone?: ReviewSummaryTone
 }
 
 export function DepositReviewSummary({
@@ -33,45 +40,29 @@ export function DepositReviewSummary({
   const total = amount + feeUsdc
   const feeLabel = formatProtocolFeeLabel(feeUsdc)
   const totalLabel = `${formatUsdcAmount(total, 2)} USDC`
-  const summaryClassName = [styles.summary, tone === 'neutral' && styles.summaryNeutral]
-    .filter(Boolean)
-    .join(' ')
 
   return (
-    <div className={summaryClassName}>
-      <div className={styles.summaryBody}>
-        {confirmedAt ? <TransactionDateTimeRow confirmedAt={confirmedAt} /> : null}
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Network</span>
-          <span className={styles.summaryValue}>{networkName}</span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>From your wallet</span>
-          <span className={styles.summaryValue}>
-            <span className={styles.valueWithIcon}>
-              <WalletProviderIcon provider={walletProvider} size={ROW_ICON_PX} />
-              <span>{truncateAddress(walletAddress)}</span>
-            </span>
-          </span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>To Armada</span>
-          <span className={styles.summaryValue}>
-            <span className={styles.valueWithIcon}>
-              <ArmadaLogo variant="mark" markTone="deep" className={styles.armadaIcon} />
-              <span>{truncateArmadaAddress(armadaAddress)}</span>
-            </span>
-          </span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Fees</span>
-          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{feeLabel}</span>
-        </div>
-      </div>
-      <div className={styles.summaryTotalRow}>
-        <span className={styles.summaryTotalLabel}>Total</span>
-        <span className={[styles.summaryTotalValue, usdcAmount.font].join(' ')}>{totalLabel}</span>
-      </div>
-    </div>
+    <ReviewSummary
+      tone={tone}
+      total={<ReviewSummaryTotalRow valueClassName={usdcAmount.font}>{totalLabel}</ReviewSummaryTotalRow>}
+    >
+      {confirmedAt ? <TransactionDateTimeRow confirmedAt={confirmedAt} /> : null}
+      <ReviewSummaryRow label="Network">{networkName}</ReviewSummaryRow>
+      <ReviewSummaryRow label="From your wallet">
+        <ReviewSummaryValueWithIcon>
+          <WalletProviderIcon provider={walletProvider} size={ROW_ICON_PX} />
+          <span>{truncateAddress(walletAddress)}</span>
+        </ReviewSummaryValueWithIcon>
+      </ReviewSummaryRow>
+      <ReviewSummaryRow label="To Armada">
+        <ReviewSummaryValueWithIcon>
+          <ArmadaLogo variant="mark" markTone="deep" className={reviewSummaryMarkIconClassName} />
+          <span>{truncateArmadaAddress(armadaAddress)}</span>
+        </ReviewSummaryValueWithIcon>
+      </ReviewSummaryRow>
+      <ReviewSummaryRow label="Fees" valueClassName={usdcAmount.font}>
+        {feeLabel}
+      </ReviewSummaryRow>
+    </ReviewSummary>
   )
 }

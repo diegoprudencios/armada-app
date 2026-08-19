@@ -1,10 +1,16 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import {
+  ReviewSummary,
+  ReviewSummaryRow,
+  ReviewSummaryTotalRow,
+  ReviewSummaryValueWithIcon,
+  reviewSummaryMarkIconClassName,
+} from '@/components/ReviewSummary'
 import { TransactionDateTimeRow } from '@/components/TransactionDateTimeRow'
 import { isArmadaAddress, sendNetworkDisplayName, type SendChainId } from '@/pages/sendFlowConstants'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
 import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import usdcAmount from '@/styles/usdcAmount.module.css'
-import styles from '../DepositReviewSummary/DepositReviewSummary.module.css'
 
 export interface ReceivePaymentReviewSummaryProps {
   amount: number
@@ -30,46 +36,31 @@ export function ReceivePaymentReviewSummary({
   const totalLabel = `${formatUsdcAmount(amount, 2)} USDC`
 
   return (
-    <div className={styles.summary}>
-      <div className={styles.summaryBody}>
-        <TransactionDateTimeRow confirmedAt={confirmedAt} />
-        {!isPrivate && networkName ? (
-          <div className={styles.summaryRow}>
-            <span className={styles.summaryLabel}>Network</span>
-            <span className={styles.summaryValue}>{networkName}</span>
-          </div>
-        ) : null}
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>From</span>
-          <span className={styles.summaryValue}>
-            <span className={styles.valueWithIcon}>
-              {isPrivate ? <ArmadaLogo variant="mark" markTone="deep" className={styles.armadaIcon} /> : null}
-              <span>{truncateAddress(sender)}</span>
-            </span>
-          </span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>To your private account</span>
-          <span className={styles.summaryValue}>
-            <span className={styles.valueWithIcon}>
-              <ArmadaLogo variant="mark" markTone="deep" className={styles.armadaIcon} />
-              <span>{truncateAddress(armadaAddress)}</span>
-            </span>
-          </span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Transaction</span>
-          <span className={styles.summaryValue}>{truncateAddress(txHash)}</span>
-        </div>
-        <div className={styles.summaryRow}>
-          <span className={styles.summaryLabel}>Fees</span>
-          <span className={[styles.summaryValue, usdcAmount.font].join(' ')}>{feeLabel}</span>
-        </div>
-      </div>
-      <div className={styles.summaryTotalRow}>
-        <span className={styles.summaryTotalLabel}>Total</span>
-        <span className={[styles.summaryTotalValue, usdcAmount.font].join(' ')}>{totalLabel}</span>
-      </div>
-    </div>
+    <ReviewSummary
+      total={<ReviewSummaryTotalRow valueClassName={usdcAmount.font}>{totalLabel}</ReviewSummaryTotalRow>}
+    >
+      <TransactionDateTimeRow confirmedAt={confirmedAt} />
+      {!isPrivate && networkName ? (
+        <ReviewSummaryRow label="Network">{networkName}</ReviewSummaryRow>
+      ) : null}
+      <ReviewSummaryRow label="From">
+        <ReviewSummaryValueWithIcon>
+          {isPrivate ? (
+            <ArmadaLogo variant="mark" markTone="deep" className={reviewSummaryMarkIconClassName} />
+          ) : null}
+          <span>{truncateAddress(sender)}</span>
+        </ReviewSummaryValueWithIcon>
+      </ReviewSummaryRow>
+      <ReviewSummaryRow label="To your private account">
+        <ReviewSummaryValueWithIcon>
+          <ArmadaLogo variant="mark" markTone="deep" className={reviewSummaryMarkIconClassName} />
+          <span>{truncateAddress(armadaAddress)}</span>
+        </ReviewSummaryValueWithIcon>
+      </ReviewSummaryRow>
+      <ReviewSummaryRow label="Transaction">{truncateAddress(txHash)}</ReviewSummaryRow>
+      <ReviewSummaryRow label="Fees" valueClassName={usdcAmount.font}>
+        {feeLabel}
+      </ReviewSummaryRow>
+    </ReviewSummary>
   )
 }
