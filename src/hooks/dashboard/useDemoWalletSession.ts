@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
+import type { DemoWalletProvider } from '@/constants/demoWallets'
 import {
   createConnectedWallet,
   demoWalletFromConnected,

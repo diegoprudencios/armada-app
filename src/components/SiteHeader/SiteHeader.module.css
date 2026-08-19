@@ -191,18 +191,18 @@
   flex-shrink: 0;
   border: none;
   /* EXCEPTION — white pill on the transparent hero header. */
-  background: #ffffff;
+  background: var(--semantic-color-surface-default);
   color: var(--semantic-component-button-gradient-text);
   /* Don’t interpolate fill when the docked bar appears — it should already be purple. */
   transition: opacity 0.15s, transform 0.1s;
 }
 
 .appCta.appCta:hover:not(:disabled) {
-  background: color-mix(in srgb, #000000 6%, #ffffff);
+  background: color-mix(in srgb, var(--semantic-color-text-primary) 6%, var(--semantic-color-surface-default));
 }
 
 .appCta.appCta:active:not(:disabled) {
-  background: color-mix(in srgb, #000000 10%, #ffffff);
+  background: color-mix(in srgb, var(--semantic-color-text-primary) 10%, var(--semantic-color-surface-default));
 }
 
 .headerScrolled .appCta.appCta {

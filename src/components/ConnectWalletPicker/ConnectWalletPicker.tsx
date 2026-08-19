@@ -1,21 +1,11 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
-import {
-  WalletMetamask,
-  WalletPhantom,
-  WalletWalletConnect,
-} from '@web3icons/react'
 import { BottomSheet } from '@/components/BottomSheet'
 import WalletItem from '@/components/WalletItem/WalletItem'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
-import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
+import { CONNECT_WALLET_OPTIONS } from '@/constants/connectWallets'
+import type { DemoWalletProvider } from '@/constants/demoWallets'
 import styles from './ConnectWalletPicker.module.css'
-
-const CONNECT_WALLETS: { id: DemoWalletProvider; name: string; icon: ReactNode }[] = [
-  { id: 'metamask', name: 'MetaMask', icon: <WalletMetamask size={24} /> },
-  { id: 'phantom', name: 'Phantom', icon: <WalletPhantom size={24} /> },
-  { id: 'walletconnect', name: 'WalletConnect', icon: <WalletWalletConnect size={24} /> },
-]
 
 export interface ConnectWalletPickerProps {
   onSelect: (provider: DemoWalletProvider) => void
@@ -77,7 +67,7 @@ export function ConnectWalletPicker({
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [open, isMobile])
 
-  const walletItems = CONNECT_WALLETS.map((wallet) => (
+  const walletItems = CONNECT_WALLET_OPTIONS.map((wallet) => (
     <WalletItem
       key={wallet.id}
       name={wallet.name}

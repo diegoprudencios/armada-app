@@ -4,7 +4,7 @@ import {
   writeActivityUserHidden,
   writeDemoDashboardSession,
 } from '@/utils/demoDashboardSession'
-import { DEMO_WALLET_ADDRESS } from '@/pages/depositFlowConstants'
+import { DEMO_WALLET_ADDRESS } from '@/constants/demoWallets'
 
 export const LANDING_PATH = '/'
 export const APP_DASHBOARD_PATH = '/dashboard'

@@ -1,6 +1,9 @@
 import { aggregateHoldingsBalance, DEMO_USDC_BY_PROVIDER, holdingsForWallets } from '@/constants/walletMenu'
-import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
-import { DEMO_ADDRESS_BY_PROVIDER, resolveDemoWalletAddress } from '@/pages/depositFlowConstants'
+import {
+  DEMO_ADDRESS_BY_PROVIDER,
+  resolveDemoWalletAddress,
+  type DemoWalletProvider,
+} from '@/constants/demoWallets'
 import type { DemoWallet } from '@/utils/demoDashboardSession'
 
 export type ConnectedWallet = {

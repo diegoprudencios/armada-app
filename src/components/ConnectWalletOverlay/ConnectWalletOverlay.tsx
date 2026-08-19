@@ -1,28 +1,18 @@
-import { useEffect, useId, useRef, type ReactNode } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import {
-  WalletMetamask,
-  WalletPhantom,
-  WalletWalletConnect,
-} from '@web3icons/react'
 import WalletItem from '@/components/WalletItem/WalletItem'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { useRestoreFocus } from '@/hooks/useRestoreFocus'
-import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
+import { CONNECT_WALLET_OPTIONS } from '@/constants/connectWallets'
+import type { DemoWalletProvider } from '@/constants/demoWallets'
 import styles from './ConnectWalletOverlay.module.css'
 
 export interface ConnectWalletOverlayProps {
   onSelect: (provider: DemoWalletProvider) => void
   onDismiss: () => void
 }
-
-const WALLETS: { id: DemoWalletProvider; name: string; icon: ReactNode }[] = [
-  { id: 'metamask', name: 'MetaMask', icon: <WalletMetamask size={24} /> },
-  { id: 'phantom', name: 'Phantom', icon: <WalletPhantom size={24} /> },
-  { id: 'walletconnect', name: 'WalletConnect', icon: <WalletWalletConnect size={24} /> },
-]
 
 export function ConnectWalletOverlay({ onSelect, onDismiss }: ConnectWalletOverlayProps) {
   const titleId = useId()
@@ -54,7 +44,7 @@ export function ConnectWalletOverlay({ onSelect, onDismiss }: ConnectWalletOverl
           <p className={styles.subtitle}>Choose a wallet to continue to Armada.</p>
         </div>
         <div className={styles.walletList}>
-          {WALLETS.map((wallet, index) => (
+          {CONNECT_WALLET_OPTIONS.map((wallet, index) => (
             <WalletItem
               key={wallet.id}
               ref={index === 0 ? firstWalletRef : undefined}

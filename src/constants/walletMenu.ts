@@ -1,6 +1,8 @@
 import type { DepositChainId } from '@/constants/depositChains'
-import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
-import { DEMO_ADDRESS_BY_PROVIDER } from '@/pages/depositFlowConstants'
+import {
+  DEMO_ADDRESS_BY_PROVIDER,
+  type DemoWalletProvider,
+} from '@/constants/demoWallets'
 import { connectedWalletId } from '@/utils/walletMenu'
 
 export const DEMO_USDC_BY_PROVIDER: Record<DemoWalletProvider, number> = {

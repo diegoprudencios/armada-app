@@ -78,16 +78,16 @@ Risk here is the chance of breaking dashboard or connect UX if the item is chang
 
 ---
 
-## `DemoWalletProvider` (defined in `pages/depositFlowConstants.ts`, used elsewhere)
+## `DemoWalletProvider` (defined in `constants/demoWallets.ts`)
 
-The type `'metamask' \| 'phantom' \| 'walletconnect'` and hardcoded addresses (`DEMO_WALLET_ADDRESS`, `DEMO_ADDRESS_BY_PROVIDER`) live under **pages** and are imported by UI and hooks. That is a domain module pretending to be a page constant file.
+The type `'metamask' | 'phantom' | 'walletconnect'` and hardcoded addresses (`DEMO_WALLET_ADDRESS`, `DEMO_ADDRESS_BY_PROVIDER`) live in **`src/constants/demoWallets.ts`**. `pages/depositFlowConstants.ts` re-exports them for deposit pages. Connect UI uses `CONNECT_WALLET_OPTIONS` from `constants/connectWallets.tsx`.
 
-### `src/pages/depositFlowConstants.ts`
+### `src/constants/demoWallets.ts`
 
 | | |
 |--|--|
 | **What it does now** | Owns `DemoWalletProvider`, per-provider fake addresses, `resolveDemoWalletAddress`. |
-| **Why it's on the list** | Real connectors will not use these addresses. Components currently import the type from here — move or replace in one pass. |
+| **Why it's on the list** | Real connectors will not use these addresses. Replace in one pass with wagmi/connector ids. |
 | **Risk** | **Medium** — many imports |
 
 ### `src/hooks/dashboard/useDemoWalletSession.ts`

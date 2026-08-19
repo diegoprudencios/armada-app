@@ -182,8 +182,22 @@
 
   .sitemap {
     grid-template-columns: 1fr;
-    gap: var(--primitives-spacing-6);
-    text-align: center;
+    justify-items: center;
+    gap: var(--primitives-spacing-1);
+  }
+
+  /* Flex titles ignore text-align; center the link and drop desktop row height. */
+  .columnTitle {
+    min-height: 0;
+    justify-content: center;
+  }
+
+  .columnTitleLink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--primitives-spacing-11);
+    padding: var(--primitives-spacing-2) var(--primitives-spacing-4);
   }
 
   .socialList {

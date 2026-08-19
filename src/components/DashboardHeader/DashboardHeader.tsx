@@ -3,7 +3,7 @@ import { WalletButton } from '@/components/WalletButton'
 import { WalletPillMenu } from '@/components/WalletPillMenu'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import type { DepositChainId } from '@/constants/depositChains'
-import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
+import type { DemoWalletProvider } from '@/constants/demoWallets'
 import type { ConnectedWallet } from '@/utils/walletMenu'
 import styles from './DashboardHeader.module.css'
 

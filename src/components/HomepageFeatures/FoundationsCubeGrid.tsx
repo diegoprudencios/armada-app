@@ -297,12 +297,10 @@ export function FoundationsCubeGrid() {
     const rootStyle = getComputedStyle(root)
     const fillSolid =
       rootStyle.getPropertyValue('--cube-face-fill').trim() ||
-      rootStyle.getPropertyValue('--semantic-color-brand-deep').trim() ||
-      '#291433'
+      rootStyle.getPropertyValue('--semantic-color-brand-deep').trim()
     const stroke =
       rootStyle.getPropertyValue('--cube-stroke').trim() ||
-      rootStyle.getPropertyValue('--diagram-stroke').trim() ||
-      '#5a4a62'
+      rootStyle.getPropertyValue('--diagram-stroke').trim()
 
     const paint = () => {
       const faces = collectFaces(spaceRef.current, motionRef.current.yaw, motionRef.current.y)

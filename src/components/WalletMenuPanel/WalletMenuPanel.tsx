@@ -24,7 +24,7 @@ import {
   WALLET_PANEL_ETHEREUM_NETWORK_LABEL,
 } from '@/constants/walletMenu'
 import type { DepositChainId } from '@/constants/depositChains'
-import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
+import type { DemoWalletProvider } from '@/constants/demoWallets'
 import type { ConnectedWallet } from '@/utils/walletMenu'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
 import styles from './WalletMenuPanel.module.css'
