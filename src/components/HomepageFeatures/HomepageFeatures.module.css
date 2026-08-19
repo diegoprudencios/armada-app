@@ -9,8 +9,7 @@
   --section-features-pad-y: calc(var(--primitives-spacing-20) * 2);
   /* EXCEPTION — Figma marketing page fill (white), not amber-100. Light surface-default is #ffffff. */
   --section-page-bg: var(--semantic-color-surface-default);
-  /* EXCEPTION — Figma panel fill #f9f3ef (no matching token). */
-  --section-panel-bg: #f9f3ef;
+  --section-panel-bg: var(--semantic-color-surface-default);
 
   display: flex;
   flex-direction: column;
