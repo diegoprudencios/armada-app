@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { useId, useLayoutEffect, useRef, useState } from 'react'
 import type { RowKind, TransactionProgressVariantProps } from '../transactionProgressUtils'
 import { rowKindFor, stageLabelFor } from '../transactionProgressUtils'
@@ -121,7 +121,7 @@ export function TimelineVariant({
         aria-controls={panelId}
         onClick={() => setIsOpen((open) => !open)}
       >
-        <ChevronDown className={styles.chevron} size={14} aria-hidden />
+        <ChevronDownIcon className={styles.chevron} aria-hidden />
       </button>
 
       <div

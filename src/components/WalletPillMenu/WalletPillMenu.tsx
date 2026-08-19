@@ -7,7 +7,6 @@ import { BOTTOM_SHEET_EXIT_MS } from '@/components/BottomSheet'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import type { DemoWalletProvider } from '@/pages/depositFlowConstants'
 import { truncateAddress } from '@/utils/format'
-import { useWalletPanelVersion } from '@/utils/walletPanelVersion'
 import type { ConnectedWallet } from '@/utils/walletMenu'
 import styles from './WalletPillMenu.module.css'
 import { WalletProviderIcon } from './WalletProviderIcon'
@@ -15,7 +14,6 @@ import { WalletProviderIcon } from './WalletProviderIcon'
 export interface WalletPillMenuProps {
   wallets: readonly ConnectedWallet[]
   activeWalletId: string | null
-  onSelectWallet: (walletId: string) => void
   onDisconnectWallet: (walletId: string) => void
   onConnectWallet: (provider: DemoWalletProvider) => void
   onDeposit: (walletId: string, chain: DepositChainId) => void
@@ -36,7 +34,6 @@ function fadeDelayMs(): number {
 export function WalletPillMenu({
   wallets,
   activeWalletId,
-  onSelectWallet,
   onDisconnectWallet,
   onConnectWallet,
   onDeposit,
@@ -46,17 +43,11 @@ export function WalletPillMenu({
   const isMobile = useMobileLayout()
   const [panelOpen, setPanelOpen] = useState(false)
   const [pillHidden, setPillHidden] = useState(false)
-  const [panelVersion] = useWalletPanelVersion()
   const openTimerRef = useRef<number | null>(null)
   const closeTimerRef = useRef<number | null>(null)
 
   const activeWallet = wallets.find((wallet) => wallet.id === activeWalletId) ?? wallets[0] ?? null
-  const iconWallets =
-    panelVersion === 'v1'
-      ? activeWallet
-        ? [activeWallet]
-        : []
-      : wallets
+  const iconWallets = activeWallet ? [activeWallet] : []
   const pillWallet = iconWallets.length === 1 ? iconWallets[0] : null
   const iconStackClassName = [
     styles.triggerIconStack,
@@ -142,7 +133,6 @@ export function WalletPillMenu({
         onClose={closeMenu}
         wallets={wallets}
         activeWalletId={activeWalletId}
-        onSelectWallet={onSelectWallet}
         onDisconnectWallet={(walletId) => {
           onDisconnectWallet(walletId)
           if (wallets.length <= 1) closeMenu()

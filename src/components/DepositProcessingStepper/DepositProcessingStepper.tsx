@@ -3,12 +3,10 @@ import {
   DEPOSIT_PROCESSING_STAGES,
   DEPOSIT_PROGRESS_CARD_COPY,
 } from '@/constants/txProcessingCopy'
-import type { TransactionProgressVariant } from '@/components/TransactionProgressDisclosure'
 
 export interface DepositProcessingStepperProps {
   activeStageIndex?: number
   completed?: boolean
-  progressVariant?: TransactionProgressVariant
   layout?: TxProcessingLayoutVariant
   className?: string
 }
@@ -16,7 +14,6 @@ export interface DepositProcessingStepperProps {
 export function DepositProcessingStepper({
   activeStageIndex = 0,
   completed = false,
-  progressVariant,
   layout,
   className,
 }: DepositProcessingStepperProps) {
@@ -27,7 +24,6 @@ export function DepositProcessingStepper({
       stages={DEPOSIT_PROCESSING_STAGES}
       activeStageIndex={activeStageIndex}
       completed={completed}
-      progressVariant={progressVariant}
       layout={layout}
     />
   )

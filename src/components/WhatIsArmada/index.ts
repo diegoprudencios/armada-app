@@ -1,2 +1,2 @@
 export { WhatIsArmada } from './WhatIsArmada'
-export type { WhatIsArmadaFeaturesLayout, WhatIsArmadaProps } from './WhatIsArmada'
+export type { WhatIsArmadaProps } from './WhatIsArmada'

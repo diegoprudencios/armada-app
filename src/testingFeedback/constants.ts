@@ -76,9 +76,3 @@ export const TESTING_PRIMARY_ACTION_PATTERNS = [
   /\bwithdraw\b/i,
   /\bearn\b/i,
 ] as const
-
-/** @deprecated Use TESTING_FLOW_QUESTION_SHIELD_EXPECTATION */
-export const TESTING_FLOW_QUESTION_SHIELD_DEPOSIT = TESTING_FLOW_QUESTION_SHIELD_EXPECTATION
-
-/** @deprecated Use testingFlowQuestionSendPrivacyCertainty */
-export const testingFlowQuestionPrivateVsPublic = testingFlowQuestionSendPrivacyCertainty

@@ -90,6 +90,3 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
 ]
-
-/** @deprecated Prefer NAV_ITEMS — kept for any leftover imports. */
-export const NAV_MENUS: NavMenu[] = NAV_ITEMS.filter(isNavMenu)

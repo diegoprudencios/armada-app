@@ -1,9 +1,3 @@
-/*
-  Privacy intro: title + body/CTA above, full-width fog banner below
-  Alt: full-bleed 50/50 split (INTRO_LAYOUT = 'split')
-  Features: footer gem gradient (lavender → rose → amber) behind cream panels
-*/
-
 .section {
   /* Shared with feature stack + intro fog so widths stay aligned. */
   --section-stack-max: calc(
@@ -29,23 +23,6 @@
   background: var(--section-page-bg);
   color: #000000;
 }
-
-/* Split intro: flush to hero above and features band below. */
-.sectionSplit {
-  padding-top: 0;
-  gap: 0;
-}
-
-/* Loop intro: sticky brand-deep + copy flush under the hero. */
-.sectionLoop {
-  padding-top: 0;
-  gap: 0;
-  /* Stretch full-bleed children (default .section centers and shrinks them). */
-  align-items: stretch;
-  background: var(--semantic-color-brand-deep);
-}
-
-/* Privacy + split cards: one 40% gem wash on amber, so sticky never punches through to page white. */
 .sectionIntroStack {
   --gem-wash-base: var(--primitives-color-amber-100);
   --gem-wash-start: color-mix(
@@ -81,8 +58,6 @@
   background-attachment: fixed;
 }
 
-/* —— Intro: desktop handoff uses sticky copy; default is normal flow —— */
-
 .intro {
   display: flex;
   flex-direction: column;
@@ -96,8 +71,6 @@
   scroll-margin-top: 0;
   background: transparent;
 }
-
-/* Sit under the full hero pin so copy is centered after amber clears. */
 .introUnderHero {
   margin-top: var(--intro-under-hero-margin, calc(-100lvh - 140svh));
   padding-bottom: 0;
@@ -110,10 +83,6 @@
 
   .introCopy {
     opacity: 1 !important;
-  }
-
-  .introHold {
-    height: 0;
   }
 
   .introExitPin {
@@ -140,11 +109,6 @@
   text-align: center;
   background: transparent;
 }
-
-/*
-  Exit pin: tall scrub range with a sticky stage inside (same pattern as hero).
-  Sibling holds below sticky release too early — pin height is the fade travel.
-*/
 .introExitPin {
   position: relative;
   box-sizing: border-box;
@@ -153,11 +117,6 @@
   height: var(--intro-exit-pin-height, calc(100lvh + 204svh));
   background: transparent;
 }
-
-/*
-  Sticky amber sheet fills the viewport while copy fades in place.
-  Stays put for the full pin scrub; cards only enter after the pin ends.
-*/
 .introTextSticky {
   position: sticky;
   top: 0;
@@ -171,13 +130,9 @@
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
-
-/* Once privacy copy is on, sit above the cleared hero pin. */
 :global(html[data-privacy-copy='on']) .introTextSticky {
   z-index: 5;
 }
-
-/* iOS ignores background-attachment: fixed — flatten both layers to the 0% stop. */
 @supports (-webkit-touch-callout: none) {
   .sectionIntroStack,
   .introTextSticky {
@@ -198,13 +153,6 @@
   will-change: opacity;
 }
 
-.introHold {
-  flex-shrink: 0;
-  height: var(--intro-hold-svh, 100svh);
-  pointer-events: none;
-  background: transparent;
-}
-
 .introTitle {
   margin: 0;
   width: 100%;
@@ -216,28 +164,6 @@
   text-align: center;
   text-wrap: pretty;
 }
-
-/* Match feature stack width (same pad + max as .features > .stack). */
-.fogWrap {
-  position: relative;
-  z-index: 2;
-  box-sizing: border-box;
-  width: 100%;
-  padding: 0 var(--section-features-pad-x);
-}
-
-/* Desktop cover height for sticky privacy handoff. */
-.fogWrapCover {
-  --fog-cover-height: 70vh;
-}
-
-.fog {
-  width: 100%;
-  max-width: var(--section-stack-max);
-  margin-inline: auto;
-}
-
-/* Mobile: normal section padding (handoff is desktop-only via JS). */
 @media (max-width: 767px) {
   .intro {
     gap: var(--primitives-spacing-10);
@@ -258,76 +184,6 @@
   max-width: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-11));
   color: rgba(0, 0, 0, 0.7);
   text-wrap: pretty;
-}
-
-/* —— Intro split (full-bleed 50/50) —— */
-
-.introSplit {
-  --intro-pad-x: calc(var(--primitives-spacing-20) + var(--primitives-spacing-10));
-
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  box-sizing: border-box;
-  width: 100%;
-  min-height: calc(100svh - var(--primitives-spacing-20));
-  scroll-margin-top: 0;
-}
-
-.introSplitContent {
-  box-sizing: border-box;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-  min-width: 0;
-  max-width: none;
-  padding:
-    var(--primitives-spacing-16)
-    var(--intro-pad-x)
-    var(--primitives-spacing-16)
-    var(--intro-pad-x);
-  text-align: left;
-  background: var(--semantic-color-brand-deep);
-  /* Light copy on deep — same white token as MarketingHero on fleet photo. */
-  color: var(--semantic-component-tag-label);
-}
-
-.introSplitTitle,
-.introSplitContent .ctaRowStart {
-  max-width: 100%;
-  min-width: 0;
-}
-
-.introSplitTitle {
-  margin: 0;
-  width: 100%;
-  max-width: calc(var(--primitives-spacing-20) * 8);
-  color: var(--semantic-component-tag-label);
-  text-align: left;
-}
-
-.introSplitBody {
-  /* Leave margin-top undeclared so .armada-site-stack > * + * can apply title-to-body. */
-  margin-right: 0;
-  margin-bottom: 0;
-  margin-left: 0;
-  max-width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-10));
-  color: color-mix(in srgb, var(--semantic-component-tag-label) 70%, transparent);
-  text-wrap: pretty;
-}
-
-.introSplitMedia {
-  position: relative;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.fogSplit {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
 }
 
 .titleLine {
@@ -359,8 +215,6 @@
   background: color-mix(in srgb, #000000 6%, transparent);
   color: #000000;
 }
-
-/* —— Feature band —— same gem stops as SiteFooter (lavender → rose → amber) —— */
 
 .features {
   /* Opaque tints (not transparent mixes) so split cards don’t pick up mud from amber. */
@@ -408,20 +262,10 @@
   width: 100%;
   max-width: var(--section-stack-max);
 }
-
-/*
-  Desktop feature scroll: one card per 100vh, centered with ≥80px padding.
-  Tone 0 starts on the same amber as privacy, then morphs through gem colors.
-*/
 .featuresScroll {
   padding: 0;
   background: none;
 }
-
-/*
-  Overlap must not paint a fill — an opaque wash on top of the privacy copy
-  clips the title. Cards keep their own panel fills; the section gem wash shows through.
-*/
 .featuresOverlapIntro {
   position: relative;
   z-index: 6;
@@ -506,13 +350,9 @@
   background: var(--section-panel-bg);
   scroll-margin-top: 0;
 }
-
-/* Full-bleed cream panels (no diagram half). */
 .panel:not(.panelSplit) {
   padding: 0 var(--panel-pad-x);
 }
-
-/* 50/50 split: cream copy | brand-deep diagram — edge to edge, sharp clip. */
 .panelSplit {
   --panel-split-max-h: calc(
     var(--primitives-spacing-20) * 7 + var(--primitives-spacing-10)
@@ -532,8 +372,6 @@
   /* EXCEPTION — diagram stroke on deep half (no matching token). */
   --diagram-stroke: #5a4a62;
 }
-
-/* Deep animation left | cream copy right (compliance, foundations). */
 .panelSplitDeepLeft .panelDiagram {
   order: -1;
 }
@@ -552,8 +390,6 @@
     var(--panel-pad-x);
   background: var(--section-panel-bg);
 }
-
-/* Titles/CTAs may not exceed the padded content box (body keeps its own measure). */
 .panelSplit .panelTitle,
 .panelSplit .ctaRowStart {
   max-width: 100%;
@@ -622,335 +458,18 @@
   text-wrap: pretty;
 }
 
-/* —— Homepage3: edge-aligned grid — full-bleed H, continuous V on container —— */
-
-.featuresGrid {
-  --features-pad-y: calc(var(--primitives-spacing-20) * 2);
-  --features-pad-x: var(--primitives-spacing-20);
-  /* EXCEPTION — blueprint line on cream / deep / gem band. */
-  --grid-line: color-mix(in srgb, #5a4a62 45%, transparent);
-
-  position: relative;
-  overflow: visible;
-  padding: var(--features-pad-y) var(--features-pad-x);
-}
-
-.stackGrid {
-  position: relative;
-  isolation: isolate;
-}
-
-/* Continuous verticals on the content container edges (through panel gaps). */
-.stackGrid::before,
-.stackGrid::after {
-  content: '';
-  position: absolute;
-  top: calc(var(--features-pad-y) * -1);
-  bottom: calc(var(--features-pad-y) * -1);
-  width: 1px;
-  background: var(--grid-line);
-  z-index: 6;
-  pointer-events: none;
-}
-
-.stackGrid::before {
-  left: 0;
-}
-
-.stackGrid::after {
-  right: 0;
-}
-
-.panelGrid {
-  position: relative;
-  /* Let full-bleed horizontals escape; clip diagrams separately. */
-  overflow: visible;
-  border-radius: 0;
-  z-index: 1;
-}
-
-.panelGrid.panelSplit {
-  overflow: visible;
-}
-
-.panelGrid .panelDiagram {
-  overflow: hidden;
-}
-
-/*
-  Homepage5: copy half is transparent over the gem wash;
-  one Deep stroke around the whole split card.
-*/
-.panelOutlined.panelSplit,
-.cardViewport .panelOutlined.panelSplit {
-  background: transparent;
-  background-color: transparent;
-  background-image: none;
-  border: calc(var(--primitives-borderWidth-default) * 1px) solid
-    var(--semantic-color-brand-deep);
-}
-
-.panelOutlined.panelSplit .panelContent {
-  background: transparent;
-}
-
-.gridLineH,
-.gridMid {
-  position: absolute;
-  background: var(--grid-line);
-  pointer-events: none;
-  z-index: 6;
-}
-
-/* Horizontals on panel top/bottom — span full viewport width. */
-.gridLineH {
-  left: 50%;
-  width: 100vw;
-  height: 1px;
-  transform: translateX(-50%);
-}
-
-.gridLineH[data-edge='top'] {
-  top: 0;
-}
-
-.gridLineH[data-edge='bottom'] {
-  bottom: 0;
-}
-
-/* 50/50 seam — full panel height. */
-.gridMid {
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  transform: translateX(-50%);
-}
-
-/* —— Homepage4: varied bento (privacy + features) —— */
-
-.sectionBento {
-  /* Flush under hero; bento band owns padding. */
-  padding-top: 0;
-  gap: 0;
-  align-items: stretch;
-}
-
-.featuresBento {
-  padding:
-    calc(var(--primitives-spacing-20) + var(--primitives-spacing-10))
-    var(--primitives-spacing-10);
-}
-
-.stackBento {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: var(--primitives-spacing-5);
-  align-items: stretch;
-  max-width: calc(
-    var(--primitives-spacing-20) * 18 + var(--primitives-spacing-16) - var(--primitives-spacing-1) /
-      2
-  );
-}
-
-.panelBento {
-  /* 580px — shared bento card height */
-  height: calc(var(--primitives-spacing-20) * 7 + var(--primitives-spacing-5));
-  min-height: calc(var(--primitives-spacing-20) * 7 + var(--primitives-spacing-5));
-  border-radius: var(--primitives-spacing-5);
-  overflow: hidden;
-  box-shadow: 0 0 0 1px color-mix(in srgb, #000000 6%, transparent);
-}
-
-/* Bento type: title 32px / body 13px */
-.panelBento :global(.armada-text-title),
-.panelBento .panelTitle {
-  font-size: calc(var(--primitives-fontSize-3xl) * 1px);
-  line-height: 1.1;
-}
-
-.panelBento :global(.armada-text-body),
-.panelBento .panelBody {
-  font-size: calc(var(--primitives-fontSize-base) * 1px);
-  line-height: 1.4;
-}
-
-.panelBento.panelSplit {
-  --panel-pad-x: var(--primitives-spacing-10);
-}
-
-/* Bento non-split cards: kill inherited .panel:not(.panelSplit) side padding so media is edge-flush. */
-.panelBento:not(.panelSplit) {
-  padding: 0;
-}
-
-/* Privacy — full width, copy | fog (no panel padding — media is edge-flush) */
-.bentoPrivacy {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
-  align-items: stretch;
-  background: var(--section-panel-bg);
-}
-
-.bentoPrivacyCopyOnly {
-  grid-template-columns: 1fr;
-}
-
-.bentoPrivacyCopy {
-  box-sizing: border-box;
-  justify-content: center;
-  align-items: flex-start;
-  padding: var(--primitives-spacing-12) var(--primitives-spacing-10);
-  min-width: 0;
-}
-
-.bentoPrivacyMedia {
-  position: relative;
-  min-width: 0;
-  min-height: calc(var(--primitives-spacing-20) * 4);
-  overflow: hidden;
-  background: var(--semantic-color-brand-deep);
-}
-
-/* Capital — ~8/12, all deep + light type */
-.bentoCapital {
-  grid-column: 1 / span 8;
-  background: var(--semantic-color-brand-deep);
-}
-
-.bentoCapital .panelContent,
-.bentoCapital.panelSplit .panelContent {
-  background: transparent;
-}
-
-/* Compliance — ~4/12, vertical diagram → copy (diagram flush) */
-.bentoCompliance {
-  grid-column: 9 / -1;
-  display: flex;
-  flex-direction: column;
-  --panel-pad-x: var(--primitives-spacing-10);
-  --diagram-stroke: #5a4a62;
-  background: var(--section-panel-bg);
-}
-
-.bentoCompliance .panelDiagram {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: calc(var(--primitives-spacing-20) * 3);
-  width: 100%;
-  overflow: hidden;
-  background: var(--semantic-color-brand-deep);
-  --privacy-sphere-stroke: var(--diagram-stroke);
-  --toggle-stroke: var(--diagram-stroke);
-  --cube-stroke: var(--diagram-stroke);
-  --cube-face-fill: var(--semantic-color-brand-deep);
-}
-
-.bentoCompliance .panelContent {
-  flex: 0 0 auto;
-  height: auto;
-  max-width: none;
-  padding: var(--primitives-spacing-10);
-  background: var(--section-panel-bg);
-}
-
-/* Beyond — ~4/12 (inverse of capital row), cream + dark copy */
-.bentoBeyond {
-  grid-column: 1 / span 4;
-  display: grid;
-  grid-template-rows: minmax(calc(var(--primitives-spacing-20) * 3), 1fr) auto;
-  --diagram-stroke: #5a4a62;
-  background: var(--section-panel-bg);
-}
-
-.bentoBeyond .panelDiagram {
-  position: relative;
-  width: 100%;
-  min-height: calc(var(--primitives-spacing-20) * 3);
-  overflow: hidden;
-  background: transparent;
-  --privacy-sphere-stroke: var(--diagram-stroke);
-}
-
-.bentoBeyond .panelContent {
-  flex: 0 0 auto;
-  height: auto;
-  max-width: none;
-  padding: var(--primitives-spacing-8) var(--primitives-spacing-10)
-    var(--primitives-spacing-10);
-  background: transparent;
-}
-
-/* Deep-panel helpers (capital bento + stack / grid layouts) */
-.panelDeep .panelContentDeep {
-  justify-content: flex-start;
-  height: auto;
-  max-width: none;
-  padding: var(--primitives-spacing-8) var(--primitives-spacing-10)
-    var(--primitives-spacing-10);
-  background: transparent;
-}
-
-/* Capital split: keep content padding aligned with other bento splits */
-.bentoCapital.panelSplit .panelContentDeep {
-  padding:
-    var(--primitives-spacing-12)
-    var(--panel-pad-x)
-    var(--primitives-spacing-12)
-    var(--panel-pad-x);
-}
-
-.panelTitleDeep {
-  color: var(--semantic-component-tag-label);
-}
-
-.panelBodyDeep {
-  color: color-mix(in srgb, var(--semantic-component-tag-label) 72%, transparent);
-}
-
-.panelDeep :global(.ghostCta),
-.panelDeep .ghostCta {
-  color: var(--semantic-component-tag-label);
-}
-
-.panelDeep .ghostCta.ghostCta:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--semantic-component-tag-label) 10%, transparent);
-  color: var(--semantic-component-tag-label);
-}
-
-/* Foundations — ~8/12 (inverse of capital row), horizontal deep-left */
-.bentoFoundations {
-  grid-column: 5 / -1;
-}
-
-.panelBento .panelContent,
-.panelBento.panelSplit .panelContent {
-  z-index: 1;
-}
-
-.panelBento .panelDiagram {
-  z-index: 1;
-}
-
 @media (min-width: 768px) {
   .introTitle .titleLine,
-  .introSplitTitle .titleLine,
   .panelTitle .titleLine {
     white-space: nowrap;
   }
 
-  /* Split halves are narrower — let lines wrap so padding stays intact. */
-  .introSplitTitle .titleLine,
   .panelSplit .panelTitle .titleLine {
     white-space: normal;
   }
 }
 
 @media (min-width: 1200px) and (max-width: 1535px) {
-  .introSplit {
-    --intro-pad-x: calc(var(--primitives-spacing-16) + var(--primitives-spacing-4));
-  }
 
   .panel {
     height: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-5));
@@ -976,19 +495,12 @@
     padding-inline: var(--panel-pad-x);
   }
 }
-
-/*
-  Tablet: keep desktop horizontal splits; tighten padding vs large desktop.
-  Vertical stacking is mobile-only (≤767).
-*/
 @media (max-width: 1199px) {
   .section {
     gap: var(--primitives-spacing-16);
     padding-top: var(--primitives-spacing-16);
   }
 
-  .sectionSplit,
-  .sectionLoop,
   .sectionIntroStack {
     padding-top: 0;
     gap: 0;
@@ -1001,14 +513,6 @@
 
   .introText {
     padding: var(--primitives-spacing-16) var(--primitives-spacing-10);
-  }
-
-  .fogWrap {
-    padding: 0 var(--section-features-pad-x);
-  }
-
-  .introSplit {
-    --intro-pad-x: var(--primitives-spacing-10);
   }
 
   .features {
@@ -1032,25 +536,16 @@
     padding: 0 var(--panel-pad-x);
   }
 
-  .featuresGrid {
-    --features-pad-y: var(--primitives-spacing-16);
-    --features-pad-x: var(--primitives-spacing-10);
-  }
-
   .panelContent {
     max-width: none;
   }
 }
-
-/* Mobile: stack split panels; animation square on top; tighter padding. */
 @media (max-width: 767px) {
   .section {
     gap: var(--primitives-spacing-8);
     padding-top: var(--primitives-spacing-8);
   }
 
-  .sectionSplit,
-  .sectionLoop,
   .sectionIntroStack {
     padding-top: 0;
     gap: 0;
@@ -1069,15 +564,6 @@
     padding: var(--primitives-spacing-16) var(--primitives-spacing-8) 0;
   }
 
-  .fogWrap {
-    padding: 0 var(--section-features-pad-x);
-  }
-
-  .fog {
-    width: 100%;
-    max-width: var(--section-stack-max);
-  }
-
   .introTitle {
     width: 100%;
     max-width: none;
@@ -1088,47 +574,11 @@
     max-width: none;
   }
 
-  .introSplit {
-    --intro-pad-x: var(--primitives-spacing-8);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    min-height: 0;
-  }
-
-  .introSplitMedia {
-    order: -1;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    min-height: 0;
-  }
-
-  .fogSplit {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-  }
-
-  .introSplitContent {
-    /* Hug title + body + CTA — no forced min-height. */
-    flex: 0 0 auto;
-    justify-content: flex-start;
-    padding: var(--primitives-spacing-8) var(--intro-pad-x);
-  }
-
   .features {
     /* Side inset matches panel content bottom padding (spacing-8). */
     padding: var(--section-features-pad-y) var(--section-features-pad-x);
     --section-features-pad-x: var(--primitives-spacing-8);
     --section-features-pad-y: var(--primitives-spacing-20);
-  }
-
-  .featuresGrid {
-    --features-pad-y: var(--primitives-spacing-20);
-    --features-pad-x: var(--primitives-spacing-8);
-    padding: var(--features-pad-y) var(--features-pad-x);
   }
 
   .stack {
@@ -1155,57 +605,6 @@
     height: auto;
     min-height: 0;
     max-height: none;
-  }
-
-  /* Stacked split: mid seam no longer matches layout. */
-  .gridMid {
-    display: none;
-  }
-
-  .stackBento {
-    grid-template-columns: 1fr;
-    gap: var(--primitives-spacing-8);
-  }
-
-  .bentoPrivacy,
-  .bentoCapital,
-  .bentoCompliance,
-  .bentoBeyond,
-  .bentoFoundations {
-    grid-column: 1 / -1;
-  }
-
-  .bentoPrivacy {
-    grid-template-columns: 1fr;
-    height: auto;
-    min-height: 0;
-  }
-
-  .bentoPrivacyMedia {
-    order: -1;
-    min-height: 0;
-    aspect-ratio: 4 / 3;
-  }
-
-  .bentoBeyond {
-    grid-template-rows: minmax(calc(var(--primitives-spacing-20) * 2 + var(--primitives-spacing-10)), auto) auto;
-  }
-
-  .bentoCompliance,
-  .bentoBeyond,
-  .bentoCapital,
-  .bentoFoundations {
-    height: auto;
-    min-height: 0;
-  }
-
-  .panelBento {
-    height: auto;
-    min-height: 0;
-  }
-
-  .panelBento:not(.panelSplit) {
-    padding: 0;
   }
 
   .panelSplit .panelContent {
@@ -1236,10 +635,6 @@
 
   .panelContent {
     max-width: none;
-  }
-
-  .featuresBento {
-    padding: var(--primitives-spacing-10) var(--primitives-spacing-8);
   }
 
   .titleLine {

@@ -2,7 +2,6 @@ import {
   TxProcessingLayout,
   type TxProcessingLayoutVariant,
 } from '@/components/TxProcessingLayout'
-import type { TransactionProgressVariant } from '@/components/TransactionProgressDisclosure'
 import { sendProcessingStages, sendProgressCardCopy } from '@/constants/txProcessingCopy'
 import { sendProcessingCopyMode, type SendFlowVariant } from '@/pages/sendFlowConstants'
 
@@ -11,7 +10,6 @@ export interface SendProcessingStepperProps {
   completed?: boolean
   variant?: SendFlowVariant
   recipient?: string
-  progressVariant?: TransactionProgressVariant
   layout?: TxProcessingLayoutVariant
   className?: string
 }
@@ -21,7 +19,6 @@ export function SendProcessingStepper({
   completed = false,
   variant = 'send',
   recipient,
-  progressVariant,
   layout,
   className,
 }: SendProcessingStepperProps) {
@@ -34,7 +31,6 @@ export function SendProcessingStepper({
       stages={sendProcessingStages(copyMode)}
       activeStageIndex={activeStageIndex}
       completed={completed}
-      progressVariant={progressVariant}
       layout={layout}
     />
   )

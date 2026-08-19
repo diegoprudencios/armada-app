@@ -59,9 +59,6 @@ export const COPY_EXIT_CARD = {
  */
 export const INTRO_EXIT_PIN_HEIGHT = `calc(100lvh + ${HERO_EXIT_SCRUB_SVH + INTRO_HOLD_BEFORE_CARDS_SVH}svh)`
 
-/** @deprecated Alias — fog handoff removed. */
-export const INTRO_HOLD_BEFORE_FOG_SVH = INTRO_HOLD_BEFORE_CARDS_SVH
-
 /** Map value from [start, end] onto 0–1. `end < start` is valid (e.g. element top falling as you scroll). */
 export function remap01(value: number, start: number, end: number) {
   const span = end - start

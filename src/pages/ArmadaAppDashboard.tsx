@@ -13,7 +13,6 @@ import { RecentActivityList } from '@/components/RecentActivityList'
 import { useDashboardDemoState } from '@/hooks/useDashboardDemoState'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { useRequireConnectedWallet } from '@/hooks/useRequireConnectedWallet'
-import { getDashboardVersionFromPath } from '@/utils/dashboardVersion'
 import { DashboardOverlays } from './DashboardOverlays'
 import { DashboardCardStack } from './DashboardCardStack'
 import { EarnChooserSheet } from './EarnChooserSheet'
@@ -31,15 +30,13 @@ export interface ArmadaAppDashboardProps {
   balance?: number
   onSend?: () => void
   onRequest?: () => void
-  onMore?: () => void
 }
 
-/** Dashboard shell — v01/v02 layout selected from `/dashboard` vs `/dashboard-v2`. */
+/** Dashboard shell. */
 export function ArmadaAppDashboard({
   balance: initialBalance = 0,
   onSend,
   onRequest,
-  onMore,
 }: ArmadaAppDashboardProps) {
   const isMobile = useMobileLayout()
   const [vaultChooserOpen, setVaultChooserOpen] = useState(false)
@@ -55,7 +52,6 @@ export function ArmadaAppDashboard({
     showEarnBanner,
     openConnect,
     connectWallet,
-    selectActiveWallet,
     disconnectWallet,
     openDepositFromWallet,
     openDeposit,
@@ -76,8 +72,6 @@ export function ArmadaAppDashboard({
 
   if (!wallet) return null
 
-  const dashboardVersion = getDashboardVersionFromPath()
-  const isV2 = dashboardVersion === 'v2'
   const showActivity = activityVisible && recentActivity.length > 0
   if (activityVisibleOnPaintRef.current === null) {
     activityVisibleOnPaintRef.current = showActivity
@@ -90,7 +84,6 @@ export function ArmadaAppDashboard({
   return (
     <div
       className={styles.shell}
-      data-dashboard-version={dashboardVersion}
       data-activity-visible={showActivity ? 'true' : 'false'}
       style={
         showActivity
@@ -106,7 +99,6 @@ export function ArmadaAppDashboard({
           wallets={connectedWallets}
           activeWalletId={activeWalletId}
           onConnect={openConnect}
-          onSelectWallet={selectActiveWallet}
           onDisconnectWallet={disconnectWallet}
           onConnectWallet={connectWallet}
           onDeposit={openDepositFromWallet}
@@ -115,7 +107,6 @@ export function ArmadaAppDashboard({
         />
       </div>
       <DashboardCardStack
-        stackClassName={isV2 ? styles.cardStackV2 : undefined}
         showDepositTooltip={showDepositTooltip}
         showEarnBanner={showEarnBanner}
         activityVisible={showActivity}
@@ -136,13 +127,10 @@ export function ArmadaAppDashboard({
             balanceRollMode={balanceRoll.mode}
             balanceRollFromValue={balanceRoll.fromValue}
             hasActivityItems={recentActivity.length > 0}
-            actionLayout={isV2 ? 'v2' : undefined}
             onSend={onSend ?? openSend}
             onDeposit={openDeposit}
             onRequest={onRequest ?? openRequest}
-            onMore={onMore}
             onEarn={() => openEarn('add')}
-            onWithdraw={openWithdraw}
             vaultBalance={earningBalance}
             vaultRollFromValue={balanceRoll.vaultFromValue}
             onVaultOpen={() => {
@@ -164,7 +152,7 @@ export function ArmadaAppDashboard({
           />
         }
         depositTooltip={
-          <DepositTooltip stretch variant={isV2 ? 'v2' : undefined} onDeposit={openDeposit} />
+          <DepositTooltip stretch onDeposit={openDeposit} />
         }
         earnBanner={
           <DepositTooltip

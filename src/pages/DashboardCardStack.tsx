@@ -2,7 +2,6 @@ import { type CSSProperties, type ReactNode } from 'react'
 import styles from './ArmadaAppDashboard.module.css'
 
 export interface DashboardCardStackProps {
-  stackClassName?: string
   showDepositTooltip: boolean
   showEarnBanner?: boolean
   activityVisible: boolean
@@ -15,7 +14,6 @@ export interface DashboardCardStackProps {
 }
 
 export function DashboardCardStack({
-  stackClassName,
   showDepositTooltip,
   showEarnBanner = false,
   activityVisible,
@@ -31,7 +29,7 @@ export function DashboardCardStack({
 
   return (
     <div
-      className={[styles.cardStack, stackClassName].filter(Boolean).join(' ')}
+      className={styles.cardStack}
       data-activity-visible={activityVisible ? 'true' : 'false'}
       data-deposit-tooltip={showPromoBanner ? 'visible' : 'hidden'}
     >

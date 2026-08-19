@@ -14,34 +14,11 @@ import {
 import { ComplianceToggleStack } from './ComplianceToggleStack'
 import { FoundationsCubeGrid } from './FoundationsCubeGrid'
 import { BeyondCaptureGuard } from './BeyondCaptureGuard'
-import { UsdcLoopIntro } from './UsdcLoopIntro'
 import styles from './WhatIsArmada.module.css'
 
-/**
- * Sphere diagram variant on the capital-in-motion panel:
- * - 'default' — continuous USDC traveler (PrivacySphere)
- * - 'story' — dual-layer rim sync: sharp outside / blurred inside (PrivacySphereStory)
- *
- * Flip this flag, then hard-refresh — React.lazy + HMR can keep the old chunk mounted.
- */
-const PRIVACY_SPHERE_VARIANT: 'default' | 'story' = 'story'
-
-/**
- * Privacy intro layout:
- * - 'loop' — sticky concentric rings + wash fade + copy
- * - 'centered' — title + body/CTA (feature cards follow below)
- * - 'split' — full-bleed 50/50: copy left | media right
- */
-const INTRO_LAYOUT: 'loop' | 'centered' | 'split' = 'centered'
-
-const PrivacySphereDefault = lazy(() =>
-  import('@/components/PrivacySphere').then((module) => ({ default: module.PrivacySphere })),
-)
-const PrivacySphereStoryLazy = lazy(() =>
+const PrivacySphereViz = lazy(() =>
   import('@/components/PrivacySphere').then((module) => ({ default: module.PrivacySphereStory })),
 )
-const PrivacySphereViz =
-  PRIVACY_SPHERE_VARIANT === 'story' ? PrivacySphereStoryLazy : PrivacySphereDefault
 
 type Cta = {
   label: string
@@ -290,38 +267,10 @@ function IntroCentered({ underHero = false }: { underHero?: boolean }) {
   )
 }
 
-function IntroSplit() {
-  return (
-    <div className={styles.introSplit} id="what-is-armada">
-      <RevealStack className={`armada-site-stack ${styles.introSplitContent}`}>
-        <h2
-          id="integrators-heading"
-          className={`armada-text-title ${styles.introSplitTitle}`}
-        >
-          <span className={styles.titleLine}>{INTRO.title[0]}</span>
-          <span className={styles.titleLine}>{INTRO.title[1]}</span>
-        </h2>
-        <p className={`armada-text-body ${styles.introSplitBody}`}>{INTRO.body}</p>
-        <CtaRow ctas={INTRO.ctas} align="start" />
-      </RevealStack>
-    </div>
-  )
-}
-
-export type WhatIsArmadaFeaturesLayout = 'stack' | 'grid' | 'bento' | 'outlined'
-
 export interface WhatIsArmadaProps {
   /**
-   * Feature band layout experiment:
-   * - `stack` — current full-width stacked splits (default /homepage)
-   * - `grid` — same splits with blueprint frame lines (/homepage3)
-   * - `bento` — privacy + features as a varied bento grid (/homepage4)
-   * - `outlined` — transparent copy half + Deep 1px stroke (/homepage5)
-   */
-  featuresLayout?: WhatIsArmadaFeaturesLayout
-  /**
    * Pull the privacy intro under the hero pin so copy fades in centered
-   * as the hero dissolves to amber (`/homepage` + heroScrollExit).
+   * as the hero dissolves to amber.
    */
   introUnderHero?: boolean
 }
@@ -359,13 +308,9 @@ function FeatureCopy({
 
 function FeaturePanel({
   block,
-  isGrid,
-  isOutlined,
   isExitCard,
 }: {
   block: Block
-  isGrid?: boolean
-  isOutlined?: boolean
   isExitCard?: boolean
 }) {
   const isCapital = block.id === 'capital-in-motion'
@@ -383,21 +328,12 @@ function FeaturePanel({
         isPanelSplit ? styles.panelSplit : '',
         isCompliance || isFoundations ? styles.panelSplitDeepLeft : '',
         isFoundations ? styles.panelCrop : '',
-        isGrid ? styles.panelGrid : '',
-        isOutlined ? styles.panelOutlined : '',
       ]
         .filter(Boolean)
         .join(' ')}
       aria-labelledby={`${block.id}-heading`}
       {...(isExitCard ? { 'data-privacy-exit-card': '' } : {})}
     >
-      {isGrid ? (
-        <>
-          <span className={styles.gridLineH} data-edge="top" aria-hidden />
-          <span className={styles.gridLineH} data-edge="bottom" aria-hidden />
-          {isPanelSplit ? <span className={styles.gridMid} aria-hidden /> : null}
-        </>
-      ) : null}
       <FeatureCopy
         block={block}
         headingId={`${block.id}-heading`}
@@ -412,15 +348,7 @@ function FeaturePanel({
  * Desktop: one card per viewport with ≥80px padding; section bg shifts through
  * gem colors as cards enter. Mobile: normal stacked layout + paddings.
  */
-function FeatureCardsBand({
-  isGrid = false,
-  isOutlined = false,
-  overlapIntro = false,
-}: {
-  isGrid?: boolean
-  isOutlined?: boolean
-  overlapIntro?: boolean
-}) {
+function FeatureCardsBand({ overlapIntro = false }: { overlapIntro?: boolean }) {
   const desktop = useDesktopHandoff(true)
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -491,23 +419,10 @@ function FeatureCardsBand({
 
   if (!desktop) {
     return (
-      <div
-        className={[styles.features, isGrid ? styles.featuresGrid : '']
-          .filter(Boolean)
-          .join(' ')}
-      >
-        <div
-          className={[styles.stack, isGrid ? styles.stackGrid : '']
-            .filter(Boolean)
-            .join(' ')}
-        >
+      <div className={styles.features}>
+        <div className={styles.stack}>
           {FEATURES.map((block) => (
-            <FeaturePanel
-              key={block.id}
-              block={block}
-              isGrid={isGrid}
-              isOutlined={isOutlined}
-            />
+            <FeaturePanel key={block.id} block={block} />
           ))}
         </div>
       </div>
@@ -521,7 +436,6 @@ function FeatureCardsBand({
         styles.features,
         styles.featuresScroll,
         overlapIntro ? styles.featuresOverlapIntro : '',
-        isGrid ? styles.featuresGrid : '',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -533,13 +447,8 @@ function FeatureCardsBand({
     >
       {FEATURES.map((block, index) => (
         <div key={block.id} className={styles.cardViewport}>
-          <div className={[styles.stack, isGrid ? styles.stackGrid : ''].filter(Boolean).join(' ')}>
-            <FeaturePanel
-              block={block}
-              isGrid={isGrid}
-              isOutlined={isOutlined}
-              isExitCard={index === 0}
-            />
+          <div className={styles.stack}>
+            <FeaturePanel block={block} isExitCard={index === 0} />
           </div>
         </div>
       ))}
@@ -551,7 +460,7 @@ function FeatureDiagram({ id }: { id: string }) {
   if (id === 'capital-in-motion') {
     return (
       <div className={styles.panelDiagram}>
-        <Suspense key={PRIVACY_SPHERE_VARIANT} fallback={null}>
+        <Suspense fallback={null}>
           <PrivacySphereViz />
         </Suspense>
       </div>
@@ -581,162 +490,11 @@ function FeatureDiagram({ id }: { id: string }) {
   return null
 }
 
-/** Homepage4 — privacy + features as one varied bento composition. */
-function BentoBand() {
-  const capital = FEATURES[0]
-  const compliance = FEATURES[1]
-  const beyond = FEATURES[2]
-  const foundations = FEATURES[3]
-
+export function WhatIsArmada({ introUnderHero = false }: WhatIsArmadaProps) {
   return (
-    <div className={`${styles.features} ${styles.featuresBento}`}>
-      <div className={`${styles.stack} ${styles.stackBento}`}>
-        {/* Privacy — copy only (fog removed). */}
-        <article
-          className={`${styles.panel} ${styles.panelBento} ${styles.bentoPrivacy} ${styles.bentoPrivacyCopyOnly}`}
-          id="what-is-armada"
-          aria-labelledby="integrators-heading"
-        >
-          <RevealStack
-            className={`armada-site-stack ${styles.bentoPrivacyCopy}`}
-          >
-            <h2
-              id="integrators-heading"
-              className={`armada-text-title ${styles.panelTitle}`}
-            >
-              {`${INTRO.title[0]} ${INTRO.title[1]}`}
-            </h2>
-            <p className={`armada-text-body ${styles.panelBody}`}>{INTRO.body}</p>
-            <CtaRow ctas={INTRO.ctas} align="start" />
-          </RevealStack>
-        </article>
-
-        {/* Capital — all deep, horizontal split */}
-        <article
-          className={[
-            styles.panel,
-            styles.panelSplit,
-            styles.panelBento,
-            styles.panelDeep,
-            styles.bentoCapital,
-          ].join(' ')}
-          id={capital.id}
-          aria-labelledby={`${capital.id}-heading`}
-        >
-          <FeatureCopy
-            block={capital}
-            headingId={`${capital.id}-heading`}
-            contentClassName={`${styles.panelContent} ${styles.panelContentDeep}`}
-            titleClassName={`${styles.panelTitle} ${styles.panelTitleDeep}`}
-            bodyClassName={`${styles.panelBody} ${styles.panelBodyDeep}`}
-          />
-          <FeatureDiagram id={capital.id} />
-        </article>
-
-        {/* Compliance — vertical: diagram above, copy below */}
-        <article
-          className={[
-            styles.panel,
-            styles.panelBento,
-            styles.bentoCompliance,
-          ].join(' ')}
-          id={compliance.id}
-          aria-labelledby={`${compliance.id}-heading`}
-        >
-          <FeatureDiagram id={compliance.id} />
-          <FeatureCopy
-            block={compliance}
-            headingId={`${compliance.id}-heading`}
-            contentClassName={styles.panelContent}
-          />
-        </article>
-
-        {/* Beyond — cream card (diagram + dark copy) */}
-        <article
-          className={[
-            styles.panel,
-            styles.panelBento,
-            styles.bentoBeyond,
-          ].join(' ')}
-          id={beyond.id}
-          aria-labelledby={`${beyond.id}-heading`}
-        >
-          <FeatureDiagram id={beyond.id} />
-          <FeatureCopy
-            block={beyond}
-            headingId={`${beyond.id}-heading`}
-            contentClassName={styles.panelContent}
-          />
-        </article>
-
-        {/* Foundations — horizontal, deep left */}
-        <article
-          className={[
-            styles.panel,
-            styles.panelSplit,
-            styles.panelSplitDeepLeft,
-            styles.panelCrop,
-            styles.panelBento,
-            styles.bentoFoundations,
-          ].join(' ')}
-          id={foundations.id}
-          aria-labelledby={`${foundations.id}-heading`}
-        >
-          <FeatureCopy
-            block={foundations}
-            headingId={`${foundations.id}-heading`}
-            contentClassName={styles.panelContent}
-          />
-          <FeatureDiagram id={foundations.id} />
-        </article>
-      </div>
-    </div>
-  )
-}
-
-export function WhatIsArmada({
-  featuresLayout = 'stack',
-  introUnderHero = false,
-}: WhatIsArmadaProps) {
-  const isLoop = INTRO_LAYOUT === 'loop'
-  const isSplit = INTRO_LAYOUT === 'split'
-  const isCentered = INTRO_LAYOUT === 'centered'
-  const isGrid = featuresLayout === 'grid'
-  const isBento = featuresLayout === 'bento'
-  const isOutlined = featuresLayout === 'outlined'
-
-  if (isBento) {
-    return (
-      <section
-        className={`${styles.section} ${styles.sectionIntroStack} ${styles.sectionBento}`}
-        aria-label="What is Armada"
-      >
-        <BentoBand />
-      </section>
-    )
-  }
-
-  return (
-    <section
-      className={[
-        styles.section,
-        isSplit ? styles.sectionSplit : '',
-        isLoop ? styles.sectionLoop : '',
-        isCentered ? styles.sectionIntroStack : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      aria-label="What is Armada"
-    >
-      {isLoop ? <UsdcLoopIntro content={INTRO} /> : null}
-      {isSplit ? <IntroSplit /> : null}
-      {isCentered ? <IntroCentered underHero={introUnderHero} /> : null}
-
-      <FeatureCardsBand
-        isGrid={isGrid}
-        isOutlined={isOutlined}
-        overlapIntro={introUnderHero}
-      />
+    <section className={`${styles.section} ${styles.sectionIntroStack}`} aria-label="What is Armada">
+      <IntroCentered underHero={introUnderHero} />
+      <FeatureCardsBand overlapIntro={introUnderHero} />
     </section>
   )
 }

@@ -22,8 +22,6 @@ import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { formatUsdcAmount, truncateArmadaAddress } from '@/utils/format'
 import styles from './BalanceCard.module.css'
 
-export type BalanceCardActionLayout = 'default' | 'v2'
-
 export interface BalanceCardProps {
   balance: number
   balanceRollTrigger?: number
@@ -31,14 +29,10 @@ export interface BalanceCardProps {
   balanceRollFromValue?: string
   /** When true, show hide/show activity in the ellipses menu. */
   hasActivityItems?: boolean
-  /** Kept for callers; action row is the same on both dashboard versions. */
-  actionLayout?: BalanceCardActionLayout
   onSend?: () => void
   onDeposit?: () => void
   onRequest?: () => void
-  onMore?: () => void
   onEarn?: () => void
-  onWithdraw?: () => void
   vaultBalance?: number
   vaultApy?: number
   vaultRollFromValue?: string

@@ -2,7 +2,7 @@ import { useMemo, type ReactNode } from 'react'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
 import { Button } from '@/components/Button'
 import { PaymentLinkQrCode } from '@/components/PaymentLinkQrCode'
-import { APP_DASHBOARD_V2_PATH } from '@/utils/appNavigation'
+import { APP_DASHBOARD_PATH } from '@/utils/appNavigation'
 import { formatUsdcAmount, truncateArmadaAddress } from '@/utils/format'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { parsePayViaLinkSearch, writePendingPayViaLink } from '@/utils/payViaLink'
@@ -31,7 +31,7 @@ function GoToArmadaButton() {
         label="Go to Armada"
         showIcon={false}
         className={styles.cta}
-        onClick={() => window.location.assign(APP_DASHBOARD_V2_PATH)}
+        onClick={() => window.location.assign(APP_DASHBOARD_PATH)}
       />
     </div>
   )
@@ -43,7 +43,7 @@ export function PayViaLinkLanding() {
   function handleContinue() {
     if (parsed.status !== 'ok') return
     writePendingPayViaLink(parsed.params)
-    window.location.assign(APP_DASHBOARD_V2_PATH)
+    window.location.assign(APP_DASHBOARD_PATH)
   }
 
   if (parsed.status === 'invalid') {

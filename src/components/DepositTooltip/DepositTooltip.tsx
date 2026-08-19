@@ -12,7 +12,6 @@ const DEFAULT_BODY =
   "Depositing into Armada's shielded pool is the first step to move funds privately."
 
 export interface DepositTooltipProps {
-  variant?: 'default' | 'v2'
   onDeposit?: () => void
   /** Info tooltip in the top-right (earn APY banner). */
   infoTooltip?: string

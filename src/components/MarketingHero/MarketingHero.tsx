@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type AnimationEvent } from 'react'
-import heroBackground from '@/assets/hero-fleet-centered.webp'
-import heroBackgroundLegacy from '@/assets/new-fleet.webp'
+import heroBackground from '@/assets/new-fleet.webp'
 import { Button } from '@/components/Button'
 import {
   HANDOFF,
@@ -33,9 +32,7 @@ function useDesktopHandoff(enabled: boolean) {
   return active
 }
 
-/** Flip to true to restore the previous bottom-aligned hero layout. */
-const SHOW_LEGACY_HERO = true
-
+/** Bottom-aligned hero layout (production). */
 const HEADING_LINES = ['Pluggable privacy', 'infrastructure for stablecoins'] as const
 
 const FEATURE_COPY =
@@ -107,10 +104,9 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
   const [usdcEntered, setUsdcEntered] = useState(false)
   const [settleBg, setSettleBg] = useState(true)
 
-  const backgroundUrl = SHOW_LEGACY_HERO ? heroBackgroundLegacy : heroBackground
   const backgroundClass = [
     styles.background,
-    SHOW_LEGACY_HERO && styles.backgroundBottom,
+    styles.backgroundBottom,
     settleBg && styles.backgroundSettle,
   ]
     .filter(Boolean)
@@ -251,19 +247,6 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
 
   const heroCopy = (
     <>
-      <h1 id="marketing-hero-heading" className={`armada-text-title ${styles.heading}`}>
-        {HEADING_LINES.map((line) => (
-          <span key={line} className={styles.headingLine}>
-            {line}
-          </span>
-        ))}
-      </h1>
-      <IntegrateCta className={styles.cta} />
-    </>
-  )
-
-  const heroCopyLegacy = (
-    <>
       <h1
         id="marketing-hero-heading"
         className={`armada-text-title ${styles.headingLegacy}`}
@@ -278,17 +261,14 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
     </>
   )
 
-  const introLegacyClass = pinHandoff
+  const introClass = pinHandoff
     ? `armada-site-stack ${styles.introLegacy} ${styles.introExit}`
     : `armada-site-stack ${styles.introLegacy}`
-  const introClass = pinHandoff
-    ? `armada-site-stack ${styles.intro} ${styles.introExit}`
-    : `armada-site-stack ${styles.intro}`
 
   const backgroundNode = (
     <div
       className={backgroundClass}
-      style={{ backgroundImage: `url(${backgroundUrl})` }}
+      style={{ backgroundImage: `url(${heroBackground})` }}
       aria-hidden
       onAnimationEnd={() => setSettleBg(false)}
     />
@@ -307,21 +287,21 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
       ? undefined
       : styles.featureEnter
 
-  const heroInner = SHOW_LEGACY_HERO ? (
+  const heroInner = (
     <div className={styles.contentLegacy}>
       <div className={styles.bottomLegacy}>
         {copyReady ? (
           <div
-            className={[introLegacyClass, !copyEntered && styles.copyEnter]
+            className={[introClass, !copyEntered && styles.copyEnter]
               .filter(Boolean)
               .join(' ')}
             onAnimationEnd={finishCopyEnter}
           >
-            {heroCopyLegacy}
+            {heroCopy}
           </div>
         ) : (
           <div className={`${styles.introLegacy} ${styles.chromePending}`} aria-hidden>
-            {heroCopyLegacy}
+            {heroCopy}
           </div>
         )}
         {pinHandoff ? (
@@ -332,28 +312,6 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
           <FeatureCard className={usdcEnterClass} onAnimationEnd={finishUsdcEnter} />
         )}
       </div>
-    </div>
-  ) : (
-    <div className={styles.content}>
-      {copyReady ? (
-        <div
-          className={[introClass, !copyEntered && styles.copyEnter].filter(Boolean).join(' ')}
-          onAnimationEnd={finishCopyEnter}
-        >
-          {heroCopy}
-        </div>
-      ) : (
-        <div className={`${styles.intro} ${styles.chromePending}`} aria-hidden>
-          {heroCopy}
-        </div>
-      )}
-      {pinHandoff ? (
-        <div className={styles.featureExit}>
-          <FeatureCard className={usdcEnterClass} onAnimationEnd={finishUsdcEnter} />
-        </div>
-      ) : (
-        <FeatureCard className={usdcEnterClass} onAnimationEnd={finishUsdcEnter} />
-      )}
     </div>
   )
 

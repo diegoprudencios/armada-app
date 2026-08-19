@@ -1,8 +1,7 @@
-import { useCallback, useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 import {
   ENV_STORAGE_KEY,
   getCurrentEnvironment,
-  setEnvironment,
   type Environment,
 } from '@/utils/environment'
 
@@ -26,6 +25,5 @@ export function useEnvironment() {
     getCurrentEnvironment,
     () => 'mock' as Environment,
   )
-  const applyEnvironment = useCallback((next: Environment) => setEnvironment(next), [])
-  return [environment, applyEnvironment] as const
+  return [environment] as const
 }

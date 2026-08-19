@@ -120,7 +120,3 @@ export function parsePayViaLinkSearch(search: string, now = Date.now()): PayViaL
     },
   }
 }
-
-export function canUseNativeShare(): boolean {
-  return typeof navigator !== 'undefined' && typeof navigator.share === 'function'
-}

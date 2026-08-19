@@ -1,7 +1,6 @@
 import { modalStepBodyEnter } from '@/components/ModalShell'
 import {
   TransactionProgressDisclosure,
-  type TransactionProgressVariant,
 } from '@/components/TransactionProgressDisclosure'
 import { TxProgressCard, type TxProgressCardVariant } from '@/components/TxProgressCard/TxProgressCard'
 import { resolveStageLabel, type TxProgressCardCopy, type TxProgressStage } from '@/constants/txProcessingCopy'
@@ -15,7 +14,6 @@ export interface TxProcessingLayoutProps {
   stages: ReadonlyArray<TxProgressStage>
   activeStageIndex?: number
   completed?: boolean
-  progressVariant?: TransactionProgressVariant
   /** Mobile keypad: full-bleed gradient shell, details docked at bottom. */
   layout?: TxProcessingLayoutVariant
   className?: string
@@ -26,7 +24,6 @@ export function TxProcessingLayout({
   stages,
   activeStageIndex = 0,
   completed = false,
-  progressVariant = 'timeline',
   layout = 'default',
   className,
 }: TxProcessingLayoutProps) {
@@ -59,7 +56,6 @@ export function TxProcessingLayout({
             .join(' ')}
         >
           <TransactionProgressDisclosure
-            variant={progressVariant}
             stages={stages}
             activeStageIndex={activeStageIndex}
             completed={completed}

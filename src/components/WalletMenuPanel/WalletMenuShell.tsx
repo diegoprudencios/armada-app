@@ -12,7 +12,6 @@ export interface WalletMenuShellProps {
   onClose: () => void
   wallets: readonly ConnectedWallet[]
   activeWalletId: string | null
-  onSelectWallet: (walletId: string) => void
   onDisconnectWallet: (walletId: string) => void
   onConnectWallet: (provider: DemoWalletProvider) => void
   onDeposit: (walletId: string, chain: DepositChainId) => void
@@ -25,7 +24,6 @@ export function WalletMenuShell({
   onClose,
   wallets,
   activeWalletId,
-  onSelectWallet,
   onDisconnectWallet,
   onConnectWallet,
   onDeposit,
@@ -40,7 +38,6 @@ export function WalletMenuShell({
       activeWalletId={activeWalletId}
       showClose={!isMobile}
       onClose={onClose}
-      onSelectWallet={onSelectWallet}
       onDisconnectWallet={onDisconnectWallet}
       onConnectWallet={onConnectWallet}
       onDeposit={onDeposit}

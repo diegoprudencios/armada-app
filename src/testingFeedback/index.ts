@@ -48,9 +48,6 @@ export {
   TESTING_SESSION_WINDOW_KEY,
   TESTING_TOAST_AUTO_DISMISS_MS,
   testingFlowQuestionSendPrivacyCertainty,
-  // Deprecated aliases
-  TESTING_FLOW_QUESTION_SHIELD_DEPOSIT,
-  testingFlowQuestionPrivateVsPublic,
 } from './constants'
 
 export type { TestingFeedbackLogEntry, TestingFeedbackLogKind } from './persistFeedback'

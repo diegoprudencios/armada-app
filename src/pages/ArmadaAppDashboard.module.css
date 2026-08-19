@@ -101,10 +101,6 @@
   gap: var(--primitives-spacing-6);
 }
 
-.cardStackV2 {
-  gap: var(--primitives-spacing-5);
-}
-
 .primaryStack {
   display: flex;
   flex-direction: column;

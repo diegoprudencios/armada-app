@@ -13,7 +13,6 @@ export interface DashboardHeaderProps {
   wallets: readonly ConnectedWallet[]
   activeWalletId: string | null
   onConnect?: () => void
-  onSelectWallet: (walletId: string) => void
   onDisconnectWallet: (walletId: string) => void
   onConnectWallet: (provider: DemoWalletProvider) => void
   onDeposit: (walletId: string, chain: DepositChainId) => void
@@ -26,7 +25,6 @@ export function DashboardHeader({
   wallets,
   activeWalletId,
   onConnect,
-  onSelectWallet,
   onDisconnectWallet,
   onConnectWallet,
   onDeposit,
@@ -67,7 +65,6 @@ export function DashboardHeader({
           <WalletPillMenu
             wallets={wallets}
             activeWalletId={activeWalletId}
-            onSelectWallet={onSelectWallet}
             onDisconnectWallet={onDisconnectWallet}
             onConnectWallet={onConnectWallet}
             onDeposit={onDeposit}
