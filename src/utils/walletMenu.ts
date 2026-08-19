@@ -38,6 +38,11 @@ export function demoWalletFromConnected(wallet: ConnectedWallet): DemoWallet {
 export function normalizeConnectedWallets(
   wallets: unknown,
   activeWalletId: unknown,
+  // WALLET INTEGRATION NOTE: this is demo-wallet normalization logic —
+  // builds a fallback session shape from an older single-DemoWallet format.
+  // When real wallet connection replaces the demo layer, this needs to be
+  // reviewed and probably removed rather than carried forward as-is.
+  // Do not refactor or delete without checking what depends on this shape.
   legacyWallet: DemoWallet | null,
 ): { wallets: ConnectedWallet[]; activeWalletId: string | null } {
   if (Array.isArray(wallets) && wallets.length > 0) {
@@ -53,6 +58,11 @@ export function normalizeConnectedWallets(
     return { wallets: parsed, activeWalletId: resolvedActive }
   }
 
+  // WALLET INTEGRATION NOTE: this is demo-wallet normalization logic —
+  // builds a fallback session shape from an older single-DemoWallet format.
+  // When real wallet connection replaces the demo layer, this needs to be
+  // reviewed and probably removed rather than carried forward as-is.
+  // Do not refactor or delete without checking what depends on this shape.
   if (legacyWallet?.address && legacyWallet.provider in DEMO_ADDRESS_BY_PROVIDER) {
     const provider = legacyWallet.provider as DemoWalletProvider
     const connected = createConnectedWallet(provider)
