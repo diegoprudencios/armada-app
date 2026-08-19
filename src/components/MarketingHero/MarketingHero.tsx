@@ -6,31 +6,9 @@ import {
   HERO_PIN_HEIGHT,
   remap01,
 } from '@/constants/homepageHandoff'
+import { useDesktopHandoff } from '@/hooks/useDesktopHandoff'
 import { HeroUsdcSpinner } from './HeroUsdcSpinner'
 import styles from './MarketingHero.module.css'
-
-/** Desktop-only sticky handoff; mobile is a normal hero → section scroll. */
-function useDesktopHandoff(enabled: boolean) {
-  const [active, setActive] = useState(() =>
-    enabled && typeof window !== 'undefined'
-      ? window.matchMedia('(min-width: 768px)').matches
-      : false,
-  )
-
-  useEffect(() => {
-    if (!enabled) {
-      setActive(false)
-      return
-    }
-    const mq = window.matchMedia('(min-width: 768px)')
-    const sync = () => setActive(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [enabled])
-
-  return active
-}
 
 /** Bottom-aligned hero layout (production). */
 const HEADING_LINES = ['Pluggable privacy', 'infrastructure for stablecoins'] as const

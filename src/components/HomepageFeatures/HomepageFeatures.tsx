@@ -11,6 +11,7 @@ import {
   remap01,
   smoothstep,
 } from '@/constants/homepageHandoff'
+import { useDesktopHandoff } from '@/hooks/useDesktopHandoff'
 import { ComplianceToggleStack } from './ComplianceToggleStack'
 import { FoundationsCubeGrid } from './FoundationsCubeGrid'
 import { BeyondCaptureGuard } from './BeyondCaptureGuard'
@@ -124,29 +125,6 @@ function CtaRow({ ctas, align }: { ctas: Cta[]; align: 'center' | 'start' }) {
       ))}
     </div>
   )
-}
-
-/** Sticky under-hero handoff is desktop-only; mobile is a normal scroll section. */
-function useDesktopHandoff(enabled: boolean) {
-  const [active, setActive] = useState(() =>
-    enabled && typeof window !== 'undefined'
-      ? window.matchMedia('(min-width: 768px)').matches
-      : false,
-  )
-
-  useEffect(() => {
-    if (!enabled) {
-      setActive(false)
-      return
-    }
-    const mq = window.matchMedia('(min-width: 768px)')
-    const sync = () => setActive(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [enabled])
-
-  return active
 }
 
 function IntroCentered({ underHero = false }: { underHero?: boolean }) {

@@ -66,7 +66,7 @@ Heavy CSS: `HomepageFeatures.module.css`, `MarketingHero.module.css`, `WalletMen
 | Confirmed screens | **Partial** — shared CSS module; still separate TSX. | **Medium** |
 | Review summary tables | **Open** — Earn still imports Deposit CSS. | **Medium** |
 | Connect-wallet lists (`WALLETS` vs `CONNECT_WALLETS`) | **Done** — `CONNECT_WALLET_OPTIONS` in `constants/connectWallets.tsx`. | — |
-| Desktop scroll handoff (`useDesktopHandoff` vs HomepageFeatures `matchMedia`) | **Open**. | **Medium** |
+| Desktop scroll handoff (`useDesktopHandoff` vs HomepageFeatures `matchMedia`) | **Done** — shared `hooks/useDesktopHandoff.ts`. | — |
 | Overlay a11y stack | **Open** — partly shared. | **Medium** |
 | Tick-ring spinner, clipboard 2s timeout, fee helper split | **Open**. | **Low** |
 
@@ -146,7 +146,7 @@ Unchanged. Wallet work: read **`WALLET_INTEGRATION_NOTES.md` first**. Do not mix
 ## Suggested order (remaining)
 
 1. **Low:** optional `nestedDialog` filename.  
-2. **Medium:** extract `useDesktopHandoff`; diagram-stroke token (none today — `#5a4a62`); shared review-row primitive (confirmed CSS already shared).  
+2. **Medium:** diagram-stroke token (none today — `#5a4a62`); shared review-row primitive (confirmed CSS already shared).  
 3. **High / wallets:** do **not** merge modal flows or split `AmountInputScreen` / `BalanceCard` in the same PR as wallet connect. Treat `useDashboardDemoState` as the swap boundary (`WALLET_INTEGRATION_NOTES.md`).
 
 No tests means even leftover CSS/token changes need a visual pass on `/`, `/homepage`, `/dashboard` (desktop + mobile), and one full deposit + send path.
