@@ -13,15 +13,14 @@
   --semantic-color-brand-gradient-rose: #f39db0;
 
   /*
-    Frost scale — white (neutral-50) mixed over the dashboard gradient.
-    Use these instead of one-off color-mix percentages.
-    quiet 20% → raised 40% → hover 55% → pressed 70%.
+    Frost scale — mix of neutral-50 over the page (white in light).
+    quiet 20% → raised 40% → hover/strong 60% → pressed 80%.
     Solid --semantic-color-surface-hover stays for opaque chrome (panels, menus).
   */
   --semantic-color-frost: color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent);
   --semantic-color-frost-raised: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
-  --semantic-color-frost-hover: color-mix(in srgb, var(--primitives-color-neutral-50) 55%, transparent);
-  --semantic-color-frost-pressed: color-mix(in srgb, var(--primitives-color-neutral-50) 70%, transparent);
+  --semantic-color-frost-hover: color-mix(in srgb, var(--primitives-color-neutral-50) 60%, transparent);
+  --semantic-color-frost-pressed: color-mix(in srgb, var(--primitives-color-neutral-50) 80%, transparent);
 }
 
 [data-theme='light'] {

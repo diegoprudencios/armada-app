@@ -118,7 +118,7 @@
 }
 
 .qrBox {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 60%, transparent);
+  background: var(--semantic-color-frost-hover);
   border-radius: calc(
     (var(--primitives-borderRadius-lg) + var(--primitives-borderRadius-xl)) / 2 * 1px
   );

@@ -1,7 +1,7 @@
 /* Shared fill for round icon buttons and % pills. */
 .frostedFill,
 .frosted {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 60%, transparent);
+  background: var(--semantic-color-frost-hover);
   border: none;
 }
 

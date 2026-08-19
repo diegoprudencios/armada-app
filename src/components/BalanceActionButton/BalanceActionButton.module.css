@@ -75,20 +75,20 @@
   }
 
   .subtle:hover:not(:disabled) .glyph {
-    background: color-mix(in srgb, var(--primitives-color-neutral-50) 55%, transparent);
+    background: var(--semantic-color-frost-hover);
   }
 
   .compact.subtle:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--primitives-color-neutral-50) 55%, transparent);
+    background: var(--semantic-color-frost-hover);
   }
 }
 
 .subtle .glyph {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
+  background: var(--semantic-color-frost-raised);
 }
 
 .subtle:active:not(:disabled) .glyph {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 70%, transparent);
+  background: var(--semantic-color-frost-pressed);
 }
 
 .compact {
@@ -113,11 +113,11 @@
 }
 
 .compact.subtle {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
+  background: var(--semantic-color-frost-raised);
 }
 
 .compact.subtle:active:not(:disabled) {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 70%, transparent);
+  background: var(--semantic-color-frost-pressed);
 }
 
 .compact .glyph {

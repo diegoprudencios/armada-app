@@ -10,8 +10,8 @@
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent) 0%,
-    color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent) 100%
+    var(--semantic-color-frost-raised) 0%,
+    var(--semantic-color-frost) 100%
   );
 }
 
@@ -111,14 +111,14 @@
 }
 
 .cancelButton {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
+  background: var(--semantic-color-frost-raised);
   border: calc(var(--primitives-borderWidth-default) * 1px) solid
     color-mix(in srgb, var(--primitives-color-neutral-50) 14%, transparent);
   color: var(--semantic-color-text-primary);
 }
 
 .cancelButton:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 55%, transparent);
+  background: var(--semantic-color-frost-hover);
 }
 
 @media (max-width: 479px) {

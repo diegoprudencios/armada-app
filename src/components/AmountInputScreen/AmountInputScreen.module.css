@@ -1,6 +1,6 @@
 /* Figma frame 383:12296 — DepositCard */
 .column {
-  --amount-surface-muted: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
+  --amount-surface-muted: var(--semantic-color-frost-raised);
   width: 100%;
   max-width: calc(var(--primitives-spacing-20) * 5 + var(--primitives-spacing-8) + var(--primitives-spacing-1) * 0.5);
   display: flex;
@@ -70,7 +70,7 @@
   flex-direction: column;
   padding: var(--primitives-spacing-4);
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
-  background: var(--amount-surface-muted, color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent));
+  background: var(--amount-surface-muted);
   box-sizing: border-box;
 }
 
@@ -239,8 +239,8 @@
   padding: var(--primitives-spacing-8);
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent) 0%,
-    color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent) 100%
+    var(--semantic-color-frost-raised) 0%,
+    var(--semantic-color-frost) 100%
   );
   backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
   -webkit-backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
@@ -271,7 +271,7 @@
 }
 
 .cancelButton {
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
+  background: var(--semantic-color-frost-raised);
   border: calc(var(--primitives-borderWidth-default) * 1px) solid
     color-mix(in srgb, var(--primitives-color-neutral-50) 14%, transparent);
   color: var(--semantic-color-text-primary);
@@ -279,7 +279,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .cancelButton:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--primitives-color-neutral-50) 55%, transparent);
+    background: var(--semantic-color-frost-hover);
   }
 }
 
@@ -505,7 +505,7 @@
   height: calc(var(--primitives-spacing-10) - var(--primitives-spacing-1));
   padding-inline: var(--primitives-spacing-3);
   border-radius: calc(var(--primitives-borderRadius-sm) * 1px + 1px);
-  background: var(--amount-surface-muted, color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent));
+  background: var(--amount-surface-muted);
 }
 
 .feeLabel,

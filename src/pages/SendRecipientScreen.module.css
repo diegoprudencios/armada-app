@@ -63,8 +63,8 @@
   padding: var(--primitives-spacing-8);
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent) 0%,
-    color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent) 100%
+    var(--semantic-color-frost-raised) 0%,
+    var(--semantic-color-frost) 100%
   );
   backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
   -webkit-backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
@@ -97,7 +97,7 @@
   min-height: calc(var(--primitives-spacing-12) + var(--primitives-spacing-2));
   padding: 0 var(--primitives-spacing-5);
   border-radius: calc(var(--primitives-borderRadius-xl) * 1px);
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
+  background: var(--semantic-color-frost-raised);
   box-sizing: border-box;
 }
 
@@ -233,7 +233,7 @@
   padding: var(--primitives-spacing-2) var(--primitives-spacing-5);
   border: none;
   border-radius: calc(var(--primitives-borderRadius-xl) * 1px);
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 40%, transparent);
+  background: var(--semantic-color-frost-raised);
   cursor: pointer;
   text-align: left;
   box-sizing: border-box;
@@ -495,7 +495,7 @@
   padding: var(--primitives-spacing-3);
   border: none;
   border-radius: calc(var(--primitives-spacing-5) / 2);
-  background: color-mix(in srgb, var(--primitives-color-neutral-50) 20%, transparent);
+  background: var(--semantic-color-frost);
   cursor: pointer;
   text-align: left;
   box-sizing: border-box;
