@@ -338,7 +338,7 @@ export function MarketingHero({ scrollExit = false }: MarketingHeroProps) {
         </div>
         <div className={styles.overlay} aria-hidden />
         {heroInner}
-        {/* EXCEPTION — match WhatIsArmada privacy intro amber for seamless dissolve. */}
+        {/* EXCEPTION — match HomepageFeatures privacy intro amber for seamless dissolve. */}
         <div className={styles.dissolve} aria-hidden />
       </div>
     </section>

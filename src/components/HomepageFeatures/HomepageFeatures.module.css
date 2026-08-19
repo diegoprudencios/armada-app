@@ -7,8 +7,8 @@
   --section-features-pad-x: var(--primitives-spacing-20);
   /* Top of features band — also used as amber intro bottom pad. */
   --section-features-pad-y: calc(var(--primitives-spacing-20) * 2);
-  /* EXCEPTION — Figma marketing page fill (white), not amber-100. */
-  --section-page-bg: #ffffff;
+  /* EXCEPTION — Figma marketing page fill (white), not amber-100. Light surface-default is #ffffff. */
+  --section-page-bg: var(--semantic-color-surface-default);
   /* EXCEPTION — Figma panel fill #f9f3ef (no matching token). */
   --section-panel-bg: #f9f3ef;
 
@@ -21,7 +21,7 @@
     0
     0;
   background: var(--section-page-bg);
-  color: #000000;
+  color: var(--semantic-color-text-primary);
 }
 .sectionIntroStack {
   --gem-wash-base: var(--primitives-color-amber-100);
@@ -160,7 +160,7 @@
     var(--primitives-spacing-20) * 12 + var(--primitives-spacing-12) + var(--primitives-spacing-1) /
       2
   );
-  color: #000000;
+  color: var(--semantic-color-text-primary);
   text-align: center;
   text-wrap: pretty;
 }
@@ -182,7 +182,7 @@
   margin-left: 0;
   width: 100%;
   max-width: calc(var(--primitives-spacing-20) * 6 + var(--primitives-spacing-11));
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--semantic-color-text-secondary);
   text-wrap: pretty;
 }
 
@@ -208,12 +208,12 @@
 
 .ghostCta.ghostCta {
   background: transparent;
-  color: #000000;
+  color: var(--semantic-color-text-primary);
 }
 
 .ghostCta.ghostCta:hover:not(:disabled) {
-  background: color-mix(in srgb, #000000 6%, transparent);
-  color: #000000;
+  background: color-mix(in srgb, var(--semantic-color-text-primary) 6%, transparent);
+  color: var(--semantic-color-text-primary);
 }
 
 .features {
@@ -247,7 +247,7 @@
     var(--features-rose) 52%,
     var(--features-amber) 100%
   );
-  color: #000000;
+  color: var(--semantic-color-text-primary);
 }
 
 .sectionIntroStack .features {
@@ -444,7 +444,7 @@
 
 .panelTitle {
   margin: 0;
-  color: #000000;
+  color: var(--semantic-color-text-primary);
   text-align: left;
 }
 
@@ -454,7 +454,7 @@
   margin-bottom: 0;
   margin-left: 0;
   max-width: calc(var(--primitives-spacing-20) * 5 - var(--primitives-spacing-1) / 2);
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--semantic-color-text-secondary);
   text-wrap: pretty;
 }
 

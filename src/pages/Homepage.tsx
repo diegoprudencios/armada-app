@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { MarketingHero } from '@/components/MarketingHero'
-import { WhatIsArmada } from '@/components/WhatIsArmada'
+import { HomepageFeatures } from '@/components/HomepageFeatures'
 import { SiteFooter } from '@/components/SiteFooter'
 import styles from './Homepage.module.css'
 
@@ -48,7 +48,7 @@ export function Homepage({
       <SiteHeader />
       <main id="main-content" className={styles.main}>
         <MarketingHero scrollExit={heroScrollExit} />
-        <WhatIsArmada introUnderHero={heroScrollExit} />
+        <HomepageFeatures introUnderHero={heroScrollExit} />
       </main>
       <SiteFooter />
     </div>

@@ -14,7 +14,7 @@ import {
 import { ComplianceToggleStack } from './ComplianceToggleStack'
 import { FoundationsCubeGrid } from './FoundationsCubeGrid'
 import { BeyondCaptureGuard } from './BeyondCaptureGuard'
-import styles from './WhatIsArmada.module.css'
+import styles from './HomepageFeatures.module.css'
 
 const PrivacySphereViz = lazy(() =>
   import('@/components/PrivacySphere').then((module) => ({ default: module.PrivacySphereStory })),
@@ -239,7 +239,7 @@ function IntroCentered({ underHero = false }: { underHero?: boolean }) {
       className={[styles.intro, pinHandoff ? styles.introUnderHero : '']
         .filter(Boolean)
         .join(' ')}
-      id="what-is-armada"
+      id="homepage-features"
       style={
         pinHandoff
           ? ({
@@ -267,7 +267,7 @@ function IntroCentered({ underHero = false }: { underHero?: boolean }) {
   )
 }
 
-export interface WhatIsArmadaProps {
+export interface HomepageFeaturesProps {
   /**
    * Pull the privacy intro under the hero pin so copy fades in centered
    * as the hero dissolves to amber.
@@ -490,9 +490,9 @@ function FeatureDiagram({ id }: { id: string }) {
   return null
 }
 
-export function WhatIsArmada({ introUnderHero = false }: WhatIsArmadaProps) {
+export function HomepageFeatures({ introUnderHero = false }: HomepageFeaturesProps) {
   return (
-    <section className={`${styles.section} ${styles.sectionIntroStack}`} aria-label="What is Armada">
+    <section className={`${styles.section} ${styles.sectionIntroStack}`} aria-label="Features">
       <IntroCentered underHero={introUnderHero} />
       <FeatureCardsBand overlapIntro={introUnderHero} />
     </section>

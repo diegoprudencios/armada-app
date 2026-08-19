@@ -15,9 +15,9 @@ Risk = chance of visual or flow regressions if you “fix” it, not how bad the
 |------|------:|--------------|-------------|
 | `src/components/PrivacySphere/useThreeScene.ts` | 580 | Three.js scene, camera, fat-lines, USDC traveler, resize, reduced-motion. Not a React component, but the heaviest unit in the app. | **High** — silent visual / WebGL breakage |
 | `src/components/AmountInputScreen/AmountInputScreen.tsx` | 549 | Shared amount UI for deposit/send/earn/request/withdraw: keypad vs input, shield layout, fees, max/percent, shake, rolling balance, a11y. Props surface is a kitchen sink (`balanceMode`, `entryMode`, `layout`, slots, fee helpers). | **High** — every money flow uses it |
-| `src/components/WhatIsArmada/WhatIsArmada.tsx` | 500 | Marketing section: copy data, scroll-scrub handoff, feature cards, lazy 3D, compliance/cube diagrams. | **Medium** — marketing-only, still scroll-timing sensitive |
+| `src/components/HomepageFeatures/HomepageFeatures.tsx` | 500 | Marketing section: copy data, scroll-scrub handoff, feature cards, lazy 3D, compliance/cube diagrams. | **Medium** — marketing-only, still scroll-timing sensitive |
 | `src/components/SiteHeader/SiteHeader.tsx` | 470 | Desktop mega-menu, mobile drawer, scroll hide/show, Open App CTA. | **Medium** |
-| `src/components/WhatIsArmada/FoundationsCubeGrid.tsx` | 460 | Canvas cube grid + scroll IO + hardcoded diagram hex. | **Medium** |
+| `src/components/HomepageFeatures/FoundationsCubeGrid.tsx` | 460 | Canvas cube grid + scroll IO + hardcoded diagram hex. | **Medium** |
 | `src/pages/SendRecipientScreen.tsx` | 457 | Recipient input, clipboard, recent addresses, environment mock, shake, listbox keyboard, validation. | **High** — send/withdraw share patterns |
 | `src/pages/RequestModalFlow.tsx` | 445 | Orchestrates request + share + QR + clipboard + step machine. | **High** |
 | `src/components/BalanceCard/BalanceCard.tsx` | 400 | Balance reveal, scramble, roll, hide/peek, address copy, vault bar, action row, font-size fitting. | **High** — dashboard identity |
@@ -35,7 +35,7 @@ Risk = chance of visual or flow regressions if you “fix” it, not how bad the
 | `src/components/RollingBalanceValue/RollingBalanceValue.tsx` | 250 | Digit roll animation. | **Medium** |
 | `src/components/WalletMenuPanel/WalletMenuPanelEthereum.tsx` | 198 | Wallet panel UI (filename still says “Ethereum” from the old A/B). | **Low** to rename; **medium** to refactor layout |
 
-CSS of similar weight (not components, but same “too much in one file”): `WhatIsArmada.module.css` (~649), `MarketingHero.module.css` (~410), `WalletMenuPanel.module.css` (~314), `BalanceCard.module.css`, `AmountInputScreen.module.css`, `SiteHeader.module.css`.
+CSS of similar weight (not components, but same “too much in one file”): `HomepageFeatures.module.css` (~649), `MarketingHero.module.css` (~410), `WalletMenuPanel.module.css` (~314), `BalanceCard.module.css`, `AmountInputScreen.module.css`, `SiteHeader.module.css`.
 
 ---
 
@@ -47,7 +47,7 @@ CSS of similar weight (not components, but same “too much in one file”): `Wh
 | Confirmed screens | `DepositConfirmedScreen`, `SendConfirmedScreen`, `EarnConfirmedScreen`, `ReceivePaymentConfirmedScreen`, `RequestPaidConfirmedScreen`, etc. | Same column + title + amount + summary + “View explorer” / “Go to dashboard”. Earn even reuses `DepositConfirmedScreen.module.css`. | **Medium** |
 | Review summary tables | `DepositReviewSummary`, `SendReviewSummary`, `EarnReviewSummary`, `ReceivePaymentReviewSummary`, `RequestReceiveReviewSummary` | Same row/label/value markup; Earn already imports Deposit’s CSS. | **Medium** |
 | Connect-wallet provider list | `ConnectWalletOverlay.tsx` (`WALLETS`) and `ConnectWalletPicker.tsx` (`CONNECT_WALLETS`) | Identical MetaMask / Phantom / WalletConnect entries and icons. | **Low** |
-| Desktop scroll handoff hook | `MarketingHero.tsx` (`useDesktopHandoff`) and `WhatIsArmada.tsx` (same 768px `matchMedia` pattern) | Copy-paste instead of `useMobileLayout` / shared hook. Marketing uses **min-width 768** (desktop-true) vs app hook **max-width 767** (mobile-true) — easy to get inverted. | **Medium** |
+| Desktop scroll handoff hook | `MarketingHero.tsx` (`useDesktopHandoff`) and `HomepageFeatures.tsx` (same 768px `matchMedia` pattern) | Copy-paste instead of `useMobileLayout` / shared hook. Marketing uses **min-width 768** (desktop-true) vs app hook **max-width 767** (mobile-true) — easy to get inverted. | **Medium** |
 | Overlay a11y stack | `FlowModalOverlay`, `ConnectWalletOverlay`, `BottomSheet`, `SidePanel`, `MockMetaMaskPopup` | Repeated `createPortal` + `useBodyScrollLock` + `useFocusTrap` + `useEscapeKey`. Partly shared already; not fully. | **Medium** |
 | Tick-ring spinner | `HeroUsdcSpinner.tsx` and `TxProgressCard.tsx` | Same `--i` tick spans + CSS custom property. | **Low** |
 | Clipboard “copied” timeout | `WalletMenuPanelEthereum`, `BalanceCard`, `SendRecipientScreen`, request link screen | Same 2s timer + try/catch clipboard. | **Low** |
@@ -63,8 +63,8 @@ Documented `EXCEPTION` comments in CSS are intentional (Figma marketing, MetaMas
 |------|--------------|-------------|
 | `src/pages/Homepage.tsx` | `HOMEPAGE_CHROME_FILL = '#f8d197'` for `theme-color` / iOS chrome (same as `--semantic-color-brand-amber` / `--primitives-color-amber-100` family). | **Low** if you only swap to the token string in JS |
 | `src/pages/Homepage.module.css` | `background-color: #f8d197 !important` | **Low** |
-| `src/components/WhatIsArmada/WhatIsArmada.module.css` | `#ffffff`, `#f9f3ef`, `#000000`, `rgba(0,0,0,0.7)`, `--diagram-stroke: #5a4a62` | **Medium** — marketing contrast is tuned by eye |
-| `src/components/WhatIsArmada/FoundationsCubeGrid.tsx` | Cube colors `'#291433'`, `'#5a4a62'` (exist as purple-900 / diagram stroke) | **Medium** |
+| `src/components/HomepageFeatures/HomepageFeatures.module.css` | `#ffffff`, `#f9f3ef`, `#000000`, `rgba(0,0,0,0.7)`, `--diagram-stroke: #5a4a62` | **Medium** — marketing contrast is tuned by eye |
+| `src/components/HomepageFeatures/FoundationsCubeGrid.tsx` | Cube colors `'#291433'`, `'#5a4a62'` (exist as purple-900 / diagram stroke) | **Medium** |
 | `src/components/SiteHeader/SiteHeader.module.css` | `#ffffff` / black mixes for mobile menu | **Medium** |
 | `src/components/MarketingHero/MarketingHero.module.css` | Overlay `#000000` (commented EXCEPTION) | **Low** to leave |
 | `src/components/MockMetaMaskPopup/MockMetaMaskPopup.module.css` | Full MetaMask palette (`#24272a`, `#037dd6`, `#f6851b`, …) | **Low** — should **not** use Armada tokens |
