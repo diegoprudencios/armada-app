@@ -21,6 +21,8 @@ import {
 } from '@/components/BalanceCard/balanceRevealMotion'
 import { RollingBalanceValue } from '@/components/RollingBalanceValue'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
+import { useNudgeShake } from '@/hooks/useNudgeShake'
+import nudgeStyles from '@/styles/incompleteCtaNudge.module.css'
 import {
   amountExceedsBalance,
   applyKeypadBackspace,
@@ -153,6 +155,8 @@ export function AmountInputScreen({
   const amountDisplayId = useId()
   const feeCaptionId = useId()
   const internalAmountInputRef = useRef<HTMLInputElement | null>(null)
+  const amountDisplayRef = useRef<HTMLParagraphElement | null>(null)
+  const { shaking, nudge, onShakeAnimationEnd } = useNudgeShake()
   const isKeypad = entryMode === 'keypad'
   /** Mobile keypad: single sticky CTA, no cancel. */
   const isKeypadMobile = isKeypad && isMobile
@@ -176,6 +180,15 @@ export function AmountInputScreen({
     ? resolveExceedsBalance(amount, balance, balanceMode)
     : false
   const canReview = hasAmount && !exceedsBalance
+
+  function handleIncompleteCta() {
+    nudge()
+    if (isKeypad) {
+      amountDisplayRef.current?.focus()
+      return
+    }
+    internalAmountInputRef.current?.focus()
+  }
   const primaryLabel = canReview
     ? (primaryActionLabel ?? 'Review')
     : 'Input amount'
@@ -300,7 +313,9 @@ export function AmountInputScreen({
           <div className={styles.amountField}>
             {isKeypad ? (
               <p
+                ref={amountDisplayRef}
                 id={amountDisplayId}
+                tabIndex={-1}
                 className={[
                   styles.amountDisplay,
                   exceedsBalance && styles.amountInputError,
@@ -426,6 +441,7 @@ export function AmountInputScreen({
         showIcon={false}
         disabled={!canReview}
         dimWhenDisabled={false}
+        onDisabledClick={handleIncompleteCta}
         onClick={onReview}
       />
     </div>
@@ -447,6 +463,7 @@ export function AmountInputScreen({
         disabled={!canReview}
         dimWhenDisabled={false}
         className={styles.confirmButton}
+        onDisabledClick={handleIncompleteCta}
         onClick={onReview}
       />
     </div>
@@ -468,7 +485,12 @@ export function AmountInputScreen({
           {isKeypadMobile ? (
             <>
               <div className={`${styles.keypadAmountCenter} ${styles.keypadEnterAmount}`}>
-                {amountBlock}
+                <div
+                  className={shaking ? nudgeStyles.shake : undefined}
+                  onAnimationEnd={onShakeAnimationEnd}
+                >
+                  {amountBlock}
+                </div>
               </div>
               {footerSlot}
               {showBalanceControls ? (
@@ -482,7 +504,12 @@ export function AmountInputScreen({
             </>
           ) : (
             <>
-              <div className={styles.keypadAmountBlock}>
+              <div
+                className={[styles.keypadAmountBlock, shaking && nudgeStyles.shake]
+                  .filter(Boolean)
+                  .join(' ')}
+                onAnimationEnd={onShakeAnimationEnd}
+              >
                 {amountBlock}
                 {showBalanceControls ? balanceControls : null}
               </div>
@@ -501,7 +528,10 @@ export function AmountInputScreen({
       <div className={modalStepBodyEnter}>
         {introSlot}
 
-        <div className={styles.card}>
+        <div
+          className={[styles.card, shaking && nudgeStyles.shake].filter(Boolean).join(' ')}
+          onAnimationEnd={onShakeAnimationEnd}
+        >
           <div className={styles.cardTop}>
             {isShieldLayout ? shieldTabs : headerSlot}
             {cardTitle}

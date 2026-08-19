@@ -169,9 +169,29 @@
   field-sizing: content;
 }
 
+.amountInput:focus,
+.amountInput:focus-visible {
+  color: var(--semantic-color-text-muted);
+}
+
 .amountInput::placeholder {
   font-family: var(--primitives-fontFamily-mono), ui-monospace, monospace;
   font-weight: var(--primitives-fontWeight-regular);
   font-size: calc(var(--primitives-fontSize-4xl) * 1px);
-  color: color-mix(in srgb, var(--semantic-color-text-primary) 30%, transparent);
+  color: var(--semantic-color-text-primary);
+  opacity: 1;
+}
+
+.amountInput:focus::placeholder,
+.amountInput:focus-visible::placeholder {
+  color: var(--semantic-color-text-muted);
+}
+
+@media (max-width: 767px) {
+  .amountInput:focus,
+  .amountInput:focus-visible,
+  .amountInput:focus::placeholder,
+  .amountInput:focus-visible::placeholder {
+    color: var(--semantic-color-text-primary);
+  }
 }

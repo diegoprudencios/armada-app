@@ -11,6 +11,7 @@ export interface DashboardCardStackProps {
   depositTooltip?: ReactNode
   earnBanner?: ReactNode
   tooltipEnterStyle?: CSSProperties
+  activityEnterStyle?: CSSProperties
 }
 
 export function DashboardCardStack({
@@ -23,6 +24,7 @@ export function DashboardCardStack({
   depositTooltip,
   earnBanner,
   tooltipEnterStyle,
+  activityEnterStyle,
 }: DashboardCardStackProps) {
   const showPromoBanner =
     (showDepositTooltip && Boolean(depositTooltip)) || (showEarnBanner && Boolean(earnBanner))
@@ -53,7 +55,9 @@ export function DashboardCardStack({
         ) : null}
       </div>
       {activityVisible && activityList ? (
-        <div className={styles.cardStackActivity}>{activityList}</div>
+        <div className={styles.cardStackActivity} style={activityEnterStyle}>
+          {activityList}
+        </div>
       ) : null}
     </div>
   )

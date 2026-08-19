@@ -1,8 +1,11 @@
-import { type CSSProperties, useState } from 'react'
+import { type CSSProperties, useRef, useState } from 'react'
 import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { DASHBOARD_ACTIVITY_BOTTOM_SPACING_PX } from '@/constants/activityList'
 import { BalanceCard } from '@/components/BalanceCard'
-import { DASHBOARD_TOOLTIP_ENTER_DELAY_MS } from '@/components/BalanceCard/balanceRevealMotion'
+import {
+  DASHBOARD_TOOLTIP_ENTER_DELAY_MS,
+  dashboardActivityEnterDelayMs,
+} from '@/components/BalanceCard/balanceRevealMotion'
 import { DashboardScrollTopFade } from '@/components/DashboardScrollTopFade'
 import { DashboardHeader } from '@/components/DashboardHeader'
 import { DepositTooltip } from '@/components/DepositTooltip'
@@ -41,6 +44,7 @@ export function ArmadaAppDashboard({
   const isMobile = useMobileLayout()
   const [vaultChooserOpen, setVaultChooserOpen] = useState(false)
   const state = useDashboardDemoState(initialBalance)
+  const activityVisibleOnPaintRef = useRef<boolean | null>(null)
   const {
     wallet,
     connectedWallets,
@@ -75,6 +79,13 @@ export function ArmadaAppDashboard({
   const dashboardVersion = getDashboardVersionFromPath()
   const isV2 = dashboardVersion === 'v2'
   const showActivity = activityVisible && recentActivity.length > 0
+  if (activityVisibleOnPaintRef.current === null) {
+    activityVisibleOnPaintRef.current = showActivity
+  }
+  const activityEnterDelayMs = dashboardActivityEnterDelayMs(
+    showDepositTooltip || showEarnBanner,
+    activityVisibleOnPaintRef.current,
+  )
 
   return (
     <div
@@ -111,6 +122,11 @@ export function ArmadaAppDashboard({
         tooltipEnterStyle={
           {
             '--dashboard-tooltip-enter-delay': `${DASHBOARD_TOOLTIP_ENTER_DELAY_MS}ms`,
+          } as CSSProperties
+        }
+        activityEnterStyle={
+          {
+            '--dashboard-activity-enter-delay': `${activityEnterDelayMs}ms`,
           } as CSSProperties
         }
         balanceCard={

@@ -1,4 +1,6 @@
 import { useCallback, useId, useRef, type MutableRefObject, type Ref } from 'react'
+import { useNudgeShake } from '@/hooks/useNudgeShake'
+import nudgeStyles from '@/styles/incompleteCtaNudge.module.css'
 import { Button } from '@/components/Button'
 import { SegmentedControl } from '@/components/SegmentedControl'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
@@ -37,6 +39,7 @@ export function RequestReceiveScreen({
   const amountInputId = useId()
   const noteInputId = useId()
   const internalAmountInputRef = useRef<HTMLInputElement | null>(null)
+  const { shaking, nudge, onShakeAnimationEnd } = useNudgeShake()
 
   const setAmountInputRef = useCallback(
     (node: HTMLInputElement | null) => {
@@ -64,7 +67,10 @@ export function RequestReceiveScreen({
   return (
     <div className={styles.column}>
       <div className={modalStepBodyEnter}>
-        <div className={styles.linkCard}>
+        <div
+          className={[styles.linkCard, shaking && nudgeStyles.shake].filter(Boolean).join(' ')}
+          onAnimationEnd={onShakeAnimationEnd}
+        >
           <h1 className={`armada-text-ui-body-lg ${styles.cardTitle}`}>
             Request USDC via link
           </h1>
@@ -129,6 +135,10 @@ export function RequestReceiveScreen({
           showIcon={false}
           disabled={!canCreateLink}
           dimWhenDisabled={false}
+          onDisabledClick={() => {
+            nudge()
+            internalAmountInputRef.current?.focus()
+          }}
           onClick={onCreateLink}
           testingClickId="request_create_link_button"
         />

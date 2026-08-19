@@ -16,6 +16,8 @@ export interface ButtonProps {
   disabled?: boolean
   /** When false, disabled keeps the enabled palette and only shows not-allowed cursor. @default true */
   dimWhenDisabled?: boolean
+  /** Fired when the control is incomplete/disabled; keeps the button clickable so a nudge can run. */
+  onDisabledClick?: () => void
   onClick?: () => void
   style?: React.CSSProperties
   className?: string
@@ -46,6 +48,7 @@ export function Button({
   icon,
   disabled = false,
   dimWhenDisabled = true,
+  onDisabledClick,
   onClick,
   className,
   type = 'button',
@@ -110,12 +113,21 @@ export function Button({
     )
   }
 
+  const interceptDisabledClick = Boolean(disabled && onDisabledClick)
+
   return (
     <button
       type={type}
       className={cls}
-      disabled={disabled}
-      onClick={onClick}
+      disabled={disabled && !interceptDisabledClick}
+      aria-disabled={disabled || undefined}
+      onClick={() => {
+        if (disabled) {
+          onDisabledClick?.()
+          return
+        }
+        onClick?.()
+      }}
       style={style}
       {...testingAttrs}
     >

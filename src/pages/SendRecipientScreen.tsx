@@ -7,6 +7,8 @@ import iconButtonStyles from '@/components/IconButton/IconButton.module.css'
 import { useEnvironment } from '@/hooks/useEnvironment'
 import { useListboxKeyboard } from '@/hooks/useListboxKeyboard'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
+import { useNudgeShake } from '@/hooks/useNudgeShake'
+import nudgeStyles from '@/styles/incompleteCtaNudge.module.css'
 import { readRecipientFromClipboard } from '@/utils/clipboardAddress'
 import { truncateAddress, truncateMiddleToWidth } from '@/utils/format'
 import {
@@ -49,6 +51,7 @@ export function SendRecipientScreen({
   const inputId = useId()
   const listboxId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
+  const { shaking, nudge, onShakeAnimationEnd } = useNudgeShake()
   const chainRootRef = useRef<HTMLDivElement>(null)
   const chainListboxRef = useRef<HTMLUListElement>(null)
   const clipboardAddressRef = useRef<HTMLSpanElement>(null)
@@ -272,6 +275,10 @@ export function SendRecipientScreen({
         showIcon={false}
         disabled={!hasAddress}
         dimWhenDisabled={false}
+        onDisabledClick={() => {
+          nudge()
+          inputRef.current?.focus()
+        }}
         onClick={onContinue}
       />
     </div>
@@ -280,7 +287,11 @@ export function SendRecipientScreen({
   return (
     <div className={styles.column}>
       <div className={styles.body}>
-        <div className={`${styles.card} ${styles.enterCard}`}>
+        <div className={styles.enterCard}>
+        <div
+          className={[styles.card, shaking && nudgeStyles.shake].filter(Boolean).join(' ')}
+          onAnimationEnd={onShakeAnimationEnd}
+        >
           <h1 className={`armada-text-ui-body-lg ${styles.cardTitle}`}>
             {sendRecipientTitle(variant)}
           </h1>
@@ -413,6 +424,7 @@ export function SendRecipientScreen({
           </div>
 
           {privacyBadge}
+        </div>
         </div>
 
         {actionRow}

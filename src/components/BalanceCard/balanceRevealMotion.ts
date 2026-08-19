@@ -15,6 +15,9 @@ export const BALANCE_DEPOSIT_BUTTON_ENTER_DELAY_MS = 630
 export const DASHBOARD_TOOLTIP_ENTER_DELAY_MS =
   BALANCE_DEPOSIT_BUTTON_ENTER_DELAY_MS + BALANCE_ACTION_BUTTON_ENTER_MS + 180
 
+/** Keep in sync with ArmadaAppDashboard.module.css `.tooltipEnter`. */
+export const DASHBOARD_TOOLTIP_ENTER_MS = 360
+
 /** Pause after balance motion before the activity panel enters. */
 export const ACTIVITY_REVEAL_BUFFER_MS = 240
 
@@ -28,6 +31,18 @@ export function balanceRevealRollDurationMs(): number {
 
 export function activityRevealDelayAfterIntroMs(): number {
   return BALANCE_REVEAL_DELAY_MS + BALANCE_REVEAL_DURATION_MS + ACTIVITY_REVEAL_BUFFER_MS
+}
+
+export function activityRevealDelayAfterPromoMs(): number {
+  return DASHBOARD_TOOLTIP_ENTER_DELAY_MS + DASHBOARD_TOOLTIP_ENTER_MS + ACTIVITY_REVEAL_BUFFER_MS
+}
+
+/** Page-load cascade: activity is last, after the balance and promo banner. Later reveals use 0. */
+export function dashboardActivityEnterDelayMs(hasPromoBanner: boolean, isInitialPaint: boolean): number {
+  if (!isInitialPaint) return 0
+  const afterIntro = activityRevealDelayAfterIntroMs()
+  if (!hasPromoBanner) return afterIntro
+  return Math.max(afterIntro, activityRevealDelayAfterPromoMs())
 }
 
 export function activityRevealDelayAfterRollMs(formattedBalance: string): number {
