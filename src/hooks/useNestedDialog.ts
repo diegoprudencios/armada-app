@@ -1,4 +1,4 @@
-import { useEffect, useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from 'react'
 
 let nestedDialogCount = 0
 const listeners = new Set<() => void>()

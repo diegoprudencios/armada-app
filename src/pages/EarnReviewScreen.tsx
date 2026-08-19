@@ -10,7 +10,7 @@ import {
   earnReviewTitle,
   type EarnTab,
 } from './earnFlowConstants'
-import reviewStyles from './DepositReviewScreen.module.css'
+import reviewStyles from './ReviewScreenLayout.module.css'
 import styles from './EarnReviewScreen.module.css'
 
 export interface EarnReviewScreenProps {
@@ -53,7 +53,7 @@ export function EarnReviewScreen({
 
   if (keypadMobileLayout) {
     return (
-      <div className={styles.sheetColumn}>
+      <div className={reviewStyles.sheetColumn}>
         {summary}
         {tab === 'withdraw' ? (
           <p className={styles.slippageNotice}>
@@ -61,7 +61,7 @@ export function EarnReviewScreen({
             this quote.
           </p>
         ) : null}
-        <div className={styles.sheetActions}>
+        <div className={reviewStyles.sheetActions}>
           <Button
             variant="primary"
             size="lg"

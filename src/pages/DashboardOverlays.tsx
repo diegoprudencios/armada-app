@@ -41,7 +41,7 @@ export interface DashboardOverlaysProps {
   state: DashboardDemoState
 }
 
-/** Connect wallet + deposit/send modal flows shared by all dashboard layout variants. */
+/** Connect overlay plus deposit / send / earn / withdraw / request / receive flows. */
 export function DashboardOverlays({ state }: DashboardOverlaysProps) {
   const { notifyFirstDepositComplete, showFlowQuestion } = useSessionLogger()
   const {

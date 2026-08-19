@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { WalletMetamask } from '@web3icons/react'
-import { registerNestedDialog } from '@/hooks/nestedDialog'
+import { registerNestedDialog } from '@/hooks/useNestedDialog'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
 import { useMobileLayout } from '@/hooks/useMobileLayout'

@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import { useFocusTrap } from '@/hooks/useFocusTrap'
-import { useNestedDialogCount } from '@/hooks/nestedDialog'
+import { useNestedDialogCount } from '@/hooks/useNestedDialog'
 import { useRestoreFocus } from '@/hooks/useRestoreFocus'
 import styles from './FlowModalOverlay.module.css'
 

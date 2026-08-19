@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { CLIPBOARD_COPIED_RESET_MS } from '@/constants/clipboard'
 import { Button } from '@/components/Button'
 import { modalActionRowEnter, modalStepBodyEnter } from '@/components/ModalShell'
 import { formatUsdcAmount } from '@/utils/format'
@@ -152,7 +153,7 @@ export function RequestLinkScreen({
       await navigator.clipboard.writeText(paymentLink)
       setLinkCopied(true)
       if (linkCopyTimerRef.current) clearTimeout(linkCopyTimerRef.current)
-      linkCopyTimerRef.current = setTimeout(() => setLinkCopied(false), 2000)
+      linkCopyTimerRef.current = setTimeout(() => setLinkCopied(false), CLIPBOARD_COPIED_RESET_MS)
     } catch {
       // clipboard unavailable
     }

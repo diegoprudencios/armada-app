@@ -17,7 +17,7 @@ Risk = chance of visual or flow regressions if you “fix” it, not how bad the
 | `onMore` / `onWithdraw` on `BalanceCard` | Removed from the type and `ArmadaAppDashboard`. |
 | `onSelectWallet` | Removed from wallet panel → shell → pill → header. `selectActiveWallet` remains on demo session only. |
 | `applyEnvironment` | Removed from `useEnvironment` return. Setter still exists as `setEnvironment` in `environment.ts`. |
-| `WalletMenuPanelEthereum.tsx` | Folded into `WalletMenuPanel.tsx`. CSS class names still say `ethereum*` (cosmetic). |
+| `WalletMenuPanelEthereum.tsx` | Folded into `WalletMenuPanel.tsx`. |
 | MarketingHero `*Legacy` | `content` / `bottom` / `intro` / `heading`. |
 | Confirmed-screen CSS | Shared `ConfirmedScreen.module.css` (was `DepositConfirmedScreen.module.css`). Components still duplicated. |
 | `WhatIsArmada` | Renamed `HomepageFeatures`. Intro `id` is `homepage-features`. |
@@ -28,6 +28,12 @@ Risk = chance of visual or flow regressions if you “fix” it, not how bad the
 | Testing session `console.log` | Removed from `useSessionLogger`. |
 | Wallet panel `ethereum*` names | Classes/constants renamed; tag/explorer follow `wallet.chain` (demo: Sepolia). |
 | Default vs named exports | `LandingHero`, `WalletItem`, `Tooltip` are named exports. |
+| Shared review table | `ReviewSummary` + icon row height. |
+| Desktop handoff | `hooks/useDesktopHandoff.ts`. |
+| Nested dialog hook filename | `hooks/useNestedDialog.ts`. |
+| Orphan `WhatIsArmada/` folder | Removed (live UI is `HomepageFeatures`). |
+| Review screen layout CSS | `pages/ReviewScreenLayout.module.css` (deposit + earn). |
+| Clipboard “copied” timeout | `CLIPBOARD_COPIED_RESET_MS` (same 2000ms). |
 
 ---
 
@@ -47,7 +53,7 @@ Unchanged structurally. Do **not** split these in the same change as wallet conn
 | `BalanceCard.tsx` | Dashboard identity (reveal, scramble, vault, actions). | **High** |
 | `dashboardActivity.ts` | Factory + normalize + labels. | **Medium** |
 | `PrivacySphereStory.tsx` | SVG + Three host. | **High** if split from `useThreeScene` |
-| `MarketingHero.tsx` | Pin, scrub, inlined `useDesktopHandoff`. | **Medium** |
+| `MarketingHero.tsx` | Pin, scrub. Handoff is `useDesktopHandoff`. | **Medium** |
 | `testingFeedback/useSessionLogger.tsx` | Gated off; still compiled. | **Low** |
 | `DepositModalFlow.tsx` (+ send/earn/withdraw copies) | Parallel modal shells. | **High** to unify |
 | `DashboardOverlays.tsx` | Every modal + testing questions. | **Medium** |
@@ -64,11 +70,11 @@ Heavy CSS: `HomepageFeatures.module.css`, `MarketingHero.module.css`, `WalletMen
 |-------------------|--------|------|
 | Modal flow orchestrators (deposit/send/earn/withdraw/request) | **Open** — do not merge until wallets. | **High** |
 | Confirmed screens | **Partial** — shared CSS module; still separate TSX. | **Medium** |
-| Review summary tables | **Done** — shared `ReviewSummary` row/shell; send privacy notice stays on send. Earn review **screen** still imports Deposit screen CSS for the amount line. | **Low** leftover screen CSS |
+| Review summary tables | **Done** — shared `ReviewSummary`. | — |
 | Connect-wallet lists (`WALLETS` vs `CONNECT_WALLETS`) | **Done** — `CONNECT_WALLET_OPTIONS` in `constants/connectWallets.tsx`. | — |
 | Desktop scroll handoff (`useDesktopHandoff` vs HomepageFeatures `matchMedia`) | **Done** — shared `hooks/useDesktopHandoff.ts`. | — |
 | Overlay a11y stack | **Open** — partly shared. | **Medium** |
-| Tick-ring spinner, clipboard 2s timeout, fee helper split | **Open**. | **Low** |
+| Tick-ring spinner, clipboard 2s timeout, fee helper split | **Partial** — clipboard timeout shared; tick-ring CSS still per-component; fees already `sendFee` / `depositFee`. | **Low** |
 
 ---
 
@@ -99,7 +105,7 @@ Documented `EXCEPTION` comments (Figma marketing, MetaMask chrome) are intention
 |----------------|--------|------|
 | `WalletMenuPanelEthereum.tsx` | **Done** (file + CSS class names). | — |
 | `LandingHero` / `WalletItem` / `Tooltip` default exports | **Done** — named exports. | — |
-| `hooks/nestedDialog.ts` vs `useNestedDialog.ts` | **Open**. | **Low** |
+| `hooks/nestedDialog.ts` vs `useNestedDialog.ts` | **Done**. | — |
 | `pages/depositFlowConstants.ts` as domain module | **Partial** — `DemoWalletProvider` moved to `constants/demoWallets.ts`; deposit pages still re-export. Chain labels remain in `depositFlowConstants`. | **Low** leftover |
 | Unused crowdfund breakpoint exports | **Done**. | — |
 | MarketingHero `*Legacy` | **Done**. | — |
@@ -139,14 +145,14 @@ Unchanged: no `any`; session JSON casts; Three `LineGeometry` cast; testing-feed
 
 Unchanged. Wallet work: read **`WALLET_INTEGRATION_NOTES.md` first**. Do not mix wagmi into `useDashboardDemoState` casually.
 
-`DashboardOverlays.tsx` comment still says “all dashboard layout variants” (stale).
+`DashboardOverlays.tsx` comment updated (no longer “all dashboard layout variants”).
 
 ---
 
 ## Suggested order (remaining)
 
-1. **Low:** optional `nestedDialog` filename.  
-2. **Medium:** none in this bucket (review-row shipped). Optional leftover: Earn review screen still uses Deposit screen CSS for the amount line.  
+1. **Low / leave until tokens:** glass/shadow one-offs, `TxProgressCard` overlay, balance-fit / pill timings — these **will** change look if retokenized. Overlay a11y stack (behavior). Tick-ring still duplicated CSS.  
+2. **Medium:** none required before a token pass.  
 3. **High / wallets:** do **not** merge modal flows or split `AmountInputScreen` / `BalanceCard` in the same PR as wallet connect. Treat `useDashboardDemoState` as the swap boundary (`WALLET_INTEGRATION_NOTES.md`).
 
 No tests means even leftover CSS/token changes need a visual pass on `/`, `/homepage`, `/dashboard` (desktop + mobile), and one full deposit + send path.

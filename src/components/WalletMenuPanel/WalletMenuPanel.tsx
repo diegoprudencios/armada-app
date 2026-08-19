@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { CLIPBOARD_COPIED_RESET_MS } from '@/constants/clipboard'
 import {
   PowerIcon,
   ArrowTopRightOnSquareIcon,
@@ -76,7 +77,7 @@ export function WalletMenuPanel({
       await navigator.clipboard.writeText(wallet.address)
       setCopied(true)
       if (copyTimerRef.current) clearTimeout(copyTimerRef.current)
-      copyTimerRef.current = setTimeout(() => setCopied(false), 2000)
+      copyTimerRef.current = setTimeout(() => setCopied(false), CLIPBOARD_COPIED_RESET_MS)
     } catch {
       setCopied(false)
     }

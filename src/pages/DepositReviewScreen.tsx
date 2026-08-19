@@ -8,7 +8,7 @@ import {
   DEMO_ARMADA_ADDRESS,
   DEMO_WALLET_ADDRESS,
 } from './depositFlowConstants'
-import styles from './DepositReviewScreen.module.css'
+import styles from './ReviewScreenLayout.module.css'
 
 export interface DepositReviewScreenProps {
   amount: string

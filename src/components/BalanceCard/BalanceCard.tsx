@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { CLIPBOARD_COPIED_RESET_MS } from '@/constants/clipboard'
 import {
   ArrowDownIcon,
   ArrowRightIcon,
@@ -122,7 +123,7 @@ export function BalanceCard({
       await navigator.clipboard.writeText(armadaAddress)
       setArmadaAddressCopied(true)
       if (armadaAddressCopyTimerRef.current) clearTimeout(armadaAddressCopyTimerRef.current)
-      armadaAddressCopyTimerRef.current = setTimeout(() => setArmadaAddressCopied(false), 2000)
+      armadaAddressCopyTimerRef.current = setTimeout(() => setArmadaAddressCopied(false), CLIPBOARD_COPIED_RESET_MS)
     } catch {
       setArmadaAddressCopied(false)
     }

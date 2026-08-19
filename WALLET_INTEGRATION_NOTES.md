@@ -145,7 +145,7 @@ These pass `onConnectWallet: (provider: DemoWalletProvider) => void` down to the
 
 | | |
 |--|--|
-| **What it does now** | Fake MetaMask approve/sign chrome inside the deposit flow. `nestedDialog.ts` documents it as a nested dialog for focus trap. |
+| **What it does now** | Fake MetaMask approve/sign chrome inside the deposit flow. `useNestedDialog.ts` documents it as a nested dialog for focus trap. |
 | **Why it's on the list** | Real wallets use the extension / WalletConnect modal. This UI should be removed or only kept for a documented mock mode. |
 | **Risk** | **Medium** — deposit step machine currently expects this screen |
 
