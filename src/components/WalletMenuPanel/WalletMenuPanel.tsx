@@ -9,7 +9,6 @@ import {
   PlusIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
-import NetworkEthereum from '@web3icons/react/icons/networks/NetworkEthereum'
 import TokenUSDC from '@web3icons/react/icons/tokens/TokenUSDC'
 import { ConnectWalletPicker } from '@/components/ConnectWalletPicker'
 import { BalanceActionButton } from '@/components/BalanceActionButton'
@@ -20,10 +19,11 @@ import { SendButton } from '@/components/SendButton'
 import { Tag } from '@/components/Tag'
 import { WalletProviderIcon } from '@/components/WalletPillMenu/WalletPillMenu'
 import {
-  WALLET_PANEL_ETHEREUM_CHAIN,
-  WALLET_PANEL_ETHEREUM_NETWORK_LABEL,
-} from '@/constants/walletMenu'
-import type { DepositChainId } from '@/constants/depositChains'
+  DEPOSIT_CHAIN_ICONS,
+  depositChainLabel,
+  explorerAddressUrl,
+  type DepositChainId,
+} from '@/constants/depositChains'
 import type { DemoWalletProvider } from '@/constants/demoWallets'
 import type { ConnectedWallet } from '@/utils/walletMenu'
 import { formatUsdcAmount, truncateAddress } from '@/utils/format'
@@ -41,13 +41,9 @@ export interface WalletMenuPanelProps {
   onBalanceHiddenChange?: (hidden: boolean) => void
 }
 
-const ETHEREUM_WALLET_HERO_ICON_SIZE = 56
-const ETHEREUM_USDC_ROW_ICON_PX = 40
-const ETHEREUM_USDC_ROW_ICON_SIZE = Math.round((ETHEREUM_USDC_ROW_ICON_PX * 24) / 18)
-
-function ethereumExplorerAddressUrl(address: string): string {
-  return `https://sepolia.etherscan.io/address/${address}`
-}
+const WALLET_HERO_ICON_SIZE = 56
+const USDC_ROW_ICON_PX = 40
+const USDC_ROW_ICON_SIZE = Math.round((USDC_ROW_ICON_PX * 24) / 18)
 
 export function WalletMenuPanel({
   wallets,
@@ -65,8 +61,7 @@ export function WalletMenuPanel({
 
   const wallet =
     wallets.find((entry) => entry.id === activeWalletId) ?? wallets[0] ?? null
-  const ethereumBalance = wallet?.usdcBalance ?? 0
-  const balanceLabel = formatUsdcAmount(ethereumBalance)
+  const balanceLabel = formatUsdcAmount(wallet?.usdcBalance ?? 0)
 
   useEffect(() => {
     return () => {
@@ -89,40 +84,40 @@ export function WalletMenuPanel({
 
   const handleDeposit = () => {
     if (!wallet) return
-    onDeposit(wallet.id, WALLET_PANEL_ETHEREUM_CHAIN)
+    onDeposit(wallet.id, wallet.chain)
     onClose?.()
   }
 
   return (
     <div className={styles.panelLayout}>
       <div className={styles.scrollContent}>
-        <div className={`${styles.walletMenuPanel} ${styles.walletMenuPanelEthereum}`}>
+        <div className={styles.walletMenuPanel}>
           {showClose ? (
             <IconButton
               variant="frosted"
               size="sm"
-              className={styles.ethereumPanelClose}
+              className={styles.panelClose}
               aria-label="Close wallet menu"
               icon={<XMarkIcon strokeWidth={2} />}
               onClick={onClose}
             />
           ) : null}
-          <div className={styles.ethereumPanelBody}>
+          <div className={styles.panelBody}>
             {wallet ? (
-              <div className={styles.ethereumPanelContent}>
-                <div className={styles.ethereumWalletCluster}>
-                  <div className={styles.ethereumWalletIdentity}>
-                    <span className={styles.ethereumWalletHeroIcon} aria-hidden>
-                      <WalletProviderIcon provider={wallet.provider} size={ETHEREUM_WALLET_HERO_ICON_SIZE} />
+              <div className={styles.panelContent}>
+                <div className={styles.walletCluster}>
+                  <div className={styles.walletIdentity}>
+                    <span className={styles.walletHeroIcon} aria-hidden>
+                      <WalletProviderIcon provider={wallet.provider} size={WALLET_HERO_ICON_SIZE} />
                     </span>
-                    <p className={styles.ethereumWalletAddress}>{truncateAddress(wallet.address)}</p>
-                    <Tag label={WALLET_PANEL_ETHEREUM_NETWORK_LABEL} />
+                    <p className={styles.walletAddress}>{truncateAddress(wallet.address)}</p>
+                    <Tag label={depositChainLabel(wallet.chain)} />
                   </div>
 
-                  <div className={styles.ethereumActionRow}>
+                  <div className={styles.actionRow}>
                     <BalanceActionButton
                       label={balanceHidden ? 'Show' : 'Hide'}
-                      className={styles.ethereumLabeledAction}
+                      className={styles.labeledAction}
                       icon={
                         balanceHidden ? (
                           <EyeSlashIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} aria-hidden />
@@ -134,7 +129,7 @@ export function WalletMenuPanel({
                     />
                     <BalanceActionButton
                       label={copied ? 'Copied' : 'Copy'}
-                      className={styles.ethereumLabeledAction}
+                      className={styles.labeledAction}
                       icon={
                         copied ? (
                           <CheckIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} aria-hidden />
@@ -146,11 +141,11 @@ export function WalletMenuPanel({
                     />
                     <BalanceActionButton
                       label="Explorer"
-                      className={styles.ethereumLabeledAction}
+                      className={styles.labeledAction}
                       icon={<ArrowTopRightOnSquareIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} />}
                       onClick={() => {
                         window.open(
-                          ethereumExplorerAddressUrl(wallet.address),
+                          explorerAddressUrl(wallet.chain, wallet.address),
                           '_blank',
                           'noopener,noreferrer',
                         )
@@ -158,20 +153,20 @@ export function WalletMenuPanel({
                     />
                     <BalanceActionButton
                       label="Disconnect"
-                      className={styles.ethereumLabeledAction}
+                      className={styles.labeledAction}
                       icon={<PowerIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} />}
                       onClick={() => onDisconnectWallet(wallet.id)}
                     />
                   </div>
                 </div>
 
-                <div className={styles.ethereumUsdcBlock}>
-                  <p className={styles.ethereumUsdcLabel}>Your USDC wallet balance</p>
-                  <div className={styles.ethereumUsdcRow}>
-                    <UsdcChainIcon />
+                <div className={styles.usdcBlock}>
+                  <p className={styles.usdcLabel}>Your USDC wallet balance</p>
+                  <div className={styles.usdcRow}>
+                    <UsdcChainIcon chain={wallet.chain} />
                     <div className={styles.tokenIdentity}>
                       <p className={styles.listPrimary}>USDC</p>
-                      <p className={styles.listSecondary}>{WALLET_PANEL_ETHEREUM_NETWORK_LABEL}</p>
+                      <p className={styles.listSecondary}>{depositChainLabel(wallet.chain)}</p>
                     </div>
                     <p className={styles.tokenBalance}>
                       <BalanceScrambleValue value={balanceLabel} revealed={!balanceHidden} />
@@ -182,15 +177,15 @@ export function WalletMenuPanel({
                 <SendButton
                   variant="gradient"
                   label="Shield your USDC"
-                  icon={<PlusIcon className={styles.ethereumDepositButtonIcon} strokeWidth={1.5} />}
-                  className={styles.ethereumDepositButton}
+                  icon={<PlusIcon className={styles.depositButtonIcon} strokeWidth={1.5} />}
+                  className={styles.depositButton}
                   onClick={handleDeposit}
                 />
               </div>
             ) : (
               <section className={styles.connectedWalletsSection} aria-label="Connect wallet">
-                <p className={styles.ethereumDepositHint}>
-                  Connect an Ethereum wallet to view your balance and deposit USDC.
+                <p className={styles.connectHint}>
+                  Connect a wallet to view your balance and deposit USDC.
                 </p>
                 <ConnectWalletPicker onSelect={onConnectWallet} />
               </section>
@@ -202,12 +197,13 @@ export function WalletMenuPanel({
   )
 }
 
-function UsdcChainIcon() {
+function UsdcChainIcon({ chain }: { chain: DepositChainId }) {
+  const NetworkIcon = DEPOSIT_CHAIN_ICONS[chain]
   return (
-    <span className={styles.ethereumUsdcChainIcon} aria-hidden>
-      <TokenUSDC size={ETHEREUM_USDC_ROW_ICON_SIZE} variant="branded" className={styles.ethereumUsdcChainGlyph} />
-      <span className={styles.ethereumUsdcChainOverlay}>
-        <NetworkEthereum size={16} variant="branded" className={styles.ethereumUsdcChainOverlayGlyph} />
+    <span className={styles.usdcChainIcon} aria-hidden>
+      <TokenUSDC size={USDC_ROW_ICON_SIZE} variant="branded" className={styles.usdcChainGlyph} />
+      <span className={styles.usdcChainOverlay}>
+        <NetworkIcon size={16} variant="branded" className={styles.usdcChainOverlayGlyph} />
       </span>
     </span>
   )

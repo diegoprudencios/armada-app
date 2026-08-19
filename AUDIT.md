@@ -25,6 +25,9 @@ Risk = chance of visual or flow regressions if you “fix” it, not how bad the
 | HomepageFeatures copy colors | Titles / ghost CTAs → `text-primary`; body → `text-secondary`. |
 | Feature panel fill | `--section-panel-bg` → `surface-default` (independent white on the gem wash). `#f9f3ef` removed. |
 | Wallet integration map | `WALLET_INTEGRATION_NOTES.md` + comments on `legacyWallet` in `walletMenu.ts`. |
+| Testing session `console.log` | Removed from `useSessionLogger`. |
+| Wallet panel `ethereum*` names | Classes/constants renamed; tag/explorer follow `wallet.chain` (demo: Sepolia). |
+| Default vs named exports | `LandingHero`, `WalletItem`, `Tooltip` are named exports. |
 
 ---
 
@@ -38,7 +41,7 @@ Unchanged structurally. Do **not** split these in the same change as wallet conn
 | `AmountInputScreen.tsx` | Kitchen-sink amount UI for every money flow. | **High** |
 | `HomepageFeatures.tsx` | Intro + feature cards + scroll handoff + diagrams. | **Medium** |
 | `SiteHeader.tsx` | Mega-menu, drawer, scroll hide, Open App. | **Medium** |
-| `FoundationsCubeGrid.tsx` | Canvas + hardcoded diagram hex. | **Medium** |
+| `FoundationsCubeGrid.tsx` | Canvas + diagrams (stroke still a CSS hex). | **Medium** |
 | `SendRecipientScreen.tsx` | Recipient UX + mock clipboard. | **High** |
 | `RequestModalFlow.tsx` | Request/share/QR/step machine. | **High** |
 | `BalanceCard.tsx` | Dashboard identity (reveal, scramble, vault, actions). | **High** |
@@ -94,8 +97,8 @@ Documented `EXCEPTION` comments (Figma marketing, MetaMask chrome) are intention
 
 | File / pattern | Status | Risk |
 |----------------|--------|------|
-| `WalletMenuPanelEthereum.tsx` | **Done** (file). CSS still `ethereum*` / `ETHEREUM_*` constants for the Sepolia network. | **Low** cosmetic |
-| `LandingHero` / `WalletItem` / `Tooltip` default exports | **Open**. | **Low** |
+| `WalletMenuPanelEthereum.tsx` | **Done** (file + CSS class names). | — |
+| `LandingHero` / `WalletItem` / `Tooltip` default exports | **Done** — named exports. | — |
 | `hooks/nestedDialog.ts` vs `useNestedDialog.ts` | **Open**. | **Low** |
 | `pages/depositFlowConstants.ts` as domain module | **Partial** — `DemoWalletProvider` moved to `constants/demoWallets.ts`; deposit pages still re-export. Chain labels remain in `depositFlowConstants`. | **Low** leftover |
 | Unused crowdfund breakpoint exports | **Done**. | — |
@@ -119,7 +122,7 @@ Documented `EXCEPTION` comments (Figma marketing, MetaMask chrome) are intention
 
 | File | Status | Risk |
 |------|--------|------|
-| `useSessionLogger.tsx` `console.log` | **Open** (layer off). | **Low** |
+| `useSessionLogger.tsx` `console.log` | **Done** — removed. | — |
 | `persistFeedback.ts` `console.warn` | Appropriate. | **Low** |
 | TODOs / commented-out functions in `src/` | None found (original audit). | — |
 | `useDashboardActivity.ts` exhaustive-deps disable | **Open**. | **Medium** to “fix” |
@@ -142,7 +145,7 @@ Unchanged. Wallet work: read **`WALLET_INTEGRATION_NOTES.md` first**. Do not mix
 
 ## Suggested order (remaining)
 
-1. **Low:** testing `console.log`; optional `ethereum*` CSS rename; default-export consistency.  
+1. **Low:** optional `nestedDialog` filename.  
 2. **Medium:** extract `useDesktopHandoff`; diagram-stroke token (none today — `#5a4a62`); shared review-row primitive (confirmed CSS already shared).  
 3. **High / wallets:** do **not** merge modal flows or split `AmountInputScreen` / `BalanceCard` in the same PR as wallet connect. Treat `useDashboardDemoState` as the swap boundary (`WALLET_INTEGRATION_NOTES.md`).
 

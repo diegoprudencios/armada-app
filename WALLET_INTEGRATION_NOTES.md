@@ -16,7 +16,15 @@ Risk here is the chance of breaking dashboard or connect UX if the item is chang
 | **Why it's on the list** | This is the integration seam — where demo logic becomes real wallet logic. Do not refactor casually. Review fully before wallet work starts. |
 | **Risk** | **High** |
 
-### `src/utils/walletMenu.ts` (`legacyWallet` parameter, ~41 and 56–57)
+### `src/utils/walletMenu.ts` (`ConnectedWallet.chain`)
+
+| | |
+|--|--|
+| **What it does now** | Each connected wallet has a `chain` (`DepositChainId`). Demo connect always sets Sepolia (`WALLET_PANEL_DEFAULT_CHAIN`). The wallet panel tag, USDC row, explorer link, and shield deposit use this field. |
+| **Why it's on the list** | Real connectors must set `chain` from the wallet’s active network (wagmi `chainId` → `DepositChainId`), not leave the Sepolia default. |
+| **Risk** | **Medium** |
+
+### `src/utils/walletMenu.ts` (`legacyWallet` parameter)
 
 | | |
 |--|--|

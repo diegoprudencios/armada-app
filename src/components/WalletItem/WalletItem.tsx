@@ -10,7 +10,7 @@ interface WalletItemProps {
   disabled?: boolean
 }
 
-const WalletItem = forwardRef<HTMLButtonElement, WalletItemProps>(function WalletItem(
+export const WalletItem = forwardRef<HTMLButtonElement, WalletItemProps>(function WalletItem(
   { name, iconSrc, iconComponent, balance, onClick, disabled = false },
   ref,
 ) {
@@ -37,4 +37,3 @@ const WalletItem = forwardRef<HTMLButtonElement, WalletItemProps>(function Walle
   )
 })
 
-export default WalletItem

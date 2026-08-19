@@ -24,7 +24,7 @@ interface TooltipActionProps {
 
 type TooltipProps = TooltipSimpleProps | TooltipRichProps | TooltipActionProps
 
-export default function Tooltip(props: TooltipProps) {
+export function Tooltip(props: TooltipProps) {
   const [visible, setVisible] = useState(false)
   const tooltipId = useId()
   const triggerRef = useRef<HTMLDivElement>(null)

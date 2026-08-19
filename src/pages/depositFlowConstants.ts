@@ -1,4 +1,8 @@
-import type { DepositChainId } from '@/constants/depositChains'
+import {
+  DEPOSIT_CHAIN_LABELS,
+  depositChainLabel,
+  type DepositChainId,
+} from '@/constants/depositChains'
 
 export const DEPOSIT_PROGRESS_STEPS = ['Amount', 'Review', 'Wallet', 'Confirm'] as const
 
@@ -14,11 +18,7 @@ export {
   type DemoWalletProvider,
 } from '@/constants/demoWallets'
 
-export const CHAIN_LABELS: Record<DepositChainId, string> = {
-  sepolia: 'Sepolia',
-  base: 'Base',
-  arbitrum: 'Arbitrum',
-}
+export const CHAIN_LABELS = DEPOSIT_CHAIN_LABELS
 
 /** Full network names for deposit review summary (armada-interface ShieldDepositSummary). */
 export const NETWORK_DISPLAY_NAMES: Record<DepositChainId, string> = {
@@ -28,7 +28,7 @@ export const NETWORK_DISPLAY_NAMES: Record<DepositChainId, string> = {
 }
 
 export function chainLabel(chain: DepositChainId): string {
-  return CHAIN_LABELS[chain]
+  return depositChainLabel(chain)
 }
 
 export function networkDisplayName(chain: DepositChainId): string {

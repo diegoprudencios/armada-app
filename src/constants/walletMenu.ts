@@ -85,21 +85,8 @@ export function walletHoldingBalance(
     .reduce((sum, holding) => sum + holding.balance, 0)
 }
 
-/** Demo deposit chain for the Ethereum-only wallet panel (v01). */
-export const WALLET_PANEL_ETHEREUM_CHAIN: DepositChainId = 'sepolia'
-
-export const WALLET_PANEL_ETHEREUM_NETWORK_LABEL = 'Ethereum'
-
-export function ethereumUsdcBalanceForWallet(
-  walletId: string,
-  holdings: readonly WalletUsdcHolding[] = DEMO_USDC_HOLDINGS,
-): number {
-  return holdings
-    .filter(
-      (holding) => holding.walletId === walletId && holding.chain === WALLET_PANEL_ETHEREUM_CHAIN,
-    )
-    .reduce((sum, holding) => sum + holding.balance, 0)
-}
+/** Demo default until the connected wallet reports its chain. */
+export const WALLET_PANEL_DEFAULT_CHAIN: DepositChainId = 'sepolia'
 
 export function aggregateHoldingsBalance(
   holdings: readonly WalletUsdcHolding[],

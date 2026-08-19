@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { BottomSheet } from '@/components/BottomSheet'
-import WalletItem from '@/components/WalletItem/WalletItem'
+import { WalletItem } from '@/components/WalletItem/WalletItem'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import { CONNECT_WALLET_OPTIONS } from '@/constants/connectWallets'
 import type { DemoWalletProvider } from '@/constants/demoWallets'

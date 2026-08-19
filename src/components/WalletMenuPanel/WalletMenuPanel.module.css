@@ -16,13 +16,14 @@
 }
 
 .walletMenuPanel {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--primitives-spacing-5);
   min-height: 0;
   min-width: 0;
   max-width: 100%;
-  padding-top: calc(var(--primitives-spacing-5) + var(--mobile-safe-area-top));
+  padding-top: var(--primitives-spacing-10);
 }
 
 .connectedWalletsSection {
@@ -53,7 +54,7 @@
   color: var(--semantic-color-text-muted);
 }
 
-.ethereumDepositHint {
+.connectHint {
   margin: 0;
   font-family: var(--semantic-typography-ui-body-sm-font-family);
   font-size: var(--semantic-typography-ui-body-sm-font-size);
@@ -62,12 +63,7 @@
   color: var(--semantic-color-text-muted);
 }
 
-.walletMenuPanelEthereum {
-  position: relative;
-  padding-top: var(--primitives-spacing-10);
-}
-
-.ethereumPanelClose {
+.panelClose {
   position: absolute;
   top: var(--primitives-spacing-5);
   right: 0;
@@ -76,19 +72,19 @@
   height: var(--primitives-spacing-8);
 }
 
-.ethereumPanelClose > span {
+.panelClose > span {
   width: var(--primitives-spacing-5);
   height: var(--primitives-spacing-5);
 }
 
-.ethereumPanelBody {
+.panelBody {
   display: flex;
   flex-direction: column;
   width: 100%;
   min-width: 0;
 }
 
-.ethereumPanelContent {
+.panelContent {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -96,14 +92,14 @@
   min-width: 0;
 }
 
-.ethereumWalletCluster {
+.walletCluster {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
 }
 
-.ethereumWalletIdentity {
+.walletIdentity {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -113,14 +109,14 @@
   text-align: center;
 }
 
-.ethereumWalletHeroIcon {
+.walletHeroIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   line-height: 0;
 }
 
-.ethereumWalletAddress {
+.walletAddress {
   margin: 0;
   font-family: var(--semantic-typography-mono-lg-font-family);
   font-size: var(--semantic-typography-mono-lg-font-size);
@@ -131,7 +127,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.ethereumActionRow {
+.actionRow {
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -140,28 +136,28 @@
   margin-top: var(--primitives-spacing-10);
 }
 
-.walletMenuPanelEthereum .ethereumLabeledAction > span:first-child {
+.walletMenuPanel .labeledAction > span:first-child {
   width: var(--primitives-spacing-12);
   height: var(--primitives-spacing-12);
   background: var(--primitives-color-purple-50);
 }
 
-.walletMenuPanelEthereum .ethereumLabeledAction > span:first-child :global(svg) {
+.walletMenuPanel .labeledAction > span:first-child :global(svg) {
   width: var(--primitives-spacing-5);
   height: var(--primitives-spacing-5);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .walletMenuPanelEthereum .ethereumLabeledAction:hover:not(:disabled) > span:first-child {
+  .walletMenuPanel .labeledAction:hover:not(:disabled) > span:first-child {
     background: var(--primitives-color-purple-100);
   }
 }
 
-.walletMenuPanelEthereum .ethereumLabeledAction:active:not(:disabled) > span:first-child {
+.walletMenuPanel .labeledAction:active:not(:disabled) > span:first-child {
   background: var(--primitives-color-purple-100);
 }
 
-.ethereumUsdcBlock {
+.usdcBlock {
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -170,7 +166,7 @@
   margin-top: var(--semantic-spacing-section-gap);
 }
 
-.ethereumUsdcLabel {
+.usdcLabel {
   margin: 0;
   padding-left: var(--primitives-spacing-1);
   font-family: var(--semantic-typography-ui-label-md-font-family);
@@ -180,7 +176,7 @@
   color: var(--semantic-color-text-muted);
 }
 
-.ethereumUsdcRow {
+.usdcRow {
   display: flex;
   align-items: center;
   gap: var(--primitives-spacing-3);
@@ -192,33 +188,33 @@
   box-sizing: border-box;
 }
 
-.ethereumUsdcChainIcon {
-  --ethereum-chain-overlay-size: var(--primitives-spacing-6);
+.usdcChainIcon {
+  --chain-overlay-size: var(--primitives-spacing-6);
   position: relative;
   flex-shrink: 0;
   width: var(--primitives-spacing-10);
   height: var(--primitives-spacing-10);
-  margin-right: calc(var(--ethereum-chain-overlay-size) / 2);
+  margin-right: calc(var(--chain-overlay-size) / 2);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.ethereumUsdcChainGlyph {
+.usdcChainGlyph {
   display: block;
   flex-shrink: 0;
 }
 
-.ethereumUsdcChainGlyph :global(svg) {
+.usdcChainGlyph :global(svg) {
   display: block;
 }
 
-.ethereumUsdcChainOverlay {
+.usdcChainOverlay {
   position: absolute;
-  right: calc(var(--ethereum-chain-overlay-size) / -2);
+  right: calc(var(--chain-overlay-size) / -2);
   bottom: calc(var(--primitives-spacing-1) * -0.25);
-  width: var(--ethereum-chain-overlay-size);
-  height: var(--ethereum-chain-overlay-size);
+  width: var(--chain-overlay-size);
+  height: var(--chain-overlay-size);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -230,25 +226,25 @@
   overflow: hidden;
 }
 
-.ethereumUsdcChainOverlayGlyph {
+.usdcChainOverlayGlyph {
   display: block;
   flex-shrink: 0;
 }
 
-.ethereumUsdcChainOverlayGlyph :global(svg) {
+.usdcChainOverlayGlyph :global(svg) {
   display: block;
 }
 
-.ethereumPanelBody .connectedWalletsSection,
-.ethereumPanelBody .ethereumDepositButton {
+.panelBody .connectedWalletsSection,
+.panelBody .depositButton {
   width: 100%;
 }
 
-.ethereumPanelBody .connectedWalletsSection {
+.panelBody .connectedWalletsSection {
   gap: 0;
 }
 
-.ethereumDepositButton {
+.depositButton {
   width: 100%;
   margin-top: var(--primitives-spacing-5);
   background: linear-gradient(
@@ -261,7 +257,7 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .ethereumPanelBody .ethereumDepositButton:hover:not(:disabled) {
+  .panelBody .depositButton:hover:not(:disabled) {
     filter: brightness(1.04);
     background: linear-gradient(
       135deg,
@@ -272,11 +268,11 @@
   }
 }
 
-.ethereumPanelBody .ethereumDepositButton:active:not(:disabled) {
+.panelBody .depositButton:active:not(:disabled) {
   filter: brightness(0.96);
 }
 
-.ethereumDepositButtonIcon {
+.depositButtonIcon {
   width: 100%;
   height: 100%;
 }
@@ -304,10 +300,6 @@
 
 @media (max-width: 767px) {
   .walletMenuPanel {
-    padding-top: 0;
-  }
-
-  .walletMenuPanelEthereum {
     padding-top: var(--primitives-spacing-10);
   }
 }

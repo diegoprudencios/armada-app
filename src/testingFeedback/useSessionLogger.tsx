@@ -117,7 +117,6 @@ export function TestingSessionLoggerProvider({ children }: TestingSessionLoggerP
         session: ended,
         hasCompletedFirstDeposit: hasCompletedFirstDepositRef.current,
       })
-      console.log('[TestingFeedback] session end', ended)
       persistTestingSessionEnd(ended)
     }
 

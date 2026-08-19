@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
-import WalletItem from '@/components/WalletItem/WalletItem'
+import { WalletItem } from '@/components/WalletItem/WalletItem'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useEscapeKey } from '@/hooks/useEscapeKey'
 import { useFocusTrap } from '@/hooks/useFocusTrap'

@@ -4,7 +4,7 @@ import heroBackground from '@/assets/landing-hero-bg.webp'
 import landingLogo from '@/assets/landing-logo-white.png'
 import styles from './LandingHero.module.css'
 
-export default function LandingHero() {
+export function LandingHero() {
   return (
     <section className={styles.hero} aria-label="Armada landing hero">
       <img className={styles.background} src={heroBackground} alt="" aria-hidden />

@@ -1,9 +1,10 @@
-import { aggregateHoldingsBalance, DEMO_USDC_BY_PROVIDER, holdingsForWallets } from '@/constants/walletMenu'
+import { aggregateHoldingsBalance, DEMO_USDC_BY_PROVIDER, holdingsForWallets, WALLET_PANEL_DEFAULT_CHAIN } from '@/constants/walletMenu'
 import {
   DEMO_ADDRESS_BY_PROVIDER,
   resolveDemoWalletAddress,
   type DemoWalletProvider,
 } from '@/constants/demoWallets'
+import type { DepositChainId } from '@/constants/depositChains'
 import type { DemoWallet } from '@/utils/demoDashboardSession'
 
 export type ConnectedWallet = {
@@ -11,6 +12,8 @@ export type ConnectedWallet = {
   address: string
   provider: DemoWalletProvider
   usdcBalance: number
+  /** WALLET INTEGRATION: set from the connector’s active chain; demo defaults to Sepolia. */
+  chain: DepositChainId
 }
 
 export function connectedWalletId(provider: DemoWalletProvider, address: string): string {
@@ -26,6 +29,7 @@ export function createConnectedWallet(provider: DemoWalletProvider): ConnectedWa
     address,
     provider,
     usdcBalance: DEMO_USDC_BY_PROVIDER[provider],
+    chain: WALLET_PANEL_DEFAULT_CHAIN,
   }
 }
 
@@ -83,6 +87,11 @@ function normalizeConnectedWallet(entry: unknown): ConnectedWallet | null {
   if (!record.id || !record.address || !record.provider) return null
   if (!(record.provider in DEMO_ADDRESS_BY_PROVIDER)) return null
 
+  const chain =
+    record.chain === 'sepolia' || record.chain === 'base' || record.chain === 'arbitrum'
+      ? record.chain
+      : WALLET_PANEL_DEFAULT_CHAIN
+
   return {
     id: record.id,
     address: record.address,
@@ -91,5 +100,6 @@ function normalizeConnectedWallet(entry: unknown): ConnectedWallet | null {
       typeof record.usdcBalance === 'number'
         ? record.usdcBalance
         : DEMO_USDC_BY_PROVIDER[record.provider as DemoWalletProvider],
+    chain,
   }
 }
