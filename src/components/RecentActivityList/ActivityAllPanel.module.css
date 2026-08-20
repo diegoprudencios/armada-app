@@ -1,10 +1,10 @@
 .panel {
   width: min(100%, calc(var(--primitives-spacing-20) * 5 - var(--primitives-spacing-5)));
-  --side-panel-chrome-inline: 0;
 }
 
 .sheetHeader {
-  padding-top: var(--primitives-spacing-5);
+  padding: var(--primitives-spacing-5);
+  padding-bottom: var(--primitives-spacing-3);
 }
 
 .sheetHeader :global(h2),
@@ -17,7 +17,10 @@
 }
 
 .panelHeader {
-  padding-top: calc(var(--primitives-spacing-8) + var(--mobile-safe-area-top));
+  padding:
+    calc(var(--side-panel-inset, var(--primitives-spacing-5)) + var(--mobile-safe-area-top))
+    var(--side-panel-inset, var(--primitives-spacing-5))
+    var(--primitives-spacing-4);
 }
 
 .activitySheet {
