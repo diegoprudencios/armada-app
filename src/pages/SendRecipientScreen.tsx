@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/solid'
 import { ArrowRightIcon, ClipboardDocumentIcon, GlobeAltIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { BottomSheet } from '@/components/BottomSheet'
 import { Button } from '@/components/Button'
 import iconButtonStyles from '@/components/IconButton/IconButton.module.css'
 import { useEnvironment } from '@/hooks/useEnvironment'
@@ -148,7 +149,7 @@ export function SendRecipientScreen({
     handleTriggerKeyDown: handleChainTriggerKeyDown,
     handleListboxKeyDown: handleChainListboxKeyDown,
   } = useListboxKeyboard({
-    open: menuOpen,
+    open: menuOpen && !isMobile,
     options: chainOptionIds,
     value: chain,
     onOpenChange: setMenuOpen,
@@ -160,7 +161,7 @@ export function SendRecipientScreen({
   }, [])
 
   useEffect(() => {
-    if (!menuOpen) return
+    if (!menuOpen || isMobile) return
     chainListboxRef.current?.focus()
 
     function handlePointerDown(event: PointerEvent) {
@@ -171,7 +172,7 @@ export function SendRecipientScreen({
 
     document.addEventListener('pointerdown', handlePointerDown)
     return () => document.removeEventListener('pointerdown', handlePointerDown)
-  }, [menuOpen])
+  }, [menuOpen, isMobile])
 
   useEffect(() => {
     if (isMock || hasInput) {
@@ -285,6 +286,7 @@ export function SendRecipientScreen({
   )
 
   return (
+    <>
     <div className={styles.column}>
       <div className={styles.body}>
         <div className={styles.enterCard}>
@@ -365,11 +367,11 @@ export function SendRecipientScreen({
               <button
                 type="button"
                 className={styles.networkTrigger}
-                aria-haspopup="listbox"
+                aria-haspopup={isMobile ? 'dialog' : 'listbox'}
                 aria-expanded={menuOpen}
-                aria-controls={listboxId}
+                aria-controls={isMobile ? undefined : listboxId}
                 onClick={() => setMenuOpen((open) => !open)}
-                onKeyDown={handleChainTriggerKeyDown}
+                onKeyDown={isMobile ? undefined : handleChainTriggerKeyDown}
               >
                 <span className={styles.networkIconSlot} aria-hidden>
                   <SelectedNetworkIcon size={NETWORK_ICON_SIZE} variant="background" />
@@ -381,7 +383,7 @@ export function SendRecipientScreen({
                 <ChevronDownIcon className={styles.chevron} aria-hidden />
               </button>
 
-              {menuOpen ? (
+              {menuOpen && !isMobile ? (
                 <ul
                   ref={chainListboxRef}
                   id={listboxId}
@@ -453,5 +455,35 @@ export function SendRecipientScreen({
         ) : null}
       </div>
     </div>
+    {isMobile ? (
+      <BottomSheet
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        title="Network"
+        ariaLabel="Network"
+      >
+        <div className={styles.networkSheetList} role="listbox" aria-label="Network">
+          {SEND_CHAIN_OPTIONS.map((option) => {
+            const OptionIcon = option.Icon
+            return (
+              <button
+                key={option.id}
+                type="button"
+                role="option"
+                aria-selected={option.id === chain}
+                className={[styles.networkOption, styles.networkSheetOption].join(' ')}
+                onClick={() => selectChain(option.id)}
+              >
+                <span className={styles.networkIconSlot} aria-hidden>
+                  <OptionIcon size={NETWORK_ICON_SIZE} variant="background" />
+                </span>
+                <span>{option.label}</span>
+              </button>
+            )
+          })}
+        </div>
+      </BottomSheet>
+    ) : null}
+    </>
   )
 }
