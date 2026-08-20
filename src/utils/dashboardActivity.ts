@@ -106,7 +106,7 @@ export function createDepositActivity(
   return {
     id: createActivityId(),
     kind: 'deposit',
-    label: `Deposit from ${networkDisplayName(chain)}`,
+    label: `Shield from ${networkDisplayName(chain)}`,
     amount,
     occurredAt: Date.now(),
     chain,
@@ -119,7 +119,7 @@ export function createEarnActivity(amount: number, tab: EarnTab): DashboardEarnA
     return {
       id: createActivityId(),
       kind: 'earn',
-      label: 'Added to earn vault',
+      label: 'Added to shielded vault',
       amount: -amount,
       occurredAt: Date.now(),
       tab,
@@ -130,7 +130,7 @@ export function createEarnActivity(amount: number, tab: EarnTab): DashboardEarnA
   return {
     id: createActivityId(),
     kind: 'earn',
-    label: 'Withdrawn from earn vault',
+    label: 'Withdrawn from shielded vault',
     amount,
     occurredAt: Date.now(),
     tab,
@@ -146,7 +146,7 @@ export function createWithdrawActivity(
   return {
     id: createActivityId(),
     kind: 'withdraw',
-    label: `Withdraw to ${sendNetworkDisplayName(chain)}`,
+    label: `Unshield to ${sendNetworkDisplayName(chain)}`,
     amount: -amount,
     occurredAt: Date.now(),
     chain,

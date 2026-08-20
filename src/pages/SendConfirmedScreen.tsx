@@ -44,7 +44,7 @@ export function SendConfirmedScreen({
     <div className={styles.column}>
       <div className={`${styles.body} ${modalStepBodyEnter}`}>
         <div className={styles.titleBlock}>
-          <h1 className={styles.title}>{sendConfirmedTitle(variant)}</h1>
+          <h1 className={styles.title}>{sendConfirmedTitle(variant, recipient)}</h1>
           <div className={styles.amountRow}>
             <span className={styles.amountValue}>{formatUsdcAmount(amountNum)}</span>
           </div>

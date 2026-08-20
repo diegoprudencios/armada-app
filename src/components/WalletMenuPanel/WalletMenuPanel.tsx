@@ -190,7 +190,7 @@ export function WalletMenuPanel({
             ) : (
               <section className={styles.connectedWalletsSection} aria-label="Connect wallet">
                 <p className={styles.connectHint}>
-                  Connect a wallet to view your balance and deposit USDC.
+                  Connect a wallet to view your balance and shield USDC.
                 </p>
                 <ConnectWalletPicker onSelect={onConnectWallet} />
               </section>

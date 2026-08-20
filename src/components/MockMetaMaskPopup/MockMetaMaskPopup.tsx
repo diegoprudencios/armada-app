@@ -29,7 +29,7 @@ export function MockMetaMaskPopup({
   amountLabel,
   networkName = 'Ethereum Sepolia',
   accountAddress,
-  functionName = 'deposit',
+  functionName = 'shield',
   onConfirm,
   onReject,
 }: MockMetaMaskPopupProps) {

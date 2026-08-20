@@ -1,4 +1,4 @@
-.privacyNotice {
+.notice {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -11,12 +11,12 @@
 }
 
 @media (max-width: 479px) {
-  :global([data-theme='light']) .privacyNotice {
+  :global([data-theme='light']) .notice {
     background: var(--primitives-color-purple-50);
   }
 }
 
-.privacyNoticeIcon {
+.icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,7 +25,7 @@
   height: var(--primitives-spacing-10);
 }
 
-.privacyNoticeIconPrivate {
+.iconPrivate {
   border-radius: calc(var(--primitives-borderRadius-full) * 1px);
   background: linear-gradient(
     to bottom,
@@ -35,18 +35,18 @@
   );
 }
 
-.privacyNoticeIconPublic {
+.iconPublic {
   border-radius: calc(var(--primitives-borderRadius-full) * 1px);
   background: var(--semantic-color-text-primary);
   color: var(--semantic-color-surface-default);
 }
 
-.privacyNoticeMark {
+.mark {
   width: var(--primitives-spacing-5);
   height: var(--primitives-spacing-5);
 }
 
-.privacyNoticeCopy {
+.copy {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -54,13 +54,13 @@
   min-width: 0;
 }
 
-.privacyNoticeTitle {
+.title {
   composes: bodySmSemibold from '../../styles/typographyComposites.module.css';
   margin: 0;
   color: var(--semantic-color-text-primary);
 }
 
-.privacyNoticeBody {
+.body {
   composes: bodySm from '../../styles/typographyComposites.module.css';
   margin: 0;
   color: color-mix(in srgb, var(--semantic-color-text-primary) 80%, transparent);

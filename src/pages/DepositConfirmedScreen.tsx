@@ -39,7 +39,7 @@ export function DepositConfirmedScreen({
     <div className={styles.column}>
       <div className={`${styles.body} ${modalStepBodyEnter}`}>
         <div className={styles.titleBlock}>
-          <h1 className={styles.title}>USDC deposit confirmed</h1>
+          <h1 className={styles.title}>USDC shield confirmed</h1>
           <div className={styles.amountRow}>
             <span className={styles.amountValue}>{amountLabel}</span>
           </div>

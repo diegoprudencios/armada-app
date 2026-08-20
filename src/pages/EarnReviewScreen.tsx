@@ -57,7 +57,7 @@ export function EarnReviewScreen({
         {summary}
         {tab === 'withdraw' ? (
           <p className={styles.slippageNotice}>
-            The vault rate moves with each new block. Your final USDC may differ slightly from
+            The shielded vault rate moves with each new block. Your final USDC may differ slightly from
             this quote.
           </p>
         ) : null}
@@ -87,7 +87,7 @@ export function EarnReviewScreen({
         {summary}
         {tab === 'withdraw' ? (
           <p className={styles.slippageNotice}>
-            The vault rate moves with each new block. Your final USDC may differ slightly from
+            The shielded vault rate moves with each new block. Your final USDC may differ slightly from
             this quote.
           </p>
         ) : null}

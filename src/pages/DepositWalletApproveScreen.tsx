@@ -32,10 +32,10 @@ export function DepositWalletApproveScreen({
   amount,
   networkName,
   walletAddress,
-  signStepLabel = 'Sign deposit transaction',
+  signStepLabel = 'Sign shield transaction',
   computeFeeUsdc = calculateDepositFee,
   skipApproval = false,
-  functionName = 'deposit',
+  functionName = 'shield',
   keypadMobileLayout = false,
   onComplete,
   onCancel,
@@ -118,7 +118,7 @@ export function DepositWalletApproveScreen({
           <h1 className={styles.title}>
             Confirm transactions
             <br />
-            on your wallet
+            in your wallet
           </h1>
 
           <WalletConfirmList className={styles.confirmList} steps={steps} />

@@ -57,7 +57,7 @@ export function EarnChooserSheet({ open, onClose, onAdd, onWithdraw }: EarnChoos
             <span className={chooserStyles.iconBadge}>
               <ArrowDownTrayIcon className={chooserStyles.icon} strokeWidth={1.5} aria-hidden />
             </span>
-            <span className={chooserStyles.label}>Add more to the vault</span>
+            <span className={chooserStyles.label}>Add more to the shielded vault</span>
           </span>
         </button>
         <button
@@ -71,7 +71,7 @@ export function EarnChooserSheet({ open, onClose, onAdd, onWithdraw }: EarnChoos
             <span className={chooserStyles.iconBadge}>
               <ArrowUpTrayIcon className={chooserStyles.icon} strokeWidth={1.5} aria-hidden />
             </span>
-            <span className={chooserStyles.label}>Withdraw from the vault</span>
+            <span className={chooserStyles.label}>Withdraw from the shielded vault</span>
           </span>
         </button>
       </div>

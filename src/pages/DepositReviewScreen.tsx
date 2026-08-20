@@ -54,7 +54,7 @@ export function DepositReviewScreen({
   )
 
   if (keypadMobileLayout) {
-    // Amount stays on the Deposit screen behind the sheet — don't repeat it here.
+    // Amount stays on the Shield screen behind the sheet — don't repeat it here.
     return (
       <div className={styles.sheetColumn}>
         {summary}
@@ -62,7 +62,7 @@ export function DepositReviewScreen({
           <Button
             variant="primary"
             size="lg"
-            label="Confirm deposit"
+            label="Confirm shield"
             showIcon={false}
             onClick={onConfirm}
             testingClickId="deposit_confirm_button"
@@ -76,7 +76,7 @@ export function DepositReviewScreen({
     <div className={styles.column}>
       <div className={`${styles.body} ${modalStepBodyEnter}`}>
         <div className={styles.titleBlock}>
-          <h1 className={styles.title}>Review your USDC deposit</h1>
+          <h1 className={styles.title}>Review your USDC shield</h1>
           {amountBlock}
         </div>
         {summary}

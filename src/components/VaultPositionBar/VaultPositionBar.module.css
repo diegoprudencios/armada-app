@@ -73,12 +73,8 @@ button.root:active::before {
   align-items: center;
   justify-content: center;
   border-radius: calc(var(--semantic-borderRadius-item) * 1px);
-  background: var(--primitives-color-purple-100);
+  background: var(--semantic-color-surface-thumb);
   color: var(--semantic-color-text-primary);
-}
-
-:global([data-theme='dark']) .iconBadge {
-  background: var(--semantic-color-surface-bg);
 }
 
 .icon {

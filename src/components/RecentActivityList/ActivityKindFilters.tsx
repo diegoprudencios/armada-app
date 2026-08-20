@@ -8,8 +8,8 @@ export type ActivityKindFilter =
 
 const FILTERS: Array<{ id: ActivityKindFilter; label: string }> = [
   { id: 'all', label: 'All' },
-  { id: 'deposit', label: 'Deposit' },
-  { id: 'withdraw', label: 'Withdraw' },
+  { id: 'deposit', label: 'Shield' },
+  { id: 'withdraw', label: 'Unshield' },
   { id: 'send', label: 'Sent' },
   { id: 'requestLink', label: 'Requests' },
   { id: 'received', label: 'Received' },

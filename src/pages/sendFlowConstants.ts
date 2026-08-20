@@ -56,11 +56,13 @@ export function isValidRecipientAddress(address: string): boolean {
 export type SendFlowVariant = 'send' | 'withdraw'
 
 export function sendRecipientTitle(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Where do you want to send your USDC?' : 'Send your USDC to:'
+  return variant === 'withdraw' ? 'Where do you want to unshield your USDC?' : 'Send your USDC to:'
 }
 
-export function sendReviewTitle(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Review your USDC unshield' : 'Review your USDC transfer'
+export function sendReviewTitle(variant: SendFlowVariant, recipient?: string): string {
+  if (variant === 'withdraw') return 'Review unshielding transfer'
+  if (recipient && isArmadaAddress(recipient)) return 'Review your USDC shielded transfer'
+  return 'Review your USDC transfer'
 }
 
 export function sendReviewConfirmLabel(variant: SendFlowVariant): string {
@@ -80,16 +82,18 @@ export function sendPrivacyNotice(isPrivate: boolean): { title: string; body: st
   }
 }
 
-export function sendConfirmedTitle(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'USDC unshield confirmed' : 'USDC send confirmed'
+export function sendConfirmedTitle(variant: SendFlowVariant, recipient?: string): string {
+  if (variant === 'withdraw') return 'USDC unshield confirmed'
+  if (recipient && isArmadaAddress(recipient)) return 'USDC shielded transfer confirmed'
+  return 'USDC sent successfully'
 }
 
 export function sendWalletSignLabel(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Sign withdrawal transaction' : 'Sign send transaction'
+  return variant === 'withdraw' ? 'Sign unshield transaction' : 'Sign send transaction'
 }
 
 export function sendProcessingFinalStageLabel(variant: SendFlowVariant): string {
-  return variant === 'withdraw' ? 'Withdrawn' : 'Sent'
+  return variant === 'withdraw' ? 'Unshielded' : 'Sent'
 }
 
 export function sendProcessingKind(variant: SendFlowVariant): string {

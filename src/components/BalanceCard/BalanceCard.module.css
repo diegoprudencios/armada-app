@@ -36,7 +36,7 @@
 
   .armadaAddress:hover {
     color: var(--semantic-color-text-primary);
-    background: color-mix(in srgb, var(--semantic-color-text-primary) 8%, transparent);
+    background: var(--semantic-color-frost-pressed);
   }
 
   .actionEnter .actionAmber:hover:not(:disabled) {
@@ -341,7 +341,7 @@
 }
 
 .armadaAddress:active {
-  background: color-mix(in srgb, var(--semantic-color-text-primary) 12%, transparent);
+  background: var(--semantic-color-frost-pressed);
 }
 
 .armadaAddress:focus-visible {

@@ -7,6 +7,7 @@
     { "src": "^/homepage[2-5]/?$", "dest": "/homepage.html" },
     { "src": "^/pay-via-link/?$", "dest": "/pay-via-link.html" },
     { "src": "^/dashboard-v2/?$", "dest": "/dashboard.html" },
+    { "src": "^/systemdocs/?$", "dest": "/systemdocs.html" },
     { "src": "^/dashboard/?$", "dest": "/dashboard.html" },
     { "src": "^/deposit/?$", "dest": "/dashboard.html" },
     { "src": "^/showcase/?$", "dest": "/index.html" },

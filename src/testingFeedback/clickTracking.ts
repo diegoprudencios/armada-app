@@ -7,17 +7,23 @@ const INTERACTIVE_SELECTOR =
 /** Fallback label → stable id when data-testing-click is not set. */
 const LABEL_CLICK_ID_MAP: Record<string, string> = {
   deposit: 'deposit_button',
+  shield: 'deposit_button',
   'make your first deposit': 'deposit_first_button',
   send: 'send_button',
   request: 'request_button',
   withdraw: 'withdraw_og_button',
+  unshield: 'withdraw_og_button',
   earn: 'vault_open_button',
   'add more to the vault': 'vault_deposit_choose_button',
+  'add more to the shielded vault': 'vault_deposit_choose_button',
   'withdraw from the vault': 'vault_withdraw_choose_button',
+  'withdraw from the shielded vault': 'vault_withdraw_choose_button',
   'create link': 'request_create_link_button',
   'confirm send': 'send_confirm_button',
   'confirm deposit': 'deposit_confirm_button',
+  'confirm shield': 'deposit_confirm_button',
   'confirm withdrawal': 'withdraw_og_confirm_button',
+  'confirm unshield': 'withdraw_og_confirm_button',
   'input amount': 'request_amount_continue_button',
   continue: 'send_recipient_continue_button',
 }

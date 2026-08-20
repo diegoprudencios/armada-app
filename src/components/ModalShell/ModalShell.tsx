@@ -41,7 +41,7 @@ export function ModalShell({
   steps,
   currentStep,
   status = 'default',
-  flowLabel = 'Deposit',
+  flowLabel = 'Shield',
   hideStepCount = false,
   hideSteps = false,
   chrome = 'default',
@@ -119,7 +119,8 @@ export function ModalShell({
         ) : (
           <>
             <div className={styles.logoSlot}>
-              <ArmadaLogo variant="mark" markTone="white" className={styles.logo} />
+              <ArmadaLogo variant="mark" markTone="brand" className={`${styles.logo} ${styles.logoDark}`} />
+              <ArmadaLogo variant="mark" markTone="deep" className={`${styles.logo} ${styles.logoLight}`} />
             </div>
             {hideSteps ? null : (
               <div className={styles.stepsWrap}>

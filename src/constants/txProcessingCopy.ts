@@ -22,9 +22,9 @@ export const DEPOSIT_PROCESSING_STAGES: ReadonlyArray<TxProgressStage> = [
   },
   {
     id: 'hub-confirmed',
-    label: 'Depositing',
+    label: 'Shielding',
     subtitle: 'Confirming on chain',
-    completedLabel: 'Deposited',
+    completedLabel: 'Shielded',
   },
 ]
 
@@ -44,9 +44,9 @@ export function sendProcessingStages(mode: SendProcessingCopyMode): ReadonlyArra
       completedLabel: 'Sent',
     },
     withdraw: {
-      label: 'Withdrawing',
+      label: 'Unshielding',
       subtitle: 'Returning USDC to your wallet',
-      completedLabel: 'Withdrawn',
+      completedLabel: 'Unshielded',
     },
   }
 
@@ -76,10 +76,10 @@ export function sendProcessingStages(mode: SendProcessingCopyMode): ReadonlyArra
 }
 
 export function earnProcessingStages(tab: EarnTab): ReadonlyArray<TxProgressStage> {
-  const finalLabel = tab === 'add' ? 'Adding to vault' : 'Withdrawing'
+  const finalLabel = tab === 'add' ? 'Adding to shielded vault' : 'Withdrawing'
   const finalCompletedLabel = tab === 'add' ? 'Earning' : 'Returned to balance'
   const finalSubtitle =
-    tab === 'add' ? 'USDC is entering the yield vault' : 'USDC is returning to your balance'
+    tab === 'add' ? 'USDC is entering the shielded vault' : 'USDC is returning to your balance'
 
   return [
     {
@@ -90,7 +90,7 @@ export function earnProcessingStages(tab: EarnTab): ReadonlyArray<TxProgressStag
     {
       id: 'submit-relayer',
       label: 'Submitting privately',
-      subtitle: 'Relaying to vault',
+      subtitle: 'Relaying to shielded vault',
     },
     {
       id: 'hub-confirmed',
@@ -118,7 +118,7 @@ export interface TxProgressCardCopy {
 }
 
 export const DEPOSIT_PROGRESS_CARD_COPY: TxProgressCardCopy = {
-  tag: 'Deposit in progress',
+  tag: 'Shield in progress',
   title: 'Your USDC is being shielded',
   titleLines: ['Your USDC is', 'being shielded'],
   subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
@@ -128,9 +128,9 @@ export const DEPOSIT_PROGRESS_CARD_COPY: TxProgressCardCopy = {
 export function sendProgressCardCopy(mode: SendProcessingCopyMode): TxProgressCardCopy {
   if (mode === 'withdraw') {
     return {
-      tag: 'Withdrawal in progress',
-      title: 'Your withdraw is in progress',
-      titleLines: ['Your withdraw', 'is in progress'],
+      tag: 'Unshield in progress',
+      title: 'Unshielding your USDC',
+      titleLines: ['Unshielding your', 'USDC'],
       subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
       subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
     }
@@ -148,7 +148,8 @@ export function sendProgressCardCopy(mode: SendProcessingCopyMode): TxProgressCa
 
   return {
     tag: 'Send in progress',
-    title: 'Unshielding your USDC',
+    title: 'Unshielding and sending your USDC',
+    titleLines: ['Unshielding and sending', 'your USDC'],
     subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
     subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
   }
@@ -158,7 +159,7 @@ export function earnProgressCardCopy(tab: EarnTab): TxProgressCardCopy {
   if (tab === 'add') {
     return {
       tag: earnProcessingTitle('add'),
-      title: 'Depositing USDC into the vault',
+      title: 'Sending USDC to shielded vault',
       titleBreakAfter: 'USDC',
       subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
       subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
@@ -167,7 +168,7 @@ export function earnProgressCardCopy(tab: EarnTab): TxProgressCardCopy {
 
   return {
     tag: earnProcessingTitle('withdraw'),
-    title: 'Your withdrawal is in progress',
+    title: 'Withdraw from shielded vault in progress',
     subtitle: TX_PROGRESS_CLOSE_SUBTITLE_LINES.join(' '),
     subtitleLines: TX_PROGRESS_CLOSE_SUBTITLE_LINES,
   }

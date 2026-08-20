@@ -132,7 +132,7 @@
 }
 
 .title {
-  composes: displayXl from '../../styles/displayXlTitle.module.css';
+  composes: displayLg from '../../styles/displayLgTitle.module.css';
   margin: 0;
   /* EXCEPTION — headline stays white on the light gem surface. */
   color: var(--semantic-component-tag-label);

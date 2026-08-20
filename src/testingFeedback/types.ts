@@ -5,7 +5,7 @@ export type TestingFeedbackSource = 'toast' | 'popover'
 export type TestingClickType = 'click' | 'dead_click'
 
 /** Product flow bucket for Section B grouping. */
-export type TestingFlowId = 'Deposit' | 'Send' | 'Vault' | 'Withdraw' | 'Request'
+export type TestingFlowId = 'Shield' | 'Send' | 'Vault' | 'Withdraw' | 'Request'
 
 export interface TestingScreenVisit {
   route: string

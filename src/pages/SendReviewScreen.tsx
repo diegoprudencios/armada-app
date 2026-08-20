@@ -85,7 +85,7 @@ export function SendReviewScreen({
     <div className={styles.column}>
       <div className={`${styles.body} ${modalStepBodyEnter}`}>
         <div className={styles.titleBlock}>
-          <h1 className={styles.title}>{sendReviewTitle(variant)}</h1>
+          <h1 className={styles.title}>{sendReviewTitle(variant, recipient)}</h1>
           {amountBlock}
         </div>
         {summary}

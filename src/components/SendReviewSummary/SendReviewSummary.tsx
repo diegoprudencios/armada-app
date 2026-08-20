@@ -1,5 +1,5 @@
-import { GlobeAltIcon } from '@heroicons/react/24/outline'
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { PrivacyNotice } from '@/components/PrivacyNotice'
 import {
   ReviewSummary,
   ReviewSummaryRow,
@@ -13,7 +13,6 @@ import { formatUsdcAmount, truncateAddress } from '@/utils/format'
 import { formatProtocolFeeLabel } from '@/utils/protocolFee'
 import { isArmadaAddress, sendPrivacyNotice, type SendFlowVariant } from '@/pages/sendFlowConstants'
 import usdcAmount from '@/styles/usdcAmount.module.css'
-import styles from './SendReviewSummary.module.css'
 
 export interface SendReviewSummaryProps {
   recipientAddress: string
@@ -48,25 +47,11 @@ export function SendReviewSummary({
       total={<ReviewSummaryTotalRow valueClassName={usdcAmount.font}>{totalLabel}</ReviewSummaryTotalRow>}
       footer={
         !confirmedAt ? (
-          <div className={styles.privacyNotice} role="note">
-            <span
-              className={[
-                styles.privacyNoticeIcon,
-                isPrivate ? styles.privacyNoticeIconPrivate : styles.privacyNoticeIconPublic,
-              ].join(' ')}
-              aria-hidden
-            >
-              {isPrivate ? (
-                <ArmadaLogo variant="mark" markTone="deep" className={styles.privacyNoticeMark} />
-              ) : (
-                <GlobeAltIcon className={styles.privacyNoticeMark} strokeWidth={1.75} />
-              )}
-            </span>
-            <div className={styles.privacyNoticeCopy}>
-              <p className={styles.privacyNoticeTitle}>{privacyNotice.title}</p>
-              <p className={styles.privacyNoticeBody}>{privacyNotice.body}</p>
-            </div>
-          </div>
+          <PrivacyNotice
+            tone={isPrivate ? 'private' : 'public'}
+            title={privacyNotice.title}
+            body={privacyNotice.body}
+          />
         ) : null
       }
     >

@@ -85,7 +85,7 @@ export function EarnAmountScreen({
       balance={balance}
       amount={amount}
       entryMode={entryMode}
-      amountAriaLabel={tab === 'add' ? 'Vault deposit amount' : 'Vault withdrawal amount'}
+      amountAriaLabel={tab === 'add' ? 'Shielded vault deposit amount' : 'Shielded vault withdrawal amount'}
       exceedMessage={AMOUNT_EXCEEDS_BALANCE_MESSAGE}
       calculateFee={calculateSendFee}
       primaryLabelMode="static"

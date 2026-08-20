@@ -20,6 +20,7 @@ export default defineConfig({
         homepage: resolve(__dirname, 'homepage.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),
         payViaLink: resolve(__dirname, 'pay-via-link.html'),
+        systemdocs: resolve(__dirname, 'systemdocs.html'),
       },
     },
   },

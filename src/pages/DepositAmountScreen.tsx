@@ -49,7 +49,7 @@ export function DepositAmountScreen({
       amount={amount}
       entryMode={entryMode}
       amountInputRef={amountInputRef}
-      amountAriaLabel={isUnshield ? 'Unshield amount' : 'Deposit amount'}
+      amountAriaLabel={isUnshield ? 'Unshield amount' : 'Shield amount'}
       exceedMessage={isUnshield ? AMOUNT_EXCEEDS_BALANCE_MESSAGE : DEPOSIT_EXCEEDS_BALANCE_MESSAGE}
       balanceMode={isUnshield ? 'simple' : 'deposit-fee-aware'}
       calculateFee={isUnshield ? calculateSendFee : calculateDepositFee}

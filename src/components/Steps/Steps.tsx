@@ -4,7 +4,7 @@ export interface StepsProps {
   steps: string[]
   currentStep: number
   status?: 'default' | 'error' | 'confirmed'
-  /** Fixed flow title (e.g. "Deposit") — when set, shown left instead of the active step name. */
+  /** Fixed flow title (e.g. "Shield") — when set, shown left instead of the active step name. */
   flowLabel?: string
   hideStepCount?: boolean
 }

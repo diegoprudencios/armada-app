@@ -27,11 +27,11 @@ const WITHDRAW_STEP_NUMBER: Record<WithdrawModalStep, number> = {
 }
 
 const WITHDRAW_SIMPLE_HEADER_TITLE: Partial<Record<WithdrawModalStep, string>> = {
-  recipient: 'Withdraw',
-  amount: 'Withdraw',
-  /** Review opens as a sheet over amount — shell title stays Withdraw. */
-  review: 'Withdraw',
-  processing: 'Withdraw in progress',
+  recipient: 'Unshield',
+  amount: 'Unshield',
+  /** Review opens as a sheet over amount — shell title stays Unshield. */
+  review: 'Unshield',
+  processing: 'Unshield in progress',
   /** Confirmed uses the in-screen “Unshield confirmed” headline — no shell title. */
   confirmed: '',
 }
@@ -244,7 +244,7 @@ export function WithdrawModalFlow({
 
   return (
     <FlowModalOverlay
-      label="Withdraw"
+      label="Unshield"
       exiting={exiting}
       onClose={requestClose}
       initialFocusRef={
@@ -257,13 +257,13 @@ export function WithdrawModalFlow({
         steps={[...WITHDRAW_PROGRESS_STEPS]}
         currentStep={WITHDRAW_STEP_NUMBER[step]}
         status={isConfirmed ? 'confirmed' : 'default'}
-        flowLabel="Withdraw"
+        flowLabel="Unshield"
         chrome={useKeypadMobileChrome ? 'simple' : 'default'}
         surface={
           useKeypadMobileChrome && step === 'processing' ? 'immersive' : 'default'
         }
         headerTitle={
-          useKeypadMobileChrome ? WITHDRAW_SIMPLE_HEADER_TITLE[step] ?? 'Withdraw' : undefined
+          useKeypadMobileChrome ? WITHDRAW_SIMPLE_HEADER_TITLE[step] ?? 'Unshield' : undefined
         }
         onBack={useKeypadMobileChrome ? keypadBack : undefined}
         exiting={exiting}

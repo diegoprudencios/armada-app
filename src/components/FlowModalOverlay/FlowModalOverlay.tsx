@@ -8,7 +8,7 @@ import { useRestoreFocus } from '@/hooks/useRestoreFocus'
 import styles from './FlowModalOverlay.module.css'
 
 export interface FlowModalOverlayProps {
-  /** Accessible name for the dialog (e.g. "Deposit", "Send"). */
+  /** Accessible name for the dialog (e.g. "Shield", "Send"). */
   label: string
   exiting?: boolean
   onClose: () => void

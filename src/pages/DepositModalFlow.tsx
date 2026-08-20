@@ -37,8 +37,8 @@ const DEPOSIT_SIMPLE_HEADER_TITLE: Partial<Record<DepositModalStep, string>> = {
   /** Review opens as a sheet over amount — shell title stays Shield. */
   review: 'Shield',
   wallet: 'Confirm',
-  processing: 'Deposit in progress',
-  /** Confirmed uses the in-screen “Deposit confirmed” headline — no shell title. */
+  processing: 'Shield in progress',
+  /** Confirmed uses the in-screen “Shield confirmed” headline — no shell title. */
   confirmed: '',
 }
 

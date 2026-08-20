@@ -31,10 +31,14 @@
 
 .enterCard {
   animation-delay: var(--modal-step-enter-delay, 360ms);
+  position: relative;
+  z-index: 2;
 }
 
 .enterCtas {
   animation-delay: calc(var(--modal-step-enter-delay, 360ms) + 360ms);
+  position: relative;
+  z-index: 1;
 }
 
 .enterRecent {
@@ -299,7 +303,7 @@
   top: calc(100% + var(--primitives-spacing-2));
   left: 0;
   right: 0;
-  z-index: 20;
+  z-index: 30;
   margin: 0;
   padding: var(--primitives-spacing-1);
   list-style: none;

@@ -2,17 +2,17 @@ import type { ShowFlowQuestionInput, TestingFlowId } from './types'
 
 /** Display order for Section B flow groups. */
 export const TESTING_FLOW_GROUP_ORDER: readonly TestingFlowId[] = [
-  'Deposit',
+  'Shield',
   'Send',
   'Vault',
   'Withdraw',
   'Request',
 ] as const
 
-/** Deposit → shield_expectation */
+/** Shield → shield_expectation */
 export const TESTING_FLOW_QUESTION_SHIELD_EXPECTATION: ShowFlowQuestionInput = {
   questionId: 'shield_expectation',
-  flow: 'Deposit',
+  flow: 'Shield',
   prompt:
     "You just moved USDC into shielded balance. Does 'shielded' match what you expected based on what you know about Armada?",
 }
@@ -33,7 +33,7 @@ export const TESTING_FLOW_QUESTION_VAULT_DEPOSIT: ShowFlowQuestionInput = {
   questionId: 'vault_deposit_expectation',
   flow: 'Vault',
   prompt:
-    "Before depositing into the vault, what did you expect to happen to your funds, when and how you'd get them back?",
+    "Before depositing into the shielded vault, what did you expect to happen to your funds, when and how you'd get them back?",
 }
 
 /** Withdraw → withdraw_privacy_check */
@@ -71,8 +71,10 @@ export const TESTING_SESSION_WINDOW_KEY = '__ARMADA_TESTING_SESSION__'
  * Dumb substring match — intentional for this research pass.
  */
 export const TESTING_PRIMARY_ACTION_PATTERNS = [
+  /\bshield\b/i,
   /\bdeposit\b/i,
   /\bsend\b/i,
+  /\bunshield\b/i,
   /\bwithdraw\b/i,
   /\bearn\b/i,
 ] as const
