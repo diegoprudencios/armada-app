@@ -4,7 +4,19 @@
     <meta charset="UTF-8" />
     <script>
       (function () {
-        document.documentElement.setAttribute('data-theme', 'light');
+        var key = 'armada-theme';
+        var theme = 'light';
+        try {
+          var fromQuery = new URLSearchParams(window.location.search).get('theme');
+          if (fromQuery === 'dark' || fromQuery === 'light') {
+            theme = fromQuery;
+            localStorage.setItem(key, theme);
+          } else {
+            var saved = localStorage.getItem(key);
+            if (saved === 'dark' || saved === 'light') theme = saved;
+          }
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', theme);
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

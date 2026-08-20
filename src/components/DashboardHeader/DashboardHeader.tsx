@@ -1,4 +1,5 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { WalletButton } from '@/components/WalletButton'
 import { WalletPillMenu } from '@/components/WalletPillMenu'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
@@ -50,6 +51,7 @@ export function DashboardHeader({
         )}
       </div>
       <div className={styles.wallet}>
+        <ThemeToggle />
         {wallets.length > 0 ? (
           <WalletPillMenu
             wallets={wallets}
