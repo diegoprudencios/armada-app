@@ -1,4 +1,5 @@
 export const THEME_STORAGE_KEY = 'armada-theme'
+/** Keep in sync with `--semantic-motion-theme` in theme-overrides.css. */
 export const THEME_TRANSITION_MS = 320
 
 export type Theme = 'light' | 'dark'
@@ -47,6 +48,8 @@ export function setTheme(theme: Theme, options?: { animate?: boolean }): void {
 
   if (shouldAnimate) {
     root.setAttribute('data-theme-transition', '')
+    // Flush so `transition` is registered before colors change (otherwise a snap).
+    void root.offsetWidth
   }
 
   root.setAttribute('data-theme', theme)

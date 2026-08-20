@@ -4,18 +4,13 @@ import styles from './ActivityTxHashSearch.module.css'
 export interface ActivityTxHashSearchProps {
   value: string
   onChange: (value: string) => void
-  surface?: 'frost' | 'tint' | 'raised'
+  surface?: 'frost' | 'raised'
 }
 
 export function ActivityTxHashSearch({ value, onChange, surface = 'raised' }: ActivityTxHashSearchProps) {
   return (
     <label className={styles.root}>
-      <span
-        className={[
-          styles.field,
-          surface === 'raised' ? styles.fieldRaised : surface === 'tint' ? styles.fieldTint : styles.fieldFrost,
-        ].join(' ')}
-      >
+      <span className={[styles.field, surface === 'raised' ? styles.fieldRaised : styles.fieldFrost].join(' ')}>
         <MagnifyingGlassIcon className={styles.icon} strokeWidth={1.75} aria-hidden />
         <input
           className={styles.input}

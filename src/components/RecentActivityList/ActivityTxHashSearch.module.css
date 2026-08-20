@@ -20,10 +20,6 @@
   background: var(--semantic-color-frost-control);
 }
 
-.fieldTint {
-  background: var(--semantic-color-control-tint);
-}
-
 .fieldRaised {
   background: var(--semantic-color-surface-raised);
 }

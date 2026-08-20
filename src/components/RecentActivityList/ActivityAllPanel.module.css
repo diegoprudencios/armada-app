@@ -1,6 +1,6 @@
 .panel {
   width: min(100%, calc(var(--primitives-spacing-20) * 5 - var(--primitives-spacing-5)));
-  --side-panel-chrome-inline: 0px;
+  --side-panel-chrome-inline: 0;
 }
 
 .sheetHeader {
@@ -21,7 +21,7 @@
 }
 
 .activitySheet {
-  height: min(88dvh, calc(100dvh - var(--mobile-safe-area-top) - var(--primitives-spacing-5)));
+  height: min(var(--semantic-size-sheet-max), calc(100dvh - var(--mobile-safe-area-top) - var(--primitives-spacing-5)));
 }
 
 .activitySheetBody,

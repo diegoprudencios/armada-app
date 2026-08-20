@@ -12,10 +12,6 @@
   background: var(--semantic-color-frost-control);
 }
 
-.trackTint {
-  background: var(--semantic-color-control-tint);
-}
-
 .trackRaised {
   background: var(--semantic-color-surface-raised);
 }

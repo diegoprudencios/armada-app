@@ -148,8 +148,8 @@
   margin: 0;
   width: 100%;
   line-height: var(--primitives-lineHeight-normal);
-  /* EXCEPTION — dark subtitle on the light gem surface. */
-  color: rgb(14 13 15 / 65%);
+  /* Dark subtitle on the light gem surface. */
+  color: color-mix(in srgb, var(--semantic-color-brand-ink-active) 65%, transparent);
 }
 
 .subtitleLine {

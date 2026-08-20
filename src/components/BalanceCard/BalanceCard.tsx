@@ -243,6 +243,12 @@ export function BalanceCard({
             mode={balanceRollMode}
             fromValue={balanceRollFromValue}
             rollTrigger={balanceRollTrigger}
+            {...(balanceIntroPlaying
+              ? {
+                  rollStartMs: BALANCE_REVEAL_DELAY_MS,
+                  rollDurationMs: BALANCE_REVEAL_DURATION_MS,
+                }
+              : {})}
           />
         ) : (
           <BalanceScrambleValue value={formattedBalance} revealed={showBalance} />

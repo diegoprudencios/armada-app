@@ -3,7 +3,7 @@ import styles from './SegmentedControl.module.css'
 
 export type SegmentedControlSize = 'sm' | 'md'
 export type SegmentedControlLayout = 'equal' | 'scroll'
-export type SegmentedControlSurface = 'frost' | 'tint' | 'raised'
+export type SegmentedControlSurface = 'frost' | 'raised'
 
 export interface SegmentedControlOption<T extends string = string> {
   id: T
@@ -16,7 +16,7 @@ export interface SegmentedControlProps<T extends string = string> {
   onChange: (id: T) => void
   size?: SegmentedControlSize
   layout?: SegmentedControlLayout
-  /** `frost` on the dashboard wash; `tint` lavender chips; `raised` gray on opaque panels. */
+  /** `frost` on the dashboard wash; `raised` gray on opaque panels. */
   surface?: SegmentedControlSurface
   'aria-label': string
   className?: string
@@ -128,7 +128,7 @@ export function SegmentedControl<T extends string>({
 
   const trackClassName = [
     styles.track,
-    surface === 'raised' ? styles.trackRaised : surface === 'tint' ? styles.trackTint : styles.trackFrost,
+    surface === 'raised' ? styles.trackRaised : styles.trackFrost,
     isScroll ? styles.trackScroll : size === 'sm' ? styles.trackSm : styles.trackMd,
     className,
   ]

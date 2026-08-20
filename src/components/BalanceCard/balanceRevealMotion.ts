@@ -1,7 +1,11 @@
-/** Keep in sync with BalanceCard.module.css balance reveal keyframes. */
-export const BALANCE_REVEAL_DELAY_MS = 1280
-export const BALANCE_REVEAL_DURATION_MS = 920
-export const BALANCE_REVEAL_SPLIT_AT = 0.42
+/** Keep in sync with BalanceCard.module.css `.card` enter. */
+export const DASHBOARD_CARD_ENTER_DELAY_MS = 220
+export const DASHBOARD_CARD_ENTER_DURATION_MS = 480
+
+/** Intro amount rides with the hero card (not a late second beat). */
+export const BALANCE_REVEAL_DELAY_MS = DASHBOARD_CARD_ENTER_DELAY_MS
+export const BALANCE_REVEAL_DURATION_MS = DASHBOARD_CARD_ENTER_DURATION_MS
+export const BALANCE_REVEAL_SPLIT_AT = 0
 
 /** Digit odometer roll — intentionally longer than the balance reveal split window. */
 export const BALANCE_ROLL_DURATION_MS = 1000
@@ -9,11 +13,17 @@ export const BALANCE_ROLL_DIGIT_STAGGER_MS = 70
 
 /** Action button enter — keep in sync with BalanceCard.module.css `.actionEnter`. */
 export const BALANCE_ACTION_BUTTON_ENTER_MS = 520
-export const BALANCE_DEPOSIT_BUTTON_ENTER_DELAY_MS = 630
+export const BALANCE_ACTION_BUTTON_STAGGER_MS = 70
+/** First action after the hero card (incl. balance) has landed. */
+export const BALANCE_ACTION_BUTTON_FIRST_DELAY_MS =
+  DASHBOARD_CARD_ENTER_DELAY_MS + DASHBOARD_CARD_ENTER_DURATION_MS
+export const BALANCE_DEPOSIT_BUTTON_ENTER_DELAY_MS = BALANCE_ACTION_BUTTON_FIRST_DELAY_MS
+export const BALANCE_ACTION_BUTTON_LAST_DELAY_MS =
+  BALANCE_ACTION_BUTTON_FIRST_DELAY_MS + BALANCE_ACTION_BUTTON_STAGGER_MS * 3
 
-/** Tooltip appears shortly after the deposit button finishes entering. */
+/** Banner after the last action button finishes entering. */
 export const DASHBOARD_TOOLTIP_ENTER_DELAY_MS =
-  BALANCE_DEPOSIT_BUTTON_ENTER_DELAY_MS + BALANCE_ACTION_BUTTON_ENTER_MS + 180
+  BALANCE_ACTION_BUTTON_LAST_DELAY_MS + BALANCE_ACTION_BUTTON_ENTER_MS + 180
 
 /** Keep in sync with ArmadaAppDashboard.module.css `.tooltipEnter` duration. */
 export const DASHBOARD_TOOLTIP_ENTER_MS = 360
@@ -25,7 +35,7 @@ export const PROMO_BANNER_HANDOFF_MS = 360
 export const SHIELD_TO_EARN_PAUSE_MS = 280
 
 /** Keep in sync with BalanceCard.module.css `.vaultPositionEnter`. */
-export const VAULT_POSITION_ENTER_DELAY_MS = 820
+export const VAULT_POSITION_ENTER_DELAY_MS = BALANCE_ACTION_BUTTON_FIRST_DELAY_MS
 export const VAULT_POSITION_ENTER_DURATION_MS = 420
 export const VAULT_POSITION_ENTER_SETTLE_MS =
   VAULT_POSITION_ENTER_DELAY_MS + VAULT_POSITION_ENTER_DURATION_MS
@@ -91,14 +101,16 @@ export function vaultBannerAfterWithdrawMs(formattedBalance: string): number {
 }
 
 export function activityRevealDelayAfterIntroMs(): number {
-  return BALANCE_REVEAL_DELAY_MS + BALANCE_REVEAL_DURATION_MS + ACTIVITY_REVEAL_BUFFER_MS
+  return (
+    BALANCE_ACTION_BUTTON_LAST_DELAY_MS + BALANCE_ACTION_BUTTON_ENTER_MS + ACTIVITY_REVEAL_BUFFER_MS
+  )
 }
 
 export function activityRevealDelayAfterPromoMs(): number {
   return DASHBOARD_TOOLTIP_ENTER_DELAY_MS + DASHBOARD_TOOLTIP_ENTER_MS + ACTIVITY_REVEAL_BUFFER_MS
 }
 
-/** Page-load cascade: activity is last, after the balance and promo banner. Later reveals use 0. */
+/** Page-load cascade: hero → actions → banner → activity. Later reveals use 0. */
 export function dashboardActivityEnterDelayMs(hasPromoBanner: boolean, isInitialPaint: boolean): number {
   if (!isInitialPaint) return 0
   const afterIntro = activityRevealDelayAfterIntroMs()

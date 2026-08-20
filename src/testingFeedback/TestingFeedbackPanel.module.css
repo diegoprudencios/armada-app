@@ -30,7 +30,7 @@
   color: var(--tf-text);
   border: calc(var(--primitives-borderWidth-default) * 1px) solid var(--tf-border);
   font-family: var(--tf-font);
-  max-height: min(88dvh, calc(100dvh - var(--mobile-safe-area-top, 0px) - var(--primitives-spacing-5)));
+  max-height: min(var(--semantic-size-sheet-max), calc(100dvh - var(--mobile-safe-area-top, 0px) - var(--primitives-spacing-5)));
 }
 
 /* Desktop: side sheet */

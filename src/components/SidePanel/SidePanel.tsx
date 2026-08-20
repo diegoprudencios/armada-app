@@ -89,7 +89,7 @@ export function SidePanel({
               {title}
             </h2>
             <button type="button" className={styles.closeButton} aria-label="Close" onClick={onClose}>
-              <XMarkIcon width={20} height={20} strokeWidth={2} />
+              <XMarkIcon className={styles.closeIcon} strokeWidth={2} />
             </button>
           </div>
         ) : null}

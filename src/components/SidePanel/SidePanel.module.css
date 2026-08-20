@@ -77,6 +77,11 @@
   outline-offset: calc(var(--primitives-spacing-1) * 1px);
 }
 
+.closeIcon {
+  width: var(--primitives-spacing-5);
+  height: var(--primitives-spacing-5);
+}
+
 .body {
   flex: 1;
   min-height: 0;
