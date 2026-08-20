@@ -9,7 +9,13 @@
   color: var(--semantic-color-brand-deep);
 }
 
-.fullDeep svg {
+.markInk,
+.fullInk {
+  color: var(--semantic-color-brand-ink);
+}
+
+.fullDeep svg,
+.fullInk svg {
   display: block;
 }
 

@@ -1,8 +1,50 @@
 .panel {
   width: min(100%, calc(var(--primitives-spacing-20) * 5 - var(--primitives-spacing-5)));
-  --side-panel-chrome-inline: var(--primitives-spacing-3);
+  --side-panel-chrome-inline: 0px;
 }
 
-.toolbar {
-  padding-inline: var(--primitives-spacing-3);
+.sheetHeader {
+  padding-top: var(--primitives-spacing-5);
+}
+
+.sheetHeader :global(h2),
+.panelHeader :global(h2) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panelHeader {
+  padding-top: calc(var(--primitives-spacing-8) + var(--mobile-safe-area-top));
+}
+
+.activitySheet {
+  height: min(88dvh, calc(100dvh - var(--mobile-safe-area-top) - var(--primitives-spacing-5)));
+}
+
+.activitySheetBody,
+.panelBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chrome {
+  flex-shrink: 0;
+  padding-bottom: var(--primitives-spacing-4);
+  border-bottom: calc(var(--primitives-borderWidth-default) * 1px) solid
+    var(--semantic-color-border-default);
+}
+
+.listRegion {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-top: var(--primitives-spacing-4);
 }

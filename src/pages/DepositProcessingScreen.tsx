@@ -12,7 +12,7 @@ export interface DepositProcessingScreenProps {
   armadaAddress?: string
   confirmedAt: number
   confirmed?: boolean
-  /** Mobile keypad: full-bleed gradient processing layout. */
+  /** Mobile keypad: full-bleed processing shell, details docked at bottom. */
   keypadMobileLayout?: boolean
   onComplete: () => void
   onViewExplorer?: () => void

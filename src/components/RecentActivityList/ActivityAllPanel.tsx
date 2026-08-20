@@ -54,33 +54,54 @@ export function ActivityAllPanel({
 
   const list = (
     <>
-      <div className={panelStyles.toolbar}>
+      <div className={panelStyles.chrome}>
         <ActivityTxHashSearch value={hashQuery} onChange={setHashQuery} />
         <ActivityKindFilters value={kindFilter} onChange={setKindFilter} />
       </div>
-      {showFilterEmpty ? (
-        <p className={searchStyles.searchEmpty}>No transactions match your filters.</p>
-      ) : (
-        <RecentActivityList
-          variant="full"
-          items={filteredItems}
-          balanceRevealed={balanceRevealed}
-          onItemClick={handleItemClick}
-        />
-      )}
+      <div
+        className={panelStyles.listRegion}
+        role="region"
+        tabIndex={0}
+        aria-label="Filtered activity"
+      >
+        {showFilterEmpty ? (
+          <p className={searchStyles.searchEmpty}>No transactions match your filters.</p>
+        ) : (
+          <RecentActivityList
+            variant="full"
+            items={filteredItems}
+            balanceRevealed={balanceRevealed}
+            onItemClick={handleItemClick}
+          />
+        )}
+      </div>
     </>
   )
 
   if (isMobile) {
     return (
-      <BottomSheet open={open} onClose={onClose} title="Recent activity">
+      <BottomSheet
+        open={open}
+        onClose={onClose}
+        title="Recent activity"
+        headerClassName={panelStyles.sheetHeader}
+        sheetClassName={panelStyles.activitySheet}
+        bodyClassName={panelStyles.activitySheetBody}
+      >
         {list}
       </BottomSheet>
     )
   }
 
   return (
-    <SidePanel open={open} onClose={onClose} title="Recent activity" panelClassName={panelStyles.panel}>
+    <SidePanel
+      open={open}
+      onClose={onClose}
+      title="Recent activity"
+      panelClassName={panelStyles.panel}
+      headerClassName={panelStyles.panelHeader}
+      bodyClassName={panelStyles.panelBody}
+    >
       {list}
     </SidePanel>
   )

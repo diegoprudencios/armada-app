@@ -1,3 +1,4 @@
+import { SegmentedControl } from '@/components/SegmentedControl'
 import type { DashboardActivityKind } from '@/constants/dashboardActivity'
 import styles from './ActivityKindFilters.module.css'
 
@@ -19,26 +20,20 @@ const FILTERS: Array<{ id: ActivityKindFilter; label: string }> = [
 export interface ActivityKindFiltersProps {
   value: ActivityKindFilter
   onChange: (value: ActivityKindFilter) => void
+  surface?: 'frost' | 'tint' | 'raised'
 }
 
-export function ActivityKindFilters({ value, onChange }: ActivityKindFiltersProps) {
+export function ActivityKindFilters({ value, onChange, surface = 'raised' }: ActivityKindFiltersProps) {
   return (
-    <div className={styles.root} role="tablist" aria-label="Filter by transaction type">
-      {FILTERS.map((filter) => {
-        const isActive = value === filter.id
-        return (
-          <button
-            key={filter.id}
-            type="button"
-            className={[styles.filterBtn, isActive && styles.filterBtnActive].filter(Boolean).join(' ')}
-            onClick={() => onChange(filter.id)}
-            role="tab"
-            aria-selected={isActive}
-          >
-            {filter.label}
-          </button>
-        )
-      })}
-    </div>
+    <SegmentedControl
+      className={styles.root}
+      options={FILTERS}
+      value={value}
+      onChange={onChange}
+      size="sm"
+      layout="scroll"
+      surface={surface}
+      aria-label="Filter by transaction type"
+    />
   )
 }

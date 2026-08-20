@@ -46,6 +46,10 @@
   color: var(--semantic-color-text-primary);
 }
 
+:global([data-theme='dark']) .iconBadge {
+  background: var(--semantic-color-surface-bg);
+}
+
 .icon {
   width: var(--primitives-spacing-5);
   height: var(--primitives-spacing-5);

@@ -1,4 +1,5 @@
 import { ArmadaLogo } from '@/components/ArmadaLogo'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { WalletButton } from '@/components/WalletButton'
 import { WalletPillMenu } from '@/components/WalletPillMenu'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
@@ -6,8 +7,6 @@ import type { DepositChainId } from '@/constants/depositChains'
 import type { DemoWalletProvider } from '@/constants/demoWallets'
 import type { ConnectedWallet } from '@/utils/walletMenu'
 import styles from './DashboardHeader.module.css'
-
-const DASHBOARD_LIGHT_LOGO_SRC = `${import.meta.env.BASE_URL}armada-logo-dashboard-light.png`
 
 export interface DashboardHeaderProps {
   wallets: readonly ConnectedWallet[]
@@ -39,28 +38,20 @@ export function DashboardHeader({
         {isMobile ? (
           <>
             <ArmadaLogo className={`${styles.logoFullMobile} ${styles.logoDark}`} />
-            <img
+            <ArmadaLogo
+              markTone="ink"
               className={`${styles.logoFullMobile} ${styles.logoLight}`}
-              src={DASHBOARD_LIGHT_LOGO_SRC}
-              alt="Armada"
-              width={149}
-              height={36}
             />
           </>
         ) : (
           <>
             <ArmadaLogo className={`${styles.logoFull} ${styles.logoDark}`} />
-            <img
-              className={`${styles.logoFull} ${styles.logoLight}`}
-              src={DASHBOARD_LIGHT_LOGO_SRC}
-              alt="Armada"
-              width={132}
-              height={32}
-            />
+            <ArmadaLogo markTone="ink" className={`${styles.logoFull} ${styles.logoLight}`} />
           </>
         )}
       </div>
       <div className={styles.wallet}>
+        <ThemeToggle />
         {wallets.length > 0 ? (
           <WalletPillMenu
             wallets={wallets}

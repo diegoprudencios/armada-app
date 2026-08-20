@@ -96,12 +96,14 @@
 
   .tooltipHandoffEnter {
     grid-template-rows: 1fr;
+    max-height: none;
     margin-block-start: 0;
   }
 
   .tooltipHandoffExit {
     opacity: 0;
     grid-template-rows: 0fr;
+    max-height: 0;
   }
 }
 
@@ -166,16 +168,23 @@
   opacity: 1;
 }
 
+.tooltipHandoffEnter,
+.tooltipHandoffExit {
+  overflow: hidden;
+}
+
 @keyframes dashboardTooltipHandoffExit {
   from {
     opacity: 1;
     grid-template-rows: 1fr;
+    max-height: calc(var(--primitives-spacing-24) * 2);
     margin-block-start: 0;
   }
 
   to {
     opacity: 0;
     grid-template-rows: 0fr;
+    max-height: 0;
     margin-block-start: calc(-1 * var(--dashboard-promo-gap));
   }
 }
@@ -183,12 +192,14 @@
   from {
     opacity: 0;
     grid-template-rows: 0fr;
+    max-height: 0;
     margin-block-start: calc(-1 * var(--dashboard-promo-gap));
   }
 
   to {
     opacity: 1;
     grid-template-rows: 1fr;
+    max-height: calc(var(--primitives-spacing-24) * 2);
     margin-block-start: 0;
   }
 }

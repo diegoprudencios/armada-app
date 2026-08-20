@@ -121,6 +121,16 @@ export function activityRevealDelayAfterFirstShieldMs(formattedBalance: string):
   )
 }
 
+/** After a vault deposit: wait for the earn banner to collapse, then reveal the new activity row. */
+export function activityRevealDelayAfterVaultDepositMs(formattedBalance: string): number {
+  if (prefersReducedMotion()) return 80
+  return (
+    vaultBannerAfterDepositMs(formattedBalance) +
+    PROMO_BANNER_HANDOFF_MS +
+    ACTIVITY_REVEAL_BUFFER_MS
+  )
+}
+
 export function activityRevealDelayAfterRollMs(formattedBalance: string): number {
   return balanceRollSettleMs(formattedBalance) + ACTIVITY_REVEAL_BUFFER_MS
 }

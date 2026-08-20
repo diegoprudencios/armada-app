@@ -3,7 +3,6 @@ import type { DepositChainId } from '@/constants/depositChains'
 import buttonStyles from '@/components/Button/Button.module.css'
 import { SIDE_PANEL_EXIT_MS } from '@/components/SidePanel'
 import { WalletMenuShell } from '@/components/WalletMenuPanel'
-import { BOTTOM_SHEET_EXIT_MS } from '@/components/BottomSheet'
 import { useMobileLayout } from '@/hooks/useMobileLayout'
 import type { DemoWalletProvider } from '@/constants/demoWallets'
 import { truncateAddress } from '@/utils/format'
@@ -79,7 +78,12 @@ export function WalletPillMenu({
   }, [pillHidden, panelOpen])
 
   function openMenu() {
-    if (pillHidden || panelOpen) return
+    if (panelOpen) return
+    if (isMobile) {
+      setPanelOpen(true)
+      return
+    }
+    if (pillHidden) return
     clearTimers()
     setPillHidden(true)
     openTimerRef.current = window.setTimeout(() => {
@@ -91,7 +95,11 @@ export function WalletPillMenu({
   function closeMenu() {
     clearTimers()
     setPanelOpen(false)
-    const restoreDelay = fadeDelayMs() === 0 ? 0 : isMobile ? BOTTOM_SHEET_EXIT_MS : SIDE_PANEL_EXIT_MS
+    if (isMobile) {
+      setPillHidden(false)
+      return
+    }
+    const restoreDelay = fadeDelayMs() === 0 ? 0 : SIDE_PANEL_EXIT_MS
     closeTimerRef.current = window.setTimeout(() => {
       setPillHidden(false)
       closeTimerRef.current = null

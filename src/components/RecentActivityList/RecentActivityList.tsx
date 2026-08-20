@@ -103,11 +103,28 @@ interface ActivityListItemsProps {
 function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityListItemsProps) {
   const isMobile = useMobileLayout()
   const [peekedId, setPeekedId] = useState<string | null>(null)
+  const [enteringId, setEnteringId] = useState<string | null>(null)
+  const seenFirstIdRef = useRef<string | null>(null)
+  const skipEnterRef = useRef(true)
+
+  useEffect(() => {
+    const firstId = items[0]?.id ?? null
+    if (skipEnterRef.current) {
+      skipEnterRef.current = false
+      seenFirstIdRef.current = firstId
+      return
+    }
+    if (firstId && firstId !== seenFirstIdRef.current) {
+      setEnteringId(firstId)
+      seenFirstIdRef.current = firstId
+    }
+  }, [items])
 
   return (
     <ul className={styles.list}>
       {items.map((item) => {
         const Icon = ACTIVITY_ICONS[item.kind]
+        const displayLabel = activityDisplayLabel(item)
         const amountLabel = formatActivityAmount(item)
         const itemRevealed = balanceRevealed || peekedId === item.id
         const amountTone = activityAmountTone(item, itemRevealed)
@@ -122,7 +139,9 @@ function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityList
           <li key={item.id}>
             <button
               type="button"
-              className={styles.item}
+              className={[styles.item, enteringId === item.id ? styles.itemEnter : '']
+                .filter(Boolean)
+                .join(' ')}
               onClick={() => onItemClick?.(item)}
               {...peekHandlers}
             >
@@ -130,7 +149,9 @@ function ActivityListItems({ items, balanceRevealed, onItemClick }: ActivityList
                 <Icon className={styles.icon} strokeWidth={1.5} />
               </span>
               <div className={styles.copy}>
-                <span className={styles.label}>{activityDisplayLabel(item)}</span>
+                <span className={styles.label} title={displayLabel}>
+                  {displayLabel}
+                </span>
                 <span className={styles.time}>{formatActivitySubtitle(item)}</span>
               </div>
               <span

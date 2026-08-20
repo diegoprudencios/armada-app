@@ -14,8 +14,8 @@
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
   background: linear-gradient(
     180deg,
-    var(--semantic-color-frost-raised) 0%,
-    var(--semantic-color-frost) 100%
+    var(--semantic-color-frost-hero-from) 0%,
+    var(--semantic-color-frost-hero-to) 100%
   );
   backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
   -webkit-backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
@@ -128,7 +128,7 @@
   font-weight: var(--primitives-fontWeight-regular);
   font-size: calc(var(--amount-size) * 1px);
   line-height: 1;
-  color: var(--semantic-color-brand-ink);
+  color: var(--semantic-color-text-primary);
   letter-spacing: 0;
   font-variant-numeric: tabular-nums;
 }
@@ -184,7 +184,7 @@
   border-radius: calc(
     (var(--primitives-borderRadius-lg) + var(--primitives-borderRadius-xl)) / 2 * 1px
   );
-  background: var(--semantic-color-frost-hover);
+  background: var(--semantic-color-frost-control);
 }
 
 .linkValue {
@@ -199,7 +199,7 @@
   font-size: calc(var(--primitives-fontSize-base) * 1px);
   font-weight: var(--primitives-fontWeight-regular);
   line-height: var(--primitives-lineHeight-normal);
-  color: var(--semantic-color-brand-ink);
+  color: var(--semantic-color-text-primary);
   text-align: left;
 }
 
@@ -264,7 +264,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .revokeLink:hover {
-    color: var(--semantic-color-brand-ink);
+    color: var(--semantic-color-text-secondary);
   }
 }
 
@@ -337,8 +337,15 @@
 .doneButton {
   width: 100%;
   height: var(--primitives-spacing-12);
-  background: var(--semantic-color-frost-raised);
+  background: var(--semantic-color-frost-control);
   border: calc(var(--primitives-borderWidth-default) * 1px) solid
-    color-mix(in srgb, var(--primitives-color-neutral-50) 14%, transparent);
+    color-mix(in srgb, var(--semantic-color-frost-pigment) 14%, transparent);
   color: var(--semantic-color-text-primary);
+}
+
+@media (max-width: 479px) {
+  .column {
+    padding: var(--primitives-spacing-5);
+    gap: var(--primitives-spacing-8);
+  }
 }

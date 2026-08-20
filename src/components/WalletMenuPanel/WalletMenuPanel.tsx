@@ -95,7 +95,7 @@ export function WalletMenuPanel({
         <div className={styles.walletMenuPanel}>
           {showClose ? (
             <IconButton
-              variant="frosted"
+              variant="tinted"
               size="sm"
               className={styles.panelClose}
               aria-label="Close wallet menu"
@@ -118,6 +118,7 @@ export function WalletMenuPanel({
                   <div className={styles.actionRow}>
                     <BalanceActionButton
                       label={balanceHidden ? 'Show' : 'Hide'}
+                      surface="tint"
                       className={styles.labeledAction}
                       icon={
                         balanceHidden ? (
@@ -130,6 +131,7 @@ export function WalletMenuPanel({
                     />
                     <BalanceActionButton
                       label={copied ? 'Copied' : 'Copy'}
+                      surface="tint"
                       className={styles.labeledAction}
                       icon={
                         copied ? (
@@ -142,6 +144,7 @@ export function WalletMenuPanel({
                     />
                     <BalanceActionButton
                       label="Explorer"
+                      surface="tint"
                       className={styles.labeledAction}
                       icon={<ArrowTopRightOnSquareIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} />}
                       onClick={() => {
@@ -154,6 +157,7 @@ export function WalletMenuPanel({
                     />
                     <BalanceActionButton
                       label="Disconnect"
+                      surface="tint"
                       className={styles.labeledAction}
                       icon={<PowerIcon className={balanceCardStyles.actionIcon} strokeWidth={1.5} />}
                       onClick={() => onDisconnectWallet(wallet.id)}

@@ -1,0 +1,4 @@
+.button .glyph {
+  width: var(--primitives-spacing-4);
+  height: var(--primitives-spacing-4);
+}

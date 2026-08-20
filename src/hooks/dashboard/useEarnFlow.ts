@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { type EarnTab } from '@/pages/earnFlowConstants'
 import { txProcessingSettleDelayMs } from '@/constants/txProcessingTiming'
-import { vaultWithdrawDashboardHoldMs } from '@/components/BalanceCard/balanceRevealMotion'
+import {
+  activityRevealDelayAfterVaultDepositMs,
+  vaultWithdrawDashboardHoldMs,
+} from '@/components/BalanceCard/balanceRevealMotion'
 import { parseActiveAmount } from '@/utils/amountInput'
 import { formatUsdcAmount } from '@/utils/format'
 import { readActivityUserHidden } from '@/utils/demoDashboardSession'
@@ -31,6 +34,7 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
   const balanceSettledRef = useRef(false)
   const settleTimerRef = useRef<number | null>(null)
   const visibleBalanceTimerRef = useRef<number | null>(null)
+  const activityRevealTimerRef = useRef<number | null>(null)
   const earnAmountRef = useRef(earnAmount)
   const earnTabRef = useRef(earnTab)
   earnAmountRef.current = earnAmount
@@ -46,6 +50,12 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
     if (visibleBalanceTimerRef.current == null) return
     window.clearTimeout(visibleBalanceTimerRef.current)
     visibleBalanceTimerRef.current = null
+  }
+
+  function cancelActivityRevealTimer() {
+    if (activityRevealTimerRef.current == null) return
+    window.clearTimeout(activityRevealTimerRef.current)
+    activityRevealTimerRef.current = null
   }
 
   function clearEarnSnapshot() {
@@ -74,7 +84,6 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
     if (!snapshot || snapshot.amount <= 0) return
 
     ledgerSettledRef.current = true
-    activity.prependRecentActivity(createEarnActivity(snapshot.amount, snapshot.tab))
   }
 
   function applyEarnVisibleBalance() {
@@ -104,9 +113,27 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
       vaultFromValue: vaultFrom,
     }))
 
-    if (!readActivityUserHidden()) {
-      activity.scheduleActivityReveal(activity.activityRevealDelayMs())
+    const nextDashboard =
+      snapshot.tab === 'add'
+        ? balances.dashboardBalance - snapshot.amount
+        : balances.dashboardBalance + snapshot.amount
+    const nextVault =
+      snapshot.tab === 'add'
+        ? balances.earningBalance + snapshot.amount
+        : balances.earningBalance - snapshot.amount
+    const rolledLabel = formatUsdcAmount(Math.max(nextDashboard, nextVault))
+    const item = createEarnActivity(snapshot.amount, snapshot.tab)
+    if (readActivityUserHidden()) {
+      activity.prependRecentActivity(item)
+      return
     }
+
+    cancelActivityRevealTimer()
+    activityRevealTimerRef.current = window.setTimeout(() => {
+      activityRevealTimerRef.current = null
+      activity.prependRecentActivity(item)
+      activity.scheduleActivityReveal(0)
+    }, activityRevealDelayAfterVaultDepositMs(rolledLabel))
   }
 
   function armEarnSettlement() {
@@ -132,6 +159,7 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
   function resetEarnUi() {
     cancelSettleTimer()
     cancelVisibleBalanceTimer()
+    cancelActivityRevealTimer()
     clearEarnSnapshot()
     setEarnStepState(null)
     setEarnAmount('')
@@ -143,6 +171,7 @@ export function useEarnFlow({ walletSession, balances, activity }: UseEarnFlowOp
     () => () => {
       cancelSettleTimer()
       cancelVisibleBalanceTimer()
+      cancelActivityRevealTimer()
     },
     [],
   )

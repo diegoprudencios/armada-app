@@ -17,7 +17,7 @@ export interface SendProcessingScreenProps {
   confirmedAt: number
   confirmed?: boolean
   variant?: SendFlowVariant
-  /** Mobile keypad: full-bleed gradient processing layout. */
+  /** Mobile keypad: full-bleed processing shell, details docked at bottom. */
   keypadMobileLayout?: boolean
   onComplete: () => void
   onViewExplorer?: () => void

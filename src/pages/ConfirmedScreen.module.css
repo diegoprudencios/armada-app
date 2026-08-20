@@ -10,8 +10,8 @@
   border-radius: calc(var(--semantic-borderRadius-modal) * 1px);
   background: linear-gradient(
     180deg,
-    var(--semantic-color-frost-raised) 0%,
-    var(--semantic-color-frost) 100%
+    var(--semantic-color-frost-hero-from) 0%,
+    var(--semantic-color-frost-hero-to) 100%
   );
 }
 

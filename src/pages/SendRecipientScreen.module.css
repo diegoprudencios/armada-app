@@ -63,8 +63,8 @@
   padding: var(--primitives-spacing-8);
   background: linear-gradient(
     180deg,
-    var(--semantic-color-frost-raised) 0%,
-    var(--semantic-color-frost) 100%
+    var(--semantic-color-frost-hero-from) 0%,
+    var(--semantic-color-frost-hero-to) 100%
   );
   backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
   -webkit-backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
@@ -147,7 +147,11 @@
 }
 
 .clipboardPaste:hover .clipboardPasteIcon {
-  background: var(--primitives-color-neutral-50);
+  background: var(--semantic-color-frost-pressed);
+}
+
+.clipboardPaste:active .clipboardPasteIcon {
+  background: var(--semantic-color-frost-pressed);
 }
 
 .clipboardPasteIcon {
@@ -520,6 +524,10 @@
   border-radius: calc(var(--semantic-borderRadius-item) * 1px);
   background: color-mix(in srgb, var(--primitives-color-purple-500) 15%, transparent);
   color: var(--semantic-color-text-primary);
+}
+
+:global([data-theme='dark']) .recentIconBadge {
+  background: var(--semantic-color-surface-bg);
 }
 
 .recentIcon {

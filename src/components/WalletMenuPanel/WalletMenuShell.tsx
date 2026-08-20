@@ -53,6 +53,7 @@ export function WalletMenuShell({
         onClose={onClose}
         ariaLabel="Wallet"
         sheetClassName={shellStyles.shellSheet}
+        bodyClassName={shellStyles.shellSheetBody}
         scrimClassName={shellStyles.shellScrim}
       >
         {panel}

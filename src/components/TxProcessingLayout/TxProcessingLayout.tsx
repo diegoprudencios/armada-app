@@ -14,7 +14,7 @@ export interface TxProcessingLayoutProps {
   stages: ReadonlyArray<TxProgressStage>
   activeStageIndex?: number
   completed?: boolean
-  /** Mobile keypad: full-bleed gradient shell, details docked at bottom. */
+  /** Mobile keypad: full-bleed processing shell, details docked at bottom. */
   layout?: TxProcessingLayoutVariant
   className?: string
 }

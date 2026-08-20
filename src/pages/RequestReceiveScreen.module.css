@@ -27,8 +27,8 @@
   padding: var(--primitives-spacing-8);
   background: linear-gradient(
     180deg,
-    var(--semantic-color-frost-raised) 0%,
-    var(--semantic-color-frost) 100%
+    var(--semantic-color-frost-hero-from) 0%,
+    var(--semantic-color-frost-hero-to) 100%
   );
   backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));
   -webkit-backdrop-filter: blur(calc(var(--primitives-spacing-24) * 3 + var(--primitives-spacing-3)));

@@ -20,3 +20,7 @@
   overflow-x: clip;
   max-width: 100%;
 }
+
+.shellSheet .shellSheetBody {
+  padding-bottom: calc(var(--primitives-spacing-8) + var(--mobile-safe-area-bottom, 0px));
+}
