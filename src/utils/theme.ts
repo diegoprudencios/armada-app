@@ -4,7 +4,7 @@ export const THEME_TRANSITION_MS = 320
 
 export type Theme = 'light' | 'dark'
 
-/** Default when the user has not chosen. Dark is available on this preview branch. */
+/** Default when the user has not chosen. Dark exists in tokens; the toggle is hidden for now. */
 export const DEFAULT_THEME: Theme = 'light'
 
 export function isTheme(value: string | null): value is Theme {
@@ -68,5 +68,7 @@ export function setTheme(theme: Theme, options?: { animate?: boolean }): void {
 }
 
 export function initTheme(): void {
-  setTheme(themeFromQuery() ?? getSavedTheme() ?? DEFAULT_THEME, { animate: false })
+  // Ignore saved / query theme while the product toggle is hidden, so visitors
+  // are not stuck in dark with no control.
+  setTheme(DEFAULT_THEME, { animate: false })
 }
