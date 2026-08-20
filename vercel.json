@@ -10,7 +10,8 @@
     { "src": "^/systemdocs/?$", "dest": "/systemdocs.html" },
     { "src": "^/dashboard/?$", "dest": "/dashboard.html" },
     { "src": "^/deposit/?$", "dest": "/dashboard.html" },
-    { "src": "^/showcase/?$", "dest": "/index.html" },
+    { "src": "^/landing/?$", "dest": "/landing.html" },
+    { "src": "^/showcase/?$", "dest": "/landing.html" },
     { "src": "^/$", "dest": "/index.html" }
   ]
 }

@@ -62,7 +62,7 @@ function IntegrateCta({ className }: { className?: string }) {
 export interface MarketingHeroProps {
   /**
    * Sticky scroll-exit: intro + USDC drift apart, hero image dissolves
-   * into the section below. Desktop `/homepage` only — mobile is a normal hero.
+   * into the section below. Desktop `/` homepage only — mobile is a normal hero.
    */
   scrollExit?: boolean
 }

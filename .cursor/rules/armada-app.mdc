@@ -37,6 +37,6 @@ Never hand-edit `typography.css` or `variants.ts`. After changing `semantic.typo
 
 ## Dev
 
-- `npm run dev` → http://localhost:5177/
+- `npm run dev` → http://localhost:5177/ (marketing homepage)
 - App dashboard → http://localhost:5177/dashboard.html (prod: `/dashboard`)
 - `npm run build` → `npm run tokens:typography && tsc && vite build`

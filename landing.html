@@ -19,26 +19,8 @@
         document.documentElement.setAttribute('data-theme', theme);
       })();
     </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <!-- Keep this hex in sync with --semantic-color-brand-amber in
-    theme-overrides.css. Can't reference the CSS variable here since this
-    renders before stylesheets load. -->
-    <meta name="theme-color" content="#f8d197" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <!-- Keep this hex in sync with --semantic-color-brand-amber in
-    theme-overrides.css. Can't reference the CSS variable here since this
-    renders before stylesheets load. -->
-    <style>
-      /* Overscroll + gap behind the iOS bottom toolbar (body surface is otherwise white). */
-      html,
-      body {
-        background-color: #f8d197;
-      }
-    </style>
-    <meta
-      name="description"
-      content="Armada — pluggable privacy infrastructure for stablecoins. Protects USDC balances for on-chain asset managers and private capital platforms."
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Armada — asset privacy infrastructure for USDC." />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon-light.ico" sizes="any" media="(prefers-color-scheme: light)" />
     <link rel="icon" href="/favicon-dark.ico" sizes="any" media="(prefers-color-scheme: dark)" />
@@ -54,10 +36,10 @@
       href="https://fonts.googleapis.com/css2?family=Charis+SIL:wght@400;700&family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap"
       rel="stylesheet"
     />
-    <title>Armada — Pluggable privacy infrastructure for stablecoins</title>
+    <title>Armada — Asset privacy infrastructure</title>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main-homepage.tsx"></script>
+    <script type="module" src="/src/main-landing.tsx"></script>
   </body>
 </html>

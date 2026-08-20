@@ -18,6 +18,7 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, 'index.html'),
         homepage: resolve(__dirname, 'homepage.html'),
+        landing: resolve(__dirname, 'landing.html'),
         dashboard: resolve(__dirname, 'dashboard.html'),
         payViaLink: resolve(__dirname, 'pay-via-link.html'),
         systemdocs: resolve(__dirname, 'systemdocs.html'),

@@ -428,7 +428,7 @@ not documented yet in ARMADA_DESIGN_SYSTEM.md or armada-project.mdc
             <p className={styles.meta}>Landing stack, Button, QR, frost/raised on a product page.</p>
             <iframe className={styles.iframe} title="Pay via link" src="/pay-via-link.html" />
             <h3 className={styles.subTitle}>App intro</h3>
-            <p className={styles.meta}>LandingHero / intro entry (`index.html`).</p>
+            <p className={styles.meta}>Marketing homepage (`index.html` / `/`).</p>
             <iframe className={styles.iframe} title="App intro" src="/index.html" />
           </section>
 
