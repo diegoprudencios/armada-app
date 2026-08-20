@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run tokens:sync && tsc && vite build",
+    "build": "npm run tokens:typography && tsc && vite build",
     "preview": "vite preview",
-    "tokens:sync": "node scripts/sync-tokens.mjs"
+    "tokens:typography": "node scripts/build-typography.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

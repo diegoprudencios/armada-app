@@ -1,4 +1,4 @@
-/* AUTO-GENERATED — run: npm run tokens */
+/* App-owned primitives + semantic colors. Edit here (or Token Studio JSON, then keep this file in sync). */
 [data-theme="dark"] {
   /* Primitives */
   --primitives-color-purple-50: #f5eefb;

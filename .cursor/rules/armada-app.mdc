@@ -9,22 +9,25 @@ alwaysApply: true
 
 ## Required workflow
 
-1. **Read** `../armada-crowdfund/ARMADA_DESIGN_SYSTEM.md` before writing or editing UI.
+1. **Verify token names** in `src/styles/tokens.css` before writing or editing UI.
 2. **Follow `accessibility-a11y.mdc`** — strictly apply [A11Y.md](https://github.com/fecarrico/A11Y.md/blob/main/docs/en/A11Y.md) for all frontend work.
-3. **Never hardcode** hex colors, raw `px` spacing/sizing, or font sizes — use CSS custom properties from `src/styles/tokens.css`.
-4. **Verify token names** in `src/styles/tokens.css` before using any `var(--…)`.
-5. **Run `npm run build`** before marking any task complete.
+3. **Never hardcode** hex colors, raw `px` spacing/sizing, or font sizes — use CSS custom properties from `src/styles/tokens.css`. App-only roles live in `src/styles/theme-overrides.css`.
+4. **Run `npm run build`** before marking any task complete.
 
 ## Tokens
 
+This repo owns tokens and typography. Do not copy or overwrite them from another project.
+
 | File | Role |
 |------|------|
-| `src/tokens/armada-tokens.json` | Token Studio source (synced from armada-crowdfund) |
-| `src/constants/depositChains.ts` | `DepositChainId` type + network icons (app-owned) |
-| `src/styles/tokens.css` | Primitives + semantic colors (synced from armada-crowdfund) |
-| `src/styles/typography.css` | Composite typography classes (synced from armada-poc `@armada/ui`) |
+| `src/tokens/armada-tokens.json` | Token Studio source (edit `semantic.typography` composites here) |
+| `src/styles/tokens.css` | Primitives + semantic colors (hand-maintained with the JSON) |
+| `src/styles/theme-overrides.css` | App-only roles (frost, overlays, theme motion, sheet max) |
+| `src/styles/typography.css` | Generated composites — `npm run tokens:typography` |
+| `src/typography/variants.ts` | Generated `TypographyVariant` — same command |
+| `src/constants/depositChains.ts` | `DepositChainId` type + network icons |
 
-After token changes in sibling repos, run `npm run tokens:sync` (also runs automatically before `npm run build`).
+Never hand-edit `typography.css` or `variants.ts`. After changing `semantic.typography` in JSON, run `npm run tokens:typography`.
 
 ## Styling
 
@@ -34,7 +37,6 @@ After token changes in sibling repos, run `npm run tokens:sync` (also runs autom
 
 ## Dev
 
-- `npm run dev` → http://localhost:5177/ (app intro landing)
-- Marketing site → http://localhost:5177/homepage.html (prod: `/homepage`)
+- `npm run dev` → http://localhost:5177/
 - App dashboard → http://localhost:5177/dashboard.html (prod: `/dashboard`)
-- `npm run build` → `npm run tokens:sync && tsc && vite build`
+- `npm run build` → `npm run tokens:typography && tsc && vite build`
